@@ -60,6 +60,9 @@ export default function Login({
       </Link>
 
       <form className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
+        <p className="text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center">
+          Sign Up
+        </p>
         <label className="text-md" htmlFor="email">
           Email
         </label>
