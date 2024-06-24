@@ -21,7 +21,9 @@ export default function Login({
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      const errorMsg = error.message;
+      console.error("Could not authenticate user:", error);
+      return redirect("/login?message=Could not authenticate user: " + errorMsg);
     }
 
     return redirect("/protected");
