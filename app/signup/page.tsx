@@ -30,7 +30,9 @@ export default function Login({
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      const errorMsg = error.message;
+      console.error("Could not authenticate user:", error);
+      return redirect("/login?message=Could not authenticate user: " + errorMsg);
     }
 
     return redirect("/login?message=Please check your inbox for a confirmation email! If not found, please contact us at creative.contact.vn@gmail.com");
