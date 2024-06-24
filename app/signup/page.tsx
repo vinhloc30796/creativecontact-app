@@ -33,7 +33,7 @@ export default function Login({
       return redirect("/login?message=Could not authenticate user");
     }
 
-    return redirect("/login?message=Check email to continue sign in process");
+    return redirect("/login?message=Please check your inbox for a confirmation email! If not found, please contact us at creative.contact.vn@gmail.com");
   };
 
   return (
