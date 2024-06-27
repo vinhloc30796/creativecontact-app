@@ -66,7 +66,7 @@ export function PasswordFields() {
       hasNumber: /[0-9]/.test(password),
       passwordsMatch: password === confirmPassword
     }
-    console.log(passwordStrength)
+    // console.log(passwordStrength)
     setPasswordStrength(passwordStrength)
   }
 
