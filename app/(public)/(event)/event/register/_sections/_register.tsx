@@ -1,18 +1,20 @@
 import styles from './_register.module.scss'
 import { cn } from '@/lib/utils'
 import RegisterWrapper from './wrapper'
-import RegisterForm from './form'
+import EventSlotsFetcher from './EventSlotsFetcher'
 
-interface RegisterPageProps {}
+interface RegisterPageProps {
+  eventId: string; // Add this prop to receive the event ID
+}
 
-const RegisterPage: React.FC<RegisterPageProps> = () => {
-	return (
-		<div className={cn('min-h-screen container flex items-center justify-center', styles.container)}>
-			<RegisterWrapper>
-				<RegisterForm />
-			</RegisterWrapper>
-		</div>
-	)
+const RegisterPage: React.FC<RegisterPageProps> = async ({ eventId }) => {
+  return (
+    <div className={cn('min-h-screen container flex items-center justify-center', styles.container)}>
+      <RegisterWrapper>
+        <EventSlotsFetcher eventId={eventId} />
+      </RegisterWrapper>
+    </div>
+  )
 }
 
 export default RegisterPage
