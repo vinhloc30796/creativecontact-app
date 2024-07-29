@@ -163,7 +163,10 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 	return (
 		<Form {...form}>
 			<form onSubmit={handleSubmit} className={cn('flex flex-col gap-2', styles.form)}>
-				<div className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}>
+				<div
+					className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
+					style={{ backgroundColor: '#F6EBE4' }}
+				>
 					<h2 className="text-2xl font-semibold">{currentStep.title}</h2>
 					<p>{currentStep.description}</p>
 				</div>

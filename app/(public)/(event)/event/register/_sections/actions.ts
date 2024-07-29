@@ -194,30 +194,52 @@ export async function signInAnonymously() {
 	return data.user
 }
 
-export async function confirmRegistration(signature: string): Promise<{ success: boolean; error?: string }> {
-	const cookieStore = cookies()
+export async function confirmRegistration(signature: string) {
 	const supabase = createClient()
 
-	const { data, error } = await supabase.from('event_registrations').update({ status: 'confirmed' }).match({ signature: signature, status: 'unconfirmed' }).select()
+	// Start a transaction
+	const { data: registration, error: fetchError } = await supabase.from('event_registrations').select('*').eq('signature', signature).single()
 
-	if (error) {
-		console.error('Error confirming registration:', error)
-		return { success: false, error: error.message }
+	if (fetchError) {
+		console.error('Failed to fetch registration:', fetchError)
+		return { success: false, error: 'Failed to fetch registration' }
 	}
 
-	if (data && data.length > 0) {
-		// Fetch the slot details
-		const { data: slotData, error: slotError } = await supabase.from('event_slots').select('*').eq('id', data[0].slot).single()
+	if (!registration) {
+		return { success: false, error: 'Registration not found' }
+	}
 
-		if (slotError) {
-			console.error('Error fetching slot details:', slotError)
-			return { success: false, error: slotError.message }
+	if (registration.status === 'confirmed') {
+		return { success: false, error: 'Registration already confirmed' }
+	}
+
+	// Update the registration status
+	const { error: updateError } = await supabase.from('event_registrations').update({ status: 'confirmed' }).eq('signature', signature)
+
+	if (updateError) {
+		console.error('Failed to confirm registration:', updateError)
+		return { success: false, error: 'Failed to confirm registration' }
+	}
+
+	// If the registration was created by a user, update their email
+	if (registration.created_by) {
+		const { data: userData, error: userError } = await supabase.auth.admin.getUserById(registration.created_by)
+
+		if (userError) {
+			console.error('Failed to fetch user:', userError)
+			// We don't return here because the registration is confirmed, even if email update fails
+		} else if (userData && userData.user) {
+			// Check if the user is anonymous (you might need to adjust this condition based on how you identify anonymous users)
+			if (userData.user.email === null || userData.user.email === '') {
+				const { error: authUpdateError } = await supabase.auth.admin.updateUserById(registration.created_by, { email: registration.email })
+
+				if (authUpdateError) {
+					console.error('Failed to update user email:', authUpdateError)
+					// We don't return here because the registration is confirmed, even if email update fails
+				}
+			}
 		}
-
-		// Send confirmation email with ICS file
-		await sendConfirmationEmailWithICSAndQR(data[0].email, data[0], slotData, data[0].qr_code)
-		return { success: true }
-	} else {
-		return { success: false, error: 'Invalid or expired signature' }
 	}
+
+	return { success: true }
 }

@@ -13,7 +13,7 @@ const RegisterWrapper: React.FC<RegisterWrapperProps> = ({ children }) => {
 			<CardHeader
 				className="border-b aspect-video bg-accent-foreground text-accent-foreground"
 				style={{
-					backgroundImage: 'url(/bg.jpg)',
+					backgroundImage: 'url(/banner.jpg)',
 					backgroundSize: 'cover',
 				}}
 			></CardHeader>

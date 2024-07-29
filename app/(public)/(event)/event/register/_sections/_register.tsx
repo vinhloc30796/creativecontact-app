@@ -10,7 +10,7 @@ interface RegisterPageProps {
 
 const RegisterPage = ({ eventSlots }: RegisterPageProps) => {
 	return (
-		<div className={cn('min-h-screen container flex items-center justify-center', styles.container)}>
+		<div className={cn('min-h-screen flex items-center justify-center', styles.container)}>
 			<RegisterWrapper>
 				<RegistrationForm initialEventSlots={eventSlots} />
 			</RegisterWrapper>

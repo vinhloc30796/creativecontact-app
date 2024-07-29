@@ -1,5 +1,4 @@
 import { confirmRegistration } from '@/app/(public)/(event)/event/register/_sections/actions'
-import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -16,7 +15,9 @@ export async function GET(request: Request) {
 		// Redirect to a confirmation success page
 		return NextResponse.redirect(new URL('/registration-confirmed', request.url))
 	} else {
-		// Redirect to an error page
-		return NextResponse.redirect(new URL('/registration-error', request.url))
+		// Redirect to an error page with the error message
+		const errorUrl = new URL('/registration-error', request.url)
+		errorUrl.searchParams.set('error', result.error || 'Unknown error')
+		return NextResponse.redirect(errorUrl)
 	}
 }
