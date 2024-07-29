@@ -24,7 +24,7 @@ export async function getRegistrationsForSlots(slotIds: string[]): Promise<Event
 	return data as EventRegistration[]
 }
 
-export async function createRegistration(
+export async function oldcreateRegistration(
 	formData: FormData & { created_by: string | null; is_anonymous: boolean }
 ): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'unconfirmed' }> {
 	const cookieStore = cookies()
@@ -238,4 +238,45 @@ export async function confirmRegistration(signature: string) {
 	}
 
 	return { success: true }
+}
+
+export async function checkExistingRegistration(email: string): Promise<EventRegistration | null> {
+	const supabase = createClient()
+
+	const { data, error } = await supabase.from('event_registrations').select('*').eq('email', email).in('status', ['confirmed', 'unconfirmed']).order('created_at', { ascending: false }).limit(1)
+
+	if (error) {
+		console.error('Error checking existing registration:', error)
+		return null
+	}
+
+	return data[0] || null
+}
+
+export async function createRegistration(
+	formData: FormData & { created_by: string | null; is_anonymous: boolean; existingRegistrationId?: string }
+): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'unconfirmed' }> {
+	const supabase = createClient()
+
+	// Start a transaction
+	const { data, error } = await supabase.rpc('submit_registration', {
+		form_data: {
+			slot: formData.slot,
+			email: formData.email,
+			name: `${formData.lastName} ${formData.firstName}`,
+			phone: formData.phone,
+			created_by: formData.created_by,
+			is_anonymous: formData.is_anonymous,
+		},
+		existing_registration_id: formData.existingRegistrationId,
+	})
+
+	if (error) {
+		console.error('Error creating registration:', error)
+		return { success: false, error: error.message, status: 'unconfirmed' }
+	}
+
+	const isAuthenticated = !formData.is_anonymous
+
+	return { success: true, status: isAuthenticated ? 'confirmed' : 'unconfirmed' }
 }

@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import styles from './_register.module.scss'
 import { formSchema, FormData } from './formSchema'
-import { EventSlot } from './types'
+import { EventSlot, EventRegistration } from './types'
 import { ContactInfoStep } from './ContactInfoStep'
 import { DateSelectionStep } from './DateSelectionStep'
 import { ConfirmationStep } from './ConfirmationStep'
+import { EmailExistedStep } from './EmailExistedStep'
 import { ConfirmationPage } from './ConfirmationPage'
-import { createRegistration, signInAnonymously } from './actions'
+import { createRegistration, signInAnonymously, checkExistingRegistration } from './actions'
 import { createClient } from '@/utils/supabase/client'
 
 interface RegistrationFormProps {
@@ -29,6 +30,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const [registrationStatus, setRegistrationStatus] = useState<'none' | 'confirmed' | 'unconfirmed'>('none')
+	const [existingRegistration, setExistingRegistration] = useState<EventRegistration | null>(null)
 
 	const supabase = createClient()
 
@@ -108,10 +110,30 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 		e.preventDefault()
 		const isStepValid = await validateStep()
 		if (isStepValid) {
+			if (formStep === 0) {
+				// Check for existing registration after email is entered
+				const email = form.getValues('email')
+				const existing = await checkExistingRegistration(email)
+				if (existing) {
+					setExistingRegistration(existing)
+					return // Don't proceed to next step yet
+				}
+			}
 			setFormStep((prev) => Math.min(steps.length - 1, prev + 1))
 		} else {
 			console.log('Validation failed:', form.formState.errors)
 		}
+	}
+
+	const handleConfirmNewRegistration = () => {
+		setExistingRegistration(null)
+		setFormStep(1) // Move to date selection step
+	}
+
+	const handleKeepExistingRegistration = () => {
+		setExistingRegistration(null)
+		setFormStep(0) // Go back to contact info step
+		form.reset() // Reset the form
 	}
 
 	const handleSubmit = form.handleSubmit(async (data) => {
@@ -127,6 +149,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 				...data,
 				created_by: userId,
 				is_anonymous: isAnonymous,
+				existingRegistrationId: existingRegistration?.id,
 			})
 
 			if (result.success) {
@@ -158,6 +181,10 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 
 	if (submitted) {
 		return <ConfirmationPage formData={form.getValues()} slots={initialEventSlots} status={registrationStatus} />
+	}
+
+	if (existingRegistration) {
+		return <EmailExistedStep existingRegistration={existingRegistration} onConfirm={handleConfirmNewRegistration} onCancel={handleKeepExistingRegistration} />
 	}
 
 	return (
