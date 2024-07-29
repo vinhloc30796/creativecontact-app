@@ -1,7 +1,8 @@
 import styles from './_checkin.module.scss'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { QrCode, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
+import QRScanButton from './QRScanButton'
 
 interface CheckinPageProps {}
 
@@ -21,10 +22,7 @@ const CheckinPage: React.FC<CheckinPageProps> = () => {
 				<CardContent className="p-6 bg-slate-100">
 					<div className="flex flex-col gap-4 w-full">
 						<div className="flex gap-4 w-full">
-							<div className="flex flex-col items-center justify-center aspect-square border rounded w-full bg-white p-4">
-								<QrCode />
-								<span className="text-xs uppercase font-bold mt-2">Scan QR code</span>
-							</div>
+              <QRScanButton />
 							<div className="flex flex-col items-center justify-center aspect-square border rounded w-full bg-white p-4">
 								<Search />
 								<span className="text-xs uppercase font-bold mt-2">Manual Search</span>
