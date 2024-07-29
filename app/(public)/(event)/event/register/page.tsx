@@ -20,7 +20,5 @@ export default async function Page() {
 
 	const eventSlots = await getEventSlots(eventId)
 
-	console.log('eventSlots:', eventSlots)
-
 	return <RegisterPage eventSlots={eventSlots} />
 }

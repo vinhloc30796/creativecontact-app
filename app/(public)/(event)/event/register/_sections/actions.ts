@@ -6,6 +6,8 @@ import { EventRegistration, FormData, EventSlot } from './types'
 import { Resend } from 'resend'
 import crypto from 'crypto'
 import { createEvent } from 'ics'
+import { v4 as uuidv4 } from 'uuid'
+import QRCode from 'qrcode'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -38,17 +40,21 @@ export async function createRegistration(
 	// Generate a signature for the registration
 	const signature = crypto.randomBytes(16).toString('hex')
 
+	const registrationId = uuidv4()
+	const qrCodeDataURL = await QRCode.toDataURL(registrationId)
+
 	const { data, error } = await supabase
 		.from('event_registrations')
 		.insert([
 			{
+				id: registrationId,
 				slot: formData.slot,
 				created_by: formData.created_by,
 				name: `${formData.lastName} ${formData.firstName}`,
 				email: formData.email,
 				phone: formData.phone,
-				signature: signature,
 				status: isAuthenticated ? 'confirmed' : 'unconfirmed',
+				qr_code: qrCodeDataURL,
 			},
 		])
 		.select()
@@ -67,11 +73,11 @@ export async function createRegistration(
 	}
 
 	if (isAuthenticated) {
-		// Send confirmation email with ICS file
-		await sendConfirmationEmailWithICS(formData.email, data[0], slotData)
+		// Send confirmation email with ICS file and QR code
+		await sendConfirmationEmailWithICSAndQR(formData.email, data[0], slotData, qrCodeDataURL)
 	} else {
 		// Send confirmation request email
-		await sendConfirmationRequestEmail(formData.email, signature)
+		await sendConfirmationRequestEmail(formData.email, registrationId)
 	}
 
 	return { success: true, status: isAuthenticated ? 'confirmed' : 'unconfirmed' }
@@ -99,9 +105,9 @@ async function sendConfirmationRequestEmail(email: string, signature: string) {
 	}
 }
 
-export async function sendConfirmationEmailWithICS(email: string, registrationData: EventRegistration, slotData: EventSlot) {
+async function sendConfirmationEmailWithICSAndQR(email: string, registration: EventRegistration, slotData: EventSlot, qrCodeDataURL: string) {
 	try {
-		const icsData = await generateICSFile(registrationData, slotData)
+		const icsData = await generateICSFile(registration, slotData)
 
 		const { data, error } = await resend.emails.send({
 			from: 'Creative Contact <no-reply@bangoibanga.com>',
@@ -110,11 +116,14 @@ export async function sendConfirmationEmailWithICS(email: string, registrationDa
 			html: `
                 <h1>Your registration is confirmed!</h1>
                 <p>Thank you for registering for our event. We look forward to seeing you!</p>
+				<p>Please find your event details and QR code below:</p>
                 <p>Event details:</p>
                 <ul>
                     <li>Date: ${new Date(slotData.time_start).toLocaleDateString()}</li>
                     <li>Time: ${new Date(slotData.time_start).toLocaleTimeString()} - ${new Date(slotData.time_end).toLocaleTimeString()}</li>
                 </ul>
+				<img src="${qrCodeDataURL}" alt="Registration QR Code" />
+        		<p>Please bring this QR code with you to the event for quick check-in.</p>
                 <p>We've attached an ICS file to this email so you can add the event to your calendar.</p>
             `,
 			attachments: [
@@ -206,7 +215,7 @@ export async function confirmRegistration(signature: string): Promise<{ success:
 		}
 
 		// Send confirmation email with ICS file
-		await sendConfirmationEmailWithICS(data[0].email, data[0], slotData)
+		await sendConfirmationEmailWithICSAndQR(data[0].email, data[0], slotData, data[0].qr_code)
 		return { success: true }
 	} else {
 		return { success: false, error: 'Invalid or expired signature' }
