@@ -280,3 +280,15 @@ export async function createRegistration(
 
 	return { success: true, status: isAuthenticated ? 'confirmed' : 'unconfirmed' }
 }
+
+export async function cancelExpiredRegistrations() {
+	const supabase = createClient()
+
+	try {
+		await supabase.rpc('cancel_expired_registrations')
+		return { success: true }
+	} catch (error) {
+		console.error('Error cancelling expired registrations:', error)
+		return { success: false, error: 'Failed to cancel expired registrations' }
+	}
+}
