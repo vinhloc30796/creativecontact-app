@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
-import { EventSlot } from './(public)/(event)/event/register/_sections/types'
-import RegisterPage from './(public)/(event)/event/register/_sections/_register'
+import { EventSlot } from './(public)/(event)/register/_sections/types'
+import RegisterPage from './(public)/(event)/register/_sections/_register'
 
 async function getEventSlots(event: string): Promise<EventSlot[]> {
 	console.log('Fetching event slots...')

@@ -1,4 +1,4 @@
-import { confirmRegistration } from '@/app/(public)/(event)/event/register/_sections/actions'
+import { confirmRegistration } from '@/app/(public)/(event)/register/_sections/actions'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
