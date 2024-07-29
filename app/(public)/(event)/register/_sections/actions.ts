@@ -12,19 +12,15 @@ import QRCode from 'qrcode'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function getRegistrationsForSlots(slotIds: string[]): Promise<EventRegistration[]> {
-	const cookieStore = cookies()
 	const supabase = createClient()
 
-	console.log('Fetching registrations for slot IDs:', slotIds)
-
-	const { data, error } = await supabase.from('event_registrations').select('*').in('slot', slotIds)
+	const { data, error } = await supabase.from('event_registrations').select('*').in('slot', slotIds).in('status', ['confirmed', 'unconfirmed'])
 
 	if (error) {
 		console.error('Error fetching registrations:', error)
 		return []
 	}
 
-	console.log('Fetched registrations:', data)
 	return data as EventRegistration[]
 }
 
