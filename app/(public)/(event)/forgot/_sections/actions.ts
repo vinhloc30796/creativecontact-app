@@ -8,7 +8,13 @@ export async function sendForgotEmail(identifier: string) {
 	const supabase = createClient()
 
 	// Search for the registration
-	const { data: registrations, error } = await supabase.from('event_registrations').select('*').or(`email.eq.${identifier},phone.eq.${identifier}`).order('created_at', { ascending: false }).limit(1)
+	const { data: registrations, error } = await supabase
+		.from('event_registrations')
+		.select('*')
+		.or(`email.eq.${identifier},phone.eq.${identifier}`)
+		.eq('status', 'confirmed')
+		.order('created_at', { ascending: false })
+		.limit(1)
 
 	if (error) {
 		console.error('Error fetching registration:', error)
