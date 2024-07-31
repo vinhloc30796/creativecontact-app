@@ -1,12 +1,13 @@
+// File: app/staff/checkin/_sections/QRScanButton.tsx
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { QrCode, Camera, Upload } from 'lucide-react';
 import QrScanner from 'qr-scanner';
 
-type Step = 'select' | 'scan' | 'confirm';
+type Step = 'select' | 'scan' | 'confirm' | 'search' | 'checkin';
 
 const QRScanButton = () => {
   const [error, setError] = useState<string | null>(null);
@@ -14,10 +15,27 @@ const QRScanButton = () => {
   const [step, setStep] = useState<Step>('select');
   const [scanMethod, setScanMethod] = useState<'camera' | 'file' | null>(null);
   const [scanResult, setScanResult] = useState('');
+  const [registrationDetails, setRegistrationDetails] = useState<any>(null);
+  const [checkinStatus, setCheckinStatus] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scannerRef = useRef<QrScanner | null>(null);
 
+  const resetState = useCallback(() => {
+    setStep('select');
+    setScanMethod(null);
+    setScanResult('');
+    setError(null);
+    setCheckinStatus(null);
+    setRegistrationDetails(null);
+    console.log('State reset'); // Debug log
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    resetState();
+  }, [resetState]);
+  
   const handleScan = (result: QrScanner.ScanResult) => {
     if (scannerRef.current) {
       scannerRef.current.stop();
@@ -26,6 +44,7 @@ const QRScanButton = () => {
     setStep('confirm');
   };
 
+  // Initialize camera scanner
   useEffect(() => {
     if (step === 'scan' && scanMethod === 'camera') {
       if (!videoRef.current) {
@@ -62,6 +81,11 @@ const QRScanButton = () => {
     };
   }, [step, scanMethod]);
 
+  // Clear state when dialog is closed
+  useEffect(() => {
+    if (!isOpen) resetState()
+  }, [isOpen, resetState]);
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -74,17 +98,94 @@ const QRScanButton = () => {
     }
   };
 
-  const confirmScan = () => {
-    console.log('Confirmed QR code:', scanResult);
-    setIsOpen(false);
+  const searchRegistration = async () => {
+    setStep('search');
+    try {
+      const response = await fetch('/staff/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slotId: scanResult }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setRegistrationDetails(data);
+        setStep('checkin');
+      } else {
+        setError(data.error || 'An error occurred during search');
+        setStep('confirm');
+      }
+    } catch (error) {
+      console.error('Error during search:', error);
+      setError('An error occurred during search');
+      setStep('confirm');
+    }
   };
+
+  const confirmCheckin = async () => {
+    setStep('checkin');
+    try {
+      const response = await fetch('/staff/api/checkin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slotId: scanResult }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setCheckinStatus(data.message);
+      } else {
+        setError(data.error || 'An error occurred during check-in');
+      }
+    } catch (error) {
+      console.error('Error during check-in:', error);
+      setError('An error occurred during check-in');
+    }
+  };
+
 
   const retry = () => {
     setError(null);
     setScanResult('');
     setStep('select');
     setScanMethod(null);
+    setCheckinStatus(null);
+    setRegistrationDetails(null);
   };
+
+
+  const renderRegistrationDetails = () => {
+    if (!registrationDetails) return null;
+
+    return (
+      <div className="space-y-2">
+        <h3 className="font-semibold text-lg">Registration Details:</h3>
+        <div className="grid grid-cols-2 gap-2">
+          <p className="font-medium">Name:</p>
+          <p>{registrationDetails.name}</p>
+          <p className="font-medium">Email:</p>
+          <p>{registrationDetails.email}</p>
+          <p className="font-medium">Phone:</p>
+          <p>{registrationDetails.phone}</p>
+          <p className="font-medium">Status:</p>
+          <p className="capitalize">{registrationDetails.status}</p>
+          <p className="font-medium">Created At:</p>
+          <p>{new Date(registrationDetails.createdAt).toLocaleString()}</p>
+          <p className="font-medium">Signature:</p>
+          <p>{registrationDetails.signature}</p>
+          <p className="font-medium">Slot ID:</p>
+          <p className="break-all">{registrationDetails.slot}</p>
+        </div>
+      </div>
+    );
+  };
+
+
 
   const renderStepContent = () => {
     switch (step) {
@@ -131,25 +232,49 @@ const QRScanButton = () => {
             <p className="font-bold">Scanned Result:</p>
             <p className="p-2 bg-gray-100 rounded break-all">{scanResult}</p>
             <div className="flex space-x-2">
-              <Button onClick={confirmScan}>Confirm</Button>
+              <Button onClick={searchRegistration}>Search Registration</Button>
               <Button variant="outline" onClick={retry}>Retry</Button>
             </div>
           </div>
         );
+      case 'search':
+        return <p>Searching for registration...</p>;
+      case 'checkin':
+        return (
+          <div className="space-y-4">
+            {error ? (
+              <>
+                <p className="text-red-500">{error}</p>
+                <Button onClick={resetState}>Try Again</Button>
+              </>
+            ) : checkinStatus ? (
+              <>
+                <p className="text-green-500">{checkinStatus}</p>
+                <Button onClick={handleClose}>Close</Button>
+              </>
+            ) : registrationDetails ? (
+              <>
+                {renderRegistrationDetails()}
+                <Button onClick={confirmCheckin} className="mt-4">Confirm Check-in</Button>
+              </>
+            ) : (
+              <p>Processing check-in...</p>
+            )}
+          </div>
+        );
+
+
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      setIsOpen(open);
-      if (!open) {
-        setStep('select');
-        setScanMethod(null);
-        setScanResult('');
-        setError(null); // Clear any errors when closing the dialog
-      }
-    }}>
-
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) resetState();
+      }}
+    >
       <DialogTrigger asChild>
         <div className="aspect-square w-full">
           <Button
@@ -169,6 +294,8 @@ const QRScanButton = () => {
             {step === 'select' && "Choose how you want to scan the QR code"}
             {step === 'scan' && (scanMethod === 'camera' ? "Position the QR code in front of the camera" : "Select an image file containing a QR code")}
             {step === 'confirm' && "Verify the scanned QR code"}
+            {step === 'search' && "Searching for registration"}
+            {step === 'checkin' && "Confirm check-in"}
           </DialogDescription>
           {renderStepContent()}
         </DialogContent>

@@ -57,7 +57,7 @@ Foreign-key constraints:
 */
 
 // Enum
-const registrationStatus = pgEnum("registration_status", [
+export const registrationStatus = pgEnum("registration_status", [
   "pending",
   "confirmed",
   "checked-in",
@@ -71,6 +71,9 @@ export const eventRegistrations = pgTable("event_registrations", {
   status: registrationStatus("status").notNull().default("pending"),
   signature: text("signature"),
   slot: uuid("slot").references(() => eventSlots.id).notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
 }, (table) => ({
   uniqueUserSlotRegistration: unique("unique_user_slot_registration").on(
     table.createdBy,

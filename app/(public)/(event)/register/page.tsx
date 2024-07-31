@@ -10,6 +10,8 @@ async function getEventSlots(event: string): Promise<EventSlot[]> {
 	if (error) {
 		console.error('Error fetching event slots:', error)
 		return []
+	} else {
+		console.log("Finished fetching event slots")
 	}
 
 	return event_slots as EventSlot[]

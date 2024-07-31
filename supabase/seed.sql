@@ -1,3 +1,114 @@
+-- Seed data for users table
+-- {
+--   "instance_id": "00000000-0000-0000-0000-000000000000",
+--   "id": "13f60da9-8dd4-42f9-8a57-c0569a158857",
+--   "aud": "authenticated",
+--   "role": "authenticated",
+--   "email": null,
+--   "encrypted_password": "",
+--   "email_confirmed_at": null,
+--   "invited_at": null,
+--   "confirmation_token": "",
+--   "confirmation_sent_at": null,
+--   "recovery_token": "",
+--   "recovery_sent_at": null,
+--   "email_change_token_new": "",
+--   "email_change": "",
+--   "email_change_sent_at": null,
+--   "last_sign_in_at": "2024-07-31 13:29:02.201874+00",
+--   "raw_app_meta_data": {},
+--   "raw_user_meta_data": {},
+--   "is_super_admin": null,
+--   "created_at": "2024-07-31 13:29:02.199319+00",
+--   "updated_at": "2024-07-31 13:29:02.204237+00",
+--   "phone": null,
+--   "phone_confirmed_at": null,
+--   "phone_change": "",
+--   "phone_change_token": "",
+--   "phone_change_sent_at": null,
+--   "confirmed_at": null,
+--   "email_change_token_current": "",
+--   "email_change_confirm_status": 0,
+--   "banned_until": null,
+--   "reauthentication_token": "",
+--   "reauthentication_sent_at": null,
+--   "is_sso_user": false,
+--   "deleted_at": null,
+--   "is_anonymous": true
+-- }
+INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    invited_at,
+    confirmation_token,
+    confirmation_sent_at,
+    recovery_token,
+    recovery_sent_at,
+    email_change_token_new,
+    email_change,
+    email_change_sent_at,
+    last_sign_in_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    is_super_admin,
+    created_at,
+    updated_at,
+    phone,
+    phone_confirmed_at,
+    phone_change,
+    phone_change_token,
+    phone_change_sent_at,
+    email_change_token_current,
+    email_change_confirm_status,
+    banned_until,
+    reauthentication_token,
+    reauthentication_sent_at,
+    is_sso_user,
+    deleted_at,
+    is_anonymous
+) VALUES (
+    '00000000-0000-0000-0000-000000000000',  -- instance_id
+    '13f60da9-8dd4-42f9-8a57-c0569a158857',  -- id
+    'authenticated',                         -- aud
+    'authenticated',                         -- role
+    NULL,                                    -- email
+    '',                                      -- encrypted_password
+    NULL,                                    -- email_confirmed_at
+    NULL,                                    -- invited_at
+    '',                                      -- confirmation_token
+    NULL,                                    -- confirmation_sent_at
+    '',                                      -- recovery_token
+    NULL,                                    -- recovery_sent_at
+    '',                                      -- email_change_token_new
+    '',                                      -- email_change
+    NULL,                                    -- email_change_sent_at
+    '2024-07-31 13:29:02.201874+00',         -- last_sign_in_at
+    '{}'::jsonb,                             -- raw_app_meta_data
+    '{}'::jsonb,                             -- raw_user_meta_data
+    NULL,                                    -- is_super_admin
+    '2024-07-31 13:29:02.199319+00',         -- created_at
+    '2024-07-31 13:29:02.204237+00',         -- updated_at
+    NULL,                                    -- phone
+    NULL,                                    -- phone_confirmed_at
+    '',                                      -- phone_change
+    '',                                      -- phone_change_token
+    NULL,                                    -- phone_change_sent_at
+    '',                                      -- email_change_token_current
+    0,                                       -- email_change_confirm_status
+    NULL,                                    -- banned_until
+    '',                                      -- reauthentication_token
+    NULL,                                    -- reauthentication_sent_at
+    false,                                   -- is_sso_user
+    NULL,                                    -- deleted_at
+    true                                     -- is_anonymous
+);
+
+
 -- Seed data for events table
 INSERT INTO events (id, created_at, name, slug, created_by)
 VALUES (
@@ -122,3 +233,27 @@ INSERT INTO event_slots (id, created_at, event, time_start, time_end, capacity) 
 ('c3af29fa-e1f9-4b3e-b439-4c219af4efb0', CURRENT_TIMESTAMP, 'f47ac10b-58cc-4372-a567-0e02b2c3d479', '2024-08-28T13:45+07'::timestamptz, '2024-08-28T14:30+07'::timestamptz, 40),
 ('7335002c-9cdb-4dc5-ad8c-366e313a79a5', CURRENT_TIMESTAMP, 'f47ac10b-58cc-4372-a567-0e02b2c3d479', '2024-08-28T14:30+07'::timestamptz, '2024-08-28T15:15+07'::timestamptz, 26),
 ('ed14150e-d464-4566-a858-b89081b578f3', CURRENT_TIMESTAMP, 'f47ac10b-58cc-4372-a567-0e02b2c3d479', '2024-08-28T15:15+07'::timestamptz, '2024-08-28T16:00+07'::timestamptz, 22);
+
+INSERT INTO event_registrations (
+    id,
+    created_at,
+    created_by,
+    status,
+    signature,
+    slot,
+    name,
+    email,
+    phone,
+    qr_code
+) VALUES (
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', -- UUID for id
+    CURRENT_TIMESTAMP,                      -- Current timestamp for created_at
+    '13f60da9-8dd4-42f9-8a57-c0569a158857', -- UUID for created_by (user id)
+    'confirmed',                            -- status
+    'John Doe',                             -- signature
+    '29c5f10f-416e-45cd-a13d-3527c69f3474', -- UUID for slot
+    'Doe John',                             -- name
+    'john.doe@example.com',                 -- email
+    '+1234567890',                          -- phone
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==' -- qr_code (dummy base64 encoded image)
+);
