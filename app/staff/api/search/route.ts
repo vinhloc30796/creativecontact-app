@@ -9,7 +9,7 @@ import { createClient } from '@/utils/supabase/server';
 
 // Define the schema for input validation
 const searchSchema = z.object({
-  slotId: z.string().uuid(),
+  id: z.string().uuid(),
 });
 
 export async function POST(request: NextRequest) {
@@ -23,10 +23,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate the input
-    const { slotId } = searchSchema.parse(await request.json());
+    const { id } = searchSchema.parse(await request.json());
+    console.log('Searching for registration:', id);
 
     // Search for the registration
-    const registration = await db
+    const registrations = await db
       .select({
         id: eventRegistrations.id,
         createdAt: eventRegistrations.createdAt,
@@ -38,14 +39,16 @@ export async function POST(request: NextRequest) {
         phone: eventRegistrations.phone,
       })
       .from(eventRegistrations)
-      .where(eq(eventRegistrations.slot, slotId))
-      .limit(1);
+      .where(eq(eventRegistrations.id, id));
 
-    if (registration.length === 0) {
-      return NextResponse.json({ error: 'Registration not found' }, { status: 404 });
+    if (registrations.length === 0) {
+      return NextResponse.json({ error: `Registration not found for id ${id}` }, { status: 404 });
+    }
+    else if (registrations.length > 1) {
+      return NextResponse.json({ error: `Multiple registrations found for id ${id}` }, { status: 500 });
     }
 
-    return NextResponse.json(registration[0]);
+    return NextResponse.json(registrations[0]);
   } catch (error) {
     console.error('Error during registration search:', error);
     return NextResponse.json({

@@ -17,6 +17,7 @@ const QRScanButton = () => {
   const [scanResult, setScanResult] = useState('');
   const [registrationDetails, setRegistrationDetails] = useState<any>(null);
   const [checkinStatus, setCheckinStatus] = useState<string | null>(null);
+  const [checkinData, setCheckinData] = useState<any>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scannerRef = useRef<QrScanner | null>(null);
@@ -27,6 +28,7 @@ const QRScanButton = () => {
     setScanResult('');
     setError(null);
     setCheckinStatus(null);
+    setCheckinData(null);
     setRegistrationDetails(null);
     console.log('State reset'); // Debug log
   }, []);
@@ -106,7 +108,7 @@ const QRScanButton = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ slotId: scanResult }),
+        body: JSON.stringify({ id: scanResult }),
       });
 
       const data = await response.json();
@@ -133,12 +135,13 @@ const QRScanButton = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ slotId: scanResult }),
+        body: JSON.stringify({ id: scanResult }),
       });
 
       const data = await response.json();
       if (response.ok) {
         setCheckinStatus(data.message);
+        setCheckinData(data);
       } else {
         setError(data.error || 'An error occurred during check-in');
       }
@@ -155,6 +158,7 @@ const QRScanButton = () => {
     setStep('select');
     setScanMethod(null);
     setCheckinStatus(null);
+    setCheckinData(null);
     setRegistrationDetails(null);
   };
 
@@ -250,6 +254,14 @@ const QRScanButton = () => {
             ) : checkinStatus ? (
               <>
                 <p className="text-green-500">{checkinStatus}</p>
+                <div className="grid grid-cols-2 gap-2">
+                <p className="font-medium">Name:</p>
+                <p>{checkinData.name}</p>
+                <p className="font-medium">Email:</p>
+                <p>{checkinData.email}</p>
+                <p className="font-medium">Phone:</p>
+                <p>{checkinData.phone}</p>
+              </div>
                 <Button onClick={handleClose}>Close</Button>
               </>
             ) : registrationDetails ? (

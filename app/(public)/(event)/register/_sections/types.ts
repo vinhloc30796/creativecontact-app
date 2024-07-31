@@ -12,7 +12,7 @@ export interface EventRegistration {
 	created_at: string
 	created_by: string
 	signature: string
-	status: 'confirmed' | 'unconfirmed' | 'none' | 'cancelled'
+	status: 'confirmed' | 'pending' | 'checked-in' | 'cancelled'
 }
 
 export type FormData = {

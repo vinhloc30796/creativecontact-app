@@ -5,7 +5,7 @@ export interface EventRegistration {
 	email: string
 	phone: string
 	slot: string
-	status: 'confirmed' | 'unconfirmed'
+	status: 'confirmed' | 'pending' | 'cancelled' | 'checked-in'
 	qr_code: string
 	created_at: string
 }

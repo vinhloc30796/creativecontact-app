@@ -29,7 +29,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 	const [isLoading, setIsLoading] = useState(true)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [error, setError] = useState<string | null>(null)
-	const [registrationStatus, setRegistrationStatus] = useState<'none' | 'confirmed' | 'unconfirmed'>('none')
+	const [registrationStatus, setRegistrationStatus] = useState<'pending' | 'confirmed' | 'checked-in' | 'cancelled'>('pending')
 	const [existingRegistration, setExistingRegistration] = useState<EventRegistration | null>(null)
 
 	const supabase = createClient()
@@ -41,7 +41,12 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 			try {
 				const {
 					data: { user },
+					error
 				} = await supabase.auth.getUser()
+				if (error) {
+					console.error('Error during authentication check:', error)
+					setError('An unexpected error occurred during authentication')
+				}
 				if (user) {
 					setUserId(user.id)
 					setIsAnonymous(user.app_metadata.provider === 'anonymous')

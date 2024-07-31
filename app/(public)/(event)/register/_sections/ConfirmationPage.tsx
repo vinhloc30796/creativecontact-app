@@ -5,7 +5,7 @@ import { formatInTimeZone } from 'date-fns-tz'
 interface ConfirmationPageProps {
 	formData: FormData
 	slots: EventSlot[]
-	status: 'confirmed' | 'unconfirmed' | 'none'
+	status: 'confirmed' | 'pending' | 'cancelled' | 'checked-in'
 }
 
 export function ConfirmationPage({ formData, slots, status }: ConfirmationPageProps) {

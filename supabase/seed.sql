@@ -1,4 +1,23 @@
 -- Seed data for users table
+INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    last_sign_in_at,
+    created_at,
+    updated_at,
+    is_anonymous
+) VALUES (
+    '00000000-0000-0000-0000-000000000000',  -- instance_id
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',  -- id
+    'authenticated',                         -- aud
+    'authenticated',                         -- role
+    '2024-07-31 13:29:02.201874+00',         -- last_sign_in_at
+    '2024-07-31 13:29:02.199319+00',         -- created_at
+    '2024-07-31 13:29:02.204237+00',         -- updated_at
+    false                                    -- is_anonymous
+);
 -- {
 --   "instance_id": "00000000-0000-0000-0000-000000000000",
 --   "id": "13f60da9-8dd4-42f9-8a57-c0569a158857",

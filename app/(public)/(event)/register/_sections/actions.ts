@@ -14,7 +14,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export async function getRegistrationsForSlots(slotIds: string[]): Promise<EventRegistration[]> {
 	const supabase = createClient()
 
-	const { data, error } = await supabase.from('event_registrations').select('*').in('slot', slotIds).in('status', ['confirmed', 'unconfirmed'])
+	const { data, error } = await supabase.from('event_registrations').select('*').in('slot', slotIds).in('status', ['confirmed', 'pending'])
 
 	if (error) {
 		console.error('Error fetching registrations:', error)
@@ -26,7 +26,7 @@ export async function getRegistrationsForSlots(slotIds: string[]): Promise<Event
 
 export async function oldcreateRegistration(
 	formData: FormData & { created_by: string | null; is_anonymous: boolean }
-): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'unconfirmed' }> {
+): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'pending' }> {
 	const cookieStore = cookies()
 	const supabase = createClient()
 
@@ -49,7 +49,7 @@ export async function oldcreateRegistration(
 				name: `${formData.lastName} ${formData.firstName}`,
 				email: formData.email,
 				phone: formData.phone,
-				status: isAuthenticated ? 'confirmed' : 'unconfirmed',
+				status: isAuthenticated ? 'confirmed' : 'pending',
 				qr_code: qrCodeDataURL,
 			},
 		])
@@ -57,7 +57,7 @@ export async function oldcreateRegistration(
 
 	if (error) {
 		console.error('Error creating registration:', error)
-		return { success: false, error: error.message, status: 'unconfirmed' }
+		return { success: false, error: error.message, status: 'pending' }
 	}
 
 	// Fetch the slot details
@@ -65,7 +65,7 @@ export async function oldcreateRegistration(
 
 	if (slotError) {
 		console.error('Error fetching slot details:', slotError)
-		return { success: false, error: slotError.message, status: 'unconfirmed' }
+		return { success: false, error: slotError.message, status: 'pending' }
 	}
 
 	if (isAuthenticated) {
@@ -76,7 +76,7 @@ export async function oldcreateRegistration(
 		await sendConfirmationRequestEmail(formData.email, registrationId)
 	}
 
-	return { success: true, status: isAuthenticated ? 'confirmed' : 'unconfirmed' }
+	return { success: true, status: isAuthenticated ? 'confirmed' : 'pending' }
 }
 
 async function sendConfirmationRequestEmail(email: string, signature: string) {
@@ -243,7 +243,7 @@ export async function confirmRegistration(signature: string) {
 export async function checkExistingRegistration(email: string): Promise<EventRegistration | null> {
 	const supabase = createClient()
 
-	const { data, error } = await supabase.from('event_registrations').select('*').eq('email', email).in('status', ['confirmed', 'unconfirmed']).order('created_at', { ascending: false }).limit(1)
+	const { data, error } = await supabase.from('event_registrations').select('*').eq('email', email).in('status', ['confirmed', 'pending']).order('created_at', { ascending: false }).limit(1)
 
 	if (error) {
 		console.error('Error checking existing registration:', error)
@@ -255,7 +255,7 @@ export async function checkExistingRegistration(email: string): Promise<EventReg
 
 export async function createRegistration(
 	formData: FormData & { created_by: string | null; is_anonymous: boolean; existingRegistrationId?: string }
-): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'unconfirmed' }> {
+): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'pending' }> {
 	const supabase = createClient()
 
 	// Start a transaction
@@ -273,12 +273,12 @@ export async function createRegistration(
 
 	if (error) {
 		console.error('Error creating registration:', error)
-		return { success: false, error: error.message, status: 'unconfirmed' }
+		return { success: false, error: error.message, status: 'pending' }
 	}
 
 	const isAuthenticated = !formData.is_anonymous
 
-	return { success: true, status: isAuthenticated ? 'confirmed' : 'unconfirmed' }
+	return { success: true, status: isAuthenticated ? 'confirmed' : 'pending' }
 }
 
 export async function cancelExpiredRegistrations() {
