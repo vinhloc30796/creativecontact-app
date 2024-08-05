@@ -8,6 +8,10 @@ import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import styles from './_checkin.module.scss'
 import QRScanButton from './QRScanButton'
+import dynamic from 'next/dynamic'
+
+const EventLogWrapper = dynamic(() => import('./EventLogWrapper'), { ssr: false })
+
 
 interface CheckinPageProps {
   userEmail: string | null
@@ -63,14 +67,8 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
                 <h3 className={cn('text-lg font-bold', styles.title)}>Timeslot statistics</h3>
                 <p>Event statistics will be displayed here.</p>
               </div>
-              <div className="flex flex-col border rounded w-full bg-white p-4">
-                <h3 className={cn('text-lg font-bold', styles.title)}>Event log</h3>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="">
-                    <strong>Guest A</strong> checked in at <strong>10:00</strong> by <strong>Staff A</strong>
-                  </div>
-                ))}
-              </div>
+              {/* Insert event log here */}
+              <EventLogWrapper />
             </div>
           </CardContent>
         }
