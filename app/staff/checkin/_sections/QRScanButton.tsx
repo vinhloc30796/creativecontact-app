@@ -103,7 +103,7 @@ const QRScanButton = () => {
   const searchRegistration = async () => {
     setStep('search');
     try {
-      const response = await fetch('/staff/api/search', {
+      const response = await fetch('/staff/api/search-id', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

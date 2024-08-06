@@ -1,20 +1,39 @@
 // File: app/staff/checkin/_sections/_checkin.tsx
 "use client"
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { cn } from '@/lib/utils'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import styles from './_checkin.module.scss'
 import QRScanButton from './QRScanButton'
+import ManualSearch from './ManualSearch'
+import dynamic from 'next/dynamic'
+
+const EventLogWrapper = dynamic(() => import('./EventLogWrapper'), { ssr: false })
+
 
 interface CheckinPageProps {
   userEmail: string | null
 }
 
+interface SearchResult {
+  id: string
+  name: string
+  email: string
+  phone: string
+  status: string
+}
+
+
 export default function CheckinPage({ userEmail }: CheckinPageProps) {
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
 
   const handleSignOut = async () => {
     try {
@@ -26,6 +45,24 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
       }
     } catch (error) {
       console.error('Error during sign out:', error);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch('/staff/api/manual-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ searchTerm }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.results);
+      } else {
+        console.error('Search failed');
+      }
+    } catch (error) {
+      console.error('Error during search:', error);
     }
   };
 
@@ -50,11 +87,20 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
             <div className="flex flex-col gap-4 w-full">
               <div className="flex gap-4 w-full">
                 <QRScanButton />
-                <div className="flex flex-col items-center justify-center aspect-square border rounded w-full bg-white p-4">
-                  <Search />
-                  <span className="text-xs uppercase font-bold mt-2">Manual Search</span>
-                </div>
+                <ManualSearch />
               </div>
+              {searchResults.length > 0 && (
+                <div className="flex flex-col border rounded w-full bg-white p-4">
+                  <h3 className={cn('text-lg font-bold', styles.title)}>Search Results</h3>
+                  <ul>
+                    {searchResults.map((result: any) => (
+                      <li key={result.id}>
+                        {result.name} - {result.email} - {result.phone}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="flex flex-col border rounded w-full bg-white p-4">
                 <h3 className={cn('text-lg font-bold', styles.title)}>Event statistics</h3>
                 <p>Event statistics will be displayed here.</p>
@@ -63,20 +109,14 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
                 <h3 className={cn('text-lg font-bold', styles.title)}>Timeslot statistics</h3>
                 <p>Event statistics will be displayed here.</p>
               </div>
-              <div className="flex flex-col border rounded w-full bg-white p-4">
-                <h3 className={cn('text-lg font-bold', styles.title)}>Event log</h3>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="">
-                    <strong>Guest A</strong> checked in at <strong>10:00</strong> by <strong>Staff A</strong>
-                  </div>
-                ))}
-              </div>
+              {/* Insert event log here */}
+              <EventLogWrapper />
             </div>
           </CardContent>
         }
         <CardFooter className="flex justify-between mt-4">
           <Button type="submit" onClick={handleSignOut} variant={'secondary'}
-          className='w-full'
+            className='w-full'
           >{userEmail ? "Sign out" : "Retry"}</Button>
         </CardFooter>
       </Card>
