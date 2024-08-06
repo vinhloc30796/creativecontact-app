@@ -1,0 +1,44 @@
+sequenceDiagram
+    participant User
+    participant RegistrationForm
+    participant Supabase
+    participant Actions
+
+    Note over RegistrationForm: Component mounts
+    RegistrationForm->>Supabase: Check auth status
+    Supabase-->>RegistrationForm: Return user (if any)
+    
+    alt No user found
+        RegistrationForm->>Actions: signInAnonymously()
+        Actions->>Supabase: Auth.signInAnonymously()
+        Supabase-->>Actions: Return anonymous user
+        Actions-->>RegistrationForm: Return anonymous user
+        RegistrationForm->>RegistrationForm: Set userId and isAnonymous
+    else User found
+        RegistrationForm->>RegistrationForm: Set userId and check if anonymous
+    end
+
+    User->>RegistrationForm: Enters contact information
+    RegistrationForm->>Actions: checkExistingRegistration(email)
+    Actions->>Supabase: Query event_registrations
+    Supabase-->>Actions: Return existing registration (if any)
+    Actions-->>RegistrationForm: Return result
+
+    alt Existing registration found
+        RegistrationForm->>User: Show EmailExistedStep
+        User->>RegistrationForm: Choose to keep or create new
+    else No existing registration
+        RegistrationForm->>User: Show DateSelectionStep
+    end
+
+    User->>RegistrationForm: Selects date and confirms
+    RegistrationForm->>Actions: createRegistration(formData, userId, isAnonymous)
+    Actions->>Supabase: Insert or update event_registrations
+    Supabase-->>Actions: Return result
+    Actions-->>RegistrationForm: Return registration status
+
+    alt Registration successful
+        RegistrationForm->>User: Show ConfirmationPage
+    else Registration failed
+        RegistrationForm->>User: Show error message
+    end
