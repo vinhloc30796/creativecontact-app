@@ -93,42 +93,44 @@ const renderSearchStep = () => (
       <Button onClick={handleSearch}>Search</Button>
     </div>
     {searchResults.length > 0 && (
-      <div>
-        <RadioGroup value={selectedResult || ''} onValueChange={setSelectedResult}>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Select</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Slot</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {searchResults.map((result) => (
-                <TableRow key={result.id}>
-                  <TableCell>
-                    <RadioGroupItem value={result.id} id={result.id} />
-                  </TableCell>
-                  <TableCell>
-                    <Label htmlFor={result.id}>{result.name}</Label>
-                  </TableCell>
-                  <TableCell>{result.email}</TableCell>
-                  <TableCell>{result.phone}</TableCell>
-                  <TableCell>{result.status}</TableCell>
-                  <TableCell>{result.slot}</TableCell>
+        <div>
+          <RadioGroup value={selectedResult || ''} onValueChange={setSelectedResult}>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Select</TableHead>
+                  <TableHead>User Information</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Slot</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </RadioGroup>
-        <Button onClick={handleCheckin} disabled={!selectedResult} className="mt-4">
-          Check-in
-        </Button>
-      </div>
-    )}
+              </TableHeader>
+              <TableBody>
+                {searchResults.map((result) => (
+                  <TableRow key={result.id}>
+                    <TableCell>
+                      <RadioGroupItem value={result.id} id={result.id} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <Label htmlFor={result.id} className="font-semibold text-black">
+                          {result.name}
+                        </Label>
+                        <p className="text-sm text-gray-500">{result.email}</p>
+                        <p className="text-sm text-gray-500">{result.phone}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>{result.status}</TableCell>
+                    <TableCell>{result.slot}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </RadioGroup>
+          <Button onClick={handleCheckin} disabled={!selectedResult} className="mt-4">
+            Check-in
+          </Button>
+        </div>
+      )}
   </div>
 );
 
