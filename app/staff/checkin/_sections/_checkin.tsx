@@ -10,6 +10,7 @@ import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import styles from './_checkin.module.scss'
 import QRScanButton from './QRScanButton'
+import ManualSearch from './ManualSearch'
 import dynamic from 'next/dynamic'
 
 const EventLogWrapper = dynamic(() => import('./EventLogWrapper'), { ssr: false })
@@ -86,18 +87,7 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
             <div className="flex flex-col gap-4 w-full">
               <div className="flex gap-4 w-full">
                 <QRScanButton />
-                <div className="flex flex-col items-center justify-center aspect-square border rounded w-full bg-white p-4">
-                  <Search />
-                  <span className="text-xs uppercase font-bold mt-2">Manual Search</span>
-                  <Input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="mt-2"
-                  />
-                  <Button onClick={handleSearch} className="mt-2">Search</Button>
-                </div>
+                <ManualSearch />
               </div>
               {searchResults.length > 0 && (
                 <div className="flex flex-col border rounded w-full bg-white p-4">
@@ -126,7 +116,7 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
         }
         <CardFooter className="flex justify-between mt-4">
           <Button type="submit" onClick={handleSignOut} variant={'secondary'}
-          className='w-full'
+            className='w-full'
           >{userEmail ? "Sign out" : "Retry"}</Button>
         </CardFooter>
       </Card>
