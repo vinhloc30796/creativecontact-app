@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { format, isBefore, startOfDay, parse } from 'date-fns'
+import { isBefore, startOfDay } from 'date-fns'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import { UseFormReturn } from 'react-hook-form'
 import { FormData } from './formSchema'
 import { EventSlot, EventRegistration } from './types'
-import { getSlotsForDate, getAvailableCapacity } from './utils'
+import { getSlotsForDate, getAvailableCapacity, formatDateTime } from './utils'
 import { getRegistrationsForSlots } from './actions'
 
 interface DateSelectionStepProps {
@@ -23,7 +23,6 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
 	const [slotTouched, setSlotTouched] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 
-	const timeZone = 'Asia/Bangkok' // UTC+7
 	const today = startOfDay(new Date())
 
 	const uniqueDates = Array.from(new Set(slots.map((slot) => slot.time_start.split('T')[0])))
@@ -38,18 +37,13 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
 	useEffect(() => {
 		if (date) {
 			setIsLoading(true)
-			const slotsForDate = getSlotsForDate(slots, format(date, 'yyyy-MM-dd'))
+			const slotsForDate = getSlotsForDate(slots, formatDateTime(date.toISOString(), 'yyyy-MM-dd'))
 			const slotIds = slotsForDate.map((slot) => slot.id)
 			getRegistrationsForSlots(slotIds)
 				.then(setRegistrations)
 				.finally(() => setIsLoading(false))
 		}
 	}, [date, slots])
-
-	const formatSlotTime = (timeString: string) => {
-		const [hours, minutes] = timeString.split('T')[1].split(':')
-		return `${hours}:${minutes}`
-	}
 
 	return (
 		<>
@@ -59,7 +53,7 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
 					<PopoverTrigger asChild>
 						<FormControl>
 							<Button variant={'outline'} className={cn('w-full pl-3 text-left font-normal', !date && 'text-muted-foreground')}>
-								{date ? format(date, 'PPP') : <span>Pick a date</span>}
+								{date ? formatDateTime(date.toISOString(), 'PPP') : <span>Pick a date</span>}
 								<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 							</Button>
 						</FormControl>
@@ -71,7 +65,7 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
 							onSelect={setDate}
 							defaultMonth={date || new Date(firstAvailableDate || '')}
 							disabled={(date) => {
-								return isBefore(date, today) || !uniqueDates.includes(format(date, 'yyyy-MM-dd'))
+								return isBefore(date, today) || !uniqueDates.includes(formatDateTime(date.toISOString(), 'yyyy-MM-dd'))
 							}}
 						/>
 					</PopoverContent>
@@ -83,16 +77,21 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
 				name="slot"
 				render={({ field }) => (
 					<FormItem>
-						<FormLabel className={slotTouched && form.formState.errors.slot ? 'text-destructive' : ''}>Pick a time slot</FormLabel>
+						<FormLabel className={cn(slotTouched && form.formState.errors.slot ? 'text-destructive' : '', 'block mt-2')}>
+							<div className="flex justify-between">
+								<span>Pick a time slot</span>
+								<span>Occupied</span>
+							</div>
+						</FormLabel>
 						<FormControl>
 							<div className="flex flex-col gap-2">
 								{isLoading ? (
 									<p>Loading available slots...</p>
-								) : date && getSlotsForDate(slots, format(date, 'yyyy-MM-dd')).length === 0 ? (
+								) : date && getSlotsForDate(slots, formatDateTime(date.toISOString(), 'yyyy-MM-dd')).length === 0 ? (
 									<p>No slots available for this date. Please select another date.</p>
 								) : (
 									date &&
-									getSlotsForDate(slots, format(date, 'yyyy-MM-dd')).map((slot) => {
+									getSlotsForDate(slots, formatDateTime(date.toISOString(), 'yyyy-MM-dd')).map((slot) => {
 										const availableCapacity = getAvailableCapacity(slot, registrations)
 										const isDisabled = availableCapacity === 0
 										const isSelected = field.value === slot.id
@@ -111,10 +110,10 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
 												disabled={isDisabled}
 											>
 												<div className="font-normal">
-													{formatSlotTime(slot.time_start)} - {formatSlotTime(slot.time_end)}
+													{formatDateTime(slot.time_start, 'HH:mm')} - {formatDateTime(slot.time_end, 'HH:mm')}
 												</div>
 												<div className="text-muted-foreground">
-													{availableCapacity}/{slot.capacity}
+													{slot.capacity - availableCapacity}/{slot.capacity}
 												</div>
 											</Button>
 										)

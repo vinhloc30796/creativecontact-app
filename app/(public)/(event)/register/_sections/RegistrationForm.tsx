@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import styles from './_register.module.scss'
 import { formSchema, FormData } from './formSchema'
-import { EventSlot, EventRegistration } from './types'
+import { EventSlot, EventRegistration, EventRegistrationWithSlot } from './types'
 import { ContactInfoStep } from './ContactInfoStep'
 import { DateSelectionStep } from './DateSelectionStep'
 import { ConfirmationStep } from './ConfirmationStep'
@@ -41,7 +41,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 			try {
 				const {
 					data: { user },
-					error
+					error,
 				} = await supabase.auth.getUser()
 				if (error) {
 					console.error('Error during authentication check:', error)
@@ -189,7 +189,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 	}
 
 	if (existingRegistration) {
-		return <EmailExistedStep existingRegistration={existingRegistration} onConfirm={handleConfirmNewRegistration} onCancel={handleKeepExistingRegistration} />
+		return <EmailExistedStep existingRegistration={existingRegistration as EventRegistrationWithSlot} onConfirm={handleConfirmNewRegistration} onCancel={handleKeepExistingRegistration} />
 	}
 
 	return (

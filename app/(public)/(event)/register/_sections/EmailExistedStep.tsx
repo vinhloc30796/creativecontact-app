@@ -1,14 +1,28 @@
+// EmailExistedStep.tsx
+
 import React from 'react'
 import { Button } from '@/components/ui/button'
-import { EventRegistration } from './types'
+import { EventRegistrationWithSlot } from './types'
 
 interface EmailExistedStepProps {
-	existingRegistration: EventRegistration
+	existingRegistration: EventRegistrationWithSlot
 	onConfirm: () => void
 	onCancel: () => void
 }
 
 export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: EmailExistedStepProps) {
+	const formatDateTime = (dateTimeString: string) => {
+		const date = new Date(dateTimeString)
+		return date.toLocaleString('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: true,
+		})
+	}
+
 	return (
 		<div className="space-y-4">
 			<h2 className="text-lg font-semibold">Existing Registration Found</h2>
@@ -16,9 +30,9 @@ export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: 
 			<p>
 				Existing registration details:
 				<br />
-				Date: {new Date(existingRegistration.slot).toLocaleDateString()}
+				Date and Time: {formatDateTime(existingRegistration.event_slot.time_start)}
 				<br />
-				Time: {new Date(existingRegistration.slot).toLocaleTimeString()}
+				End Time: {formatDateTime(existingRegistration.event_slot.time_end)}
 			</p>
 			<div className="flex space-x-4">
 				<Button onClick={onConfirm}>Proceed and Cancel Existing Registration</Button>

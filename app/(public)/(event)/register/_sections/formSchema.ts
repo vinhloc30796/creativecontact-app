@@ -8,6 +8,7 @@ export const formSchema = z.object({
 		message: 'Phone number must be 10 digits',
 	}),
 	slot: z.string().min(1, 'Please select a time slot'),
+	existingRegistrationId: z.string().optional(),
 })
 
 export type FormData = z.infer<typeof formSchema>

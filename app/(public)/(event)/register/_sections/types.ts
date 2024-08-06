@@ -22,3 +22,7 @@ export type FormData = {
 	phone: string
 	slot: string
 }
+
+export interface EventRegistrationWithSlot extends EventRegistration {
+	event_slot: EventSlot
+}

@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
-import { EventRegistration, FormData, EventSlot } from './types'
+import { EventRegistration, FormData, EventSlot, EventRegistrationWithSlot } from './types'
 import { Resend } from 'resend'
 import crypto from 'crypto'
 import { createEvent } from 'ics'
@@ -24,9 +24,7 @@ export async function getRegistrationsForSlots(slotIds: string[]): Promise<Event
 	return data as EventRegistration[]
 }
 
-export async function oldcreateRegistration(
-	formData: FormData & { created_by: string | null; is_anonymous: boolean }
-): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'pending' }> {
+export async function oldcreateRegistration(formData: FormData & { created_by: string | null; is_anonymous: boolean }): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'pending' }> {
 	const cookieStore = cookies()
 	const supabase = createClient()
 
@@ -240,10 +238,21 @@ export async function confirmRegistration(signature: string) {
 	return { success: true }
 }
 
-export async function checkExistingRegistration(email: string): Promise<EventRegistration | null> {
+export async function checkExistingRegistration(email: string): Promise<EventRegistrationWithSlot | null> {
 	const supabase = createClient()
 
-	const { data, error } = await supabase.from('event_registrations').select('*').eq('email', email).in('status', ['confirmed', 'pending']).order('created_at', { ascending: false }).limit(1)
+	const { data, error } = await supabase
+		.from('event_registrations')
+		.select(
+			`
+      *,
+      event_slot:event_slots(*)
+    `
+		)
+		.eq('email', email)
+		.eq('status', 'confirmed')
+		.order('created_at', { ascending: false })
+		.limit(1)
 
 	if (error) {
 		console.error('Error checking existing registration:', error)
@@ -253,32 +262,71 @@ export async function checkExistingRegistration(email: string): Promise<EventReg
 	return data[0] || null
 }
 
-export async function createRegistration(
-	formData: FormData & { created_by: string | null; is_anonymous: boolean; existingRegistrationId?: string }
-): Promise<{ success: boolean; error?: string; status: 'confirmed' | 'pending' }> {
+interface RegistrationResult {
+	success: boolean
+	data?: any
+	error?: string
+	status: 'confirmed' | 'pending'
+}
+
+export async function createRegistration(formData: FormData & { created_by: string | null; is_anonymous: boolean; existingRegistrationId?: string }): Promise<RegistrationResult> {
 	const supabase = createClient()
 
-	// Start a transaction
-	const { data, error } = await supabase.rpc('submit_registration', {
-		form_data: {
-			slot: formData.slot,
-			email: formData.email,
-			name: `${formData.lastName} ${formData.firstName}`,
-			phone: formData.phone,
-			created_by: formData.created_by,
-			is_anonymous: formData.is_anonymous,
-		},
-		existing_registration_id: formData.existingRegistrationId,
-	})
+	// First, check if a registration already exists
+	const { data: existingRegistration, error: fetchError } = await supabase.from('event_registrations').select('*').eq('created_by', formData.created_by).eq('slot', formData.slot).single()
 
-	if (error) {
-		console.error('Error creating registration:', error)
-		return { success: false, error: error.message, status: 'pending' }
+	if (fetchError && fetchError.code !== 'PGRST116') {
+		// PGRST116 means no rows returned
+		console.error('Error fetching existing registration:', fetchError)
+		return { success: false, error: 'Error checking existing registration', status: 'pending' }
 	}
 
-	const isAuthenticated = !formData.is_anonymous
+	const status = formData.is_anonymous ? 'pending' : 'confirmed'
 
-	return { success: true, status: isAuthenticated ? 'confirmed' : 'pending' }
+	if (existingRegistration) {
+		// If a registration exists, update it
+		const { data, error } = await supabase
+			.from('event_registrations')
+			.update({
+				email: formData.email,
+				name: `${formData.lastName} ${formData.firstName}`,
+				phone: formData.phone,
+				is_anonymous: formData.is_anonymous,
+				status,
+			})
+			.eq('id', existingRegistration.id)
+			.select()
+
+		if (error) {
+			console.error('Error updating registration:', error)
+			return { success: false, error: error.message, status }
+		}
+
+		return { success: true, data, status }
+	} else {
+		// If no registration exists, create a new one
+		const { data, error } = await supabase
+			.from('event_registrations')
+			.insert([
+				{
+					slot: formData.slot,
+					email: formData.email,
+					name: `${formData.lastName} ${formData.firstName}`,
+					phone: formData.phone,
+					created_by: formData.created_by,
+					is_anonymous: formData.is_anonymous,
+					status,
+				},
+			])
+			.select()
+
+		if (error) {
+			console.error('Error creating registration:', error)
+			return { success: false, error: error.message, status }
+		}
+
+		return { success: true, data, status }
+	}
 }
 
 export async function cancelExpiredRegistrations() {
