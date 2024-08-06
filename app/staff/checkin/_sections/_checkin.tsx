@@ -1,8 +1,10 @@
 // File: app/staff/checkin/_sections/_checkin.tsx
 "use client"
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { cn } from '@/lib/utils'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -17,8 +19,20 @@ interface CheckinPageProps {
   userEmail: string | null
 }
 
+interface SearchResult {
+  id: string
+  name: string
+  email: string
+  phone: string
+  status: string
+}
+
+
 export default function CheckinPage({ userEmail }: CheckinPageProps) {
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
 
   const handleSignOut = async () => {
     try {
@@ -30,6 +44,24 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
       }
     } catch (error) {
       console.error('Error during sign out:', error);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch('/staff/api/manual-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ searchTerm }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.results);
+      } else {
+        console.error('Search failed');
+      }
+    } catch (error) {
+      console.error('Error during search:', error);
     }
   };
 
@@ -57,8 +89,28 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
                 <div className="flex flex-col items-center justify-center aspect-square border rounded w-full bg-white p-4">
                   <Search />
                   <span className="text-xs uppercase font-bold mt-2">Manual Search</span>
+                  <Input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="mt-2"
+                  />
+                  <Button onClick={handleSearch} className="mt-2">Search</Button>
                 </div>
               </div>
+              {searchResults.length > 0 && (
+                <div className="flex flex-col border rounded w-full bg-white p-4">
+                  <h3 className={cn('text-lg font-bold', styles.title)}>Search Results</h3>
+                  <ul>
+                    {searchResults.map((result: any) => (
+                      <li key={result.id}>
+                        {result.name} - {result.email} - {result.phone}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="flex flex-col border rounded w-full bg-white p-4">
                 <h3 className={cn('text-lg font-bold', styles.title)}>Event statistics</h3>
                 <p>Event statistics will be displayed here.</p>
