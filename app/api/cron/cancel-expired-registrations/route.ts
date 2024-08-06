@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 export async function POST(req: NextRequest) {
 	// Verify the request is coming from the cron job
 	const authHeader = req.headers.get('authorization')
-	if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+	if (authHeader !== `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET}`) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 

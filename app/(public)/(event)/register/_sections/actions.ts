@@ -9,7 +9,7 @@ import { createEvent } from 'ics'
 import { v4 as uuidv4 } from 'uuid'
 import QRCode from 'qrcode'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY)
 
 export async function getRegistrationsForSlots(slotIds: string[]): Promise<EventRegistration[]> {
 	const supabase = createClient()
