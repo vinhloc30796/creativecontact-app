@@ -18,7 +18,7 @@ async function getEventSlots(event: string): Promise<EventSlot[]> {
 }
 
 export default async function Page() {
-	const eventId = '10177076-f591-49c8-a87d-042ba7aa6345'
+	const eventId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
 
 	const eventSlots = await getEventSlots(eventId)
 
