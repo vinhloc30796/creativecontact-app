@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgEnum,
   pgSchema,
@@ -12,8 +13,9 @@ import { sql } from "drizzle-orm";
 
 // Partial schema for auth.users
 export const authSchema = pgSchema("auth");
-export const users = authSchema.table("users", {
+export const authUsers = authSchema.table("users", {
   id: uuid("id").primaryKey(),
+  isAnonymous: boolean("is_anonymous").notNull(),
 });
 
 // Public schema
@@ -67,7 +69,7 @@ export const registrationStatus = pgEnum("registration_status", [
 export const eventRegistrations = pgTable("event_registrations", {
   id: uuid("id").primaryKey(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
-  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdBy: uuid("created_by").notNull().references(() => authUsers.id),
   status: registrationStatus("status").notNull().default("pending"),
   signature: text("signature"),
   slot: uuid("slot").references(() => eventSlots.id).notNull(),
@@ -103,7 +105,7 @@ Foreign-key constraints:
 export const eventRegistrationLogs = pgTable("event_registration_logs", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   eventRegistrationId: uuid("event_registration_id").references(() => eventRegistrations.id).notNull(),
-  staffId: uuid("staff_id").notNull().references(() => users.id),
+  staffId: uuid("staff_id").notNull().references(() => authUsers.id),
   statusBefore: registrationStatus("status_before").notNull(),
   statusAfter: registrationStatus("status_after").notNull(),
   changedAt: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
