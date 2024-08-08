@@ -5,7 +5,7 @@ import React from 'react';
 import { eq, desc } from 'drizzle-orm';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from '@/lib/db';
-import { eventRegistrationLogs, eventRegistrations, users } from '@/db/schema';
+import { eventRegistrationLogs, eventRegistrations, authUsers } from '@/drizzle/schema';
 
 interface EventLog {
   id: string;
@@ -23,11 +23,11 @@ export async function getEventLogs(): Promise<EventLog[]> {
         changed_at: eventRegistrationLogs.changedAt,
         status_after: eventRegistrationLogs.statusAfter,
         guest_name: eventRegistrations.name,
-        staff_id: users.id,
+        staff_id: authUsers.id,
       })
       .from(eventRegistrationLogs)
       .innerJoin(eventRegistrations, eq(eventRegistrationLogs.eventRegistrationId, eventRegistrations.id))
-      .innerJoin(users, eq(eventRegistrationLogs.staffId, users.id))
+      .innerJoin(authUsers, eq(eventRegistrationLogs.staffId, authUsers.id))
       .orderBy(desc(eventRegistrationLogs.changedAt))
       .limit(5);
 
