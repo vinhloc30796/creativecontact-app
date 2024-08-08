@@ -128,12 +128,11 @@ async function sendConfirmationRequestEmail(email: string, signature: string) {
 
 async function sendConfirmationEmailWithICSAndQR(
   email: string,
-  registration: EventRegistration,
   slotData: EventSlot,
   qrCodeDataURL: string,
 ) {
   try {
-    const icsData = await generateICSFile(registration, slotData);
+    const icsData = await generateICSFile(slotData);
 
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@bangoibanga.com>",
@@ -172,10 +171,7 @@ async function sendConfirmationEmailWithICSAndQR(
   }
 }
 
-function generateICSFile(
-  registrationData: EventRegistration,
-  slotData: EventSlot,
-): Promise<string> {
+function generateICSFile(slotData: EventSlot): Promise<string> {
   return new Promise((resolve, reject) => {
     const startDate = new Date(slotData.time_start);
     const endDate = new Date(slotData.time_end);
@@ -243,7 +239,7 @@ export async function confirmRegistration(signature: string) {
   // Start a transaction
   const { data: registration, error: fetchError } = await supabase.from(
     "event_registrations",
-  ).select("*").eq("signature", signature).single();
+  ).select("*").eq("id", signature).single();
 
   if (fetchError) {
     console.error("Failed to fetch registration:", fetchError);
@@ -260,7 +256,7 @@ export async function confirmRegistration(signature: string) {
 
   // Update the registration status
   const { error: updateError } = await supabase.from("event_registrations")
-    .update({ status: "confirmed" }).eq("signature", signature);
+    .update({ status: "confirmed" }).eq("id", signature);
 
   if (updateError) {
     console.error("Failed to confirm registration:", updateError);
@@ -398,9 +394,8 @@ export async function createRegistration(
       // Send confirmation email with ICS file and QR code
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
-        dbResult.registrationResult,
         {
-          id: slotData[0].id,
+          id: dbResult.registrationResult.id,
           created_at: formatDateTime(
             slotData[0].createdAt.toISOString(),
             "yyyy-MM-dd",
