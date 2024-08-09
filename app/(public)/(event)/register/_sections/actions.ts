@@ -17,8 +17,9 @@ import {
   FormData,
 } from "./types";
 import { formatDateTime } from "./utils";
+import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 
-const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY)
+const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 export async function getRegistrationsForSlots(
   slotIds: string[],
@@ -104,13 +105,13 @@ export async function oldcreateRegistration(
 async function sendConfirmationRequestEmail(email: string, signature: string) {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Creative Contact <no-reply@bangoibanga.com>",
+      from: "Creative Contact <no-reply@creativecontact.vn>",
       to: email,
       subject: "Confirm Your Event Registration",
       html: `
         <p>Please confirm your registration by clicking on this link:</p>
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/api/confirm-registration?signature=${signature}">Confirm Registration</a></p>
-      `,
+        <p>This will also confirm your email (<a href=mailto:${email}>${email}</a>) as the contact address for this registration.</p>`,
     });
 
     if (error) {
@@ -196,7 +197,7 @@ function generateICSFile(slotData: EventSlot): Promise<string> {
         endDate.getUTCHours(),
         endDate.getUTCMinutes(),
       ],
-      title: "Your Registered Event",
+      title: "Hoàn Tất",
       description: "Thank you for registering for our event!",
       location: "Event Location",
       url: "https://youreventwebsite.com",
@@ -265,8 +266,9 @@ export async function confirmRegistration(signature: string) {
 
   // If the registration was created by a user, update their email
   if (registration.created_by) {
-    const { data: userData, error: userError } = await supabase.auth.admin
-      .getUserById(registration.created_by);
+    console.debug(`Updating user email for registration ${signature}`);
+    const { data: userData, error: userError } = await adminSupabaseClient.auth
+      .admin.getUserById(registration.created_by);
 
     if (userError) {
       console.error("Failed to fetch user:", userError);
@@ -274,7 +276,7 @@ export async function confirmRegistration(signature: string) {
     } else if (userData && userData.user) {
       // Check if the user is anonymous (you might need to adjust this condition based on how you identify anonymous users)
       if (userData.user.email === null || userData.user.email === "") {
-        const { error: authUpdateError } = await supabase.auth.admin
+        const { error: authUpdateError } = await adminSupabaseClient.auth.admin
           .updateUserById(registration.created_by, {
             email: registration.email,
           });
