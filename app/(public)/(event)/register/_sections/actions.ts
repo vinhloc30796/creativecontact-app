@@ -264,11 +264,15 @@ export async function confirmRegistration(signature: string) {
     return { success: false, error: "Failed to confirm registration" };
   }
 
+  // Store the user ID and email for later use
+  let userId = registration.created_by;
+  let email = registration.email;
+
   // If the registration was created by a user, update their email
-  if (registration.created_by) {
+  if (userId) {
     console.debug(`Updating user email for registration ${signature}`);
     const { data: userData, error: userError } = await adminSupabaseClient.auth
-      .admin.getUserById(registration.created_by);
+      .admin.getUserById(userId);
 
     if (userError) {
       console.error("Failed to fetch user:", userError);
@@ -277,8 +281,8 @@ export async function confirmRegistration(signature: string) {
       // Check if the user is anonymous (you might need to adjust this condition based on how you identify anonymous users)
       if (userData.user.email === null || userData.user.email === "") {
         const { error: authUpdateError } = await adminSupabaseClient.auth.admin
-          .updateUserById(registration.created_by, {
-            email: registration.email,
+          .updateUserById(userId, {
+            email: email,
           });
 
         if (authUpdateError) {
@@ -292,7 +296,11 @@ export async function confirmRegistration(signature: string) {
     }
   }
 
-  return { success: true };
+  return { 
+    success: true, 
+    email: email, 
+    userId: userId, 
+  };
 }
 
 export async function checkExistingRegistration(

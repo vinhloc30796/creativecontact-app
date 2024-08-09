@@ -1,3 +1,5 @@
+//File: app/api/confirm-registration/route.ts
+
 import { confirmRegistration } from '@/app/(public)/(event)/register/_sections/actions'
 import { NextResponse } from 'next/server'
 
@@ -13,7 +15,12 @@ export async function GET(request: Request) {
 
 	if (result.success) {
 		// Redirect to a confirmation success page
-		return NextResponse.redirect(new URL('/registration-confirmed', request.url))
+		const confirmationUrl = new URL('/registration-confirmed', request.url)
+		confirmationUrl.searchParams.set('email', result.email)
+		confirmationUrl.searchParams.set('userId', result.userId)
+		confirmationUrl.searchParams.set('registrationId', signature)
+		return NextResponse.redirect(confirmationUrl)
+
 	} else {
 		// Redirect to an error page with the error message
 		const errorUrl = new URL('/registration-error', request.url)

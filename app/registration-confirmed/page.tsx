@@ -2,7 +2,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -10,9 +10,24 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import { useAuth } from '@/hooks/useAuth';
+import { useSearchParams } from 'next/navigation';
 
 export default function RegistrationConfirmed() {
   const { user, isLoading } = useAuth();
+  const searchParams = useSearchParams();
+  const [registrationInfo, setRegistrationInfo] = useState({
+    email: '',
+    userId: '',
+    registrationId: ''
+  });
+
+  useEffect(() => {
+    setRegistrationInfo({
+      email: searchParams.get('email') || '',
+      userId: searchParams.get('userId') || '',
+      registrationId: searchParams.get('registrationId') || ''
+    });
+  }, [searchParams]);
 
   return (
     <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
@@ -34,13 +49,12 @@ export default function RegistrationConfirmed() {
 
           {isLoading ? (
             <p>Loading user information...</p>
-          ) : user ? (
-            <div className="space-y-2">
-              <p><strong>Registered Email:</strong> {user.email}</p>
-              <p><strong>User ID:</strong> {user.id}</p>
-            </div>
           ) : (
-            <p>User information not available. Please ensure you&apos;re logged in.</p>
+            <div className="space-y-2">
+              <p><strong>Registered Email:</strong> {registrationInfo.email || user?.email || 'Not available'}</p>
+              <p><strong>User ID:</strong> {registrationInfo.userId || user?.id || 'Not available'}</p>
+              <p><strong>Registration ID:</strong> {registrationInfo.registrationId || 'Not available'}</p>
+            </div>
           )}
 
           <div className="space-y-2">
@@ -56,7 +70,7 @@ export default function RegistrationConfirmed() {
           <div className="flex flex-col space-y-2">
             <Button asChild>
               <Link href={
-                `https://creativecontact.vn/?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${user.id}`
+                `https://creativecontact.vn/?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}`
               }>Go to Event Page</Link>
             </Button>
           </div>
