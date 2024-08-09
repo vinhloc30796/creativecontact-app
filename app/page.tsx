@@ -3,15 +3,15 @@ import { EventSlot } from './(public)/(event)/register/_sections/types'
 import RegisterPage from './(public)/(event)/register/_sections/_register'
 
 async function getEventSlots(event: string): Promise<EventSlot[]> {
-	console.log('Fetching event slots...')
+	console.log(`Fetching event slots for event ${event}...`)
 
 	let { data: event_slots, error } = await supabase.from('event_slots').select('*').eq('event', event)
 
 	if (error) {
-		console.error('Error fetching event slots:', error)
+		console.error(`Error fetching event slots for ${event}: `, error)
 		return []
 	} else {
-		console.log("Finished fetching event slots")
+		console.log(`Finished fetching event slots for ${event}`)
 	}
 	return event_slots as EventSlot[]
 }
