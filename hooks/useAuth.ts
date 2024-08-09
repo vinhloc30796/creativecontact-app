@@ -67,7 +67,7 @@ interface AuthState {
         // otherwise, anonymous if user.is_anonymous is true
         // everything else is not anonymous
         const isAnonymous = !session?.user || session?.user?.is_anonymous || false;
-        console.log(`Auth state change: ${event} where ID is ${session?.user?.id} and anonymous: ${isAnonymous}`);
+        console.log(`Auth state change: ${event} where email is ${session?.user?.email} and ID is ${session?.user?.id} and anonymous: ${isAnonymous}`);
         updateAuthState(session?.user ?? null, isAnonymous); // TODO: Check if user is anonymous
       });
   

@@ -1,15 +1,16 @@
 // File: app/(public)/(event)/checkin/page.tsx
 "use client";
 
-import React, { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { sendSignInWithOtp } from '@/app/actions/email';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import styles from './_sections/_checkin.module.scss';
 import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
+import { createClient } from '@/utils/supabase/client';
+import React, { useState } from 'react';
+import styles from './_sections/_checkin.module.scss';
 
 export default function CheckInPage() {
   const supabase = createClient();
@@ -17,24 +18,24 @@ export default function CheckInPage() {
 
   const [email, setEmail] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
 
   const handleMagicLinkRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/checkin`,
-        },
+      const result = await sendSignInWithOtp(email, {
+        redirectTo: `${hostUrl}/checkin`,
+        shouldCreateUser: false,
       });
 
-      if (error) throw error;
+      if (result.error) throw result.error;
 
       setMagicLinkSent(true);
     } catch (err) {
       console.error('Error sending magic link:', err);
     }
   };
+
 
   return (
     <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>

@@ -1,44 +1,53 @@
 sequenceDiagram
     participant User
     participant RegistrationForm
-    participant Supabase
     participant Actions
+    participant Supabase
+    participant EmailService
+    participant QRService
+    participant ConfirmRegistrationAPI
+    participant RegistrationConfirmedPage
 
-    Note over RegistrationForm: Component mounts
-    RegistrationForm->>Supabase: Check auth status
-    Supabase-->>RegistrationForm: Return user (if any)
-    
-    alt No user found
-        RegistrationForm->>Actions: signInAnonymously()
-        Actions->>Supabase: Auth.signInAnonymously()
-        Supabase-->>Actions: Return anonymous user
-        Actions-->>RegistrationForm: Return anonymous user
-        RegistrationForm->>RegistrationForm: Set userId and isAnonymous
-    else User found
-        RegistrationForm->>RegistrationForm: Set userId and check if anonymous
-    end
-
-    User->>RegistrationForm: Enters contact information
-    RegistrationForm->>Actions: checkExistingRegistration(email)
-    Actions->>Supabase: Query event_registrations
-    Supabase-->>Actions: Return existing registration (if any)
-    Actions-->>RegistrationForm: Return result
-
-    alt Existing registration found
-        RegistrationForm->>User: Show EmailExistedStep
-        User->>RegistrationForm: Choose to keep or create new
-    else No existing registration
-        RegistrationForm->>User: Show DateSelectionStep
-    end
-
-    User->>RegistrationForm: Selects date and confirms
+    User->>RegistrationForm: Submits registration form
     RegistrationForm->>Actions: createRegistration(formData, userId, isAnonymous)
-    Actions->>Supabase: Insert or update event_registrations
-    Supabase-->>Actions: Return result
-    Actions-->>RegistrationForm: Return registration status
+    
+    Actions->>Supabase: Check existing registration
+    Supabase-->>Actions: Return existing registration (if any)
 
-    alt Registration successful
-        RegistrationForm->>User: Show ConfirmationPage
-    else Registration failed
-        RegistrationForm->>User: Show error message
+    rect
+        Note over Actions: DB Transaction
+        alt Existing registration found
+            Actions->>Supabase: Update event_registrations
+        else No existing registration
+            Actions->>Supabase: Insert new event_registration
+        end
+        Actions->>Supabase: Update auth.users (set isAnonymous)
+    end
+
+    Supabase-->>Actions: Return transaction result
+
+    alt isAnonymous
+        Actions->>EmailService: sendConfirmationRequestEmail
+        EmailService-->>Actions: Email sent status
+        Actions-->>RegistrationForm: Return success (pending confirmation)
+        RegistrationForm->>User: Show pending confirmation message
+    else Not Anonymous
+        Actions->>Supabase: Fetch event slot details
+        Supabase-->>Actions: Return slot details
+        Actions->>QRService: Generate QR code
+        QRService-->>Actions: Return QR code
+        Actions->>EmailService: sendConfirmationEmailWithICSAndQR
+        EmailService-->>Actions: Email sent status
+        Actions-->>RegistrationForm: Return success (confirmed)
+        RegistrationForm->>User: Show confirmation message with next steps
+    end
+
+    alt Anonymous User (Pending Confirmation)
+        User->>ConfirmRegistrationAPI: Click confirmation link in email
+        ConfirmRegistrationAPI->>Supabase: Confirm registration
+        Supabase-->>ConfirmRegistrationAPI: Confirmation result
+        ConfirmRegistrationAPI->>EmailService: Send final confirmation email
+        EmailService-->>ConfirmRegistrationAPI: Email sent status
+        ConfirmRegistrationAPI->>RegistrationConfirmedPage: Redirect with emailSent flag
+        RegistrationConfirmedPage->>User: Display final confirmation
     end
