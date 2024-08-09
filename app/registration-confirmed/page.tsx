@@ -1,9 +1,7 @@
 // File: app/registration-confirmed/page.tsx
-
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +9,7 @@ import Link from 'next/link';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import { useAuth } from '@/hooks/useAuth';
 import { useSearchParams } from 'next/navigation';
+import QRCode from "qrcode";
 
 export default function RegistrationConfirmed() {
   const { user, isLoading } = useAuth();
@@ -20,14 +19,31 @@ export default function RegistrationConfirmed() {
     userId: '',
     registrationId: ''
   });
+  const [qrCode, setQrCode] = useState('');
 
   useEffect(() => {
-    setRegistrationInfo({
+    const info = {
       email: searchParams.get('email') || '',
       userId: searchParams.get('userId') || '',
       registrationId: searchParams.get('registrationId') || ''
-    });
+    };
+    setRegistrationInfo(info);
+
+    if (info.registrationId) {
+      QRCode.toDataURL(info.registrationId)
+        .then(url => setQrCode(url))
+        .catch(err => console.error('Error generating QR code:', err));
+    }
   }, [searchParams]);
+
+  const handleSaveQRCode = () => {
+    const link = document.createElement('a');
+    link.href = qrCode;
+    link.download = 'registration-qr-code.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
@@ -53,9 +69,18 @@ export default function RegistrationConfirmed() {
             <div className="space-y-2">
               <p><strong>Registered Email:</strong> {registrationInfo.email || user?.email || 'Not available'}</p>
               <p><strong>User ID:</strong> {registrationInfo.userId || user?.id || 'Not available'}</p>
-              <p><strong>Registration ID:</strong> {registrationInfo.registrationId || 'Not available'}</p>
             </div>
           )}
+
+          <div className="bg-gray-100 p-4 rounded-md space-y-4">
+            <p><strong>Registration ID:</strong> {registrationInfo.registrationId || 'Not available'}</p>
+            {qrCode && (
+              <div className="flex flex-col items-center space-y-2">
+                <img src={qrCode} alt="Registration QR Code" className="w-48 h-48" />
+                <Button onClick={handleSaveQRCode}>Save QR Code</Button>
+              </div>
+            )}
+          </div>
 
           <div className="space-y-2">
             <p>Please check your email for a confirmation message with the following details:</p>
