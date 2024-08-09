@@ -168,6 +168,8 @@ export async function confirmRegistration(signature: string) {
         const { error: authUpdateError } = await adminSupabaseClient.auth.admin
           .updateUserById(userId, {
             email: email,
+            email_confirm: true,
+            is_anonymous: false
           });
 
         if (authUpdateError) {

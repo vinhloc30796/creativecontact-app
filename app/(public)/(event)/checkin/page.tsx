@@ -49,7 +49,7 @@ export default function CheckInPage() {
         <CardContent className='p-6 flex flex-col gap-2'>
           {isLoading ? (
             <p>Loading...</p>
-          ) : (user) ? (
+          ) : (user && !isAnonymous) ? (
             <>
               <div
                 className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
