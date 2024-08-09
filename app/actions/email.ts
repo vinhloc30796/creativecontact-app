@@ -1,3 +1,5 @@
+// File: app/actions/email.ts
+
 "use server";
 
 import { EventSlot } from "@/app/(public)/(event)/register/_sections/types";
@@ -114,7 +116,7 @@ async function sendConfirmationEmailWithICSAndQR(
     if (error) {
       console.error("Error sending confirmation email with ICS:", error);
     } else {
-      console.log("Confirmation email with ICS sent:", data);
+      console.log(`Confirmation email with ICS sent for slot ${slotData.id}:`, data);
     }
   } catch (error) {
     console.error(
