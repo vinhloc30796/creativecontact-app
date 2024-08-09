@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import QRCode from "qrcode";
 import { useEffect, useState } from 'react';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
-import QRCodeWithHover from './QRCodeWithHover'; // Make sure to create this file
+import QRCodeWithHover from './QRCodeWithHover';
 
 export default function RegistrationConfirmed() {
   const { user, isLoading } = useAuth();
@@ -21,6 +21,7 @@ export default function RegistrationConfirmed() {
     registrationId: ''
   });
   const [qrCode, setQrCode] = useState('');
+  const [emailStatus, setEmailStatus] = useState<'sending' | 'sent' | 'error' | ''>('');
 
   useEffect(() => {
     const info = {
@@ -34,8 +35,34 @@ export default function RegistrationConfirmed() {
       QRCode.toDataURL(info.registrationId)
         .then(url => setQrCode(url))
         .catch(err => console.error('Error generating QR code:', err));
+
+      // Automatically send the confirmation email
+      sendConfirmationEmail(info.registrationId);
     }
   }, [searchParams]);
+
+  const sendConfirmationEmail = async (registrationId: string) => {
+    setEmailStatus('sending');
+    try {
+      const response = await fetch('/api/resend-confirmation-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ registrationId }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setEmailStatus('sent');
+      } else {
+        setEmailStatus('error');
+        console.error('Failed to send confirmation email:', data.error);
+      }
+    } catch (error) {
+      setEmailStatus('error');
+      console.error('Error sending confirmation email:', error);
+    }
+  };
 
   const handleSaveQRCode = () => {
     const link = document.createElement('a');
@@ -61,7 +88,10 @@ export default function RegistrationConfirmed() {
             style={{ backgroundColor: '#F6EBE4' }}
           >
             <h2 className="text-2xl font-semibold">Registration Confirmed</h2>
-            <p>Your registration has been successfully confirmed. Thank you for registering! We will send more information to your email ({registrationInfo.email || user?.email || 'Not available'})</p>
+            <p>Your registration has been successfully confirmed. Thank you for registering!</p>
+            {emailStatus === 'sending' && <p>Sending confirmation email...</p>}
+            {emailStatus === 'sent' && <p>A confirmation email has been sent to your email address ({registrationInfo.email || user?.email || 'Not available'}). Please check your inbox.</p>}
+            {emailStatus === 'error' && <p>There was an error sending the confirmation email. Please contact support if you don&apos;t receive it soon.</p>}
           </div>
 
           {isLoading ? (
@@ -73,7 +103,7 @@ export default function RegistrationConfirmed() {
           )}
 
           <div className="space-y-2">
-            <p>Please check your email for a confirmation message with the following details:</p>
+            <p>The confirmation email contains the following details:</p>
             <ul className="list-disc list-inside">
               <li>Event schedule</li>
               <li>Venue information</li>
@@ -90,8 +120,6 @@ export default function RegistrationConfirmed() {
               </div>
             )}
           </div>
-
-
 
           <div className="flex flex-col space-y-2">
             <Button asChild>
