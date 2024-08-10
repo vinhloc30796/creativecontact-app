@@ -89,30 +89,25 @@ async function sendConfirmationEmailWithICSAndQR(
   qrCodeDataURL: string,
 ) {
   try {
+    // Prep vars
     const icsData = await generateICSFile(slotData);
-
+    const dateStr = new Date(slotData.time_start).toLocaleDateString();
+    const timeStartStr = new Date(slotData.time_start).toLocaleTimeString();
+    const timeEndStr = new Date(slotData.time_end).toLocaleTimeString();
+    // Build email
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@bangoibanga.com>",
       to: email,
       subject: "Your Event Registration is Confirmed",
-      html: `
-                  <h1>Your registration is confirmed!</h1>
-                  <p>Event details:</p>
-                  <ul>
-                      <li>Date: ${
-        new Date(slotData.time_start).toLocaleDateString()
-      }</li>
-                      <li>Time: ${
-        new Date(slotData.time_start).toLocaleTimeString()
-      } - ${new Date(slotData.time_end).toLocaleTimeString()}</li>
-                  </ul>
-                  <img src="${qrCodeDataURL}" alt="Registration QR Code" />
-              `,
-      attachments: [
-        {
-          content: icsData,
-        },
-      ],
+      html: `<h1>Your registration is confirmed!</h1>
+        <p>Event details:</p>
+        <ul>
+            <li>Date: ${dateStr}</li>
+            <li>Time: ${timeStartStr} - ${timeEndStr}</li>
+        </ul>
+        <img src="${qrCodeDataURL}" alt="Registration QR Code" />
+  `,
+      attachments: [{ content: icsData, filename: "event.ics" }],
     });
 
     if (error) {
@@ -139,20 +134,24 @@ async function sendSignInWithOtp(email: string, options?: {
   try {
     // Generate OTP
     const otp = generateOTP(); // Implement this function to generate a 6-digit OTP
-    const { data: linkData, error: linkError } = await adminSupabaseClient.auth.admin.generateLink({
-      type: 'magiclink',
-      email: email,
-      options: {
-        data: { ...options?.data, otp },
-        redirectTo: options?.redirectTo,
-      }
-    });
+    const { data: linkData, error: linkError } = await adminSupabaseClient.auth
+      .admin.generateLink({
+        type: "magiclink",
+        email: email,
+        options: {
+          data: { ...options?.data, otp },
+          redirectTo: options?.redirectTo,
+        },
+      });
     if (linkError) throw linkError;
 
     console.log("Magic link confirmation URL:", linkData);
 
     // Construct confirmation URL that goes through your Next.js app
-    const confirmationURL = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${options?.redirectTo || ''}`;
+    const confirmationURL =
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${
+        options?.redirectTo || ""
+      }`;
 
     // Send custom email using Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
@@ -197,6 +196,5 @@ export {
   generateICSFile,
   sendConfirmationEmailWithICSAndQR,
   sendConfirmationRequestEmail,
-  sendSignInWithOtp
+  sendSignInWithOtp,
 };
-
