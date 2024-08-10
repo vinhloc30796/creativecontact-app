@@ -1,6 +1,7 @@
 // File: app/(public)/(event)/checkin/page.tsx
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import { sendSignInWithOtp } from '@/app/actions/email';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -9,8 +10,16 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
-import React, { useState } from 'react';
 import styles from './_sections/_checkin.module.scss';
+import { eventRegistrations, eventSlots, events } from "@/drizzle/schema";
+
+type EventRegistration = typeof eventRegistrations.$inferSelect & {
+  slotId: typeof eventSlots.$inferSelect['id'];
+  slotTimeStart: typeof eventSlots.$inferSelect['timeStart'];
+  slotTimeEnd: typeof eventSlots.$inferSelect['timeEnd'];
+  eventId: typeof events.$inferSelect['id'];
+  eventName: typeof events.$inferSelect['name'];
+};
 
 export default function CheckInPage() {
   const supabase = createClient();
@@ -18,6 +27,8 @@ export default function CheckInPage() {
 
   const [email, setEmail] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [eventRegistrations, setEventRegistrations] = useState<EventRegistration[] | null>(null);
+  const [searchError, setSearchError] = useState('');
   const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
 
   const handleMagicLinkRequest = async (e: React.FormEvent) => {
@@ -36,6 +47,31 @@ export default function CheckInPage() {
     }
   };
 
+  const searchEventRegistration = async (userEmail: string) => {
+    try {
+      const response = await fetch(`/api/search-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch event registration');
+      }
+      const data: EventRegistration[] = await response.json();
+      setEventRegistrations(data);
+      setSearchError('');
+    } catch (err) {
+      console.error('Error searching event registration:', err);
+      setEventRegistrations(null);
+      setSearchError('Failed to find event registration. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    if (user && !isAnonymous && user.email) {
+      searchEventRegistration(user.email);
+    }
+  }, [user, isAnonymous]);
 
   return (
     <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
@@ -61,9 +97,22 @@ export default function CheckInPage() {
               <div className="space-y-4">
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>User ID:</strong> {user.id}</p>
+                {eventRegistrations && eventRegistrations.length > 0 ? (
+                  eventRegistrations.map((registration, index) => (
+                    <div key={registration.id} className="border p-4 rounded-md">
+                      <h3 className="font-semibold">Registration {index + 1}</h3>
+                      <p><strong>Event:</strong> {registration.eventName}</p>
+                      <p><strong>Status:</strong> {registration.status}</p>
+                      <p><strong>Slot Time:</strong> {new Date(registration.slotTimeStart).toLocaleString()} - {new Date(registration.slotTimeEnd).toLocaleString()}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No event registrations found.</p>
+                )}
+                {searchError && <p className="text-red-500">{searchError}</p>}
               </div>
-              <Button type="submit">
-                Check In
+              <Button type="button" onClick={() => user.email && searchEventRegistration(user.email)}>
+                Refresh Registration Info
               </Button>
             </>
           ) : (
