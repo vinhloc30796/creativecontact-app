@@ -93,7 +93,6 @@ export async function oldcreateRegistration(
     // Send confirmation email with ICS file and QR code
     await sendConfirmationEmailWithICSAndQR(
       formData.email,
-      data[0],
       slotData,
       qrCodeDataURL,
     );
@@ -169,7 +168,7 @@ export async function confirmRegistration(signature: string) {
           .updateUserById(userId, {
             email: email,
             email_confirm: true,
-            is_anonymous: false
+            is_anonymous: false,
           });
 
         if (authUpdateError) {
