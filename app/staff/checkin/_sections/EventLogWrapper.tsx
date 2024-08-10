@@ -1,4 +1,6 @@
 // File: app/staff/checkin/_sections/EventLogWrapper.tsx
+"use client";
+
 import { EventLogClient } from './EventLogClient';
 import { getEventLogs } from './EventLogServer';
 
