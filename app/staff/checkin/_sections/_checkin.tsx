@@ -4,13 +4,12 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from '@/lib/utils'
-import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
-import { Suspense, useState } from 'react'
+import { useState } from 'react'
 import styles from './_checkin.module.scss'
+import { EventLogWrapper } from './EventLogWrapper'
 import ManualSearch from './ManualSearch'
 import QRScanButton from './QRScanButton'
-import { EventLogWrapper } from './EventLogWrapper'
 
 interface CheckinPageProps {
   userEmail: string | null

@@ -2,7 +2,8 @@
 
 "use server";
 
-import { EventSlot } from "@/app/(public)/(event)/register/_sections/types";
+// import { EventSlot } from "@/app/(public)/(event)/register/_sections/types";
+import { EventSlot } from "@/app/types/EventSlot";
 import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { createEvent } from "ics";
@@ -12,8 +13,8 @@ const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 function generateICSFile(slotData: EventSlot): Promise<string> {
   return new Promise((resolve, reject) => {
-    const startDate = new Date(slotData.time_start);
-    const endDate = new Date(slotData.time_end);
+    const startDate = new Date(slotData.timeStart);
+    const endDate = new Date(slotData.timeEnd);
 
     // Adjust for UTC+7
     const utcOffset = 7 * 60; // 7 hours in minutes
@@ -91,22 +92,22 @@ async function sendConfirmationEmailWithICSAndQR(
   try {
     // Prep vars
     const icsData = await generateICSFile(slotData);
-    const dateStr = new Date(slotData.time_start).toLocaleDateString();
-    const timeStartStr = new Date(slotData.time_start).toLocaleTimeString();
-    const timeEndStr = new Date(slotData.time_end).toLocaleTimeString();
+    const dateStr = new Date(slotData.timeStart).toLocaleDateString();
+    const timeStartStr = new Date(slotData.timeStart).toLocaleTimeString();
+    const timeEndStr = new Date(slotData.timeEnd).toLocaleTimeString();
     // Build email
+    const emailContent = `<h1>Your registration is confirmed!</h1>
+      <p>Event details:</p>
+      <ul>
+          <li>Date: ${dateStr}</li>
+          <li>Time: ${timeStartStr} - ${timeEndStr}</li>
+      </ul>
+      <img src="${qrCodeDataURL}" alt="Registration QR Code" />`;
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@bangoibanga.com>",
       to: email,
       subject: "Your Event Registration is Confirmed",
-      html: `<h1>Your registration is confirmed!</h1>
-        <p>Event details:</p>
-        <ul>
-            <li>Date: ${dateStr}</li>
-            <li>Time: ${timeStartStr} - ${timeEndStr}</li>
-        </ul>
-        <img src="${qrCodeDataURL}" alt="Registration QR Code" />
-  `,
+      html: emailContent,
       attachments: [{ content: icsData, filename: "event.ics" }],
     });
 
@@ -114,8 +115,7 @@ async function sendConfirmationEmailWithICSAndQR(
       console.error("Error sending confirmation email with ICS:", error);
     } else {
       console.log(
-        `Confirmation email with ICS sent for slot ${slotData.id}:`,
-        data,
+        `Confirmation email with ICS sent for slot ${slotData.id}: ${data}`,
       );
     }
   } catch (error) {
