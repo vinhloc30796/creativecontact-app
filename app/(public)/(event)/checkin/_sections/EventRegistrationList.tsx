@@ -3,7 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
-import { EventRegistrationWithSlot } from '../_types/EventRegistration';
+import { EventRegistrationWithSlot } from '@/app/types/EventRegistration';
 import { handleCheckin, CheckinStatus } from '../_utils/apiHelpers';
 
 export interface EventRegistrationWithSlotListProps {

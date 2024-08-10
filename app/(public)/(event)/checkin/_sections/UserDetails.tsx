@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { EventRegistrationList } from './EventRegistrationList';
 import { searchEventRegistration } from '../_utils/apiHelpers';
 import { User } from '@supabase/supabase-js';
-import { EventRegistrationWithSlot } from '../_types/EventRegistration';
+import { EventRegistrationWithSlot } from '@/app/types/EventRegistration';
 
 interface UserDetailsProps {
   user: User;

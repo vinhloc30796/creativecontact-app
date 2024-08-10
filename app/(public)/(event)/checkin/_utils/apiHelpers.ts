@@ -3,7 +3,7 @@
 
 // File: app/(public)/(event)/checkin/_utils/apiHelpers.ts
 import { sendSignInWithOtp } from '@/app/actions/email';
-import { EventRegistrationWithSlot } from '../_types/EventRegistration';
+import { EventRegistrationWithSlot } from '@/app/types/EventRegistration';
 
 type SetEventRegistrations = React.Dispatch<React.SetStateAction<EventRegistrationWithSlot[] | null>>;
 type SetSearchError = React.Dispatch<React.SetStateAction<string>>;
