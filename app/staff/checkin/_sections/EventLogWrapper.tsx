@@ -6,7 +6,7 @@ function formatDate(date: Date): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export default async function EventLogWrapper() {
+export async function EventLogWrapper() {
   const logs = await getEventLogs();
   const formattedLogs = logs.map(log => ({
     id: log.eventRegistrationId,
