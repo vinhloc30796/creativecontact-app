@@ -3,12 +3,18 @@
 
 // File: app/(public)/(event)/checkin/_utils/apiHelpers.ts
 import { sendSignInWithOtp } from '@/app/actions/email';
-import { EventRegistration } from '../_types/EventRegistration';
+import { EventRegistrationWithSlot } from '../_types/EventRegistration';
 
-type SetEventRegistrations = React.Dispatch<React.SetStateAction<EventRegistration[] | null>>;
+type SetEventRegistrations = React.Dispatch<React.SetStateAction<EventRegistrationWithSlot[] | null>>;
 type SetSearchError = React.Dispatch<React.SetStateAction<string>>;
 type SetMagicLinkSent = React.Dispatch<React.SetStateAction<boolean>>;
-type SetCheckinStatus = React.Dispatch<React.SetStateAction<{ id: string; status: 'success' | 'failure' } | null>>;
+export type CheckinStatus = {
+  id: string;
+  status: 'success' | 'failure';
+  errorMessage?: string;
+};
+type SetCheckinStatus = (status: CheckinStatus) => void;
+
 
 export async function searchEventRegistration(
   userEmail: string,
@@ -38,7 +44,6 @@ export async function handleCheckin(
   registrationId: string,
   setCheckinStatus: SetCheckinStatus
 ): Promise<void> {
-
   try {
     const response = await fetch('/api/checkin', {
       method: 'POST',
@@ -49,11 +54,19 @@ export async function handleCheckin(
     if (response.ok) {
       setCheckinStatus({ id: registrationId, status: 'success' });
     } else {
-      setCheckinStatus({ id: registrationId, status: 'failure' });
+      setCheckinStatus({ 
+        id: registrationId, 
+        status: 'failure', 
+        errorMessage: data.error || 'Check-in failed'
+      });
     }
   } catch (err) {
     console.error('Error during check-in:', err);
-    setCheckinStatus({ id: registrationId, status: 'failure' });
+    setCheckinStatus({ 
+      id: registrationId, 
+      status: 'failure', 
+      errorMessage: 'An unexpected error occurred'
+    });
   }
 }
 

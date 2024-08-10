@@ -19,17 +19,20 @@ export async function POST(request: NextRequest) {
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const staffId = session.user.id;
+    const userId = session.user.id;
 
     // Validate the input
     const { id } = checkinSchema.parse(await request.json());
 
     // Perform the check-in
-    const result = await performCheckin(id, staffId);
+    const result = await performCheckin(id, userId);
 
     if (!result.success || !result.data) {
       console.error("Check-in failed:", result.error || "No data returned");
-      return NextResponse.json({ error: result.error || "Check-in failed" }, { status: 400 });
+      return NextResponse.json({ 
+        error: result.error || "Check-in failed",
+        errorCode: result.errorCode
+      }, { status: 400 });
     }
 
     return NextResponse.json({
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
     console.error("Unexpected error during check-in:", error);
     return NextResponse.json({
       error: "An unexpected error occurred during check-in",
+      errorCode: "UNEXPECTED_ERROR"
     }, { status: 500 });
   }
 }
-

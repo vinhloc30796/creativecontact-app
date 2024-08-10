@@ -23,6 +23,7 @@ export type CheckinResult = {
     phone: string;
   };
   error?: string;
+  errorCode?: string;
 };
 
 export async function performCheckin(
@@ -43,8 +44,8 @@ export async function performCheckin(
     if (matchedRegistrations.length !== 1) {
       return {
         success: false,
-        error:
-          `Invalid slot ID, expected 1 but found ${matchedRegistrations.length}`,
+        error: `Invalid slot ID, expected 1 but found ${matchedRegistrations.length}`,
+        errorCode: "INVALID_ID",
       };
     }
     const { id: registrationId, status } = matchedRegistrations[0];
@@ -83,8 +84,8 @@ export async function performCheckin(
     } else {
       return {
         success: false,
-        error:
-          `Only [${validStatuses}] registrations can be checked in, but current registration is already '${status}'`,
+        error: `Registration cannot be checked in. Current status: '${status}'`,
+        errorCode: "INVALID_STATUS",
       };
     }
   });

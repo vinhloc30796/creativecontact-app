@@ -3,20 +3,15 @@
 
 import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
-import { EventRegistration } from '../_types/EventRegistration';
-import { handleCheckin } from '../_utils/apiHelpers';
+import { EventRegistrationWithSlot } from '../_types/EventRegistration';
+import { handleCheckin, CheckinStatus } from '../_utils/apiHelpers';
 
-interface EventRegistrationListProps {
-  eventRegistrations: EventRegistration[] | null;
+export interface EventRegistrationWithSlotListProps {
+  eventRegistrations: EventRegistrationWithSlot[] | null;
   searchError: string;
 }
 
-interface CheckinStatus {
-  id: string;
-  status: 'success' | 'failure';
-}
-
-export function EventRegistrationList({ eventRegistrations, searchError }: EventRegistrationListProps) {
+export function EventRegistrationList({ eventRegistrations, searchError }: EventRegistrationWithSlotListProps) {
   const [checkinStatus, setCheckinStatus] = useState<CheckinStatus | null>(null);
 
   return (
@@ -31,7 +26,9 @@ export function EventRegistrationList({ eventRegistrations, searchError }: Event
               <p><strong>Slot Time:</strong> {new Date(registration.slotTimeStart).toLocaleString()} - {new Date(registration.slotTimeEnd).toLocaleString()}</p>
               {checkinStatus?.id === registration.id && (
                 <p className={`mt-2 ${checkinStatus.status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                  Check-in {checkinStatus.status === 'success' ? 'successful' : 'failed'}
+                  {checkinStatus.status === 'success' 
+                    ? 'Check-in successful' 
+                    : `Check-in failed: ${checkinStatus.errorMessage || 'An error occurred'}`}
                 </p>
               )}
             </div>

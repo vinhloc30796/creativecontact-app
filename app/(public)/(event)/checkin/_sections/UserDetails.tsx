@@ -5,13 +5,14 @@ import React, { useState, useEffect } from 'react';
 import { EventRegistrationList } from './EventRegistrationList';
 import { searchEventRegistration } from '../_utils/apiHelpers';
 import { User } from '@supabase/supabase-js';
-import { EventRegistration } from '../_types/EventRegistration';
+import { EventRegistrationWithSlot } from '../_types/EventRegistration';
 
 interface UserDetailsProps {
   user: User;
 }
-export function UserDetails({ user }) {
-  const [eventRegistrations, setEventRegistrations] = useState(null);
+
+export function UserDetails({ user }: UserDetailsProps) {
+  const [eventRegistrations, setEventRegistrations] = useState<EventRegistrationWithSlot[] | null>(null);
   const [searchError, setSearchError] = useState('');
 
   useEffect(() => {
