@@ -10,11 +10,12 @@ import QRCode from "qrcode";
 import { Resend } from "resend";
 import { v4 as uuidv4 } from "uuid";
 import {
-  EventRegistration,
+  // EventRegistration,
   EventRegistrationWithSlot,
   EventSlot,
   FormData,
 } from "./types";
+import { EventRegistration } from "@/app/types/EventRegistration";
 import { formatDateTime } from "./utils";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import {
@@ -93,7 +94,6 @@ export async function oldcreateRegistration(
     // Send confirmation email with ICS file and QR code
     await sendConfirmationEmailWithICSAndQR(
       formData.email,
-      data[0],
       slotData,
       qrCodeDataURL,
     );
@@ -169,7 +169,8 @@ export async function confirmRegistration(signature: string) {
           .updateUserById(userId, {
             email: email,
             email_confirm: true,
-            is_anonymous: false
+            // @ts-ignore -- this works, but Supabase needs to update their types
+            is_anonymous: false,
           });
 
         if (authUpdateError) {
@@ -250,25 +251,41 @@ export async function createRegistration(
           })
           .where(eq(eventRegistrations.id, existingRegistration.id))
           .returning();
-        registrationResult = updateResult[0];
+        registrationResult = updateResult.map((r) => ({
+          ...r,
+          // map id
+          id: r.id as `${string}-${string}-${string}-${string}-${string}`,
+          createdBy: r.createdBy as `${string}-${string}-${string}-${string}-${string}`,
+          slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
+        }))[0];
       } else {
         // Insert new registration
+        const name: string = `${formData.lastName} ${formData.firstName}`;
+        const slot: string = formData.slot;
         const insertResult = await tx.insert(eventRegistrations)
+          // @ts-ignore
           .values({
-            slot: formData.slot,
+            slot: slot,
             email: formData.email,
-            name: `${formData.lastName} ${formData.firstName}`,
+            name: name,
             phone: formData.phone,
             createdBy: formData.created_by,
             status: status,
           })
           .returning();
-        registrationResult = insertResult[0];
+        registrationResult = insertResult.map((r) => ({
+          ...r,
+          // map id
+          id: r.id as `${string}-${string}-${string}-${string}-${string}`,
+          createdBy: r.createdBy as `${string}-${string}-${string}-${string}-${string}`,
+          slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
+        }))[0];
       }
 
       // Update auth.users -- set isAnonymous to false if the user is no longer anonymous
       await tx.update(authUsers)
         .set({ isAnonymous: isAnonymous })
+        // @ts-ignore
         .where(eq(authUsers.id, formData.created_by));
 
       return { success: true, registrationResult, status };

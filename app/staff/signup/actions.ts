@@ -1,15 +1,19 @@
+// File: app/staff/signup/action.ts
+
 "use server";
 
+import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
-import { createClient } from "@/utils/supabase/server";
+type SignupResult =
+  | { success: true }
+  | { success: false; error: string };
 
-export async function signup(formData: FormData) {
+export async function signup(formData: FormData): Promise<SignupResult> {
   const supabase = createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
@@ -19,9 +23,10 @@ export async function signup(formData: FormData) {
 
   if (error) {
     console.error(`Signup error: ${error.message}`);
-    return redirect("/error");
+    return { success: false, error: error.message };
   }
 
   revalidatePath("/staff", "layout");
-  return redirect("/staff/checkin");
+  redirect("/staff/checkin");
+  return { success: true };
 }

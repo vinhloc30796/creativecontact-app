@@ -130,7 +130,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     try {
       const result = await createRegistration({
         ...data,
-        created_by: user?.id,
+        created_by: user?.id || null,
         is_anonymous: isAnonymous,
         existingRegistrationId: existingRegistration?.id,
       });

@@ -1,61 +1,62 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { createClient } from '@/utils/supabase/custom-middleware'
-import { STAFF_PASSWORD, PASSWORD_COOKIE_NAME } from '@/app/staff-access/const'
+// File: middleware.ts
+
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { createClient } from "@/utils/supabase/custom-middleware";
+import { PASSWORD_COOKIE_NAME, STAFF_PASSWORD } from "@/app/staff-access/const";
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createClient(req)
+  const res = NextResponse.next();
+  const supabase = createClient(req);
 
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
-  const isStaffRoute = req.nextUrl.pathname.startsWith('/staff/')
-  const isLoginPage = req.nextUrl.pathname === '/staff/login'
-  const isSignOutPage = req.nextUrl.pathname === '/staff/signout'
-  const isSignUpPage = req.nextUrl.pathname === '/staff/signup'
-  const isLoginCallback = req.nextUrl.pathname === '/staff/login-callback'
-  const isPasswordPage = req.nextUrl.pathname === '/staff-access/password'
+  const pathname = req.nextUrl.pathname;
+  // Staff password
+  const isPasswordPage = pathname === "/staff-access/password";
+  // Staff pages
+  const isStaffRoute = pathname.startsWith("/staff/");
+  const isLoginPage = pathname === "/staff/login";
+  const isSignOutPage = pathname === "/staff/signout";
+  const isSignUpPage = pathname === "/staff/signup";
+  const isLoginCallback = pathname === "/staff/login-callback";
 
   // Check for password cookie
-  const passwordCookie = req.cookies.get(PASSWORD_COOKIE_NAME)
-  const hasValidPasswordCookie = passwordCookie?.value === STAFF_PASSWORD
+  const passwordCookie = req.cookies.get(PASSWORD_COOKIE_NAME);
+  const hasValidPasswordCookie = passwordCookie?.value === STAFF_PASSWORD;
 
-  console.log(`Password cookie (querying ${PASSWORD_COOKIE_NAME}): ${passwordCookie?.value}`)
-  console.log('Expected STAFF_PASSWORD:', STAFF_PASSWORD)
-  console.log('Session:', session)
-  console.log('Request URL:', req.nextUrl.pathname)
+  console.log(
+    `Password cookie (querying ${PASSWORD_COOKIE_NAME}): ${passwordCookie?.value}`,
+  );
+  console.log("Expected STAFF_PASSWORD:", STAFF_PASSWORD);
+  console.log("Session:", session);
+  console.log("Request URL:", pathname);
 
-  if (isStaffRoute && !isPasswordPage) {
-    // Handle password check
-    if (!hasValidPasswordCookie && !isPasswordPage) {
-      const redirectUrl = req.nextUrl.clone()
-      redirectUrl.pathname = '/staff-access/password'
-      redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname)
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    // Handle authentication after password check
-    if (hasValidPasswordCookie || isPasswordPage) {
-      if (!session && !isLoginPage && !isSignUpPage && !isSignOutPage && !isLoginCallback) {
-        const redirectUrl = req.nextUrl.clone()
-        redirectUrl.pathname = '/staff/login'
-        redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname)
-        return NextResponse.redirect(redirectUrl)
-      }
-      
-      if (session && (isLoginPage || isSignUpPage)) {
-        const redirectUrl = req.nextUrl.clone()
-        redirectUrl.pathname = '/staff/checkin'
-        return NextResponse.redirect(redirectUrl)
-      }
-    }
+  // 1. Block access to /staff/* routes if no valid password cookie
+  if (isStaffRoute && !hasValidPasswordCookie) {
+    console.log(`Invalid cookie: Redirecting from ${pathname} to /staff-access/password`)
+    return NextResponse.redirect(new URL("/staff-access/password", req.url));
   }
 
-  return res
+  // 2. Allow access to /staff/* routes if valid password cookie
+  if (isStaffRoute && hasValidPasswordCookie) {
+    return res;
+  }
+
+  // 3. Redirect /staff-access/password to /staff/login if valid cookie
+  if (isPasswordPage && hasValidPasswordCookie) {
+    console.log(
+      "Valid cookie: Redirecting from /staff-access/password to /staff/login",
+    );
+    return NextResponse.redirect(new URL("/staff/login", req.url));
+  }
+
+  // For all other cases, proceed with the request
+  return res;
 }
 
 export const config = {
-  matcher: ['/staff/:path*'],
-}
+  matcher: ["/staff/:path*"],
+};

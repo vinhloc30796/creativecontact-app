@@ -1,3 +1,5 @@
+// File: app/staff-access/password/page.tsx
+
 'use client'
 
 import { Button } from '@/components/ui/button'
@@ -22,7 +24,7 @@ function StaffPasswordForm() {
 	const [error, setError] = useState<string | null>(null)
 	const router = useRouter()
 	const searchParams = useSearchParams()
-	const redirectedFrom = searchParams.get('redirectedFrom') || '/staff'
+	const redirectedFrom = searchParams.get('redirectedFrom') || '/staff/checkin'
 	const form = useForm<StaffPasswordFormData>({
 		resolver: zodResolver(staffPasswordSchema),
 		defaultValues: {

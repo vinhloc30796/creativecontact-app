@@ -1,20 +1,16 @@
 // File: app/staff/checkin/_sections/_checkin.tsx
 "use client"
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from '@/lib/utils'
-import { Search } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import styles from './_checkin.module.scss'
-import QRScanButton from './QRScanButton'
-import ManualSearch from './ManualSearch'
 import dynamic from 'next/dynamic'
-
-const EventLogWrapper = dynamic(() => import('./EventLogWrapper'), { ssr: false })
-
+import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import styles from './_checkin.module.scss'
+import ManualSearch from './ManualSearch'
+import QRScanButton from './QRScanButton'
+import { EventLogWrapper } from './EventLogWrapper'
 
 interface CheckinPageProps {
   userEmail: string | null
