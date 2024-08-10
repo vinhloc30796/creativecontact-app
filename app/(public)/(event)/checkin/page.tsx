@@ -29,6 +29,7 @@ export default function CheckInPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [eventRegistrations, setEventRegistrations] = useState<EventRegistration[] | null>(null);
   const [searchError, setSearchError] = useState('');
+  const [checkinStatus, setCheckinStatus] = useState<{ id: string; status: string } | null>(null);
   const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
 
   const handleMagicLinkRequest = async (e: React.FormEvent) => {
@@ -67,6 +68,25 @@ export default function CheckInPage() {
     }
   };
 
+  const handleCheckin = async (registrationId: string) => {
+    try {
+      const response = await fetch('/api/checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: registrationId }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setCheckinStatus({ id: registrationId, status: 'success' });
+      } else {
+        setCheckinStatus({ id: registrationId, status: 'failure' });
+      }
+    } catch (err) {
+      console.error('Error during check-in:', err);
+      setCheckinStatus({ id: registrationId, status: 'failure' });
+    }
+  };
+
   useEffect(() => {
     if (user && !isAnonymous && user.email) {
       searchEventRegistration(user.email);
@@ -98,22 +118,33 @@ export default function CheckInPage() {
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>User ID:</strong> {user.id}</p>
                 {eventRegistrations && eventRegistrations.length > 0 ? (
-                  eventRegistrations.map((registration, index) => (
-                    <div key={registration.id} className="border p-4 rounded-md">
-                      <h3 className="font-semibold">Registration {index + 1}</h3>
-                      <p><strong>Event:</strong> {registration.eventName}</p>
-                      <p><strong>Status:</strong> {registration.status}</p>
-                      <p><strong>Slot Time:</strong> {new Date(registration.slotTimeStart).toLocaleString()} - {new Date(registration.slotTimeEnd).toLocaleString()}</p>
-                    </div>
+                  eventRegistrations.map((registration) => (
+                    <>
+                      <div key={registration.id} className="border p-4 rounded-md">
+                        <h3 className="font-semibold">Registration</h3>
+                        <p><strong>Event:</strong> {registration.eventName}</p>
+                        <p><strong>Status:</strong> {registration.status}</p>
+                        <p><strong>Slot Time:</strong> {new Date(registration.slotTimeStart).toLocaleString()} - {new Date(registration.slotTimeEnd).toLocaleString()}</p>
+                        {checkinStatus?.id === registration.id && (
+                          <p className={`mt-2 ${checkinStatus.status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+                            Check-in {checkinStatus.status === 'success' ? 'successful' : 'failed'}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        className="mt-2 w-full"
+                        onClick={() => handleCheckin(registration.id)}
+                        disabled={checkinStatus?.id === registration.id}
+                      >
+                        Check-in
+                      </Button>
+                    </>
                   ))
                 ) : (
                   <p>No event registrations found.</p>
                 )}
                 {searchError && <p className="text-red-500">{searchError}</p>}
               </div>
-              <Button type="button" onClick={() => user.email && searchEventRegistration(user.email)}>
-                Refresh Registration Info
-              </Button>
             </>
           ) : (
             <>
