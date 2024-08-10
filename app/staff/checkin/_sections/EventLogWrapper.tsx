@@ -9,8 +9,11 @@ function formatDate(date: Date): string {
 export default async function EventLogWrapper() {
   const logs = await getEventLogs();
   const formattedLogs = logs.map(log => ({
-    ...log,
-    changed_at: formatDate(log.changed_at)
+    id: log.eventRegistrationId,
+    guest_name: log.guestName,
+    status_after: log.statusAfter,
+    changed_at: formatDate(log.changedAt),
+    staff_id: log.staffId,
   }));
 
   return <EventLogClient logs={formattedLogs} />;

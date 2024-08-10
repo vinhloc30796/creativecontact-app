@@ -1,12 +1,14 @@
-// File: app/types/EventRegistrationLogEntry.ts
+// File: app/types/EventRegistrationLog.ts
 
 import { UUID } from "crypto";
 import { RegistrationStatus } from "@/app/types/RegistrationStatus";
 
-// Define the EventRegistrationLogEntry interface
-export interface EventRegistrationLogEntry {
+// Define the EventRegistrationLog interface
+export interface EventRegistrationLog {
   eventRegistrationId: UUID;
   staffId: UUID;
   statusBefore: RegistrationStatus;
   statusAfter: RegistrationStatus;
+  changedAt: Date;
+  guestName: string;
 }

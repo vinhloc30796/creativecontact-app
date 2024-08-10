@@ -6,24 +6,19 @@ import { eq, desc } from 'drizzle-orm';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from '@/lib/db';
 import { eventRegistrationLogs, eventRegistrations, authUsers } from '@/drizzle/schema';
+import { EventRegistrationLog } from '@/app/types/EventRegistrationLog';
 
-interface EventLog {
-  id: string;
-  changed_at: Date;
-  status_after: string;
-  guest_name: string;
-  staff_id: string;
-}
 
-export async function getEventLogs(): Promise<EventLog[]> {
+export async function getEventLogs(): Promise<EventRegistrationLog[]> {
   try {
     const logs = await db
       .select({
-        id: eventRegistrationLogs.id,
-        changed_at: eventRegistrationLogs.changedAt,
-        status_after: eventRegistrationLogs.statusAfter,
-        guest_name: eventRegistrations.name,
-        staff_id: authUsers.id,
+        eventRegistrationId: eventRegistrationLogs.id,
+        changedAt: eventRegistrationLogs.changedAt,
+        statusBefore: eventRegistrationLogs.statusBefore,
+        statusAfter: eventRegistrationLogs.statusAfter,
+        guestName: eventRegistrations.name,
+        staffId: authUsers.id,
       })
       .from(eventRegistrationLogs)
       .innerJoin(eventRegistrations, eq(eventRegistrationLogs.eventRegistrationId, eventRegistrations.id))
@@ -31,7 +26,11 @@ export async function getEventLogs(): Promise<EventLog[]> {
       .orderBy(desc(eventRegistrationLogs.changedAt))
       .limit(5);
 
-    return logs;
+      return logs.map(log => ({
+        ...log,
+        eventRegistrationId: log.eventRegistrationId as `${string}-${string}-${string}-${string}-${string}`,
+        staffId: log.staffId as `${string}-${string}-${string}-${string}-${string}`
+      }));
   } catch (error) {
     console.error('Error fetching event logs:', error);
     return [];
@@ -43,23 +42,38 @@ function formatDate(date: Date): string {
 }
 
 export default async function EventLog() {
-  const logs = await getEventLogs();
-
-  return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Event log</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {logs.map((log) => (
-          <div key={log.id} className="mb-2">
-            <strong>{log.guest_name}</strong>{' '}
-            {log.status_after.toLowerCase()} at{' '}
-            <strong>{formatDate(log.changed_at)}</strong> by{' '}
-            <strong>{log.staff_id}</strong>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
+  try {
+    const logs = await getEventLogs();
+    console.debug('Event logs:', logs);
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Event log</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {logs.map((log) => (
+            <div key={log.eventRegistrationId} className="mb-2">
+              <strong>{log.guestName}</strong>{' '}
+              {log.statusAfter.toLowerCase()} at{' '}
+              <strong>{formatDate(log.changedAt)}</strong> by{' '}
+              <strong>{log.staffId}</strong>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  }
+  catch (error) {
+    console.error('Error fetching event logs:', error);
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Event log</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Error fetching event logs</p>
+        </CardContent>
+      </Card>
+    )
+  }
 }

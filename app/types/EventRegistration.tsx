@@ -8,7 +8,6 @@ import { EventSlot } from "@/app/types/EventSlot";
 // Define the base EventRegistration interface
 export interface EventRegistration {
   id: UUID;
-  eventName: string;
   createdAt: Date;
   createdBy: UUID;
   status: RegistrationStatus;

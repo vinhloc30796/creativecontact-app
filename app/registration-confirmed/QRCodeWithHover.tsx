@@ -1,3 +1,5 @@
+// File: app/registration-confirmed/QRCodeWithHover.tsx
+"use client";
 import React from 'react';
 
 interface QRCodeWithHoverProps {

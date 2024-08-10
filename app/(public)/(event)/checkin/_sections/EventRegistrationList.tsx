@@ -21,7 +21,7 @@ export function EventRegistrationList({ eventRegistrations, searchError }: Event
           <React.Fragment key={registration.id}>
             <div className="border p-4 rounded-md">
               <h3 className="font-semibold">Registration</h3>
-              <p><strong>Event:</strong> {registration.eventName}</p>
+              <p><strong>Event:</strong> {registration.name}</p>
               <p><strong>Status:</strong> {registration.status}</p>
               <p><strong>Slot Time:</strong> {new Date(registration.slotTimeStart).toLocaleString()} - {new Date(registration.slotTimeEnd).toLocaleString()}</p>
               {checkinStatus?.id === registration.id && (
