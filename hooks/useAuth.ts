@@ -24,7 +24,7 @@ interface AuthState {
   
     useEffect(() => {
       let isMounted = true;
-      let authListener: { subscription: { unsubscribe: () => void } } | null = null;
+      let authListener: { data: { subscription: { unsubscribe: () => void } } } | null = null;
   
       const initializeAuth = async () => {
         try {
@@ -73,8 +73,8 @@ interface AuthState {
   
       return () => {
         isMounted = false;
-        if (authListener?.subscription?.unsubscribe) {
-          authListener.subscription.unsubscribe();
+        if (authListener?.data.subscription?.unsubscribe) {
+          authListener.data.subscription.unsubscribe();
         }
       };      
     }, []);
