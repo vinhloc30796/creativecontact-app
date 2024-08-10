@@ -1,3 +1,5 @@
+// File: drizzle/schema.ts
+
 import {
   boolean,
   integer,
