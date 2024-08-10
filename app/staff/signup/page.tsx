@@ -1,16 +1,18 @@
+// File: app/staff/signup/page.tsx
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { signup } from './actions';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -25,6 +27,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -40,7 +43,12 @@ export default function SignupPage() {
     formData.append('email', data.email);
     formData.append('password', data.password);
     formData.append('confirmPassword', data.confirmPassword);
-    await signup(formData);
+    
+    const result = await signup(formData);
+    
+    if (!result.success) {
+      setError(result.error);
+    }
   };
 
   const handleLoginClick = (e: React.MouseEvent) => {
@@ -65,6 +73,11 @@ export default function SignupPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 bg-slate-100">
+              {error && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
               <FormField
                 control={form.control}
                 name="email"
@@ -109,7 +122,7 @@ export default function SignupPage() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="inline-block"> {/* Wrapper div */}
+                    <div className="inline-block">
                       <Button type="submit" disabled={!form.formState.isValid}>Sign up</Button>
                     </div>
                   </TooltipTrigger>
