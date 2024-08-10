@@ -263,8 +263,8 @@ export async function createRegistration(
           ...r,
           // map id
           id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-          createdBy: r
-            .createdBy as `${string}-${string}-${string}-${string}-${string}`,
+          created_by: r
+            .created_by as `${string}-${string}-${string}-${string}-${string}`,
           slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
         }))[0];
       } else {
@@ -278,7 +278,7 @@ export async function createRegistration(
             email: formData.email,
             name: name,
             phone: formData.phone,
-            createdBy: formData.created_by,
+            created_by: formData.created_by,
             status: status,
           })
           .returning();
@@ -286,8 +286,8 @@ export async function createRegistration(
           ...r,
           // map id
           id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-          createdBy: r
-            .createdBy as `${string}-${string}-${string}-${string}-${string}`,
+          created_by: r
+            .created_by as `${string}-${string}-${string}-${string}-${string}`,
           slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
         }))[0];
       }
@@ -320,9 +320,9 @@ export async function createRegistration(
         formData.email,
         {
           id: dbResult.registrationResult.id,
-          createdAt: slotData[0].createdAt,
-          timeStart: slotData[0].timeStart,
-          timeEnd: slotData[0].timeEnd,
+          created_at: slotData[0].created_at,
+          time_start: slotData[0].time_start,
+          time_end: slotData[0].time_end,
           capacity: slotData[0].capacity,
           event: slotData[0]
             .event as `${string}-${string}-${string}-${string}-${string}`,

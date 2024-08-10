@@ -23,18 +23,18 @@ export const authUsers = authSchema.table("users", {
 // Public schema
 export const events = pgTable("events", {
   id: uuid("id").primaryKey(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull(),
   name: text("name").notNull(),
   slug: text("slug").notNull(),
-  createdBy: uuid("created_by").notNull(),
+  created_by: uuid("created_by").notNull(),
 });
 
 export const eventSlots = pgTable("event_slots", {
   id: uuid("id").primaryKey(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull(),
   event: uuid("event").references(() => events.id).notNull(),
-  timeStart: timestamp("time_start", { withTimezone: true }).notNull(),
-  timeEnd: timestamp("time_end", { withTimezone: true }).notNull(),
+  time_start: timestamp("time_start", { withTimezone: true }).notNull(),
+  time_end: timestamp("time_end", { withTimezone: true }).notNull(),
   capacity: integer("capacity").notNull(),
 });
 
@@ -70,8 +70,8 @@ export const registrationStatus = pgEnum("registration_status", [
 
 export const eventRegistrations = pgTable("event_registrations", {
   id: uuid("id").primaryKey(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
-  createdBy: uuid("created_by").notNull().references(() => authUsers.id),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull(),
+  created_by: uuid("created_by").notNull().references(() => authUsers.id),
   status: registrationStatus("status").notNull().default("pending"),
   signature: text("signature"),
   slot: uuid("slot").references(() => eventSlots.id).notNull(),
@@ -80,7 +80,7 @@ export const eventRegistrations = pgTable("event_registrations", {
   phone: text("phone").notNull(),
 }, (table) => ({
   uniqueUserSlotRegistration: unique("unique_user_slot_registration").on(
-    table.createdBy,
+    table.created_by,
     table.slot,
   ),
 }));
@@ -106,9 +106,9 @@ Foreign-key constraints:
 
 export const eventRegistrationLogs = pgTable("event_registration_logs", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  eventRegistrationId: uuid("event_registration_id").references(() => eventRegistrations.id).notNull(),
-  staffId: uuid("staff_id").notNull().references(() => authUsers.id),
-  statusBefore: registrationStatus("status_before").notNull(),
-  statusAfter: registrationStatus("status_after").notNull(),
-  changedAt: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
+  event_registration_id: uuid("event_registration_id").references(() => eventRegistrations.id).notNull(),
+  staff_id: uuid("staff_id").notNull().references(() => authUsers.id),
+  status_before: registrationStatus("status_before").notNull(),
+  status_after: registrationStatus("status_after").notNull(),
+  changed_at: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
 });

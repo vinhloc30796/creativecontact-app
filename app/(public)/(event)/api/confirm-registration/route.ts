@@ -54,9 +54,9 @@ export async function GET(request: Request) {
         {
           id: registration[0].id as `${string}-${string}-${string}-${string}-${string}`,
           event: slot[0].event as `${string}-${string}-${string}-${string}-${string}`,
-          createdAt: registration[0].createdAt,
-          timeStart: slot[0].timeStart,
-          timeEnd: slot[0].timeEnd,
+          created_at: registration[0].created_at,
+          time_start: slot[0].time_start,
+          time_end: slot[0].time_end,
           capacity: slot[0].capacity,
         },
         qr,

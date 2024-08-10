@@ -8,8 +8,8 @@ import { EventSlot } from "@/app/types/EventSlot";
 // Define the base EventRegistration interface
 export interface EventRegistration {
   id: UUID;
-  createdAt: Date;
-  createdBy: UUID;
+  created_at: Date;
+  created_by: UUID;
   status: RegistrationStatus;
   signature: string | null;
   slot: UUID;
@@ -20,7 +20,7 @@ export interface EventRegistration {
 
 // Define the EventRegistrationWithSlot interface, which includes slot details
 export interface EventRegistrationWithSlot extends EventRegistration {
-  slotDetails: EventSlot;
-  slotTimeStart: string;
-  slotTimeEnd: string;
+  slot_details: EventSlot;
+  slot_time_start: string;
+  slot_time_end: string;
 }

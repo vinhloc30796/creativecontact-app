@@ -13,8 +13,8 @@ const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 function generateICSFile(slotData: EventSlot): Promise<string> {
   return new Promise((resolve, reject) => {
-    const startDate = new Date(slotData.timeStart);
-    const endDate = new Date(slotData.timeEnd);
+    const startDate = new Date(slotData.time_start);
+    const endDate = new Date(slotData.time_end);
 
     // Adjust for UTC+7
     const utcOffset = 7 * 60; // 7 hours in minutes
@@ -92,9 +92,9 @@ async function sendConfirmationEmailWithICSAndQR(
   try {
     // Prep vars
     const icsData = await generateICSFile(slotData);
-    const dateStr = new Date(slotData.timeStart).toLocaleDateString();
-    const timeStartStr = new Date(slotData.timeStart).toLocaleTimeString();
-    const timeEndStr = new Date(slotData.timeEnd).toLocaleTimeString();
+    const dateStr = new Date(slotData.time_start).toLocaleDateString();
+    const timeStartStr = new Date(slotData.time_start).toLocaleTimeString();
+    const timeEndStr = new Date(slotData.time_end).toLocaleTimeString();
     // Build email
     const emailContent = `<h1>Your registration is confirmed!</h1>
       <p>Event details:</p>

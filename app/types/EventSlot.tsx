@@ -5,9 +5,9 @@ import { UUID } from "crypto";
 // Define the EventSlot interface
 export interface EventSlot {
   id: UUID;
-  createdAt: Date;
+  created_at: Date;
   event: UUID;
-  timeStart: Date;
-  timeEnd: Date;
+  time_start: Date;
+  time_end: Date;
   capacity: number;
 }

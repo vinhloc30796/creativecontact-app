@@ -5,10 +5,10 @@ import { RegistrationStatus } from "@/app/types/RegistrationStatus";
 
 // Define the EventRegistrationLog interface
 export interface EventRegistrationLog {
-  eventRegistrationId: UUID;
-  staffId: UUID;
-  statusBefore: RegistrationStatus;
-  statusAfter: RegistrationStatus;
-  changedAt: Date;
+  event_registration_id: UUID;
+  staff_id: UUID;
+  status_before: RegistrationStatus;
+  status_after: RegistrationStatus;
+  changed_at: Date;
   guestName: string;
 }

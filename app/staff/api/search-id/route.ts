@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const registrations = await db
       .select({
         id: eventRegistrations.id,
-        createdAt: eventRegistrations.createdAt,
+        created_at: eventRegistrations.created_at,
         status: eventRegistrations.status,
         signature: eventRegistrations.signature,
         slot: eventRegistrations.slot,

@@ -16,9 +16,9 @@ export async function sendEventDetailsEmail(
   const icsData = await generateICSFile(slot);
   // console.debug("Generated ICS file:", icsData);
   const qr = await QRCode.toDataURL(registration.id);
-  const dateStr = new Date(slot.timeStart).toLocaleDateString();
-  const timeStartStr = new Date(slot.timeStart).toLocaleTimeString();
-  const timeEndStr = new Date(slot.timeEnd).toLocaleTimeString();
+  const dateStr = new Date(slot.time_start).toLocaleDateString();
+  const timeStartStr = new Date(slot.time_start).toLocaleTimeString();
+  const timeEndStr = new Date(slot.time_end).toLocaleTimeString();
   const emailContent = `
     <h1>Your Event Registration Details</h1>
     <p>Here are the details of your event registration:</p>

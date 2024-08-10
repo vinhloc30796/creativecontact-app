@@ -23,7 +23,7 @@ export function EventRegistrationList({ eventRegistrations, searchError }: Event
               <h3 className="font-semibold">Registration</h3>
               <p><strong>Event:</strong> {registration.name}</p>
               <p><strong>Status:</strong> {registration.status}</p>
-              <p><strong>Slot Time:</strong> {new Date(registration.slotTimeStart).toLocaleString()} - {new Date(registration.slotTimeEnd).toLocaleString()}</p>
+              <p><strong>Slot Time:</strong> {new Date(registration.slot_time_start).toLocaleString()} - {new Date(registration.slot_time_end).toLocaleString()}</p>
               {checkinStatus?.id === registration.id && (
                 <p className={`mt-2 ${checkinStatus.status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
                   {checkinStatus.status === 'success' 
