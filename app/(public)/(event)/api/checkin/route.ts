@@ -1,4 +1,4 @@
-// File: app/staff/api/checkin/route.ts
+// File: app/(public)/(event)/api/checkin/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const staffId = session.user.id;
+    const userId = session.user.id;
 
     // Validate the input
     const { id } = checkinSchema.parse(await request.json());
 
     // Perform the check-in
-    const result = await performCheckin(id, staffId);
+    const result = await performCheckin(id, userId);
 
     if (!result.success || !result.data) {
       console.error("Check-in failed:", result.error || "No data returned");
