@@ -29,11 +29,11 @@ interface AuthState {
       const initializeAuth = async () => {
         try {
           // Check for existing session
-          const { data: { session } } = await supabase.auth.getSession();
+          const { data: { user } } = await supabase.auth.getUser();
           
-          if (session?.user) {
-            const isAnonymous = session.user.is_anonymous || true;
-            updateAuthState(session.user, isAnonymous);
+          if (user) {
+            const isAnonymous = user.is_anonymous || true;
+            updateAuthState(user, isAnonymous);
           } else {
             // If no session, attempt anonymous sign-in
             const { data, error } = await supabase.auth.signInAnonymously();
