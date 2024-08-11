@@ -43,12 +43,12 @@ export default function SignupPage() {
     formData.append('email', data.email);
     formData.append('password', data.password);
     formData.append('confirmPassword', data.confirmPassword);
-    
-    const result = await signup(formData);
-    
-    if (!result.success) {
-      setError(result.error);
-    }
+
+    const result = await signup(formData).then(res => res.success).catch(err => {
+      console.error('Error signing up:', err);
+      setError('An unexpected error occurred. Please try again later.');
+      return { success: false, error: 'An unexpected error occurred. Please try again later.' };
+    })
   };
 
   const handleLoginClick = (e: React.MouseEvent) => {

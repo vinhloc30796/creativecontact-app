@@ -16,9 +16,9 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code)
 
     // Check if the exchange was successful by getting the session
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user } } = await supabase.auth.getUser()
 
-    if (session) {
+    if (user) {
       // Successful login, redirect to the check-in page
       return NextResponse.redirect(new URL('/staff/checkin', request.url))
     }
