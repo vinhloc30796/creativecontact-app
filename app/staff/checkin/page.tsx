@@ -9,11 +9,8 @@ export default async function Page() {
     data: { user },
     error
   } = await supabase.auth.getUser()
-  if (error) {
-    console.error("/staff/checkin: Error getting user: ", error)
-  }
-  
-  if (!user) {
+  if (error || !user) {
+    console.error("/staff/checkin: Error getting user: ", error || "No user found");
     redirect('/staff/login')
   }
   
