@@ -1,7 +1,6 @@
 "use server";
 
-import { authUsers, eventRegistrations, eventSlots } from "@/drizzle/schema";
-import { db } from "@/lib/db";
+import { authUsers, eventRegistrations, eventSlots } from "@/drizzle/schema";import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
@@ -271,8 +270,9 @@ export async function createRegistration(
         // Insert new registration
         const name: string = `${formData.lastName} ${formData.firstName}`;
         const slot: string = formData.slot;
+        // @ts-ignore
         const insertResult = await tx.insert(eventRegistrations)
-          // @ts-ignore
+        // @ts-ignore
           .values({
             slot: slot,
             email: formData.email,

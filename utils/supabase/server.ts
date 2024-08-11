@@ -2,7 +2,6 @@
 
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import type { Cookie } from 'next/types'
 
 export function createClient() {
 	const cookieStore = cookies()
@@ -12,7 +11,7 @@ export function createClient() {
 			getAll() {
 				return cookieStore.getAll()
 			},
-			setAll(cookiesToSet: Cookie[]) {
+			setAll(cookiesToSet) {
 				try {
 					cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
 				} catch {
