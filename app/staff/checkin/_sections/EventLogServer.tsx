@@ -26,11 +26,7 @@ export async function getEventLogs(): Promise<EventRegistrationLog[]> {
       .orderBy(desc(eventRegistrationLogs.changed_at))
       .limit(5);
 
-      return logs.map(log => ({
-        ...log,
-        event_registration_id: log.event_registration_id as `${string}-${string}-${string}-${string}-${string}`,
-        staff_id: log.staff_id as `${string}-${string}-${string}-${string}-${string}`
-      }));
+      return logs.map(log => log as EventRegistrationLog);
   } catch (error) {
     console.error('Error fetching event logs:', error);
     return [];

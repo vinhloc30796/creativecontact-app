@@ -1,5 +1,5 @@
-// EventLogClient.tsx
-'use client';
+// File: app/staff/checkin/_sections/EventLogClient.tsx
+"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 

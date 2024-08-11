@@ -9,9 +9,7 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createClient(req);
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const {data: { user }} = await supabase.auth.getUser();
 
   const pathname = req.nextUrl.pathname;
   // Staff password
@@ -27,12 +25,12 @@ export async function middleware(req: NextRequest) {
   const passwordCookie = req.cookies.get(PASSWORD_COOKIE_NAME);
   const hasValidPasswordCookie = passwordCookie?.value === STAFF_PASSWORD;
 
-  console.log(
-    `Password cookie (querying ${PASSWORD_COOKIE_NAME}): ${passwordCookie?.value}`,
+  console.debug(
+    `Password cookie (querying ${PASSWORD_COOKIE_NAME}): ${passwordCookie?.value};`,
+    `Expected STAFF_PASSWORD: ${STAFF_PASSWORD};`,
+    "User:", user,
+    "with Request URL:", pathname,
   );
-  console.log("Expected STAFF_PASSWORD:", STAFF_PASSWORD);
-  console.log("Session:", session);
-  console.log("Request URL:", pathname);
 
   // 1. Block access to /staff/* routes if no valid password cookie
   if (isStaffRoute && !hasValidPasswordCookie) {
