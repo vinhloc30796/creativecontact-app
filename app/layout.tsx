@@ -1,28 +1,26 @@
-import { GeistSans } from "geist/font/sans";
-import "./globals.css";
+import type { Metadata } from 'next'
+import { Inter as FontSans } from 'next/font/google'
+import './globals.css'
+import { cn } from '@/lib/utils'
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const fontSans = FontSans({
+	subsets: ['latin'],
+	variable: '--font-sans',
+})
 
-export const metadata = {
-  metadataBase: new URL(defaultUrl),
-  title: "Creative Contact - Application",
-  description: "In stealth - Using Next.js & Supabase",
-};
+export const metadata: Metadata = {
+	title: 'Creative Contact',
+}
 
 export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en" className={GeistSans.className}>
-      <body className="bg-background text-foreground">
-        <main className="min-h-screen flex flex-col items-center">
-          {children}
-        </main>
-      </body>
-    </html>
-  );
+	children,
+}: Readonly<{
+	children: React.ReactNode
+}>) {
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<head />
+			<body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>{children}</body>
+		</html>
+	)
 }

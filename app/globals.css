@@ -3,44 +3,72 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 200 20% 98%;
-    --btn-background: 200 10% 91%;
-    --btn-background-hover: 200 10% 89%;
-    --foreground: 200 50% 3%;
-    --success: 142 76% 36%;
-    --muted-foreground: 200 19% 18%;
-  }
+	:root {
+		--background: 0 0% 100%;
+		--foreground: 11.25 50% 6.27%;
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: 200 50% 3%;
-      --btn-background: 200 10% 9%;
-      --btn-background-hover: 200 10% 12%;
-      --foreground: 200 20% 96%;
-      --success: 142 69% 58%;
-      --muted-foreground: 200 5% 65%;
-    }
-  }
+		--primary: 11.93 86.1% 63.33%;
+		--primary-foreground: 0 0% 100%;
+
+		--card: 0 0% 100%;
+		--card-foreground: 11.25 50% 6.27%;
+
+		--popover: 0 0% 100%;
+		--popover-foreground: 11.25 50% 6.27%;
+
+		--secondary: 12.5 85.71% 94.51%;
+		--secondary-foreground: 0 0% 0%;
+
+		--muted: 11.25 88.89% 96.47%;
+		--muted-foreground: 0 0% 40%;
+
+		--accent: 11.25 88.89% 96.47%;
+		--accent-foreground: 11.93 86.1% 63.33%;
+
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 210 40% 98%;
+
+		--border: 0 0% 90.2%;
+		--input: 0 0% 90.2%;
+		--ring: 11.93 86.1% 63.33%;
+
+		--radius: 0.1rem;
+	}
+	.dark {
+		--primary: 11.93 86.1% 63.33%;
+		--primary-foreground: 0 0% 100%;
+
+		--card: 0 0% 0%;
+		--card-foreground: 12.5 85.71% 94.51%;
+
+		--popover: 0 0% 0%;
+		--popover-foreground: 12.5 85.71% 94.51%;
+
+		--secondary: 12.63 50.44% 22.16%;
+		--secondary-foreground: 0 0% 100%;
+
+		--muted: 0 0% 9.8%;
+		--muted-foreground: 0 0% 50.2%;
+
+		--accent: 12.63 50.44% 22.16%;
+		--accent-foreground: 12.5 85.71% 94.51%;
+
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 210 40% 98%;
+
+		--border: 0 0% 14.9%;
+		--input: 0 0% 14.9%;
+		--ring: 11.93 86.1% 63.33%;
+
+		--radius: 0.1rem;
+	}
 }
 
 @layer base {
-  * {
-    @apply border-foreground/20;
-  }
-}
-
-.animate-in {
-  animation: animateIn 0.3s ease 0.15s both;
-}
-
-@keyframes animateIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
 }

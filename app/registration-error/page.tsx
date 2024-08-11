@@ -1,0 +1,76 @@
+// File: app/registration-error/page.tsx
+
+"use client";
+
+import React from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
+import { AlertCircle } from 'lucide-react';
+
+export default function RegistrationError() {
+  const supabase = createClient();
+
+  const handleRetry = async () => {
+    // This is a placeholder function. You'll need to implement the actual retry logic.
+    // It might involve re-sending a confirmation email or redirecting to a registration page.
+    console.log('Retry registration');
+  };
+
+  return (
+    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
+      <Card className="w-[400px] overflow-hidden relative z-10">
+        <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
+          style={{
+            backgroundImage: 'url(/banner.jpg)',
+            backgroundSize: 'cover',
+          }}
+        />
+        <CardContent className='p-6 flex flex-col gap-4'>
+          <div
+            className={cn('flex flex-col space-y-2 p-4 bg-red-100 rounded-md border border-red-300', styles.step)}
+          >
+            <h2 className="text-2xl font-semibold flex items-center gap-2 text-red-700">
+              <AlertCircle size={24} />
+              Registration Error
+            </h2>
+            <p>We&apos;re sorry, but there was an error confirming your registration.</p>
+          </div>
+
+          <div className="space-y-2">
+            <p>This might be due to one of the following reasons:</p>
+            <ul className="list-disc list-inside">
+              <li>The confirmation link has expired</li>
+              <li>The confirmation link has already been used</li>
+              <li>There was a technical issue with our system</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <p className="font-semibold">What you can do:</p>
+            <ol className="list-decimal list-inside">
+              <li>Try to register again using the button below</li>
+              <li>Check your email for a more recent confirmation link</li>
+              <li>Contact our support team if the issue persists</li>
+            </ol>
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            <Button onClick={handleRetry}>
+              Retry Registration
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="mailto:hello@creativecontact.vn">Contact Support: hello@creativecontact.vn</Link>
+            </Button>
+            <Button variant="link" asChild>
+              <Link href="/">Return to Home Page</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

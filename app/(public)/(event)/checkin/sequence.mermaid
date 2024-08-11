@@ -1,0 +1,37 @@
+sequenceDiagram
+    participant User
+    participant UserDevice as User's Device
+    participant WebApp as Web Application
+    participant Server
+    participant Database
+    participant Email as Email Service
+
+    Note over User,Email: Registration Process
+    User->>WebApp: Registers for event
+    WebApp->>Server: Send registration data
+    Server->>Database: Store user data
+    Server->>UserDevice: Set session cookie & local storage
+
+    Note over User,Email: Check-in Process
+    User->>UserDevice: Scans shared QR code
+    UserDevice->>WebApp: Load check-in web app
+    WebApp->>WebApp: Attempt to retrieve user session
+    alt Session found
+        WebApp->>Server: Send automatic check-in request
+        Server->>Database: Verify user and update status
+        Server->>WebApp: Confirm check-in
+        WebApp->>UserDevice: Display success message
+    else Session not found
+        WebApp->>UserDevice: Display magic link option
+        User->>UserDevice: Requests magic link
+        WebApp->>Server: Request magic link
+        Server->>Email: Send magic link email
+        Email->>User: Deliver magic link
+        User->>UserDevice: Click magic link
+        UserDevice->>WebApp: Open link with token
+        WebApp->>Server: Validate token and check in
+        Server->>Database: Update user status
+        Server->>WebApp: Confirm check-in
+        WebApp->>UserDevice: Display success message
+    end
+    UserDevice->>User: Show check-in confirmation

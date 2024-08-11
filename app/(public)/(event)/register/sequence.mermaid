@@ -1,0 +1,53 @@
+sequenceDiagram
+    participant User
+    participant RegistrationForm
+    participant Actions
+    participant Supabase
+    participant EmailService
+    participant QRService
+    participant ConfirmRegistrationAPI
+    participant RegistrationConfirmedPage
+
+    User->>RegistrationForm: Submits registration form
+    RegistrationForm->>Actions: createRegistration(formData, userId, isAnonymous)
+    
+    Actions->>Supabase: Check existing registration
+    Supabase-->>Actions: Return existing registration (if any)
+
+    rect
+        Note over Actions: DB Transaction
+        alt Existing registration found
+            Actions->>Supabase: Update event_registrations
+        else No existing registration
+            Actions->>Supabase: Insert new event_registration
+        end
+        Actions->>Supabase: Update auth.users (set isAnonymous)
+    end
+
+    Supabase-->>Actions: Return transaction result
+
+    alt isAnonymous
+        Actions->>EmailService: sendConfirmationRequestEmail
+        EmailService-->>Actions: Email sent status
+        Actions-->>RegistrationForm: Return success (pending confirmation)
+        RegistrationForm->>User: Show pending confirmation message
+    else Not Anonymous
+        Actions->>Supabase: Fetch event slot details
+        Supabase-->>Actions: Return slot details
+        Actions->>QRService: Generate QR code
+        QRService-->>Actions: Return QR code
+        Actions->>EmailService: sendConfirmationEmailWithICSAndQR
+        EmailService-->>Actions: Email sent status
+        Actions-->>RegistrationForm: Return success (confirmed)
+        RegistrationForm->>User: Show confirmation message with next steps
+    end
+
+    alt Anonymous User (Pending Confirmation)
+        User->>ConfirmRegistrationAPI: Click confirmation link in email
+        ConfirmRegistrationAPI->>Supabase: Confirm registration
+        Supabase-->>ConfirmRegistrationAPI: Confirmation result
+        ConfirmRegistrationAPI->>EmailService: Send final confirmation email
+        EmailService-->>ConfirmRegistrationAPI: Email sent status
+        ConfirmRegistrationAPI->>RegistrationConfirmedPage: Redirect with emailSent flag
+        RegistrationConfirmedPage->>User: Display final confirmation
+    end
