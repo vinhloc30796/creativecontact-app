@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { CheckinPage } from './_sections/_checkin'
+import CheckinPage from './_sections/_checkin'
 
 export default async function Page() {
   const supabase = createClient()

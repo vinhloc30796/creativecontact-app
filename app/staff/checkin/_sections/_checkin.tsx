@@ -1,65 +1,22 @@
-// File: app/staff/checkin/_sections/_checkin.tsx
-"use client"
-
+// File: app/staff/checkin/_sections/page.tsx
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { createClient } from "@/utils/supabase/server"
+import { redirect } from 'next/navigation'
 import styles from './_checkin.module.scss'
 import { EventLogWrapper } from './EventLogWrapper'
-import ManualSearch from './ManualSearch'
 import QRScanButton from './QRScanButton'
+import SuspenseManualSearch from './SuspenseManualSearch'
 
-interface CheckinPageProps {
-  userEmail: string | null
-}
+export default async function CheckinPage() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    redirect('/staff/login')
+  }
 
-interface SearchResult {
-  id: string
-  name: string
-  email: string
-  phone: string
-  status: string
-}
-
-
-export default function CheckinPage({ userEmail }: CheckinPageProps) {
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-
-
-  const handleSignOut = async () => {
-    try {
-      const response = await fetch('/staff/signout', { method: 'POST' });
-      if (response.ok) {
-        router.push('/staff/login');
-      } else {
-        console.error('Sign out failed');
-      }
-    } catch (error) {
-      console.error('Error during sign out:', error);
-    }
-  };
-
-  const handleSearch = async () => {
-    try {
-      const response = await fetch('/staff/api/manual-search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ searchTerm }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSearchResults(data.results);
-      } else {
-        console.error('Search failed');
-      }
-    } catch (error) {
-      console.error('Error during search:', error);
-    }
-  };
+  const userEmail = user.email;
 
   return (
     <div className={cn('min-h-screen container flex items-center justify-center bg-slate-50', styles.container)}>
@@ -82,20 +39,8 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
             <div className="flex flex-col gap-4 w-full">
               <div className="flex gap-4 w-full">
                 <QRScanButton />
-                <ManualSearch />
+                <SuspenseManualSearch />
               </div>
-              {searchResults.length > 0 && (
-                <div className="flex flex-col border rounded w-full bg-white p-4">
-                  <h3 className={cn('text-lg font-bold', styles.title)}>Search Results</h3>
-                  <ul>
-                    {searchResults.map((result: any) => (
-                      <li key={result.id}>
-                        {result.name} - {result.email} - {result.phone}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
               <div className="flex flex-col border rounded w-full bg-white p-4">
                 <h3 className={cn('text-lg font-bold', styles.title)}>Event statistics</h3>
                 <p>Event statistics will be displayed here.</p>
@@ -104,19 +49,18 @@ export default function CheckinPage({ userEmail }: CheckinPageProps) {
                 <h3 className={cn('text-lg font-bold', styles.title)}>Timeslot statistics</h3>
                 <p>Event statistics will be displayed here.</p>
               </div>
-              {/* Insert event log here */}
               <EventLogWrapper />
             </div>
           </CardContent>
         }
         <CardFooter className="flex justify-between mt-4">
-          <Button type="submit" onClick={handleSignOut} variant={'secondary'}
-            className='w-full'
-          >{userEmail ? "Sign out" : "Retry"}</Button>
+          <form action="/staff/signout" method="POST" className="w-full">
+            <Button type="submit" variant={'secondary'} className="w-full">
+              {userEmail ? "Sign out" : "Retry"}
+            </Button>
+          </form>
         </CardFooter>
       </Card>
     </div>
   )
 }
-
-export { CheckinPage }
