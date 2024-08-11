@@ -1,7 +1,7 @@
 import styles from './_register.module.scss'
 import { cn } from '@/lib/utils'
 import RegisterWrapper from './wrapper'
-import { EventSlot } from './types'
+import { EventSlot } from '@/app/types/EventSlot'
 import RegistrationForm from './RegistrationForm'
 
 interface RegisterPageProps {

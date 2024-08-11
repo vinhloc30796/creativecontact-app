@@ -2,7 +2,8 @@
 
 "use server";
 
-import { EventSlot } from "@/app/(public)/(event)/register/_sections/types";
+// import { EventSlot } from "@/app/(public)/(event)/register/_sections/types";
+import { EventSlot } from "@/app/types/EventSlot";
 import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { createEvent } from "ics";
@@ -12,33 +13,25 @@ const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 function generateICSFile(slotData: EventSlot): Promise<string> {
   return new Promise((resolve, reject) => {
-    const startDate = new Date(slotData.time_start);
-    const endDate = new Date(slotData.time_end);
-
-    // Adjust for UTC+7
-    const utcOffset = 7 * 60; // 7 hours in minutes
-    startDate.setMinutes(startDate.getMinutes() + utcOffset);
-    endDate.setMinutes(endDate.getMinutes() + utcOffset);
-
     const event = {
       start: [
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth() + 1,
-        startDate.getUTCDate(),
-        startDate.getUTCHours(),
-        startDate.getUTCMinutes(),
+        slotData.time_start.getUTCFullYear(),
+        slotData.time_start.getUTCMonth() + 1,
+        slotData.time_start.getUTCDate(),
+        slotData.time_start.getUTCHours(),
+        slotData.time_start.getUTCMinutes(),
       ],
       end: [
-        endDate.getUTCFullYear(),
-        endDate.getUTCMonth() + 1,
-        endDate.getUTCDate(),
-        endDate.getUTCHours(),
-        endDate.getUTCMinutes(),
+        slotData.time_end.getUTCFullYear(),
+        slotData.time_end.getUTCMonth() + 1,
+        slotData.time_end.getUTCDate(),
+        slotData.time_end.getUTCHours(),
+        slotData.time_end.getUTCMinutes(),
       ],
       title: "Hoàn Tất",
       description: "Thank you for registering for our event!",
       location: "Event Location",
-      url: "https://youreventwebsite.com",
+      url: "https://creativecontact.vn",
       status: "CONFIRMED" as const,
       busyStatus: "BUSY" as const,
       // Explicitly set the timezone
@@ -95,18 +88,18 @@ async function sendConfirmationEmailWithICSAndQR(
     const timeStartStr = new Date(slotData.time_start).toLocaleTimeString();
     const timeEndStr = new Date(slotData.time_end).toLocaleTimeString();
     // Build email
+    const emailContent = `<h1>Your registration is confirmed!</h1>
+      <p>Event details:</p>
+      <ul>
+          <li>Date: ${dateStr}</li>
+          <li>Time: ${timeStartStr} - ${timeEndStr}</li>
+      </ul>
+      <img src="${qrCodeDataURL}" alt="Registration QR Code" />`;
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@bangoibanga.com>",
       to: email,
       subject: "Your Event Registration is Confirmed",
-      html: `<h1>Your registration is confirmed!</h1>
-        <p>Event details:</p>
-        <ul>
-            <li>Date: ${dateStr}</li>
-            <li>Time: ${timeStartStr} - ${timeEndStr}</li>
-        </ul>
-        <img src="${qrCodeDataURL}" alt="Registration QR Code" />
-  `,
+      html: emailContent,
       attachments: [{ content: icsData, filename: "event.ics" }],
     });
 
@@ -114,8 +107,7 @@ async function sendConfirmationEmailWithICSAndQR(
       console.error("Error sending confirmation email with ICS:", error);
     } else {
       console.log(
-        `Confirmation email with ICS sent for slot ${slotData.id}:`,
-        data,
+        `Confirmation email with ICS sent for slot ${slotData.id}: `, data,
       );
     }
   } catch (error) {

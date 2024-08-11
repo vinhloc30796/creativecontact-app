@@ -52,15 +52,15 @@ export async function GET(request: Request) {
       await sendConfirmationEmailWithICSAndQR(
         registration[0].email,
         {
-          id: registration[0].id,
-          created_at: new Date(registration[0].createdAt).toISOString(),
-          time_start: new Date(slot[0].timeStart).toISOString(),
-          time_end: new Date(slot[0].timeEnd).toISOString(),
+          id: registration[0].id as `${string}-${string}-${string}-${string}-${string}`,
+          event: slot[0].event as `${string}-${string}-${string}-${string}-${string}`,
+          created_at: registration[0].created_at,
+          time_start: slot[0].time_start,
+          time_end: slot[0].time_end,
           capacity: slot[0].capacity,
         },
         qr,
       );
-      console.log("Confirmation email sent successfully");
     } catch (error) {
       console.error("Failed to send confirmation email:", error);
       // Note: We're not returning here, as we still want to redirect the user

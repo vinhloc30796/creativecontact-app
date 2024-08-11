@@ -1,4 +1,4 @@
-import { EventSlot } from "./types";
+import { EventSlot } from "@/app/types/EventSlot";
 import { format, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { EventRegistration } from "@/app/types/EventRegistration";
@@ -17,7 +17,7 @@ export function getAvailableCapacity(
 
 // Keep the getSlotsForDate function as is
 export function getSlotsForDate(slots: EventSlot[], date: string): EventSlot[] {
-  return slots.filter((slot) => slot.time_start.split("T")[0] === date);
+  return slots.filter((slot) => format(slot.time_start, "yyyy-MM-dd") === date);
 }
 
 const TIMEZONE = "Asia/Bangkok"; // UTC+7

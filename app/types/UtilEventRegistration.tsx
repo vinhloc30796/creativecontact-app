@@ -4,9 +4,9 @@ import { EventRegistration } from "@/app/types/EventRegistration";
 
 
 // Utility type for creating a new event registration
-export type NewEventRegistration = Omit<EventRegistration, 'id' | 'createdAt' | 'status'> & {
+export type NewEventRegistration = Omit<EventRegistration, 'id' | 'created_at' | 'status'> & {
   status?: RegistrationStatus;
 };
 
 // Utility type for updating an event registration
-export type UpdateEventRegistration = Partial<Omit<EventRegistration, 'id' | 'createdAt' | 'createdBy'>>;
+export type UpdateEventRegistration = Partial<Omit<EventRegistration, 'id' | 'created_at' | 'created_by'>>;

@@ -1,27 +1,15 @@
-import { supabase } from '@/lib/supabase'
-import { EventSlot } from './(public)/(event)/register/_sections/types'
+import { EventSlot } from '@/app/types/EventSlot'
 import RegisterPage from './(public)/(event)/register/_sections/_register'
+import { db } from '@/lib/db'
+import { eq } from 'drizzle-orm'
+import { eventSlots } from '@/drizzle/schema'
 
 async function getEventSlots(event: string): Promise<EventSlot[]> {
-	console.log(`Fetching event slots for event ${event}...`)
-
-	let { data: event_slots, error } = await supabase.from('event_slots').select('*').eq('event', event)
-
-	if (error) {
-		console.error(`Error fetching event slots for ${event}: `, error)
-		return []
-	} else {
-		console.log(`Finished fetching event slots for ${event}`)
-	}
-	return event_slots as EventSlot[]
+	return (await db.select().from(eventSlots).where(eq(eventSlots.event, event))).map(slot => slot as EventSlot)
 }
 
 export default async function Page() {
 	const eventId = '10177076-f591-49c8-a87d-042ba7aa6345'
-
 	const eventSlots = await getEventSlots(eventId)
-
-	// console.log('eventSlots:', eventSlots)
-
 	return <RegisterPage eventSlots={eventSlots} />
 }

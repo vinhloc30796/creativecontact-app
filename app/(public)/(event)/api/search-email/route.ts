@@ -30,15 +30,15 @@ export async function POST(request: NextRequest) {
     const registrations = await db
       .select({
         id: eventRegistrations.id,
-        createdAt: eventRegistrations.createdAt,
+        created_at: eventRegistrations.created_at,
         status: eventRegistrations.status,
         signature: eventRegistrations.signature,
         name: eventRegistrations.name,
         email: eventRegistrations.email,
         phone: eventRegistrations.phone,
         slotId: eventSlots.id,
-        slotTimeStart: eventSlots.timeStart,
-        slotTimeEnd: eventSlots.timeEnd,
+        slot_time_start: eventSlots.time_start,
+        slot_time_end: eventSlots.time_end,
         eventId: events.id,
         eventName: events.name,
       })
@@ -48,9 +48,8 @@ export async function POST(request: NextRequest) {
       .where(eq(eventRegistrations.email, email));
 
     if (registrations.length === 0) {
-      return NextResponse.json({
-        error: `Registration not found for email ${email}`,
-      }, { status: 404 });
+      console.warn(`Registration not found for email ${email}`);
+      return NextResponse.json(registrations);
     }
 
     // Return all matching registrations

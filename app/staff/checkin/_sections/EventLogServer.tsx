@@ -13,23 +13,23 @@ export async function getEventLogs(): Promise<EventRegistrationLog[]> {
   try {
     const logs = await db
       .select({
-        eventRegistrationId: eventRegistrationLogs.id,
-        changedAt: eventRegistrationLogs.changedAt,
-        statusBefore: eventRegistrationLogs.statusBefore,
-        statusAfter: eventRegistrationLogs.statusAfter,
+        event_registration_id: eventRegistrationLogs.id,
+        changed_at: eventRegistrationLogs.changed_at,
+        status_before: eventRegistrationLogs.status_before,
+        status_after: eventRegistrationLogs.status_after,
         guestName: eventRegistrations.name,
-        staffId: authUsers.id,
+        staff_id: authUsers.id,
       })
       .from(eventRegistrationLogs)
-      .innerJoin(eventRegistrations, eq(eventRegistrationLogs.eventRegistrationId, eventRegistrations.id))
-      .innerJoin(authUsers, eq(eventRegistrationLogs.staffId, authUsers.id))
-      .orderBy(desc(eventRegistrationLogs.changedAt))
+      .innerJoin(eventRegistrations, eq(eventRegistrationLogs.event_registration_id, eventRegistrations.id))
+      .innerJoin(authUsers, eq(eventRegistrationLogs.staff_id, authUsers.id))
+      .orderBy(desc(eventRegistrationLogs.changed_at))
       .limit(5);
 
       return logs.map(log => ({
         ...log,
-        eventRegistrationId: log.eventRegistrationId as `${string}-${string}-${string}-${string}-${string}`,
-        staffId: log.staffId as `${string}-${string}-${string}-${string}-${string}`
+        event_registration_id: log.event_registration_id as `${string}-${string}-${string}-${string}-${string}`,
+        staff_id: log.staff_id as `${string}-${string}-${string}-${string}-${string}`
       }));
   } catch (error) {
     console.error('Error fetching event logs:', error);
@@ -52,11 +52,11 @@ export default async function EventLog() {
         </CardHeader>
         <CardContent>
           {logs.map((log) => (
-            <div key={log.eventRegistrationId} className="mb-2">
+            <div key={log.event_registration_id} className="mb-2">
               <strong>{log.guestName}</strong>{' '}
-              {log.statusAfter.toLowerCase()} at{' '}
-              <strong>{formatDate(log.changedAt)}</strong> by{' '}
-              <strong>{log.staffId}</strong>
+              {log.status_after.toLowerCase()} at{' '}
+              <strong>{formatDate(log.changed_at)}</strong> by{' '}
+              <strong>{log.staff_id}</strong>
             </div>
           ))}
         </CardContent>

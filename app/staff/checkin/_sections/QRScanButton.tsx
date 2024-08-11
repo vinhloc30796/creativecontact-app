@@ -179,7 +179,7 @@ const QRScanButton = () => {
           <p className="font-medium">Status:</p>
           <p className="capitalize">{registrationDetails.status}</p>
           <p className="font-medium">Created At:</p>
-          <p>{new Date(registrationDetails.createdAt).toLocaleString()}</p>
+          <p>{new Date(registrationDetails.created_at).toLocaleString()}</p>
           <p className="font-medium">Signature:</p>
           <p>{registrationDetails.signature}</p>
           <p className="font-medium">Slot ID:</p>

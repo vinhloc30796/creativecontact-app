@@ -1,5 +1,6 @@
 import React from 'react'
-import { FormData, EventSlot } from './types'
+import { FormData } from './types'
+import { EventSlot } from '@/app/types/EventSlot'
 import { formatInTimeZone } from 'date-fns-tz'
 
 interface ConfirmationPageProps {

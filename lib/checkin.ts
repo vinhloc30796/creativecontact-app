@@ -7,10 +7,10 @@ import { eventRegistrationLogs, eventRegistrations } from "@/drizzle/schema";
 type RegistrationStatus = "pending" | "confirmed" | "checked-in" | "cancelled";
 
 type EventRegistrationLogInsert = {
-  eventRegistrationId: string;
-  staffId: string;
-  statusBefore: RegistrationStatus;
-  statusAfter: RegistrationStatus;
+  event_registration_id: string;
+  staff_id: string;
+  status_before: RegistrationStatus;
+  status_after: RegistrationStatus;
 };
 
 export type CheckinResult = {
@@ -28,7 +28,7 @@ export type CheckinResult = {
 
 export async function performCheckin(
   id: string,
-  staffId: string,
+  staff_id: string,
 ): Promise<CheckinResult> {
   return await db.transaction(async (tx) => {
     // Get the current registration status
@@ -69,10 +69,10 @@ export async function performCheckin(
 
       // Insert a new record into event_registration_logs
       const logEntry: EventRegistrationLogInsert = {
-        eventRegistrationId: updatedRegistration.id,
-        staffId: staffId,
-        statusBefore: status as RegistrationStatus,
-        statusAfter: "checked-in",
+        event_registration_id: updatedRegistration.id,
+        staff_id: staff_id,
+        status_before: status as RegistrationStatus,
+        status_after: "checked-in",
       };
 
       await tx.insert(eventRegistrationLogs).values(logEntry);

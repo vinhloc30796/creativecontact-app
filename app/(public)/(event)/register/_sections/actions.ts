@@ -12,10 +12,10 @@ import { v4 as uuidv4 } from "uuid";
 import {
   // EventRegistration,
   EventRegistrationWithSlot,
-  EventSlot,
   FormData,
 } from "./types";
 import { EventRegistration } from "@/app/types/EventRegistration";
+import { EventSlot } from "@/app/types/EventSlot";
 import { formatDateTime } from "./utils";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import {
@@ -81,25 +81,33 @@ export async function oldcreateRegistration(
   }
 
   // Fetch the slot details
-  const { data: slotData, error: slotError } = await supabase.from(
-    "event_slots",
-  ).select("*").eq("id", formData.slot).single();
-
-  if (slotError) {
-    console.error("Error fetching slot details:", slotError);
-    return { success: false, error: slotError.message, status: "pending" };
-  }
-
-  if (isAuthenticated) {
-    // Send confirmation email with ICS file and QR code
-    await sendConfirmationEmailWithICSAndQR(
-      formData.email,
-      slotData,
-      qrCodeDataURL,
-    );
-  } else {
-    // Send confirmation request email
-    await sendConfirmationRequestEmail(formData.email, registrationId);
+  try {
+    const slots = await db.select()
+      .from(eventSlots)
+      .where(eq(eventSlots.id, formData.slot));
+    const slot = slots.map((r) => ({
+      ...r,
+      id: r.id as `${string}-${string}-${string}-${string}-${string}`,
+      event: r.event as `${string}-${string}-${string}-${string}-${string}`,
+    }))[0];
+    if (isAuthenticated) {
+      // Send confirmation email with ICS file and QR code
+      await sendConfirmationEmailWithICSAndQR(
+        formData.email,
+        slot,
+        qrCodeDataURL,
+      );
+    } else {
+      // Send confirmation request email
+      await sendConfirmationRequestEmail(formData.email, registrationId);
+    }
+  } catch (error) {
+    console.error("Error sending confirmation email:", error);
+    return {
+      success: false,
+      error: "Failed to send confirmation email",
+      status: "pending",
+    };
   }
 
   return { success: true, status: isAuthenticated ? "confirmed" : "pending" };
@@ -255,7 +263,8 @@ export async function createRegistration(
           ...r,
           // map id
           id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-          createdBy: r.createdBy as `${string}-${string}-${string}-${string}-${string}`,
+          created_by: r
+            .created_by as `${string}-${string}-${string}-${string}-${string}`,
           slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
         }))[0];
       } else {
@@ -269,7 +278,7 @@ export async function createRegistration(
             email: formData.email,
             name: name,
             phone: formData.phone,
-            createdBy: formData.created_by,
+            created_by: formData.created_by,
             status: status,
           })
           .returning();
@@ -277,7 +286,8 @@ export async function createRegistration(
           ...r,
           // map id
           id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-          createdBy: r.createdBy as `${string}-${string}-${string}-${string}-${string}`,
+          created_by: r
+            .created_by as `${string}-${string}-${string}-${string}-${string}`,
           slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
         }))[0];
       }
@@ -310,16 +320,12 @@ export async function createRegistration(
         formData.email,
         {
           id: dbResult.registrationResult.id,
-          created_at: formatDateTime(
-            slotData[0].createdAt.toISOString(),
-            "yyyy-MM-dd",
-          ),
-          time_start: formatDateTime(
-            slotData[0].timeStart.toISOString(),
-            "HH:mm",
-          ),
-          time_end: formatDateTime(slotData[0].timeEnd.toISOString(), "HH:mm"),
+          created_at: slotData[0].created_at,
+          time_start: slotData[0].time_start,
+          time_end: slotData[0].time_end,
           capacity: slotData[0].capacity,
+          event: slotData[0]
+            .event as `${string}-${string}-${string}-${string}-${string}`,
         },
         qr,
       );
