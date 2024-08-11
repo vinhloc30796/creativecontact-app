@@ -1,16 +1,20 @@
+// File: app/staff/login/page.tsx
+
 "use client"
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { login } from './actions';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -20,6 +24,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  let [loginError, setLoginError] = React.useState<string | null>(null);
+
   const router = useRouter();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -35,7 +41,19 @@ export default function LoginPage() {
     formData.append('email', data.email);
     formData.append('password', data.password);
     console.log("Attempting login for email:", data.email);
-    await login(formData);
+    const result = await login(formData).then(
+      res => {
+        if (res.error) {
+          console.error('Error logging in:', res.error);
+          setLoginError(res.error);
+          return { success: false, error: res.error };
+        } else console.log("Login successful")
+      }
+    ).catch(err => {
+      console.error('Error logging in:', err);
+      setLoginError('An unexpected error occurred. Please try again later.');
+      return { success: false, error: 'An unexpected error occurred. Please try again later.' };
+    });
   };
 
   const handleSignupClick = (e: React.MouseEvent) => {
@@ -50,7 +68,7 @@ export default function LoginPage() {
     }
     return Object.values(errors).map(error => error.message).join(', ');
   };
-  
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
@@ -70,11 +88,11 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="email" 
+                      <Input
+                        type="email"
                         // Autocomplete attribute
                         autoComplete="username"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     {form.formState.touchedFields.email && <FormMessage />}
@@ -88,11 +106,11 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="password" 
+                      <Input
+                        type="password"
                         // Autocomplete attribute
                         autoComplete="current-password"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     {form.formState.touchedFields.password && <FormMessage />}
@@ -100,20 +118,27 @@ export default function LoginPage() {
                 )}
               />
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="inline-block">
-                      <Button type="submit" disabled={!form.formState.isValid}>Log in</Button>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{form.formState.isValid ? 'Ready to log in' : getFormErrors()}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <Button onClick={handleSignupClick} variant="outline">Sign up</Button>
+            <CardFooter className="flex flex-col">
+              <div className="flex justify-between w-full">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="inline-block">
+                        <Button type="submit" disabled={!form.formState.isValid}>Log in</Button>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{form.formState.isValid ? 'Ready to log in' : getFormErrors()}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <Button onClick={handleSignupClick} variant="outline">Sign up</Button>
+              </div>
+              {loginError && <Alert variant="destructive" className="mt-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{loginError}</AlertDescription>
+              </Alert>
+              }
             </CardFooter>
           </form>
         </Form>
