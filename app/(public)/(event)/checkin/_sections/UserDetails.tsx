@@ -29,6 +29,7 @@ export function UserDetails({ user }: UserDetailsProps) {
         <EventRegistrationList
           eventRegistrations={eventRegistrations}
           searchError={searchError}
+          userEmail={user.email || null}
         />
       </div>
     </>

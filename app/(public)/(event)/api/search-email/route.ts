@@ -48,9 +48,8 @@ export async function POST(request: NextRequest) {
       .where(eq(eventRegistrations.email, email));
 
     if (registrations.length === 0) {
-      return NextResponse.json({
-        error: `Registration not found for email ${email}`,
-      }, { status: 404 });
+      console.warn(`Registration not found for email ${email}`);
+      return NextResponse.json(registrations);
     }
 
     // Return all matching registrations

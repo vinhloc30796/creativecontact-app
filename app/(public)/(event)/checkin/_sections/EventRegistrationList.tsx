@@ -5,14 +5,30 @@ import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
 import { EventRegistrationWithSlot } from '@/app/types/EventRegistration';
 import { handleCheckin, CheckinStatus } from '../_utils/apiHelpers';
+import { useRouter } from 'next/navigation';
 
 export interface EventRegistrationWithSlotListProps {
   eventRegistrations: EventRegistrationWithSlot[] | null;
   searchError: string;
+  userEmail: string | null;
 }
 
-export function EventRegistrationList({ eventRegistrations, searchError }: EventRegistrationWithSlotListProps) {
+export function EventRegistrationList({ eventRegistrations, searchError, userEmail }: EventRegistrationWithSlotListProps) {
   const [checkinStatus, setCheckinStatus] = useState<CheckinStatus | null>(null);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      const response = await fetch('/signout', { method: 'POST' });
+      if (response.ok) {
+        router.push('/');
+      } else {
+        console.error('Sign out failed');
+      }
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
+  };
 
   return (
     <>
@@ -42,7 +58,12 @@ export function EventRegistrationList({ eventRegistrations, searchError }: Event
           </React.Fragment>
         ))
       ) : (
-        <p>No event registrations found.</p>
+        <div className="flex flex-col gap-4">
+          <p>No event registrations found. Please retry with a different email address.</p>
+          <Button type="submit" onClick={handleSignOut} variant="secondary" className="w-full">
+            {userEmail ? "Sign out" : "Retry"}
+          </Button>
+        </div>
       )}
       {searchError && <p className="text-red-500">{searchError}</p>}
     </>
