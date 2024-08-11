@@ -8,5 +8,7 @@ export async function POST(request: Request) {
   await supabase.auth.signOut();
 
   // Redirect to the login page after sign out
-  return NextResponse.redirect(new URL("/staff/login", request.url));
+  const method = "GET";
+  const url = new URL("/staff/login", request.url);
+  return NextResponse.redirect(url, { status: 303, statusText: "See Other", headers: { Location: url.toString() } });
 }
