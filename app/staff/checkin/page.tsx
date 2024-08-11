@@ -12,8 +12,11 @@ export default async function Page() {
   if (error || !user) {
     console.error("/staff/checkin: Error getting user: ", error || "No user found");
     redirect('/staff/login')
+  } else if (!user.email) {
+    console.error("/staff/checkin: User has no email: ", user);
+    redirect('/staff/login')
+  } else {
+    console.log("Rendering CheckinPage, user:", user);
+    return <CheckinPage userEmail={user.email} />
   }
-  
-  console.log("Rendering CheckinPage, user:", user);
-  return <CheckinPage userEmail={user.email!} />
 }
