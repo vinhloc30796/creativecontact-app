@@ -1,7 +1,14 @@
 "use server";
 
-import { authUsers, eventRegistrations, eventSlots } from "@/drizzle/schema";import { db } from "@/lib/db";
+import {
+  sendConfirmationEmailWithICSAndQR,
+  sendConfirmationRequestEmail,
+} from "@/app/actions/email";
+import { EventRegistration } from "@/app/types/EventRegistration";
+import { authUsers, eventRegistrations, eventSlots } from "@/drizzle/schema";
+import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
+import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
@@ -13,14 +20,6 @@ import {
   EventRegistrationWithSlot,
   FormData,
 } from "./types";
-import { EventRegistration } from "@/app/types/EventRegistration";
-import { EventSlot } from "@/app/types/EventSlot";
-import { formatDateTime } from "./utils";
-import { adminSupabaseClient } from "@/utils/supabase/server-admin";
-import {
-  sendConfirmationEmailWithICSAndQR,
-  sendConfirmationRequestEmail,
-} from "@/app/actions/email";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -272,7 +271,7 @@ export async function createRegistration(
         const slot: string = formData.slot;
         // @ts-ignore
         const insertResult = await tx.insert(eventRegistrations)
-        // @ts-ignore
+          // @ts-ignore
           .values({
             slot: slot,
             email: formData.email,
