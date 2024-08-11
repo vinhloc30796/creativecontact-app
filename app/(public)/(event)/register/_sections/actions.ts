@@ -12,10 +12,10 @@ import { v4 as uuidv4 } from "uuid";
 import {
   // EventRegistration,
   EventRegistrationWithSlot,
-  EventSlot,
   FormData,
 } from "./types";
 import { EventRegistration } from "@/app/types/EventRegistration";
+import { EventSlot } from "@/app/types/EventSlot";
 import { formatDateTime } from "./utils";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import {

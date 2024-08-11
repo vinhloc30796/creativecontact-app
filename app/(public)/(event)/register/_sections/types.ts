@@ -1,4 +1,4 @@
-export interface EventSlot {
+interface EventSlot {
 	id: string
 	created_at: string
 	time_start: string

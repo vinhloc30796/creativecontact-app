@@ -13,33 +13,25 @@ const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 function generateICSFile(slotData: EventSlot): Promise<string> {
   return new Promise((resolve, reject) => {
-    const startDate = new Date(slotData.time_start);
-    const endDate = new Date(slotData.time_end);
-
-    // Adjust for UTC+7
-    const utcOffset = 7 * 60; // 7 hours in minutes
-    startDate.setMinutes(startDate.getMinutes() + utcOffset);
-    endDate.setMinutes(endDate.getMinutes() + utcOffset);
-
     const event = {
       start: [
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth() + 1,
-        startDate.getUTCDate(),
-        startDate.getUTCHours(),
-        startDate.getUTCMinutes(),
+        slotData.time_start.getUTCFullYear(),
+        slotData.time_start.getUTCMonth() + 1,
+        slotData.time_start.getUTCDate(),
+        slotData.time_start.getUTCHours(),
+        slotData.time_start.getUTCMinutes(),
       ],
       end: [
-        endDate.getUTCFullYear(),
-        endDate.getUTCMonth() + 1,
-        endDate.getUTCDate(),
-        endDate.getUTCHours(),
-        endDate.getUTCMinutes(),
+        slotData.time_end.getUTCFullYear(),
+        slotData.time_end.getUTCMonth() + 1,
+        slotData.time_end.getUTCDate(),
+        slotData.time_end.getUTCHours(),
+        slotData.time_end.getUTCMinutes(),
       ],
       title: "Hoàn Tất",
       description: "Thank you for registering for our event!",
       location: "Event Location",
-      url: "https://youreventwebsite.com",
+      url: "https://creativecontact.vn",
       status: "CONFIRMED" as const,
       busyStatus: "BUSY" as const,
       // Explicitly set the timezone
@@ -115,7 +107,7 @@ async function sendConfirmationEmailWithICSAndQR(
       console.error("Error sending confirmation email with ICS:", error);
     } else {
       console.log(
-        `Confirmation email with ICS sent for slot ${slotData.id}: ${data}`,
+        `Confirmation email with ICS sent for slot ${slotData.id}: `, data,
       );
     }
   } catch (error) {
