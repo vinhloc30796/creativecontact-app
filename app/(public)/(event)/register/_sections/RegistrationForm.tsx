@@ -169,7 +169,11 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   }
 
   if (existingRegistration) {
-    return <EmailExistedStep existingRegistration={existingRegistration as EventRegistrationWithSlot} onConfirm={handleConfirmNewRegistration} onCancel={handleKeepExistingRegistration} />
+    return <EmailExistedStep
+      existingRegistration={existingRegistration as EventRegistrationWithSlot}
+      onConfirm={handleConfirmNewRegistration}
+      onCancel={handleKeepExistingRegistration}
+    />
   }
 
   return (

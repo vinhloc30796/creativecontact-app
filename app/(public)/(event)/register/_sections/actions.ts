@@ -93,7 +93,7 @@ export async function oldcreateRegistration(
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
         slot,
-        qrCodeDataURL,
+        registrationId,
       );
     } else {
       // Send confirmation request email
@@ -314,7 +314,6 @@ export async function createRegistration(
       const slotData = await db.select()
         .from(eventSlots)
         .where(eq(eventSlots.id, formData.slot));
-      const qr = await QRCode.toDataURL(dbResult.registrationResult.id);
       // Send confirmation email with ICS file and QR code
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
@@ -327,7 +326,7 @@ export async function createRegistration(
           event: slotData[0]
             .event as `${string}-${string}-${string}-${string}-${string}`,
         },
-        qr,
+        dbResult.registrationResult.id,
       );
       return {
         success: true,

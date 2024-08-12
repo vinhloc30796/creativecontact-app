@@ -47,8 +47,7 @@ export async function GET(request: Request) {
         });
       }
 
-      // Generate QR code
-      const qr = await QRCode.toDataURL(registrationId);
+      // Send confirmation email with ICS and QR code
       await sendConfirmationEmailWithICSAndQR(
         registration[0].email,
         {
@@ -59,7 +58,7 @@ export async function GET(request: Request) {
           time_end: slot[0].time_end,
           capacity: slot[0].capacity,
         },
-        qr,
+        registrationId,
       );
     } catch (error) {
       console.error("Failed to send confirmation email:", error);

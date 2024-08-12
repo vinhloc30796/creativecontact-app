@@ -4,10 +4,14 @@
 import { EventSlot } from "@/app/types/EventSlot";
 import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
-import { createClient } from "@/utils/supabase/server";
 import { createEvent } from "ics";
 import { Resend } from "resend";
-import { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js";
+import { EventRegistration } from "@/app/types/EventRegistration";
+import { createClient } from "@/utils/supabase/server";
+import { db } from "@/lib/db";
+import { eventSlots } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
+import QRCode from "qrcode";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -184,14 +188,22 @@ async function sendConfirmationRequestEmail(email: string, signature: string) {
 async function sendConfirmationEmailWithICSAndQR(
   email: string,
   slotData: EventSlot,
-  qrCodeDataURL: string,
+  registrationId: string,
 ) {
   try {
     // Prep vars
-    const icsData = await generateICSFile(slotData);
     const dateStr = new Date(slotData.time_start).toLocaleDateString();
     const timeStartStr = new Date(slotData.time_start).toLocaleTimeString();
     const timeEndStr = new Date(slotData.time_end).toLocaleTimeString();
+    // Prep ICS file
+    const icsData = await generateICSFile(slotData);
+    // Generate QR code as a Buffer
+    const qrCodeBase64 = await QRCode.toDataURL(registrationId, {
+      width: 300,
+      errorCorrectionLevel: "H",
+    });
+    const qrCodeBuffer = new Buffer(qrCodeBase64.split(",")[1], "base64");
+
     // Build email
     const emailContent = `<h1>Your registration is confirmed!</h1>
       <p>Event details:</p>
@@ -199,13 +211,17 @@ async function sendConfirmationEmailWithICSAndQR(
           <li>Date: ${dateStr}</li>
           <li>Time: ${timeStartStr} - ${timeEndStr}</li>
       </ul>
-      <img src="${qrCodeDataURL}" alt="Registration QR Code" />`;
+      <img src="${qrCodeBase64}" alt="Registration QR Code" />`;
+
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@bangoibanga.com>",
       to: email,
       subject: "Your Event Registration is Confirmed",
       html: emailContent,
-      attachments: [{ content: icsData, filename: "event.ics" }],
+      attachments: [
+        { filename: "event.ics", content: icsData },
+        { filename: "qr-code.png", content: qrCodeBuffer },
+      ],
     });
 
     if (error) {
@@ -224,9 +240,114 @@ async function sendConfirmationEmailWithICSAndQR(
   }
 }
 
+async function sendForgotEmail(identifier: string) {
+  const supabase = createClient();
+
+  // Search for the registration
+  const { data: registrations, error } = await supabase
+    .from("event_registrations")
+    .select("*")
+    .or(`email.eq.${identifier},phone.eq.${identifier}`)
+    .eq("status", "confirmed")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error("Error fetching registration:", error);
+    return {
+      success: false,
+      error: "An error occurred while fetching the registration",
+    };
+  }
+
+  if (registrations.length === 0) {
+    // Don't reveal that no registration was found
+    return { success: true };
+  }
+
+  const registration = registrations[0];
+
+  // Fetch the associated event slot
+  const slots = await db.select()
+    .from(eventSlots)
+    .where(eq(eventSlots.id, registration.slot));
+  // Send the email
+  return await sendEventDetailsEmail(
+    registration.email,
+    registration,
+    slots.map((r) => ({
+      ...r,
+      id: r.id as `${string}-${string}-${string}-${string}-${string}`,
+      event: r.event as `${string}-${string}-${string}-${string}-${string}`,
+    }))[0],
+  ).then((data) => {
+    console.log("Email sent:", data);
+    return { success: true };
+  }).catch((error) => {
+    console.error("Error sending email:", error);
+    return {
+      success: false,
+      error: "An error occurred while sending the email",
+    };
+  });
+}
+
+async function sendEventDetailsEmail(
+  to: string,
+  registration: EventRegistration,
+  slot: EventSlot,
+) {
+  console.log(
+    "Sending event details email with registration details:",
+    registration,
+    "slot details: ",
+    slot,
+  );
+  const icsData = await generateICSFile(slot);
+  // console.debug("Generated ICS file:", icsData);
+  const qr = await QRCode.toDataURL(registration.id);
+  const dateStr = new Date(slot.time_start).toLocaleDateString();
+  const timeStartStr = new Date(slot.time_start).toLocaleTimeString();
+  const timeEndStr = new Date(slot.time_end).toLocaleTimeString();
+  const emailContent = `
+    <h1>Your Event Registration Details</h1>
+    <p>Here are the details of your event registration:</p>
+    <ul>
+      <li>Name: ${registration.name}</li>
+      <li>Email: ${registration.email}</li>
+      <li>Phone: ${registration.phone}</li>
+      <li>Event Date: ${dateStr}</li>
+      <li>Event Time: ${timeStartStr} - ${timeEndStr}</li>
+    </ul>
+    <p>Your QR Code:</p>
+    <img src="${qr}" alt="Registration QR Code" />`;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "Creative Contact <no-reply@bangoibanga.com>",
+      to: [to],
+      subject: "Your Event Registration Details",
+      html: emailContent,
+      attachments: [{ content: icsData, filename: "event.ics" }],
+    });
+
+    if (error) {
+      console.error("Error sending email:", error);
+      throw new Error("Failed to send email");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error;
+  }
+}
+
 export {
   generateICSFile,
   sendConfirmationEmailWithICSAndQR,
   sendConfirmationRequestEmail,
+  sendEventDetailsEmail,
+  sendForgotEmail,
   sendSignInWithOtp,
 };
