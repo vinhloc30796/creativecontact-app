@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from '@/lib/utils'
 import styles from './_checkin.module.scss'
-import { EventLogWrapper } from './EventLogWrapper'
+import { SuspenseEventLog } from './SuspenseEventLog'
 import QRScanButton from './QRScanButton'
 import SuspenseManualSearch from './SuspenseManualSearch'
 
@@ -43,7 +43,7 @@ export default async function CheckinPage({ userEmail }: CheckinPageProps) {
                 <h3 className={cn('text-lg font-bold', styles.title)}>Timeslot statistics</h3>
                 <p>Event statistics will be displayed here.</p>
               </div>
-              <EventLogWrapper />
+              <SuspenseEventLog />
             </div>
           </CardContent>
         }
