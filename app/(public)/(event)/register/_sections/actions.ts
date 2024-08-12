@@ -93,7 +93,7 @@ export async function oldcreateRegistration(
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
         slot,
-        qrCodeDataURL,
+        registrationId,
       );
     } else {
       // Send confirmation request email
@@ -159,7 +159,7 @@ export async function confirmRegistration(signature: string) {
   let userId = registration.created_by;
   let email = registration.email;
 
-  // If the registration was created by a user, update their email
+  // Update the user's email after registration confirmation
   if (userId) {
     console.debug(`Updating user email for registration ${signature}`);
     const { data: userData, error: userError } = await adminSupabaseClient.auth
@@ -169,7 +169,8 @@ export async function confirmRegistration(signature: string) {
       console.error("Failed to fetch user:", userError);
       // We don't return here because the registration is confirmed, even if email update fails
     } else if (userData && userData.user) {
-      // Check if the user is anonymous (you might need to adjust this condition based on how you identify anonymous users)
+      // Check if the user is anonymous
+      // Should double-check this, as the user may have signed in since the registration was created
       if (userData.user.email === null || userData.user.email === "") {
         const { error: authUpdateError } = await adminSupabaseClient.auth.admin
           .updateUserById(userId, {
@@ -313,7 +314,6 @@ export async function createRegistration(
       const slotData = await db.select()
         .from(eventSlots)
         .where(eq(eventSlots.id, formData.slot));
-      const qr = await QRCode.toDataURL(dbResult.registrationResult.id);
       // Send confirmation email with ICS file and QR code
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
@@ -326,7 +326,7 @@ export async function createRegistration(
           event: slotData[0]
             .event as `${string}-${string}-${string}-${string}-${string}`,
         },
-        qr,
+        dbResult.registrationResult.id,
       );
       return {
         success: true,

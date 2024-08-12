@@ -1,5 +1,5 @@
 //File: app/api/confirm-registration/route.ts
-// File: app/api/resend-confirmation-email/route.ts
+
 import { confirmRegistration } from "@/app/(public)/(event)/register/_sections/actions";
 import { sendConfirmationEmailWithICSAndQR } from "@/app/actions/email"; // Adjust the import path as necessary
 import { eventRegistrations, eventSlots } from "@/drizzle/schema";
@@ -47,8 +47,7 @@ export async function GET(request: Request) {
         });
       }
 
-      // Generate QR code
-      const qr = await QRCode.toDataURL(registrationId);
+      // Send confirmation email with ICS and QR code
       await sendConfirmationEmailWithICSAndQR(
         registration[0].email,
         {
@@ -59,7 +58,7 @@ export async function GET(request: Request) {
           time_end: slot[0].time_end,
           capacity: slot[0].capacity,
         },
-        qr,
+        registrationId,
       );
     } catch (error) {
       console.error("Failed to send confirmation email:", error);
