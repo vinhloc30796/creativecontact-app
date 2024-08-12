@@ -1,5 +1,5 @@
 //File: app/api/confirm-registration/route.ts
-// File: app/api/resend-confirmation-email/route.ts
+
 import { confirmRegistration } from "@/app/(public)/(event)/register/_sections/actions";
 import { sendConfirmationEmailWithICSAndQR } from "@/app/actions/email"; // Adjust the import path as necessary
 import { eventRegistrations, eventSlots } from "@/drizzle/schema";

@@ -4,10 +4,10 @@
 import { EventSlot } from "@/app/types/EventSlot";
 import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/utils/supabase/server";
 import { createEvent } from "ics";
 import { Resend } from "resend";
-import { PostgrestError, PostgrestSingleResponse } from '@supabase/supabase-js';
+import { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -108,27 +108,59 @@ function sendSignInWithOtp(email: string, options?: {
 }
 
 async function sendConfirmationRequestEmail(email: string, signature: string) {
+  const registrationURL =
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/confirm-registration?signature=${signature}`;
+  const otp = generateOTP();
+  let linkData: any;
+  let confirmationURL: string;
+
   try {
-    const { data, error } = await resend.emails.send({
+    const linkResponse = await adminSupabaseClient.auth.admin.generateLink({
+      type: "magiclink",
+      email: email,
+      options: {
+        data: {
+          shouldCreateUser: false,
+          otp,
+        },
+        redirectTo: registrationURL,
+      },
+    });
+
+    if (linkResponse.error) {
+      console.warn("Magic link generation failed:", linkResponse.error);
+      // Fallback to a direct confirmation URL without the magic link
+      confirmationURL =
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/confirm-registration?signature=${signature}&email=${email}`;
+    } else {
+      linkData = linkResponse.data;
+      console.log("Magic link confirmation URL:", linkData);
+      confirmationURL =
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${registrationURL}`;
+    }
+
+    const emailResponse = await resend.emails.send({
       from: "Creative Contact <no-reply@bangoibanga.com>",
       to: email,
       subject: "Confirm Your Event Registration",
       html: `
-          <p>Please confirm your registration by clicking on this link:</p>
-          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/api/confirm-registration?signature=${signature}">Confirm Registration</a></p>
-          <p>This will also confirm your email (<a href=mailto:${email}>${email}</a>) as the contact address for this registration.</p>`,
+        <p>Please confirm your registration by clicking on this link:</p>
+        <p><a href="${confirmationURL}">Confirm Registration</a></p>
+        <p>This will also sign you in & confirm your email (<a href=mailto:${email}>${email}</a>) as the contact address for this registration.</p>`,
     });
 
-    if (error) {
-      console.error("Error sending confirmation request email:", error);
-    } else {
-      console.log("Confirmation request email sent:", data);
-    }
+    console.log("Confirmation request email sent:", emailResponse);
+    return {
+      success: true,
+      email: email,
+      error: null,
+    };
   } catch (error) {
-    console.error(
-      "Unexpected error sending confirmation request email:",
-      error,
-    );
+    console.error("Error in sendConfirmationRequestEmail:", error);
+    return {
+      success: false,
+      error: error,
+    };
   }
 }
 
