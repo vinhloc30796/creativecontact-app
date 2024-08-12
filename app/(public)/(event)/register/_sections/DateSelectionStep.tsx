@@ -30,7 +30,7 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
 
   const uniqueDates = Array.from(new Set(slots.map((slot) => format(slot.time_start, "yyyy-MM-dd"))))
   const firstAvailableDate = uniqueDates.find((dateString) => !isBefore(new Date(dateString), today))
-
+  console.debug(`uniqueDates: ${uniqueDates}, firstAvailableDate: ${firstAvailableDate}`)
 
   useEffect(() => {
     if (firstAvailableDate) {
