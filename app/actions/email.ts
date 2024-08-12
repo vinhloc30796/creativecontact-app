@@ -28,12 +28,29 @@ function generateICSFile(slotData: EventSlot): Promise<string> {
         slotData.time_end.getUTCHours(),
         slotData.time_end.getUTCMinutes(),
       ],
-      title: "Hoàn Tất",
-      description: "Thank you for registering for our event!",
-      location: "Event Location",
+      // Event information
+      title: "Hoàn Tất Project",
+      description: "Dự án độc đáo kêu gọi các bạn thực hành sáng tạo và nghệ thuật trao đổi và hoàn thành tác phẩm dang dở, kết hợp với Neo-",
+      organizer: { name: "Creative Contact", email: "no-reply@creativecontact.vn" },
+      // Geo
+      location: "NEO-, 393/7 Hai Bà Trưng, Phường 8, Quận 3, Hồ Chí Minh, Vietnam",
+      geo: { lat: 10.790062, lon: 106.688437 },
+      // Other information
       url: "https://creativecontact.vn",
       status: "CONFIRMED" as const,
       busyStatus: "BUSY" as const,
+      alarms: [
+        {
+          action: "display",
+          description: "Reminder: Hoàn Tất is starting in 1 day",
+          trigger: { hours: 24, minutes: 0, before: true },
+        },
+        {
+          action: "display",
+          description: "Reminder: Hoàn Tất is starting in 1 hour",
+          trigger: { hours: 1, minutes: 0, before: true },
+        },
+      ],
       // Explicitly set the timezone
       startInputType: "utc",
       startOutputType: "utc",
