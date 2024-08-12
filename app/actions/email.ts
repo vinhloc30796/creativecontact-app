@@ -1,13 +1,13 @@
 // File: app/actions/email.ts
-
 "use server";
 
-// import { EventSlot } from "@/app/(public)/(event)/register/_sections/types";
 import { EventSlot } from "@/app/types/EventSlot";
 import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
+import { createClient } from "@/utils/supabase/server"
 import { createEvent } from "ics";
 import { Resend } from "resend";
+import { PostgrestError, PostgrestSingleResponse } from '@supabase/supabase-js';
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -49,6 +49,62 @@ function generateICSFile(slotData: EventSlot): Promise<string> {
       }
     });
   });
+}
+
+function sendSignInWithOtp(email: string, options?: {
+  shouldCreateUser?: boolean;
+  redirectTo?: string;
+  data?: Record<string, any>;
+}) {
+  const otp = generateOTP();
+  let linkData: any;
+
+  return adminSupabaseClient.auth.admin.generateLink({
+    type: "magiclink",
+    email: email,
+    options: {
+      data: { ...options?.data, otp },
+      redirectTo: options?.redirectTo,
+    },
+  })
+    .then((response) => {
+      if (response.error) throw response.error;
+      linkData = response.data;
+      console.log("Magic link confirmation URL:", linkData);
+
+      const confirmationURL =
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${
+          options?.redirectTo || ""
+        }`;
+
+      return resend.emails.send({
+        from: "Creative Contact <no-reply@bangoibanga.com>",
+        to: email,
+        subject: "Your Magic Link for Event Check-In",
+        html: `
+        <h1>Welcome to our Event!</h1>
+        <p>Here's your one-time password: <strong>${otp}</strong></p>
+        <p>Or click the link below to sign in and complete your check-in:</p>
+        <p><a href="${confirmationURL}">Sign In to Check-In</a></p>
+        <p>If you didn't request this email, please ignore it.</p>
+      `,
+      });
+    })
+    .then((emailData) => {
+      console.log("Custom magic link email sent:", emailData);
+      return {
+        success: true,
+        email: email,
+        error: null,
+      };
+    })
+    .catch((error) => {
+      console.error("Error in sendSignInWithOtp:", error);
+      return {
+        success: false,
+        error: error,
+      };
+    });
 }
 
 async function sendConfirmationRequestEmail(email: string, signature: string) {
@@ -107,7 +163,8 @@ async function sendConfirmationEmailWithICSAndQR(
       console.error("Error sending confirmation email with ICS:", error);
     } else {
       console.log(
-        `Confirmation email with ICS sent for slot ${slotData.id}: `, data,
+        `Confirmation email with ICS sent for slot ${slotData.id}: `,
+        data,
       );
     }
   } catch (error) {
@@ -115,72 +172,6 @@ async function sendConfirmationEmailWithICSAndQR(
       "Unexpected error sending confirmation email with ICS:",
       error,
     );
-  }
-}
-
-async function sendSignInWithOtp(email: string, options?: {
-  shouldCreateUser?: boolean;
-  redirectTo?: string;
-  data?: Record<string, any>;
-}) {
-  try {
-    // Generate OTP
-    const otp = generateOTP(); // Implement this function to generate a 6-digit OTP
-    const { data: linkData, error: linkError } = await adminSupabaseClient.auth
-      .admin.generateLink({
-        type: "magiclink",
-        email: email,
-        options: {
-          data: { ...options?.data, otp },
-          redirectTo: options?.redirectTo,
-        },
-      });
-    if (linkError) throw linkError;
-
-    console.log("Magic link confirmation URL:", linkData);
-
-    // Construct confirmation URL that goes through your Next.js app
-    const confirmationURL =
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${
-        options?.redirectTo || ""
-      }`;
-
-    // Send custom email using Resend
-    const { data: emailData, error: emailError } = await resend.emails.send({
-      from: "Creative Contact <no-reply@bangoibanga.com>",
-      to: email,
-      subject: "Your Magic Link for Event Check-In",
-      html: `
-        <h1>Welcome to our Event!</h1>
-        <p>Here's your one-time password: <strong>${otp}</strong></p>
-        <p>Or click the link below to sign in and complete your check-in:</p>
-        <p><a href="${confirmationURL}">Sign In to Check-In</a></p>
-        <p>If you didn't request this email, please ignore it.</p>
-      `,
-    });
-
-    if (emailError) {
-      console.error("Error sending custom magic link email:", emailError);
-      throw emailError;
-    }
-
-    console.log("Custom magic link email sent:", emailData);
-
-    // Store OTP in Supabase for verification (you might want to encrypt this)
-    const { error: storeError } = await adminSupabaseClient
-      .from("otp_storage")
-      .insert({
-        email,
-        otp,
-        expires_at: new Date(Date.now() + 15 * 60 * 1000),
-      }); // OTP expires in 15 minutes
-
-    if (storeError) throw storeError;
-
-    return { data: { user: null, session: null }, error: null };
-  } catch (error) {
-    console.error("Error in sendSignInWithOtp:", error);
-    return { data: { user: null, session: null }, error };
   }
 }
 

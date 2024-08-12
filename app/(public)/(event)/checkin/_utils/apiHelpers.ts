@@ -1,7 +1,6 @@
 // File: app/(public)/(event)/checkin/_utils/apiHelpers.ts
 "use client";
 
-// File: app/(public)/(event)/checkin/_utils/apiHelpers.ts
 import { sendSignInWithOtp } from '@/app/actions/email';
 import { EventRegistrationWithSlot } from '@/app/types/EventRegistration';
 
@@ -75,19 +74,21 @@ export async function handleMagicLinkRequest(
   email: string,
   setMagicLinkSent: SetMagicLinkSent
 ): Promise<void> {
-
   e.preventDefault();
   try {
-    const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
-    const result = await sendSignInWithOtp(email, {
-      redirectTo: `${hostUrl}/checkin`,
-      shouldCreateUser: false,
+    const response = await fetch('/api/magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
     });
 
-    if (result.error) throw result.error;
+    if (!response.ok) {
+      throw new Error('Failed to send magic link');
+    }
 
     setMagicLinkSent(true);
   } catch (err) {
     console.error('Error sending magic link:', err);
+    // You might want to set an error state here and display it to the user
   }
 }
