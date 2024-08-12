@@ -24,7 +24,7 @@ export async function getEventLogs(): Promise<EventRegistrationLog[]> {
       .innerJoin(eventRegistrations, eq(eventRegistrationLogs.event_registration_id, eventRegistrations.id))
       .innerJoin(authUsers, eq(eventRegistrationLogs.staff_id, authUsers.id))
       .orderBy(desc(eventRegistrationLogs.changed_at))
-      .limit(5);
+      .limit(6);
 
       return logs.map(log => log as EventRegistrationLog);
   } catch (error) {
