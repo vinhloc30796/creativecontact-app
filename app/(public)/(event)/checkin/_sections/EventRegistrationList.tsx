@@ -42,19 +42,25 @@ export function EventRegistrationList({ eventRegistrations, searchError, userEma
               <p><strong>Slot Time:</strong> {new Date(registration.slot_time_start).toLocaleString()} - {new Date(registration.slot_time_end).toLocaleString()}</p>
               {checkinStatus?.id === registration.id && (
                 <p className={`mt-2 ${checkinStatus.status === 'success' ? 'text-green-500' : 'text-red-500'}`}>
-                  {checkinStatus.status === 'success' 
-                    ? 'Check-in successful' 
+                  {checkinStatus.status === 'success'
+                    ? 'Check-in successful'
                     : `Check-in failed: ${checkinStatus.errorMessage || 'An error occurred'}`}
                 </p>
               )}
             </div>
-            <Button
-              className="mt-2 w-full"
-              onClick={() => handleCheckin(registration.id, setCheckinStatus)}
-              disabled={checkinStatus?.id === registration.id}
-            >
-              Check-in
-            </Button>
+            <div className="flex flex-row gap-4 mt-2">
+
+              <Button type="submit" onClick={handleSignOut} variant="secondary" className="w-full">
+                {userEmail ? "Sign out" : "Retry"}
+              </Button>
+              <Button
+                className="w-full"
+                onClick={() => handleCheckin(registration.id, setCheckinStatus)}
+                disabled={checkinStatus?.id === registration.id}
+              >
+                Check-in
+              </Button>
+            </div>
           </React.Fragment>
         ))
       ) : (
