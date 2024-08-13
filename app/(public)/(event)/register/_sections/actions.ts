@@ -279,14 +279,7 @@ export async function createRegistration(
             status: status,
           })
           .returning();
-        registrationResult = insertResult.map((r) => ({
-          ...r,
-          // map id
-          id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-          created_by: r
-            .created_by as `${string}-${string}-${string}-${string}-${string}`,
-          slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
-        }))[0];
+        registrationResult = insertResult.map((r) => (r as EventRegistration))[0];
       }
 
       // Update auth.users -- set isAnonymous to false if the user is no longer anonymous
