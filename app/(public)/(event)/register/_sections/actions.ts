@@ -20,6 +20,7 @@ import {
   EventRegistrationWithSlot,
   FormData,
 } from "./types";
+import { EventSlot } from "@/app/types/EventSlot";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -83,11 +84,7 @@ export async function oldcreateRegistration(
     const slots = await db.select()
       .from(eventSlots)
       .where(eq(eventSlots.id, formData.slot));
-    const slot = slots.map((r) => ({
-      ...r,
-      id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-      event: r.event as `${string}-${string}-${string}-${string}-${string}`,
-    }))[0];
+    const slot = slots.map((r) => (r as EventSlot))[0];
     if (isAuthenticated) {
       // Send confirmation email with ICS file and QR code
       await sendConfirmationEmailWithICSAndQR(

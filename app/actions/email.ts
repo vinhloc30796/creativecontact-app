@@ -275,11 +275,7 @@ async function sendForgotEmail(identifier: string) {
   return await sendEventDetailsEmail(
     registration.email,
     registration,
-    slots.map((r) => ({
-      ...r,
-      id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-      event: r.event as `${string}-${string}-${string}-${string}-${string}`,
-    }))[0],
+    slots.map((r) => (r as EventSlot))[0],
   ).then((data) => {
     console.log("Email sent:", data);
     return { success: true };

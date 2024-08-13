@@ -36,6 +36,7 @@ export const eventSlots = pgTable("event_slots", {
   time_start: timestamp("time_start", { withTimezone: true }).notNull(),
   time_end: timestamp("time_end", { withTimezone: true }).notNull(),
   capacity: integer("capacity").notNull(),
+  special_notes: text("special_notes"),
 });
 
 /* postgres=> \d event_registrations
