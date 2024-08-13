@@ -4,7 +4,8 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { CalendarIcon } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { CalendarIcon, InfoIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UseFormReturn } from 'react-hook-form'
 import { FormData } from './formSchema'
@@ -104,24 +105,38 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
                     const selectedClass = isSelected ? 'bg-gray-100' : ''
                     const timeStartStr = format(slot.time_start, 'HH:mm')
                     const timeEndStr = format(slot.time_end, 'HH:mm')
+                    const specialNotes = slot.special_notes ? `Special notes: ${slot.special_notes}` : undefined
                     return (
-                      <Button
-                        type="button"
-                        variant={'outline'}
-                        key={slot.id}
-                        onClick={() => {
-                          form.clearErrors('slot')
-                          form.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true })
-                          setSlotTouched(true)
-                        }}
-                        className={cn('w-full flex justify-between', selectedClass)}
-                        disabled={isDisabled}
-                      >
-                        <div className="font-normal">{timeStartStr} - {timeEndStr}</div>
-                        <div className="text-muted-foreground">
-                          {slot.capacity - availableCapacity}/{slot.capacity}
-                        </div>
-                      </Button>
+                      <TooltipProvider key={slot.id}>
+                        <Button
+                          type="button"
+                          variant={'outline'}
+                          onClick={() => {
+                            form.clearErrors('slot')
+                            form.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true })
+                            setSlotTouched(true)
+                          }}
+                          className={cn('w-full flex justify-between items-center', selectedClass)}
+                          disabled={isDisabled}
+                        >
+                          <div className="font-normal flex items-center">
+                            {timeStartStr} - {timeEndStr}
+                            {specialNotes && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <InfoIcon className="ml-2 h-4 w-4 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{specialNotes}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                          <div className="text-muted-foreground">
+                            {slot.capacity - availableCapacity}/{slot.capacity}
+                          </div>
+                        </Button>
+                      </TooltipProvider>
                     )
                   })
                 )}

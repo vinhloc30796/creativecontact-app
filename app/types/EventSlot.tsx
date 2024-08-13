@@ -10,4 +10,6 @@ export interface EventSlot {
   time_start: Date;
   time_end: Date;
   capacity: number;
+  // Optional: special_notes: string;
+  special_notes?: string;
 }
