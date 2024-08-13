@@ -186,9 +186,13 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           <h2 className="text-2xl font-semibold">{currentStep.title}</h2>
           <p>{currentStep.description}</p>
           {/* Minimal, understated, grey display of user information if found */}
+          <div>
+
           <p className="text-muted-foreground">{
-            `ID: ${user?.id || 'N/A'}${isAnonymous ? ' (Anonymous)' : ''}`
+            // either "You're a guest" or "You're logged in as {user.email}"
+            `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)
           }</p>
+          </div>
         </div>
         {currentStep.component}
         <div className="flex justify-between mt-2">
