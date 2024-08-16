@@ -1,3 +1,5 @@
+// File: app/(public)/(event)/register/_sections/ContactInfoStep.tsx
+
 import React from 'react'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'

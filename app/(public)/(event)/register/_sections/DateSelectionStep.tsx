@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import { isBefore, startOfDay } from 'date-fns'
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
+import { EventRegistration } from '@/app/types/EventRegistration'
+import { EventSlot } from '@/app/types/EventSlot'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { CalendarIcon, InfoIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { format, isBefore, startOfDay } from 'date-fns'
+import { CalendarIcon, InfoIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { FormData } from './formSchema'
-import { EventSlot } from '@/app/types/EventSlot'
-import { EventRegistration } from '@/app/types/EventRegistration'
-import { getSlotsForDate, getAvailableCapacity, formatDateTime } from './utils'
 import { getRegistrationsForSlots } from './actions'
-import { format } from "date-fns";
+import { FormData } from './formSchema'
+import { formatDateTime, getAvailableCapacity, getSlotsForDate } from './utils'
 
 interface DateSelectionStepProps {
   form: UseFormReturn<FormData>
@@ -26,6 +25,7 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
   const [registrations, setRegistrations] = useState<EventRegistration[]>([])
   const [slotTouched, setSlotTouched] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
   const today = startOfDay(new Date())
 
@@ -52,11 +52,16 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
     }
   }, [date, slots])
 
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate)
+    setIsCalendarOpen(false)  // Close the popover when a date is selected
+  }
+
   return (
     <>
       <FormItem className="space-y-2">
         <FormLabel>Pick a date</FormLabel>
-        <Popover>
+        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
           <PopoverTrigger asChild>
             <FormControl>
               <Button variant={'outline'} className={cn('w-full pl-3 text-left font-normal', !date && 'text-muted-foreground')}>
@@ -69,7 +74,7 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
             <Calendar
               mode="single"
               selected={date}
-              onSelect={setDate}
+              onSelect={handleDateSelect}
               defaultMonth={date || new Date(firstAvailableDate || '')}
               disabled={(date) => {
                 return isBefore(date, today) || !uniqueDates.includes(format(date, 'yyyy-MM-dd'))
