@@ -17,7 +17,7 @@ import { DateSelectionStep } from './DateSelectionStep'
 import { ConfirmationStep } from './ConfirmationStep'
 import { EmailExistedStep } from './EmailExistedStep'
 import { ConfirmationPage } from './ConfirmationPage'
-import { createRegistration, signInAnonymously, checkExistingRegistration } from './actions'
+import { createRegistration, signInAnonymously, checkExistingRegistration, writeUserInfo } from './actions'
 import { createClient } from '@/utils/supabase/client'
 import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
@@ -140,23 +140,37 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     if (isSubmitting) {
       return;
     }
-
+  
     setIsSubmitting(true);
     setFormError(null);
-
+  
     try {
-      const result = await createRegistration({
-        ...data,
-        created_by: user?.id || null,
-        is_anonymous: isAnonymous,
-        existingRegistrationId: existingRegistration?.id,
-      });
-
-      if (result.success) {
+      const [registrationResult, userInfoResult] = await Promise.all([
+        createRegistration({
+          ...data,
+          created_by: user?.id || null,
+          is_anonymous: isAnonymous,
+          existingRegistrationId: existingRegistration?.id,
+        }),
+        user?.id
+          ? writeUserInfo(user.id, {
+              industries: data.industries,
+              experience: data.experience,
+              field: data.field,
+            })
+          : Promise.resolve(null), // If there's no user.id, we don't call writeUserInfo
+      ]);
+  
+      if (registrationResult.success) {
         setSubmitted(true);
-        setRegistrationStatus(result.status);
+        setRegistrationStatus(registrationResult.status);
       } else {
-        throw new Error(result.error || 'Registration failed');
+        throw new Error(registrationResult.error || 'Registration failed');
+      }
+  
+      // Optionally, you can handle the userInfoResult here if needed
+      if (userInfoResult && !userInfoResult.success) {
+        console.error('Error writing user info:', userInfoResult.error);
       }
     } catch (error) {
       console.error('Error during registration:', error);
@@ -165,7 +179,6 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       setIsSubmitting(false);
     }
   });
-
 
   if (isLoading) {
     return <div>Loading...</div>;

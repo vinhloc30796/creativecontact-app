@@ -113,3 +113,67 @@ export const eventRegistrationLogs = pgTable("event_registration_logs", {
   status_after: registrationStatus("status_after").notNull(),
   changed_at: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/* postgres=> \d user_infos
+                    Table "public.user_infos"
+    Column    |       Type       | Collation | Nullable | Default 
+--------------+------------------+-----------+----------+---------
+ id           | uuid             |           | not null | 
+ display_name | text             |           |          | 
+ location     | text             |           |          | 
+ occupation   | text             |           |          | 
+ about        | text             |           |          | 
+ industries   | industry[]       |           |          | 
+ experience   | experience_level |           |          | 
+ field        | text             |           |          | 
+Indexes:
+    "user_infos_pkey" PRIMARY KEY, btree (id)
+    "idx_user_infos_industries" gin (industries)
+Foreign-key constraints:
+    "user_infos_id_fkey" FOREIGN KEY (id) REFERENCES auth.users(id)
+Policies (row security enabled): (none)
+*/ 
+
+export const industries = [
+  'Advertising',
+  'Architecture',
+  'Arts and Crafts',
+  'Design',
+  'Fashion',
+  'Film, Video, and Photography',
+  'Music',
+  'Performing Arts',
+  'Publishing',
+  'Software and Interactive',
+  'Television and Radio',
+  'Visual Arts',
+  'Other'
+] as const;
+
+export const industryEnum = pgEnum('industry', industries);
+
+export const experienceLevels = [
+  'Entry',
+  'Junior',
+  'Mid-level',
+  'Senior',
+  'Manager',
+  'C-level'
+] as const;
+
+export const experienceEnum = pgEnum('experience_level', experienceLevels);
+
+export const userInfos = pgTable('user_infos', {
+  id: uuid('id').primaryKey().references(() => authUsers.id),
+  displayName: text('display_name'),
+  location: text('location'),
+  occupation: text('occupation'),
+  about: text('about'),
+  industries: industryEnum('industries').array(),
+  experience: experienceEnum('experience').notNull(),
+  field: text('field'),
+});
+
+// TypeScript types for use in your application
+export type IndustryType = typeof industries[number];
+export type ExperienceType = typeof experienceLevels[number];

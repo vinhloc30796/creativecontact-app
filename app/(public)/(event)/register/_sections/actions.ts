@@ -1,3 +1,5 @@
+// File: app/(public)/(event)/register/_sections/actions.ts
+
 "use server";
 
 import {
@@ -5,22 +7,18 @@ import {
   sendConfirmationRequestEmail,
 } from "@/app/actions/email";
 import { EventRegistration } from "@/app/types/EventRegistration";
-import { authUsers, eventRegistrations, eventSlots } from "@/drizzle/schema";
+import { authUsers, eventRegistrations, eventSlots, ExperienceType, IndustryType, userInfos } from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
-import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import QRCode from "qrcode";
 import { Resend } from "resend";
-import { v4 as uuidv4 } from "uuid";
 import {
   // EventRegistration,
   EventRegistrationWithSlot,
   FormData,
 } from "./types";
-import { EventSlot } from "@/app/types/EventSlot";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -28,97 +26,26 @@ export async function getRegistrationsForSlots(
   slotIds: string[],
 ): Promise<EventRegistration[]> {
   const supabase = createClient();
-
   const { data, error } = await supabase.from("event_registrations").select(
     "*",
   ).in("slot", slotIds).in("status", ["confirmed", "pending"]);
-
+  // Return or error
   if (error) {
     console.error("Error fetching registrations:", error);
     return [];
   }
-
   return data as EventRegistration[];
-}
-
-export async function oldcreateRegistration(
-  formData: FormData & { created_by: string | null; is_anonymous: boolean },
-): Promise<
-  { success: boolean; error?: string; status: "confirmed" | "pending" }
-> {
-  const cookieStore = cookies();
-  const supabase = createClient();
-
-  // Check if the user is authenticated (not anonymous)
-  const isAuthenticated = !formData.is_anonymous;
-
-  // Generate a signature for the registration
-  const signature = crypto.randomBytes(16).toString("hex");
-
-  const registrationId = uuidv4();
-  const qrCodeDataURL = await QRCode.toDataURL(registrationId);
-
-  const { data, error } = await supabase
-    .from("event_registrations")
-    .insert([
-      {
-        id: registrationId,
-        slot: formData.slot,
-        created_by: formData.created_by,
-        name: `${formData.lastName} ${formData.firstName}`,
-        email: formData.email,
-        phone: formData.phone,
-        status: isAuthenticated ? "confirmed" : "pending",
-        qr_code: qrCodeDataURL,
-      },
-    ])
-    .select();
-
-  if (error) {
-    console.error("Error creating registration:", error);
-    return { success: false, error: error.message, status: "pending" };
-  }
-
-  // Fetch the slot details
-  try {
-    const slots = await db.select()
-      .from(eventSlots)
-      .where(eq(eventSlots.id, formData.slot));
-    const slot = slots.map((r) => (r as EventSlot))[0];
-    if (isAuthenticated) {
-      // Send confirmation email with ICS file and QR code
-      await sendConfirmationEmailWithICSAndQR(
-        formData.email,
-        slot,
-        registrationId,
-      );
-    } else {
-      // Send confirmation request email
-      await sendConfirmationRequestEmail(formData.email, registrationId);
-    }
-  } catch (error) {
-    console.error("Error sending confirmation email:", error);
-    return {
-      success: false,
-      error: "Failed to send confirmation email",
-      status: "pending",
-    };
-  }
-
-  return { success: true, status: isAuthenticated ? "confirmed" : "pending" };
 }
 
 export async function signInAnonymously() {
   const cookieStore = cookies();
   const supabase = createClient();
-
   const { data, error } = await supabase.auth.signInAnonymously();
-
+  // Return or error
   if (error) {
     console.error("Error signing in anonymously:", error);
     return null;
   }
-
   return data.user;
 }
 
@@ -129,16 +56,13 @@ export async function confirmRegistration(signature: string) {
   const { data: registration, error: fetchError } = await supabase.from(
     "event_registrations",
   ).select("*").eq("id", signature).single();
-
   if (fetchError) {
     console.error("Failed to fetch registration:", fetchError);
     return { success: false, error: "Failed to fetch registration" };
   }
-
   if (!registration) {
     return { success: false, error: "Registration not found" };
   }
-
   if (registration.status === "confirmed") {
     return { success: false, error: "Registration already confirmed" };
   }
@@ -146,7 +70,6 @@ export async function confirmRegistration(signature: string) {
   // Update the registration status
   const { error: updateError } = await supabase.from("event_registrations")
     .update({ status: "confirmed" }).eq("id", signature);
-
   if (updateError) {
     console.error("Failed to confirm registration:", updateError);
     return { success: false, error: "Failed to confirm registration" };
@@ -176,7 +99,6 @@ export async function confirmRegistration(signature: string) {
             // @ts-ignore -- this works, but Supabase needs to update their types
             is_anonymous: false,
           });
-
         if (authUpdateError) {
           console.error(
             "Failed to update user email:",
@@ -212,12 +134,11 @@ export async function checkExistingRegistration(
     .eq("status", "confirmed")
     .order("created_at", { ascending: false })
     .limit(1);
-
+  // Return or error
   if (error) {
     console.error("Error checking existing registration:", error);
     return null;
   }
-
   return data[0] || null;
 }
 
@@ -279,7 +200,8 @@ export async function createRegistration(
             status: status,
           })
           .returning();
-        registrationResult = insertResult.map((r) => (r as EventRegistration))[0];
+        registrationResult =
+          insertResult.map((r) => (r as EventRegistration))[0];
       }
 
       // Update auth.users -- set isAnonymous to false if the user is no longer anonymous
@@ -342,5 +264,39 @@ export async function cancelExpiredRegistrations() {
       success: false,
       error: "Failed to cancel expired registrations",
     };
+  }
+}
+
+export async function writeUserInfo(
+  userId: string,
+  professionalInfo: {
+    industries: IndustryType[];
+    experience: ExperienceType;
+    field: string;
+  }
+) {
+  try {
+    const result = await db
+      .insert(userInfos)
+      .values({
+        id: userId as any, // Type assertion to bypass strict type checking
+        industries: professionalInfo.industries as any[], // Type assertion for array
+        experience: professionalInfo.experience,
+        field: professionalInfo.field,
+      })
+      .onConflictDoUpdate({
+        target: userInfos.id,
+        set: {
+          industries: professionalInfo.industries as any[], // Type assertion for array
+          experience: professionalInfo.experience,
+          field: professionalInfo.field,
+        },
+      })
+      .returning();
+
+    return { success: true, data: result[0] };
+  } catch (error) {
+    console.error('Error writing user info:', error);
+    return { success: false, error: (error as Error).message };
   }
 }

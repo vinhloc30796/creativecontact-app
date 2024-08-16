@@ -1,31 +1,7 @@
 // File: app/(public)/(event)/register/_sections/formSchema.ts
 
 import { z } from "zod";
-
-const industryOptions = [
-  "Advertising",
-  "Architecture",
-  "Arts and Crafts",
-  "Design",
-  "Fashion",
-  "Film, Video, and Photography",
-  "Music",
-  "Performing Arts",
-  "Publishing",
-  "Software and Interactive",
-  "Television and Radio",
-  "Visual Arts",
-  "Other",
-] as const;
-
-const experienceOptions = [
-  "Entry",
-  "Junior",
-  "Mid-level",
-  "Senior",
-  "Manager",
-  "C-level",
-] as const;
+import { industries, experienceLevels } from "@/drizzle/schema";
 
 export const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -36,9 +12,9 @@ export const formSchema = z.object({
   }),
   // IndustryInfoStep fields
   industries: z.array(
-    z.enum(industryOptions),
+    z.enum(industries),
   ).min(1, "Please select at least one industry").default([]),
-  experience: z.enum(experienceOptions),
+  experience: z.enum(experienceLevels),
   field: z.string().min(
     1,
     "Please enter your specific field or area of expertise",
