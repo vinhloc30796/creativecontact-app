@@ -19,6 +19,7 @@ import { EmailExistedStep } from './EmailExistedStep'
 import { ConfirmationPage } from './ConfirmationPage'
 import { createRegistration, signInAnonymously, checkExistingRegistration } from './actions'
 import { createClient } from '@/utils/supabase/client'
+import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
 
 interface RegistrationFormProps {
@@ -82,7 +83,10 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     },
   ]
 
+  // Extract the current step
   const currentStep = steps[formStep]
+  // Calculate progress percentage
+  const progress = ((formStep + 1) / steps.length) * 100
 
   const validateStep = async () => {
     const fieldsToValidate = currentStep.fields
@@ -193,6 +197,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
             `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)
           }</p>
           </div>
+          <Progress value={progress} className="w-full" />
         </div>
         {currentStep.component}
         <div className="flex justify-between mt-2">
