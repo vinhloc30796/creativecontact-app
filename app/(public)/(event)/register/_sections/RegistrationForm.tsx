@@ -45,7 +45,12 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       firstName: '',
       lastName: '',
       phone: '',
+      // Date selection fields
       slot: '',
+      // Professional info fields
+      industries: [], // Initialize with an empty array
+      experience: undefined,
+      field: '',
     },
   })
 
