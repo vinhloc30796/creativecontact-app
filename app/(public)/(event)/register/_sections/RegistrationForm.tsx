@@ -21,6 +21,7 @@ import { createRegistration, signInAnonymously, checkExistingRegistration } from
 import { createClient } from '@/utils/supabase/client'
 import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
+import { ProfessionalInfoStep } from './ProfessionalInfoStep'
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[]
@@ -68,6 +69,12 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       description: 'Please provide your contact information',
       component: <ContactInfoStep form={form} />,
       fields: ['email', 'firstName', 'lastName', 'phone'] as const,
+    },
+    {
+      title: 'Professional Information',
+      description: 'Please provide your professional information',
+      component: <ProfessionalInfoStep form={form} />,
+      fields: ['industries', 'experience', 'field'] as const,
     },
     {
       title: 'Select A Date',
