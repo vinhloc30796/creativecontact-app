@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import { EventRegistration } from '@/app/types/EventRegistration';
 import { EventSlot } from '@/app/types/EventSlot';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import { format, isBefore, startOfDay } from 'date-fns';
-import { CalendarIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-import { UseFormReturn } from 'react-hook-form';
-import { getRegistrationsForSlots } from './actions';
-import { FormData } from './formSchema';
-import { formatDateTime, getAvailableCapacity, getSlotsForDate } from './utils';
 import {
   Table,
   TableBody,
@@ -20,6 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from '@/lib/utils';
+import { format, isBefore, startOfDay } from 'date-fns';
+import { CalendarIcon, ChevronDownIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { UseFormReturn } from 'react-hook-form';
+import { getRegistrationsForSlots } from './actions';
+import { FormData } from './formSchema';
+import { formatDateTime, getAvailableCapacity, getSlotsForDate } from './utils';
 
 interface DateSelectionStepProps {
   form: UseFormReturn<FormData>;
@@ -62,7 +63,7 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
     setIsCalendarOpen(false);
   };
 
-  const toggleAccordion = (slotId: string) => {
+  const toggleExpand = (slotId: string) => {
     setExpandedSlotId(expandedSlotId === slotId ? null : slotId);
   };
 
@@ -101,16 +102,15 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
             <FormLabel className={cn(slotTouched && form.formState.errors.slot ? 'text-destructive' : '', 'block mt-2')}>
               <div className="flex justify-between">
                 <span>Pick a time slot</span>
-                <span>Occupied</span>
               </div>
             </FormLabel>
             <FormControl>
-            <Table>
+              <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Time</TableHead>
-                    <TableHead>Occupied</TableHead>
-                    <TableHead>Special Notes</TableHead>
+                    <TableHead className="text-right">Occupied</TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -132,25 +132,54 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
                       const timeEndStr = format(slot.time_end, 'HH:mm');
 
                       return (
-                        <TableRow 
-                          key={slot.id} 
-                          className={cn(
-                            isSelected && 'bg-muted',
-                            isDisabled && 'opacity-50',
-                            'cursor-pointer'
-                          )}
-                          onClick={() => {
-                            if (!isDisabled) {
-                              form.clearErrors('slot');
-                              form.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true });
-                              setSlotTouched(true);
-                            }
-                          }}
+                        <Collapsible
+                          asChild key={slot.id}
+                          open={expandedSlotId === slot.id}
+                          onOpenChange={() => toggleExpand(slot.id)}
                         >
-                          <TableCell>{timeStartStr} - {timeEndStr}</TableCell>
-                          <TableCell>{slot.capacity - availableCapacity}/{slot.capacity}</TableCell>
-                          <TableCell>{slot.special_notes || 'None'}</TableCell>
-                        </TableRow>
+                          <>
+                            <TableRow
+                              key={slot.id}
+                              className={cn(
+                                isSelected && 'bg-muted',
+                                isDisabled && 'opacity-50',
+                                'cursor-pointer'
+                              )}
+                              onClick={() => {
+                                if (!isDisabled) {
+                                  form.clearErrors('slot');
+                                  form.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true });
+                                  setSlotTouched(true);
+                                }
+                              }}
+                            >
+                              <TableCell>{timeStartStr} - {timeEndStr}</TableCell>
+                              <TableCell className="text-right">
+                                {slot.capacity - availableCapacity}/{slot.capacity}
+                              </TableCell>
+                              <TableCell>
+                                {slot.special_notes &&
+                                  <>
+                                    <CollapsibleTrigger asChild>
+                                      <div
+                                        // Rotate the icon when the slot is expanded
+                                        className={cn('transform transition-transform', expandedSlotId === slot.id && 'rotate-180')}
+                                      >
+                                        <ChevronDownIcon className="h-4 w-4" />
+                                      </div>
+                                    </CollapsibleTrigger>
+                                  </>
+                                }
+                              </TableCell>
+                            </TableRow>
+                            <CollapsibleContent>
+                              <TableRow>
+                                <TableCell
+                                  colSpan={3}><div className="text-sm text-muted-foreground">{slot.special_notes}</div></TableCell>
+                              </TableRow>
+                            </CollapsibleContent>
+                          </>
+                        </Collapsible>
                       );
                     })
                   )}
@@ -158,8 +187,9 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
               </Table>
             </FormControl>
             {slotTouched && form.formState.errors.slot && <FormMessage>{form.formState.errors.slot.message}</FormMessage>}
-          </FormItem>
-        )}
+          </FormItem >
+        )
+        }
       />
     </>
   );
