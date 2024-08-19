@@ -7,7 +7,14 @@ import {
   sendConfirmationRequestEmail,
 } from "@/app/actions/email";
 import { EventRegistration } from "@/app/types/EventRegistration";
-import { authUsers, eventRegistrations, eventSlots, ExperienceType, IndustryType, userInfos } from "@/drizzle/schema";
+import {
+  authUsers,
+  eventRegistrations,
+  eventSlots,
+  ExperienceType,
+  IndustryType,
+  userInfos,
+} from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
@@ -78,9 +85,23 @@ export async function confirmRegistration(signature: string) {
   // Store the user ID and email for later use
   let userId = registration.created_by;
   let email = registration.email;
-  
-  // Update the user's email after registration confirmation
-  if (userId) {
+
+  // Check if user email already exists
+  const { data: existingUser, error: existingUserError } =
+    await adminSupabaseClient.rpc(
+      "get_user_id_by_email",
+      { email: email },
+    );
+
+  if (existingUser) {
+    console.log(`An account with email ${email} already exists.`);
+    // Decide how to handle this case (merge, inform user, etc.)
+    return { success: false, error: "Email already in use" };
+  } else if (existingUserError) {
+    console.error("Error checking for existing user:", existingUserError);
+    return { success: false, error: "Error checking email availability" };
+  } else if (userId) {
+    // Update the user's email after registration confirmation
     console.debug(`Updating user email for registration ${signature}`);
     const { data: userData, error: userError } = await adminSupabaseClient.auth
       .admin.getUserById(userId);
@@ -273,7 +294,7 @@ export async function writeUserInfo(
     industries: IndustryType[];
     experience: ExperienceType;
     field: string;
-  }
+  },
 ) {
   try {
     const result = await db
@@ -296,7 +317,7 @@ export async function writeUserInfo(
 
     return { success: true, data: result[0] };
   } catch (error) {
-    console.error('Error writing user info:', error);
+    console.error("Error writing user info:", error);
     return { success: false, error: (error as Error).message };
   }
 }
