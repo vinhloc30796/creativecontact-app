@@ -54,7 +54,7 @@ function RegistrationContent() {
     <Card className="w-[400px] overflow-hidden relative z-10">
       <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
         style={{
-          backgroundImage: 'url(/banner.jpg)',
+          backgroundImage: 'url(/HoanTatProject-background.png)',
           backgroundSize: 'cover',
         }}
       />
@@ -63,7 +63,7 @@ function RegistrationContent() {
           className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
           style={{ backgroundColor: '#F6EBE4' }}
         >
-          <h2 className="text-2xl font-semibold">Registration Confirmed</h2>
+          <h2 className="text-2xl font-semibold text-primary">Registration Confirmed</h2>
           <p>Your registration has been successfully confirmed. Thank you for registering!</p>
           {emailStatus === 'sent' && <p>A confirmation email has been sent!</p>}
           {emailStatus === 'error' && <p>There was an error sending the confirmation email...</p>}
@@ -110,7 +110,7 @@ function RegistrationContent() {
 
 export default function RegistrationConfirmed() {
   return (
-    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
+    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
       <Suspense fallback={<div>Loading...</div>}>
         <RegistrationContent />
       </Suspense>

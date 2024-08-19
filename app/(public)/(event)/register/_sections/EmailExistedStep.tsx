@@ -13,7 +13,7 @@ interface EmailExistedStepProps {
 export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: EmailExistedStepProps) {
 	return (
 		<div className="space-y-4">
-			<h2 className="text-lg font-semibold">Existing Registration Found</h2>
+			<h2 className="text-lg font-semibold text-primary">Existing Registration Found</h2>
 			<p>You have already registered for another slot with this email address. If you proceed, your existing registration will be cancelled.</p>
 			<p>
 				Existing registration details:

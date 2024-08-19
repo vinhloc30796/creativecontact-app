@@ -25,7 +25,7 @@ export function ConfirmationPage({ formData, slots, status }: ConfirmationPagePr
 
 	return (
 		<div className="space-y-4">
-			<h2 className="text-2xl font-bold">Registration {status === 'confirmed' ? 'Confirmed' : 'Submitted'}</h2>
+			<h2 className="text-2xl font-bold text-primary">Registration {status === 'confirmed' ? 'Confirmed' : 'Submitted'}</h2>
 			{status === 'confirmed' ? (
 				<p>Thank you for registering! Your registration is confirmed. We&apos;ve sent you an email with the event details and a calendar invite.</p>
 			) : (

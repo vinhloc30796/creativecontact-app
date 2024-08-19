@@ -64,7 +64,7 @@ export function MagicSignIn() {
         className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
         style={{ backgroundColor: '#F6EBE4' }}
       >
-        <h2 className="text-2xl font-semibold">Magic Sign-In</h2>
+        <h2 className="text-2xl font-semibold text-primary">Magic Sign-In</h2>
         <p>Please enter your email for magic sign-in before check-in</p>
       </div>
       {magicLinkSent ? (
