@@ -1,10 +1,11 @@
 // File: app/staff/checkin/_sections/EventLogWrapper.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TIMEZONE } from "@/lib/constants";
 import { Suspense } from 'react';
 import { getEventLogs } from './EventLogServer';
 
 function formatDate(date: Date): string {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString(TIMEZONE, { hour: '2-digit', minute: '2-digit' });
 }
 
 async function EventLogContent() {

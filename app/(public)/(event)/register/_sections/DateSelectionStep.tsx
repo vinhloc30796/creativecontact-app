@@ -1,21 +1,14 @@
 import { EventRegistration } from '@/app/types/EventRegistration';
 import { EventSlot } from '@/app/types/EventSlot';
+import ExpandableText from '@/components/ExpandableText';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 import { format, isBefore, startOfDay } from 'date-fns';
-import { CalendarIcon, ChevronDownIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { getRegistrationsForSlots } from './actions';
@@ -33,7 +26,6 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
   const [slotTouched, setSlotTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [expandedSlotId, setExpandedSlotId] = useState<string | null>(null);
 
   const today = startOfDay(new Date());
 
@@ -61,10 +53,6 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
   const handleDateSelect = (selectedDate: Date | undefined) => {
     setDate(selectedDate);
     setIsCalendarOpen(false);
-  };
-
-  const toggleExpand = (slotId: string) => {
-    setExpandedSlotId(expandedSlotId === slotId ? null : slotId);
   };
 
   return (
@@ -132,54 +120,35 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
                       const timeEndStr = format(slot.time_end, 'HH:mm');
 
                       return (
-                        <Collapsible
-                          asChild key={slot.id}
-                          open={expandedSlotId === slot.id}
-                          onOpenChange={() => toggleExpand(slot.id)}
-                        >
-                          <>
-                            <TableRow
-                              key={slot.id}
-                              className={cn(
-                                isSelected && 'bg-muted',
-                                isDisabled && 'opacity-50',
-                                'cursor-pointer'
+                        <>
+                          <TableRow
+                            key={slot.id}
+                            className={cn(
+                              isSelected && 'bg-muted',
+                              isDisabled && 'opacity-50',
+                              'cursor-pointer'
+                            )}
+                            onClick={() => {
+                              if (!isDisabled) {
+                                form.clearErrors('slot');
+                                form.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true });
+                                setSlotTouched(true);
+                              }
+                            }}
+                          >
+                            <TableCell>
+                              <p>{timeStartStr} - {timeEndStr}</p>
+                              {slot.special_notes && (
+                                <ExpandableText text={slot.special_notes} textClassName='text-muted-foreground' />
                               )}
-                              onClick={() => {
-                                if (!isDisabled) {
-                                  form.clearErrors('slot');
-                                  form.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true });
-                                  setSlotTouched(true);
-                                }
-                              }}
-                            >
-                              <TableCell>{timeStartStr} - {timeEndStr}</TableCell>
-                              <TableCell className="text-right">
-                                {slot.capacity - availableCapacity}/{slot.capacity}
-                              </TableCell>
-                              <TableCell>
-                                {slot.special_notes &&
-                                  <>
-                                    <CollapsibleTrigger asChild>
-                                      <div
-                                        // Rotate the icon when the slot is expanded
-                                        className={cn('transform transition-transform', expandedSlotId === slot.id && 'rotate-180')}
-                                      >
-                                        <ChevronDownIcon className="h-4 w-4" />
-                                      </div>
-                                    </CollapsibleTrigger>
-                                  </>
-                                }
-                              </TableCell>
-                            </TableRow>
-                            <CollapsibleContent>
-                              <TableRow>
-                                <TableCell
-                                  colSpan={3}><div className="text-sm text-muted-foreground">{slot.special_notes}</div></TableCell>
-                              </TableRow>
-                            </CollapsibleContent>
-                          </>
-                        </Collapsible>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {slot.capacity - availableCapacity}/{slot.capacity}
+                            </TableCell>
+                            <TableCell>
+                            </TableCell>
+                          </TableRow>
+                        </>
                       );
                     })
                   )}

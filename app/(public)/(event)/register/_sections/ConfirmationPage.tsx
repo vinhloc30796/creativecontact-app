@@ -2,6 +2,7 @@ import React from 'react'
 import { FormData } from './types'
 import { EventSlot } from '@/app/types/EventSlot'
 import { formatInTimeZone } from 'date-fns-tz'
+import { TIMEZONE } from '@/lib/constants'
 
 interface ConfirmationPageProps {
 	formData: FormData
@@ -10,15 +11,14 @@ interface ConfirmationPageProps {
 }
 
 export function ConfirmationPage({ formData, slots, status }: ConfirmationPageProps) {
-	const timeZone = 'Asia/Bangkok' // UTC+7
 
 	const selectedSlot = slots.find((slot) => slot.id === formData.slot)
 
 	const formatSlotTime = (slot: EventSlot | undefined) => {
 		if (!slot) return 'No slot selected'
 
-		const startTime = formatInTimeZone(new Date(slot.time_start), timeZone, 'dd/MM/yyyy HH:mm')
-		const endTime = formatInTimeZone(new Date(slot.time_end), timeZone, 'HH:mm')
+		const startTime = formatInTimeZone(new Date(slot.time_start), TIMEZONE, 'dd/MM/yyyy HH:mm')
+		const endTime = formatInTimeZone(new Date(slot.time_end), TIMEZONE, 'HH:mm')
 
 		return `${startTime} - ${endTime}`
 	}

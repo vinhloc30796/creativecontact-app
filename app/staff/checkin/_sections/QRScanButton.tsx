@@ -1,11 +1,12 @@
 // File: app/staff/checkin/_sections/QRScanButton.tsx
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { QrCode, Camera, Upload } from 'lucide-react';
+import { TIMEZONE } from '@/lib/constants';
+import { Camera, QrCode, Upload } from 'lucide-react';
 import QrScanner from 'qr-scanner';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 type Step = 'select' | 'scan' | 'confirm' | 'search' | 'checkin';
 
@@ -179,7 +180,7 @@ const QRScanButton = () => {
           <p className="font-medium">Status:</p>
           <p className="capitalize">{registrationDetails.status}</p>
           <p className="font-medium">Created At:</p>
-          <p>{new Date(registrationDetails.created_at).toLocaleString()}</p>
+          <p>{new Date(registrationDetails.created_at).toLocaleString(TIMEZONE)}</p>
           <p className="font-medium">Signature:</p>
           <p>{registrationDetails.signature}</p>
           <p className="font-medium">Slot ID:</p>
