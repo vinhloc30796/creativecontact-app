@@ -1,6 +1,6 @@
 import { EventRegistration } from "@/app/types/EventRegistration";
 import { EventSlot } from "@/app/types/EventSlot";
-import { TIMEZONE } from "@/lib/constants";
+import { TIMEZONE } from "@/lib/timezones";
 import { format, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 

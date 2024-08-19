@@ -2,7 +2,7 @@ import React from 'react'
 import { FormData } from './types'
 import { EventSlot } from '@/app/types/EventSlot'
 import { formatInTimeZone } from 'date-fns-tz'
-import { TIMEZONE } from '@/lib/constants'
+import { TIMEZONE } from '@/lib/timezones'
 
 interface ConfirmationPageProps {
 	formData: FormData

@@ -3,7 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { TIMEZONE } from '@/lib/constants';
+import { LOCALE, timezoneFormatter } from '@/lib/timezones';
 import { Camera, QrCode, Upload } from 'lucide-react';
 import QrScanner from 'qr-scanner';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -180,7 +180,7 @@ const QRScanButton = () => {
           <p className="font-medium">Status:</p>
           <p className="capitalize">{registrationDetails.status}</p>
           <p className="font-medium">Created At:</p>
-          <p>{new Date(registrationDetails.created_at).toLocaleString(TIMEZONE)}</p>
+          <p>{new Date(registrationDetails.created_at).toLocaleString(LOCALE)}</p>
           <p className="font-medium">Signature:</p>
           <p>{registrationDetails.signature}</p>
           <p className="font-medium">Slot ID:</p>
