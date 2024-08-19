@@ -8,7 +8,7 @@ interface ForgotPageProps {}
 
 const ForgotPage = ({}: ForgotPageProps) => {
 	return (
-		<div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
+		<div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
 			<Card className="w-[400px] overflow-hidden relative z-10">
 				<CardContent className="p-6">
 					<ForgotForm />

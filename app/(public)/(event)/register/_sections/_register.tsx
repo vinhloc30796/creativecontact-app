@@ -10,7 +10,7 @@ interface RegisterPageProps {
 
 const RegisterPage = ({ eventSlots }: RegisterPageProps) => {
 	return (
-		<div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
+		<div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
 			<RegisterWrapper>
 				<RegistrationForm initialEventSlots={eventSlots} />
 			</RegisterWrapper>

@@ -17,7 +17,7 @@ export default async function CheckinPage({ userEmail }: CheckinPageProps) {
       <Card className="w-[400px] overflow-hidden relative z-10">
         <CardHeader className="border-b">
           <div className="flex gap-4 items-center">
-            <div className="aspect-square border rounded w-20 flex-shrink-0" style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}></div>
+            <div className="aspect-square border rounded w-20 flex-shrink-0" style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}></div>
             <div className="flex flex-col">
               <CardTitle className="text-xl font-bold">Check-in for Event</CardTitle>
               <div className="flex items-center justify-between">

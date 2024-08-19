@@ -46,7 +46,7 @@ export default function ForgotForm() {
 
 	return (
 		<div className="container mx-auto max-w-md p-4">
-			<h1 className="text-2xl font-bold mb-4">Forgot Registration Details</h1>
+			<h1 className="text-2xl font-bold mb-4 text-primary">Forgot Registration Details</h1>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 					<FormField

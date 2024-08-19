@@ -212,7 +212,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
           style={{ backgroundColor: '#F6EBE4' }}
         >
-          <h2 className="text-2xl font-semibold">{currentStep.title}</h2>
+          <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
           <p>{currentStep.description}</p>
           {/* Minimal, understated, grey display of user information if found */}
           <div>

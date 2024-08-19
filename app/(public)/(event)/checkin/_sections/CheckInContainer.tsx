@@ -12,11 +12,11 @@ interface CheckInContainerProps {
 
 export function CheckInContainer({ children }: CheckInContainerProps) {
   return (
-    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/bg.jpg)', backgroundSize: 'cover' }}>
+    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
       <Card className="w-[400px] overflow-hidden relative z-10">
         <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
           style={{
-            backgroundImage: 'url(/banner.jpg)',
+            backgroundImage: 'url(/HoanTatProject-background.png)',
             backgroundSize: 'cover',
           }}
         />
