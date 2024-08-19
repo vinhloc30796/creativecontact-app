@@ -4,7 +4,7 @@
 import { EventRegistrationLog } from '@/app/types/EventRegistrationLog';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authUsers, eventRegistrationLogs, eventRegistrations } from '@/drizzle/schema';
-import { LOCALE, timezoneFormatter } from '@/lib/timezones';
+import { datetimeFormatter } from '@/lib/timezones';
 import { db } from '@/lib/db';
 import { desc, eq } from 'drizzle-orm';
 
@@ -33,10 +33,6 @@ export async function getEventLogs(): Promise<EventRegistrationLog[]> {
   }
 }
 
-function formatDate(date: Date): string {
-  return date.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' });
-}
-
 export default async function EventLog() {
   try {
     const logs = await getEventLogs();
@@ -51,7 +47,7 @@ export default async function EventLog() {
             <div key={log.event_registration_id} className="mb-2">
               <strong>{log.guestName}</strong>{' '}
               {log.status_after.toLowerCase()} at{' '}
-              <strong>{formatDate(log.changed_at)}</strong> by{' '}
+              <strong>{datetimeFormatter.format(log.changed_at)}</strong> by{' '}
               <strong>{log.staff_id}</strong>
             </div>
           ))}

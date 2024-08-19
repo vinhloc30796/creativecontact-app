@@ -78,7 +78,7 @@ export async function confirmRegistration(signature: string) {
   // Store the user ID and email for later use
   let userId = registration.created_by;
   let email = registration.email;
-
+  
   // Update the user's email after registration confirmation
   if (userId) {
     console.debug(`Updating user email for registration ${signature}`);
