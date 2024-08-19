@@ -10,14 +10,16 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import { AlertCircle } from 'lucide-react';
+import { NextResponse } from 'next/server';
 
 export default function RegistrationError() {
   const supabase = createClient();
 
   const handleRetry = async () => {
-    // This is a placeholder function. You'll need to implement the actual retry logic.
-    // It might involve re-sending a confirmation email or redirecting to a registration page.
-    console.log('Retry registration');
+    // Redirect to registration page
+    console.log('Redirecting to registration page');
+    const redirectUrl = new URL('/', window.location.origin);
+    window.location.href = redirectUrl.toString();
   };
 
   return (

@@ -26,6 +26,7 @@ import {
   EventRegistrationWithSlot,
   FormData,
 } from "./types";
+import { generateOTP } from "@/utils/otp";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -94,9 +95,18 @@ export async function confirmRegistration(signature: string) {
     );
 
   if (existingUser) {
-    console.log(`An account with email ${email} already exists.`);
-    // Decide how to handle this case (merge, inform user, etc.)
-    return { success: false, error: "Email already in use" };
+    console.log(`An account with email ${email} already exists, userId is`, existingUser);
+    return db.update(eventRegistrations)
+    .set({created_by: existingUser})
+    .where(eq(eventRegistrations.id, signature))
+    .then((result) => {
+      console.log(`Updated registration ${signature} with userId ${existingUser}`);
+      return { success: true, email: email, userId: existingUser.id };
+    })
+    .catch((error) => {
+      console.error(`Failed to update registration ${signature} with userId ${existingUser.id}:`, error);
+      return { success: false, error: "Email already in use & failed to update registration" };
+    })
   } else if (existingUserError) {
     console.error("Error checking for existing user:", existingUserError);
     return { success: false, error: "Error checking email availability" };

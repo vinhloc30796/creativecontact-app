@@ -73,7 +73,7 @@ function RegistrationContent() {
           <p>Loading user information...</p>
         ) : (
           <div className="space-y-2">
-            <p><strong>User ID:</strong> {registrationInfo.userId || user?.id || 'Not available'}</p>
+            <p><strong>User ID:</strong> {user?.id || registrationInfo.userId || 'Not available'}</p>
           </div>
         )}
 
