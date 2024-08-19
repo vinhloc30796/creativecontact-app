@@ -1,17 +1,18 @@
 // File: app/actions/email.ts
 "use server";
 
-import { EventSlot } from "@/app/types/EventSlot";
-import { generateOTP } from "@/utils/otp";
-import { adminSupabaseClient } from "@/utils/supabase/server-admin";
-import { createEvent } from "ics";
-import { Resend } from "resend";
 import { EventRegistration } from "@/app/types/EventRegistration";
-import { createClient } from "@/utils/supabase/server";
-import { db } from "@/lib/db";
+import { EventSlot } from "@/app/types/EventSlot";
 import { eventSlots } from "@/drizzle/schema";
+import { TIMEZONE } from "@/lib/constants";
+import { db } from "@/lib/db";
+import { generateOTP } from "@/utils/otp";
+import { createClient } from "@/utils/supabase/server";
+import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { eq } from "drizzle-orm";
+import { createEvent } from "ics";
 import QRCode from "qrcode";
+import { Resend } from "resend";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -192,9 +193,9 @@ async function sendConfirmationEmailWithICSAndQR(
 ) {
   try {
     // Prep vars
-    const dateStr = new Date(slotData.time_start).toLocaleDateString();
-    const timeStartStr = new Date(slotData.time_start).toLocaleTimeString();
-    const timeEndStr = new Date(slotData.time_end).toLocaleTimeString();
+    const dateStr = new Date(slotData.time_start).toLocaleDateString(TIMEZONE);
+    const timeStartStr = new Date(slotData.time_start).toLocaleTimeString(TIMEZONE);
+    const timeEndStr = new Date(slotData.time_end).toLocaleTimeString(TIMEZONE);
     // Prep ICS file
     const icsData = await generateICSFile(slotData);
     // Generate QR code as a Buffer
@@ -302,9 +303,9 @@ async function sendEventDetailsEmail(
   const icsData = await generateICSFile(slot);
   // console.debug("Generated ICS file:", icsData);
   const qr = await QRCode.toDataURL(registration.id);
-  const dateStr = new Date(slot.time_start).toLocaleDateString();
-  const timeStartStr = new Date(slot.time_start).toLocaleTimeString();
-  const timeEndStr = new Date(slot.time_end).toLocaleTimeString();
+  const dateStr = new Date(slot.time_start).toLocaleDateString(TIMEZONE);
+  const timeStartStr = new Date(slot.time_start).toLocaleTimeString(TIMEZONE);
+  const timeEndStr = new Date(slot.time_end).toLocaleTimeString(TIMEZONE);
   const emailContent = `
     <h1>Your Event Registration Details</h1>
     <p>Here are the details of your event registration:</p>
@@ -345,5 +346,6 @@ export {
   sendConfirmationRequestEmail,
   sendEventDetailsEmail,
   sendForgotEmail,
-  sendSignInWithOtp,
+  sendSignInWithOtp
 };
+

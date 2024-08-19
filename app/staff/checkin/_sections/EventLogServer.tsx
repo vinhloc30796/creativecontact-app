@@ -1,12 +1,12 @@
 // File: app/staff/checkin/_sections/EventLogServer.tsx
 "use server";
 
-import React from 'react';
-import { eq, desc } from 'drizzle-orm';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from '@/lib/db';
-import { eventRegistrationLogs, eventRegistrations, authUsers } from '@/drizzle/schema';
 import { EventRegistrationLog } from '@/app/types/EventRegistrationLog';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { authUsers, eventRegistrationLogs, eventRegistrations } from '@/drizzle/schema';
+import { TIMEZONE } from '@/lib/constants';
+import { db } from '@/lib/db';
+import { desc, eq } from 'drizzle-orm';
 
 
 export async function getEventLogs(): Promise<EventRegistrationLog[]> {
@@ -34,7 +34,7 @@ export async function getEventLogs(): Promise<EventRegistrationLog[]> {
 }
 
 function formatDate(date: Date): string {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString(TIMEZONE, { hour: '2-digit', minute: '2-digit' });
 }
 
 export default async function EventLog() {

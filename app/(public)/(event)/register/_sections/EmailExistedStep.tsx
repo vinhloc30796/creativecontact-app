@@ -1,7 +1,7 @@
 // EmailExistedStep.tsx
 
-import React from 'react'
 import { Button } from '@/components/ui/button'
+import { TIMEZONE } from '@/lib/constants'
 import { EventRegistrationWithSlot } from './types'
 
 interface EmailExistedStepProps {
@@ -13,7 +13,7 @@ interface EmailExistedStepProps {
 export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: EmailExistedStepProps) {
 	const formatDateTime = (dateTimeString: string) => {
 		const date = new Date(dateTimeString)
-		return date.toLocaleString('en-US', {
+		return date.toLocaleString(TIMEZONE, {
 			year: 'numeric',
 			month: 'long',
 			day: 'numeric',
