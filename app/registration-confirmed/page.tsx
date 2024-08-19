@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import QRCode from "qrcode";
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import QRCodeWithHover from './QRCodeWithHover';
 
@@ -73,7 +73,7 @@ function RegistrationContent() {
           <p>Loading user information...</p>
         ) : (
           <div className="space-y-2">
-            <p><strong>User ID:</strong> {registrationInfo.userId || user?.id || 'Not available'}</p>
+            <p><strong>User ID:</strong> {user?.id || registrationInfo.userId || 'Not available'}</p>
           </div>
         )}
 

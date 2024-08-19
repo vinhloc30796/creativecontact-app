@@ -7,7 +7,15 @@ import {
   sendConfirmationRequestEmail,
 } from "@/app/actions/email";
 import { EventRegistration } from "@/app/types/EventRegistration";
-import { authUsers, eventRegistrations, eventSlots, ExperienceType, IndustryType, userInfos } from "@/drizzle/schema";
+import { RegistrationConfirm } from "@/app/types/RegistrationConfirm";
+import {
+  authUsers,
+  eventRegistrations,
+  eventSlots,
+  ExperienceType,
+  IndustryType,
+  userInfos,
+} from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
@@ -19,6 +27,7 @@ import {
   EventRegistrationWithSlot,
   FormData,
 } from "./types";
+import { generateOTP } from "@/utils/otp";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -49,7 +58,7 @@ export async function signInAnonymously() {
   return data.user;
 }
 
-export async function confirmRegistration(signature: string) {
+export async function confirmRegistration(signature: string): Promise<RegistrationConfirm> {
   const supabase = createClient();
 
   // Start a transaction
@@ -77,10 +86,37 @@ export async function confirmRegistration(signature: string) {
 
   // Store the user ID and email for later use
   let userId = registration.created_by;
-  let email = registration.email;
-  
-  // Update the user's email after registration confirmation
-  if (userId) {
+  let email: string = registration.email;
+
+  // Check if user email already exists
+  const { data: existingUser, error: existingUserError } =
+    await adminSupabaseClient.rpc(
+      "get_user_id_by_email",
+      { email: email },
+    );
+
+  if (
+    existingUser
+    // existingUser is a string
+    && typeof existingUser === "string"
+  ) {
+    console.log(`An account with email ${email} already exists, userId is`, existingUser);
+    return db.update(eventRegistrations)
+    .set({created_by: existingUser})
+    .where(eq(eventRegistrations.id, signature))
+    .then((result) => {
+      console.log(`Updated registration ${signature} with userId ${existingUser}`);
+      return { success: true as const, email: email, userId: existingUser };
+    })
+    .catch((error) => {
+      console.error(`Failed to update registration ${signature} with userId ${existingUser}:`, error);
+      return { success: false as const, error: "Email already in use & failed to update registration" };
+    })
+  } else if (existingUserError) {
+    console.error("Error checking for existing user:", existingUserError);
+    return { success: false, error: "Error checking email availability" };
+  } else if (userId) {
+    // Update the user's email after registration confirmation
     console.debug(`Updating user email for registration ${signature}`);
     const { data: userData, error: userError } = await adminSupabaseClient.auth
       .admin.getUserById(userId);
@@ -273,7 +309,7 @@ export async function writeUserInfo(
     industries: IndustryType[];
     experience: ExperienceType;
     field: string;
-  }
+  },
 ) {
   try {
     const result = await db
@@ -296,7 +332,7 @@ export async function writeUserInfo(
 
     return { success: true, data: result[0] };
   } catch (error) {
-    console.error('Error writing user info:', error);
+    console.error("Error writing user info:", error);
     return { success: false, error: (error as Error).message };
   }
 }

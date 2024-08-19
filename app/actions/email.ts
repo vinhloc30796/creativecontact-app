@@ -36,7 +36,7 @@ function generateICSFile(slotData: EventSlot): Promise<string> {
       // Event information
       title: "Hoàn Tất Project",
       description: "Dự án độc đáo kêu gọi các bạn thực hành sáng tạo và nghệ thuật trao đổi và hoàn thành tác phẩm dang dở, kết hợp với Neo-",
-      organizer: { name: "Creative Contact", email: "no-reply@creativecontact.vn" },
+      organizer: { name: "Creative Contact", email: "no-reply@bangoibanga.com" },
       // Geo
       location: "NEO-, 393/7 Hai Bà Trưng, Phường 8, Quận 3, Hồ Chí Minh, Vietnam",
       geo: { lat: 10.790062, lon: 106.688437 },
