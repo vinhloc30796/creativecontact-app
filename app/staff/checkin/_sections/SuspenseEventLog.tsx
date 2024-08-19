@@ -1,6 +1,6 @@
 // File: app/staff/checkin/_sections/EventLogWrapper.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { timezoneFormatter } from "@/lib/timezones";
+import { datetimeFormatter } from "@/lib/timezones";
 import { Suspense } from 'react';
 import { getEventLogs } from './EventLogServer';
 
@@ -10,7 +10,7 @@ async function EventLogContent() {
     id: log.event_registration_id,
     guest_name: log.guestName,
     status_after: log.status_after,
-    changed_at: timezoneFormatter.format(log.changed_at),
+    changed_at: datetimeFormatter.format(log.changed_at),
     staff_id: log.staff_id,
   }));
 
