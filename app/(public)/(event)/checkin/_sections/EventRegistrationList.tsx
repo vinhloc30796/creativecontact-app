@@ -3,7 +3,7 @@
 
 import { EventRegistrationWithSlot } from '@/app/types/EventRegistration';
 import { Button } from '@/components/ui/button';
-import { LOCALE, timezoneFormatter } from '@/lib/timezones';
+import { timeslotFormatter } from '@/lib/timezones';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { CheckinStatus, handleCheckin } from '../_utils/apiHelpers';
@@ -35,8 +35,8 @@ export function EventRegistrationList({ eventRegistrations, searchError, userEma
     <>
       {eventRegistrations && eventRegistrations.length > 0 ? (
         eventRegistrations.map((registration) => {
-          const timeStartStr = timezoneFormatter.format(new Date(registration.slot_time_start));
-          const timeEndStr = timezoneFormatter.format(new Date(registration.slot_time_end));
+          const timeStartStr = timeslotFormatter.format(new Date(registration.slot_time_start));
+          const timeEndStr = timeslotFormatter.format(new Date(registration.slot_time_end));
           return (
             <React.Fragment key={registration.id}>
               <div className="border p-4 rounded-md">
