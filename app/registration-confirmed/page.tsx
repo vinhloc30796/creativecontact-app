@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import QRCode from "qrcode";
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import QRCodeWithHover from './QRCodeWithHover';
 
