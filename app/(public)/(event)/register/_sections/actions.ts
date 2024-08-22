@@ -211,6 +211,7 @@ export async function createRegistration(
     existingRegistrationId?: string;
   },
 ): Promise<RegistrationResult> {
+  console.debug("Creating registration with data:", formData);
   const existingRegistration = await checkExistingRegistration(formData.email);
   const isAnonymous: boolean = formData.is_anonymous;
   const status = isAnonymous ? "pending" : "confirmed";
@@ -329,22 +330,34 @@ export async function writeUserInfo(
     experience: ExperienceType;
   },
 ) {
+  console.log('Received professionalInfo:', professionalInfo);
+
+  if (!professionalInfo.industries || professionalInfo.industries.length === 0 || !professionalInfo.experience) {
+    console.error('Invalid professional info:', professionalInfo);
+    return { success: false, error: 'Invalid professional info' };
+  }
+
   try {
+    const updateSet = {
+      industries: professionalInfo.industries,
+      experience: professionalInfo.experience,
+    };
+
+    console.log('Updating with:', updateSet);
+
     const result = await db
       .insert(userInfos)
       .values({
-        id: userId as any, // Type assertion to bypass strict type checking
-        industries: professionalInfo.industries as any[], // Type assertion for array
-        experience: professionalInfo.experience,
+        id: userId,
+        ...updateSet,
       })
       .onConflictDoUpdate({
         target: userInfos.id,
-        set: {
-          industries: professionalInfo.industries as any[], // Type assertion for array
-          experience: professionalInfo.experience,
-        },
+        set: updateSet,
       })
       .returning();
+
+    console.log('Update result:', result);
 
     return { success: true, data: result[0] };
   } catch (error) {

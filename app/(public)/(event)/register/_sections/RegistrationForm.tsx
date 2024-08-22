@@ -9,7 +9,7 @@ import { Form } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import styles from './_register.module.scss'
-import { formSchema, FormData } from './formSchema'
+import { formSchema, professionalInfoSchema, FormData, ProfessionalInfoData, CombinedFormData } from './formSchema'
 import { EventRegistration, EventRegistrationWithSlot } from './types'
 import { EventSlot } from '@/app/types/EventSlot'
 import { ContactInfoStep } from './ContactInfoStep'
@@ -50,11 +50,42 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       phone: '',
       // Date selection fields
       slot: '',
-      // Professional info fields
-      industries: [], // Initialize with an empty array
+    },
+  })
+
+  const professionalInfoForm = useForm<ProfessionalInfoData>({
+    resolver: zodResolver(professionalInfoSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      industries: [],
       experience: undefined,
     },
   })
+
+  // Update this function to sync professionalInfo state with the form
+  const updateProfessionalInfo = (data: ProfessionalInfoData) => {
+    console.debug('Updating professionalInfoForm values to:', data)
+    professionalInfoForm.reset(data) // Reset the form with new data
+  }
+
+  const validateFormData = async () => {
+    const result = await form.trigger()
+    console.log('Form validation result:', result)
+    if (!result) {
+      console.error('Form validation errors:', form.formState.errors)
+    }
+    return result
+  }
+
+  const validateProfessionalInfo = () => {
+    const professionalInfoData = professionalInfoForm.getValues()
+    const validationResult = professionalInfoSchema.safeParse(professionalInfoData)
+    console.log('professionalInfoData', professionalInfoData, 'Professional info validation result:', validationResult.success)
+    if (!validationResult.success) {
+      console.error('Professional info validation errors:', validationResult.error.errors)
+    }
+    return validationResult.success
+  }
 
 
   if (isLoading) {
@@ -80,8 +111,37 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     {
       title: 'Professional Information',
       description: 'Please provide your professional information',
-      component: <ProfessionalInfoStep form={form} />,
-      fields: ['industries', 'experience'] as const,
+      component: (
+        <ProfessionalInfoStep
+          form={professionalInfoForm}
+          onSubmit={(data) => {
+            updateProfessionalInfo(data)
+            setFormStep((prev) => Math.min(steps.length - 1, prev + 1))
+          }}
+          renderButtons={(onSubmit) => (
+            <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+              <Button
+                type="button"
+                onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
+                disabled={formStep === 0 || isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                Back
+              </Button>
+              <Button
+                type="button"
+                onClick={onSubmit}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        />
+        
+      ),
+      fields: [] as const,
     },
     {
       title: 'Select A Date',
@@ -110,6 +170,10 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 
   const handleNextStep = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
+    if (formStep === 1) {
+      // Professional Info step is handled by its own form
+      return
+    }
     const isStepValid = await validateStep()
     if (isStepValid) {
       if (formStep === 0) {
@@ -139,48 +203,81 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     form.reset(); // Reset the form
   }
 
-  const handleSubmit = form.handleSubmit(async (data) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault()
+    console.log('Submit button clicked')
+    console.log('Current form values:', form.getValues())
+    console.log('Current professional info:', professionalInfoForm.getValues())
+    console.log('isUpdating:', isUpdating)
+    console.log('isSubmitting:', isSubmitting)
+
     if (isSubmitting) {
-      return;
+      console.log('Form is already submitting, returning early')
+      return
     }
 
-    setIsSubmitting(true);
-    setFormError(null);
+    setIsSubmitting(true)
+    setFormError(null)
 
     try {
+      const isFormValid = await validateFormData()
+      const isProfessionalInfoValid = validateProfessionalInfo()
+
+      console.log('Form validation result:', isFormValid)
+      console.log('Professional info validation result:', isProfessionalInfoValid)
+
+      if (!isFormValid || !isProfessionalInfoValid) {
+        console.error('Form validation failed')
+        setIsSubmitting(false)
+        return
+      }
+
+      const formData = form.getValues()
+      const professionalInfoData = professionalInfoForm.getValues()
+      const combinedData: CombinedFormData = {
+        ...formData,
+        ...professionalInfoData,
+      }
+
+      console.log('Combined data for submission:', combinedData)
+
       const [registrationResult, userInfoResult] = await Promise.all([
         createRegistration({
-          ...data,
+          ...combinedData,
           created_by: user?.id || null,
           is_anonymous: isAnonymous,
           existingRegistrationId: isUpdating ? existingRegistration?.id : undefined,
         }),
-        user?.id
+        user?.id && isProfessionalInfoValid
           ? writeUserInfo(user.id, {
-            industries: data.industries,
-            experience: data.experience,
+            industries: combinedData.industries,
+            experience: combinedData.experience,
           })
           : Promise.resolve(null),
-      ]);
+      ])
+
+      console.log('Registration result:', registrationResult)
+      console.log('User info result:', userInfoResult)
 
       if (registrationResult.success) {
-        setSubmitted(true);
-        setRegistrationStatus(registrationResult.status);
+        setSubmitted(true)
+        setRegistrationStatus(registrationResult.status)
       } else {
-        throw new Error(registrationResult.error || 'Registration failed');
+        throw new Error(registrationResult.error || 'Registration failed')
       }
 
       if (userInfoResult && !userInfoResult.success) {
-        console.error('Error writing user info:', userInfoResult.error);
+        console.error('Error writing user info:', userInfoResult.error)
       }
     } catch (error) {
-      console.error('Error during registration:', error);
-      setFormError(error instanceof Error ? error.message : 'An unexpected error occurred during registration');
+      console.error('Error during registration:', error)
+      setFormError(error instanceof Error ? error.message : 'An unexpected error occurred during registration')
     } finally {
-      setIsSubmitting(false);
-      setIsUpdating(false);
+      setIsSubmitting(false)
+      setIsUpdating(false)
     }
-  });
+  }
+
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -209,7 +306,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} className={cn('flex flex-col gap-2', styles.form)}>
+      <form onSubmit={(e) => e.preventDefault()} className={cn('flex flex-col gap-2', styles.form)}>
         <div
           className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
           style={{ backgroundColor: '#F6EBE4' }}
@@ -224,34 +321,37 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           <Progress value={progress} className="w-full" />
         </div>
         {currentStep.component}
-        <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
-          <Button
-            type="button"
-            onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
-            disabled={formStep === 0 || isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            Back
-          </Button>
-          {formStep < steps.length - 1 ? (
+        {formStep !== 1 && (
+          <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
             <Button
               type="button"
-              onClick={handleNextStep}
-              disabled={isSubmitting}
+              onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
+              disabled={formStep === 0 || isSubmitting}
               className="w-full sm:w-auto"
             >
-              Next
+              Back
             </Button>
-          ) : (
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full sm:w-auto"
-            >
-              {isSubmitting ? 'Submitting...' : isUpdating ? 'Update Registration' : 'Submit Registration'}
-            </Button>
-          )}
-        </div>
+            {formStep < steps.length - 1 ? (
+              <Button
+                type="button"
+                onClick={handleNextStep}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                Next
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                {isSubmitting ? 'Submitting...' : isUpdating ? 'Update Registration' : 'Submit Registration'}
+              </Button>
+            )}
+          </div>
+        )}
         {formError && (
           <div className="error-message mt-2 text-red-500 text-sm">
             {formError}

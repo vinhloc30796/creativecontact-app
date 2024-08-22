@@ -1,3 +1,5 @@
+// File: app/(public)/(event)/register/_sections/ProfessionalInfoStep.tsx
+
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -7,24 +9,26 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from "lucide-react"
 import React from 'react'
-import { UseFormReturn } from 'react-hook-form'
-import { FormData } from './formSchema'
+import { useForm, UseFormReturn } from 'react-hook-form'
+import { professionalInfoSchema, ProfessionalInfoData } from './formSchema'
 
 interface ProfessionalInfoStepProps {
-  form: UseFormReturn<FormData>
+  form: UseFormReturn<ProfessionalInfoData>
+  onSubmit: (data: ProfessionalInfoData) => void
+  renderButtons: (onSubmit: () => void) => React.ReactNode
 }
 
-const industries = [
+const industriesMapper = [
   { value: 'Advertising' as const, label: 'Advertising' },
   { value: 'Architecture' as const, label: 'Architecture' },
   { value: 'Arts and Crafts' as const, label: 'Arts and Crafts' },
@@ -40,9 +44,9 @@ const industries = [
   { value: 'Other' as const, label: 'Other' }
 ] as const
 
-type IndustryType = typeof industries[number]['value']
+type IndustryType = typeof industriesMapper[number]['value']
 
-const experienceLevels = [
+const experienceLevelsMapper = [
   { value: 'Entry' as const, label: 'Entry' },
   { value: 'Junior' as const, label: 'Junior' },
   { value: 'Mid-level' as const, label: 'Mid-level' },
@@ -51,7 +55,19 @@ const experienceLevels = [
   { value: 'C-level' as const, label: 'C-level' }
 ] as const
 
-const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
+type ExperienceType = typeof experienceLevelsMapper[number]['value']
+
+
+interface ProfessionalInfoStepProps {
+  onSubmit: (data: ProfessionalInfoData) => void
+  initialData?: Partial<ProfessionalInfoData>
+}
+
+interface SelectProps {
+  form: UseFormReturn<ProfessionalInfoData>
+}
+
+const IndustrySelect = ({ form }: SelectProps) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -86,7 +102,7 @@ const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
                 <CommandEmpty>No industry found.</CommandEmpty>
                 <CommandGroup>
                   <CommandList>
-                    {industries.map((industry) => (
+                    {industriesMapper.map((industry) => (
                       <CommandItem
                         key={industry.value}
                         value={industry.value}
@@ -119,7 +135,7 @@ const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
   )
 }
 
-const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
+const ExperienceSelect = ({ form }: SelectProps) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -142,7 +158,7 @@ const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
                   )}
                 >
                   {field.value
-                    ? experienceLevels.find((level) => level.value === field.value)?.label
+                    ? experienceLevelsMapper.find((level) => level.value === field.value)?.label
                     : "Select experience level"}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -154,7 +170,7 @@ const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
                 <CommandEmpty>No level found.</CommandEmpty>
                 <CommandGroup>
                   <CommandList>
-                    {experienceLevels.map((level) => (
+                    {experienceLevelsMapper.map((level) => (
                       <CommandItem
                         key={level.value}
                         value={level.value}
@@ -184,11 +200,18 @@ const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
   )
 }
 
-export function ProfessionalInfoStep({ form }: ProfessionalInfoStepProps) {
+export function ProfessionalInfoStep({ form, onSubmit, renderButtons }: ProfessionalInfoStepProps) {
+  const handleSubmit = (data: ProfessionalInfoData) => {
+    onSubmit(data)
+  }
+
   return (
-    <>
-      <IndustrySelect form={form} />
-      <ExperienceSelect form={form} />
-    </>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <IndustrySelect form={form} />
+        <ExperienceSelect form={form} />
+        {renderButtons(() => form.handleSubmit(handleSubmit)())}
+      </form>
+    </Form>
   )
 }
