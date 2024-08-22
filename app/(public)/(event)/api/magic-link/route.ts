@@ -1,5 +1,5 @@
 // File: app/api/magic-link/route.ts
-import { sendSignInWithOtp } from "@/app/actions/email";
+import { sendSignInWithOtp } from "@/app/actions/email/sendSignIn";
 import { NextRequest, NextResponse } from "next/server";
 
 export function POST(req: NextRequest) {

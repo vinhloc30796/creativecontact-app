@@ -2,12 +2,10 @@
 
 "use server";
 
-import {
-  sendConfirmationEmailWithICSAndQR,
-  sendConfirmationRequestEmail,
-} from "@/app/actions/email";
-import { EventRegistration } from "@/app/types/EventRegistration";
+import { sendConfirmationEmailWithICSAndQR, sendConfirmationRequestEmail } from "@/app/actions/email/registration";
+import { EventRegistration, EventRegistrationWithSlot } from "@/app/types/EventRegistration";
 import { RegistrationConfirm } from "@/app/types/RegistrationConfirm";
+import { UserInfo } from "@/app/types/UserInfo";
 import {
   authUsers,
   eventRegistrations,
@@ -22,8 +20,6 @@ import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { and, eq, or } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { Resend } from "resend";
-import { EventRegistrationWithSlot } from "@/app/types/EventRegistration";
-import { UserInfo } from "@/app/types/UserInfo";
 import { FormData } from "./types";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
@@ -164,8 +160,10 @@ export async function confirmRegistration(
 }
 
 export async function checkExistingRegistration(
-  email: string
-): Promise<{ registration: EventRegistrationWithSlot | null; userInfo: UserInfo | null }> {
+  email: string,
+): Promise<
+  { registration: EventRegistrationWithSlot | null; userInfo: UserInfo | null }
+> {
   try {
     // First, fetch the registration
     const registrationResult = await db
@@ -179,10 +177,10 @@ export async function checkExistingRegistration(
         and(
           eq(eventRegistrations.email, email),
           or(
-            eq(eventRegistrations.status, 'confirmed'),
-            eq(eventRegistrations.status, 'pending')
-          )
-        )
+            eq(eventRegistrations.status, "confirmed"),
+            eq(eventRegistrations.status, "pending"),
+          ),
+        ),
       )
       .orderBy(eventRegistrations.created_at)
       .limit(1);
@@ -254,7 +252,9 @@ export async function createRegistration(
             phone: formData.phone,
             status: status,
           })
-          .where(eq(eventRegistrations.id, existingRegistration.registration.id))
+          .where(
+            eq(eventRegistrations.id, existingRegistration.registration.id),
+          )
           .returning();
         registrationResult = updateResult.map((r) => ({
           ...r,
@@ -354,11 +354,14 @@ export async function writeUserInfo(
     experience: ExperienceType;
   },
 ) {
-  console.log('Received professionalInfo:', professionalInfo);
+  console.log("Received professionalInfo:", professionalInfo);
 
-  if (!professionalInfo.industries || professionalInfo.industries.length === 0 || !professionalInfo.experience) {
-    console.error('Invalid professional info:', professionalInfo);
-    return { success: false, error: 'Invalid professional info' };
+  if (
+    !professionalInfo.industries || professionalInfo.industries.length === 0 ||
+    !professionalInfo.experience
+  ) {
+    console.error("Invalid professional info:", professionalInfo);
+    return { success: false, error: "Invalid professional info" };
   }
 
   try {
@@ -367,7 +370,7 @@ export async function writeUserInfo(
       experience: professionalInfo.experience,
     };
 
-    console.log('Updating with:', updateSet);
+    console.log("Updating with:", updateSet);
 
     const result = await db
       .insert(userInfos)
@@ -381,7 +384,7 @@ export async function writeUserInfo(
       })
       .returning();
 
-    console.log('Update result:', result);
+    console.log("Update result:", result);
 
     return { success: true, data: result[0] };
   } catch (error) {
