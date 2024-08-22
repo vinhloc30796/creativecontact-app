@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { dateFormatter, timeslotFormatter } from '@/lib/timezones'
-import { EventRegistrationWithSlot } from './types'
+import { EventRegistrationWithSlot } from '@/app/types/EventRegistration'
 
 interface EmailExistedStepProps {
 	existingRegistration: EventRegistrationWithSlot
@@ -11,6 +11,9 @@ interface EmailExistedStepProps {
 }
 
 export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: EmailExistedStepProps) {
+	const dateStr = dateFormatter.format(new Date(existingRegistration.slot_time_start))
+	const startTimeStr = timeslotFormatter.format(new Date(existingRegistration.slot_time_start))
+	const endTimeStr = timeslotFormatter.format(new Date(existingRegistration.slot_time_end))
 	return (
 		// Prevent overflow-hidden from hiding the content
 		<div className="space-y-4 overflow-visible">
@@ -19,9 +22,9 @@ export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: 
 			<p className="text-sm">
 				Existing registration details:
 				<br />
-				Date: {dateFormatter.format(new Date(existingRegistration.event_slot.time_start))}
+				Date: {dateStr}
 				<br />
-				Time: {timeslotFormatter.format(new Date(existingRegistration.event_slot.time_start))} - {timeslotFormatter.format(new Date(existingRegistration.event_slot.time_end))}
+				Time: {startTimeStr} - {endTimeStr}
 			</p>
 			{/* New line when overflow */}
 			<div className="flex flex-col gap-2">

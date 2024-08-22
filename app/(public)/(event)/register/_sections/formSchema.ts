@@ -1,7 +1,8 @@
 // File: app/(public)/(event)/register/_sections/formSchema.ts
 
 import { z } from "zod";
-import { industries, experienceLevels } from "@/drizzle/schema";
+import { experienceLevels } from "@/app/types/UserInfo";
+import { industries } from "@/app/types/UserInfo";
 
 export const formSchema = z.object({
   email: z.string().email("Invalid email address"),

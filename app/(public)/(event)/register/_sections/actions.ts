@@ -19,15 +19,12 @@ import {
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
-import { eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { Resend } from "resend";
-import {
-  // EventRegistration,
-  EventRegistrationWithSlot,
-  FormData,
-} from "./types";
-import { generateOTP } from "@/utils/otp";
+import { EventRegistrationWithSlot } from "@/app/types/EventRegistration";
+import { UserInfo } from "@/app/types/UserInfo";
+import { FormData } from "./types";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -167,33 +164,60 @@ export async function confirmRegistration(
 }
 
 export async function checkExistingRegistration(
-  email: string,
-): Promise<EventRegistrationWithSlot | null> {
-  const supabase = createClient();
+  email: string
+): Promise<{ registration: EventRegistrationWithSlot | null; userInfo: UserInfo | null }> {
+  try {
+    // First, fetch the registration
+    const registrationResult = await db
+      .select({
+        registration: eventRegistrations,
+        slot: eventSlots,
+      })
+      .from(eventRegistrations)
+      .leftJoin(eventSlots, eq(eventRegistrations.slot, eventSlots.id))
+      .where(
+        and(
+          eq(eventRegistrations.email, email),
+          or(
+            eq(eventRegistrations.status, 'confirmed'),
+            eq(eventRegistrations.status, 'pending')
+          )
+        )
+      )
+      .orderBy(eventRegistrations.created_at)
+      .limit(1);
 
-  const { data, error } = await supabase
-    .from("event_registrations")
-    .select(
-      `
-      *,
-      event_slot:event_slots(*)
-    `,
-    )
-    .eq("email", email)
-    // Confirmed or Pending
-    .in("status", ["confirmed", "pending"])
-    .order("created_at", { ascending: false })
-    .limit(1);
-  // Return or error
-  if (error) {
+    let registration: EventRegistrationWithSlot | null = null;
+    let userInfo: UserInfo | null = null;
+
+    if (registrationResult[0] && registrationResult[0].slot) {
+      registration = {
+        ...registrationResult[0].registration,
+        slot_details: registrationResult[0].slot,
+        slot_time_start: registrationResult[0].slot.time_start.toISOString(),
+        slot_time_end: registrationResult[0].slot.time_end.toISOString(),
+        event_slot: registrationResult[0].slot,
+      } as EventRegistrationWithSlot;
+
+      // If we found a registration, fetch the user info
+      if (registration.created_by) {
+        const userInfoResult = await db
+          .select()
+          .from(userInfos)
+          .where(eq(userInfos.id, registration.created_by))
+          .limit(1);
+
+        userInfo = userInfoResult[0] as UserInfo | null;
+      }
+    }
+
+    console.debug("Existing registration found:", registration);
+    console.debug("User info found:", userInfo);
+
+    return { registration, userInfo };
+  } catch (error) {
     console.error("Error checking existing registration:", error);
-    return null;
-  }
-  if (data[0]) {
-    console.debug("Existing registration found:", data[0]);
-    return data[0] as EventRegistrationWithSlot;
-  } else {
-    return null;
+    return { registration: null, userInfo: null };
   }
 }
 
@@ -220,7 +244,7 @@ export async function createRegistration(
     const dbResult: any = await db.transaction(async (tx) => {
       let registrationResult: EventRegistration;
 
-      if (existingRegistration) {
+      if (existingRegistration.registration) {
         // Update existing registration
         const updateResult = await tx.update(eventRegistrations)
           .set({
@@ -230,7 +254,7 @@ export async function createRegistration(
             phone: formData.phone,
             status: status,
           })
-          .where(eq(eventRegistrations.id, existingRegistration.id))
+          .where(eq(eventRegistrations.id, existingRegistration.registration.id))
           .returning();
         registrationResult = updateResult.map((r) => ({
           ...r,

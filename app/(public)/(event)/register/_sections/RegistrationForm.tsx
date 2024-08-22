@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import styles from './_register.module.scss'
 import { formSchema, professionalInfoSchema, FormData, ProfessionalInfoData, CombinedFormData } from './formSchema'
-import { EventRegistration, EventRegistrationWithSlot } from './types'
+import { EventRegistration } from './types'
+import { EventRegistrationWithSlot } from '@/app/types/EventRegistration'
 import { EventSlot } from '@/app/types/EventSlot'
 import { ContactInfoStep } from './ContactInfoStep'
 import { DateSelectionStep } from './DateSelectionStep'
@@ -37,7 +38,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   const [isUpdating, setIsUpdating] = useState(false);
   // Forms
   const [registrationStatus, setRegistrationStatus] = useState<'pending' | 'confirmed' | 'checked-in' | 'cancelled'>('pending');
-  const [existingRegistration, setExistingRegistration] = useState<EventRegistration | null>(null);
+  const [existingRegistration, setExistingRegistration] = useState<EventRegistrationWithSlot | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm<FormData>({
@@ -179,11 +180,14 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       if (formStep === 0) {
         // Check for existing registration after email is entered
         const email = form.getValues('email')
-        const existing = await checkExistingRegistration(email)
-        if (existing) {
-          setExistingRegistration(existing)
-          return // Don't proceed to next step yet
+        const {registration: existingRegistration, userInfo: existingUserInfo } = await checkExistingRegistration(email)
+        if (existingRegistration) {
+          setExistingRegistration(existingRegistration)
         }
+        if (existingUserInfo) {
+          updateProfessionalInfo(existingUserInfo as ProfessionalInfoData)
+        }
+        // return // Don't proceed to next step yet
       }
       setFormStep((prev) => Math.min(steps.length - 1, prev + 1))
     } else {
