@@ -33,11 +33,12 @@ export async function GET(request: Request) {
           status: 404,
         });
       }
+      const foundRegistration = registration[0];
 
       // Fetch slot details
       const slot = await db.select()
         .from(eventSlots)
-        .where(eq(eventSlots.id, registration[0].slot))
+        .where(eq(eventSlots.id, foundRegistration.slot))
         .limit(1);
 
       if (!slot.length) {
@@ -48,16 +49,17 @@ export async function GET(request: Request) {
 
       // Send confirmation email with ICS and QR code
       await sendConfirmationEmailWithICSAndQR(
-        registration[0].email,
+        foundRegistration.email,
         {
-          id: registration[0].id as `${string}-${string}-${string}-${string}-${string}`,
+          id: foundRegistration.id as `${string}-${string}-${string}-${string}-${string}`,
           event: slot[0].event as `${string}-${string}-${string}-${string}-${string}`,
-          created_at: registration[0].created_at,
+          created_at: foundRegistration.created_at,
           time_start: slot[0].time_start,
           time_end: slot[0].time_end,
           capacity: slot[0].capacity,
         },
         registrationId,
+        foundRegistration.name,
       );
     } catch (error) {
       console.error("Failed to send confirmation email:", error);

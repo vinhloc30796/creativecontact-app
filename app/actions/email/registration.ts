@@ -13,6 +13,9 @@ import React from "react";
 
 export async function sendConfirmationRequestEmail(
   email: string,
+  participantName: string,
+  eventDate: string,
+  eventTime: string,
   signature: string,
 ) {
   const registrationURL =
@@ -51,7 +54,12 @@ export async function sendConfirmationRequestEmail(
       from: "Creative Contact <no-reply@creativecontact.vn>",
       to: email,
       subject: "Confirm Your Event Registration",
-      react: React.createElement(ConfirmationRequest, { confirmationUrl: confirmationURL })
+      react: React.createElement(ConfirmationRequest, {
+        confirmationUrl: confirmationURL,
+        participantName: participantName || "Creative friend",
+        eventDate: eventDate,
+        eventTime: eventTime,
+      }),
     });
 
     console.log("Confirmation request email sent:", emailResponse);
@@ -73,6 +81,7 @@ export async function sendConfirmationEmailWithICSAndQR(
   email: string,
   slotData: EventSlot,
   registrationId: string,
+  registrationName: string,
 ) {
   try {
     // Prep vars
@@ -89,10 +98,11 @@ export async function sendConfirmationEmailWithICSAndQR(
     const qrCodeBase64 = await QRCode.toDataURL(registrationId, {
       width: 300,
       errorCorrectionLevel: "H",
-      color: { dark: "#F27151"}
+      color: { dark: "#F27151" },
     });
     const qrCodeBuffer = new Buffer(qrCodeBase64.split(",")[1], "base64");
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${registrationId}&size=300x300&color=f27151&ecc=H`;
+    const qrCodeUrl =
+      `https://api.qrserver.com/v1/create-qr-code/?data=${registrationId}&size=300x300&color=f27151&ecc=H`;
 
     // Send email
     const { data, error } = await resend.emails.send({
@@ -100,10 +110,10 @@ export async function sendConfirmationEmailWithICSAndQR(
       to: email,
       subject: "Your Event Registration is Confirmed",
       react: React.createElement(ConfirmationWithICS, {
-        participantName: "Participant Name",
+        participantName: registrationName || "Creative friend",
         eventDate: dateStr,
         eventTime: `${timeStartStr} - ${timeEndStr}`,
-        qrCodeUrl: qrCodeUrl
+        qrCodeUrl: qrCodeUrl,
       }),
       attachments: [
         { filename: "event.ics", content: icsData },
