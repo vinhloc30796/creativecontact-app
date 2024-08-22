@@ -27,6 +27,7 @@ import { and, eq, or } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { Resend } from "resend";
 import { FormData } from "./types";
+import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -299,19 +300,25 @@ export async function createRegistration(
       return { success: true, registrationResult, status };
     });
 
+    // Find the slot data
+    const slotData = await db.select()
+    .from(eventSlots)
+    .where(eq(eventSlots.id, formData.slot));
     // Handle emails after the DB transaction
     if (isAnonymous) {
+      const dateStr = dateFormatter.format(new Date(slotData[0].time_start));
+      const timeStartStr = timeslotFormatter.format(new Date(slotData[0].time_start));
+      const timeEndStr = timeslotFormatter.format(new Date(slotData[0].time_end));
       // Ask the user to confirm their email
       await sendConfirmationRequestEmail(
         formData.email,
+        dbResult.registrationResult.name,
+        dateStr,
+        `${timeStartStr} - ${timeEndStr}`,
         dbResult.registrationResult.id,
       );
       return { success: true, data: "sendConfirmationRequestEmail", status };
     } else {
-      // Generate a QR code for the registration
-      const slotData = await db.select()
-        .from(eventSlots)
-        .where(eq(eventSlots.id, formData.slot));
       // Send confirmation email with ICS file and QR code
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
