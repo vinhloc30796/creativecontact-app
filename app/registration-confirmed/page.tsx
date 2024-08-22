@@ -54,7 +54,7 @@ function RegistrationContent() {
     <Card className="w-[400px] overflow-hidden relative z-10">
       <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
         style={{
-          backgroundImage: 'url(/HoanTatProject-background.png)',
+          backgroundImage: 'url(/HoanTatProject-background-20240822.png)',
           backgroundSize: 'cover',
         }}
       />
