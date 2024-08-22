@@ -14,7 +14,7 @@ export const Footer: React.FC = () => (
       className="w-full h-auto my-8"
     />
     <Section className="text-center my-4">
-      <Link href="https://facebook.com/creativecontact_vn" className="mr-2">Facebook</Link>
+      <Link href="https://www.facebook.com/creativecontact.vn" className="mr-2">Facebook</Link>
       <Link href="https://instagram.com/creativecontact_vn">Instagram</Link>
       <Link href="https://creativecontact.vn" className="ml-2">Website</Link>
     </Section>
