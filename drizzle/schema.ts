@@ -126,7 +126,6 @@ export const eventRegistrationLogs = pgTable("event_registration_logs", {
  about        | text             |           |          |
  industries   | industry[]       |           |          |
  experience   | experience_level |           |          |
- field        | text             |           |          |
 Indexes:
     "user_infos_pkey" PRIMARY KEY, btree (id)
     "idx_user_infos_industries" gin (industries)
