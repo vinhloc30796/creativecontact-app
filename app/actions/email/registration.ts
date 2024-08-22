@@ -73,6 +73,7 @@ export async function sendConfirmationEmailWithICSAndQR(
   email: string,
   slotData: EventSlot,
   registrationId: string,
+  registrationName: string,
 ) {
   try {
     // Prep vars
@@ -100,7 +101,7 @@ export async function sendConfirmationEmailWithICSAndQR(
       to: email,
       subject: "Your Event Registration is Confirmed",
       react: React.createElement(ConfirmationWithICS, {
-        participantName: "Participant Name",
+        participantName: registrationName || "Creative friend",
         eventDate: dateStr,
         eventTime: `${timeStartStr} - ${timeEndStr}`,
         qrCodeUrl: qrCodeUrl

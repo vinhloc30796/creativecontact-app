@@ -2,8 +2,14 @@
 
 "use server";
 
-import { sendConfirmationEmailWithICSAndQR, sendConfirmationRequestEmail } from "@/app/actions/email/registration";
-import { EventRegistration, EventRegistrationWithSlot } from "@/app/types/EventRegistration";
+import {
+  sendConfirmationEmailWithICSAndQR,
+  sendConfirmationRequestEmail,
+} from "@/app/actions/email/registration";
+import {
+  EventRegistration,
+  EventRegistrationWithSlot,
+} from "@/app/types/EventRegistration";
 import { RegistrationConfirm } from "@/app/types/RegistrationConfirm";
 import { UserInfo } from "@/app/types/UserInfo";
 import {
@@ -319,6 +325,7 @@ export async function createRegistration(
             .event as `${string}-${string}-${string}-${string}-${string}`,
         },
         dbResult.registrationResult.id,
+        dbResult.registrationResult.name,
       );
       return {
         success: true,
