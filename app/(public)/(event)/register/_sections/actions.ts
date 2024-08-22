@@ -308,7 +308,6 @@ export async function writeUserInfo(
   professionalInfo: {
     industries: IndustryType[];
     experience: ExperienceType;
-    field: string;
   },
 ) {
   try {
@@ -318,14 +317,12 @@ export async function writeUserInfo(
         id: userId as any, // Type assertion to bypass strict type checking
         industries: professionalInfo.industries as any[], // Type assertion for array
         experience: professionalInfo.experience,
-        field: professionalInfo.field,
       })
       .onConflictDoUpdate({
         target: userInfos.id,
         set: {
           industries: professionalInfo.industries as any[], // Type assertion for array
           experience: professionalInfo.experience,
-          field: professionalInfo.field,
         },
       })
       .returning();

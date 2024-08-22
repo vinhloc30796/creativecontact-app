@@ -15,10 +15,6 @@ export const formSchema = z.object({
     z.enum(industries),
   ).min(1, "Please select at least one industry").default([]),
   experience: z.enum(experienceLevels),
-  field: z.string().min(
-    1,
-    "Please enter your specific field or area of expertise",
-  ),
   // DateSelectionStep fields
   slot: z.string().min(1, "Please select a time slot"),
   existingRegistrationId: z.string().optional(),

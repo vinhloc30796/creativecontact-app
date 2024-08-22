@@ -171,7 +171,6 @@ export const userInfos = pgTable('user_infos', {
   about: text('about'),
   industries: industryEnum('industries').array(),
   experience: experienceEnum('experience').notNull(),
-  field: text('field'),
 });
 
 // TypeScript types for use in your application

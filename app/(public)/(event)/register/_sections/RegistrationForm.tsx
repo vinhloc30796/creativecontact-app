@@ -50,7 +50,6 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       // Professional info fields
       industries: [], // Initialize with an empty array
       experience: undefined,
-      field: '',
     },
   })
 
@@ -79,7 +78,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       title: 'Professional Information',
       description: 'Please provide your professional information',
       component: <ProfessionalInfoStep form={form} />,
-      fields: ['industries', 'experience', 'field'] as const,
+      fields: ['industries', 'experience'] as const,
     },
     {
       title: 'Select A Date',
@@ -156,7 +155,6 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           ? writeUserInfo(user.id, {
               industries: data.industries,
               experience: data.experience,
-              field: data.field,
             })
           : Promise.resolve(null), // If there's no user.id, we don't call writeUserInfo
       ]);
