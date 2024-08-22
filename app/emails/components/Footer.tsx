@@ -3,9 +3,7 @@
 import React from 'react';
 import { Img, Section, Link } from "@react-email/components";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? `https://${process.env.NEXT_PUBLIC_APP_URL}`
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "localhost:3000";
 
 export const Footer: React.FC = () => (
   // <Section style={{ marginTop: '20px' }}>
