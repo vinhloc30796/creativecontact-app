@@ -28,14 +28,17 @@ interface RegistrationFormProps {
 }
 
 export default function RegistrationForm({ initialEventSlots }: RegistrationFormProps) {
+  // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
+  // States
   const [formStep, setFormStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  // Forms
   const [registrationStatus, setRegistrationStatus] = useState<'pending' | 'confirmed' | 'checked-in' | 'cancelled'>('pending');
   const [existingRegistration, setExistingRegistration] = useState<EventRegistration | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -125,48 +128,48 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   }
 
   const handleConfirmNewRegistration = () => {
-    setExistingRegistration(null)
-    setFormStep(1) // Move to date selection step
+    setIsUpdating(true);
+    setExistingRegistration(null);
+    setFormStep(1); // Move to date selection step
   }
 
   const handleKeepExistingRegistration = () => {
-    setExistingRegistration(null)
-    setFormStep(0) // Go back to contact info step
-    form.reset() // Reset the form
+    setExistingRegistration(null);
+    setFormStep(0); // Go back to contact info step
+    form.reset(); // Reset the form
   }
 
   const handleSubmit = form.handleSubmit(async (data) => {
     if (isSubmitting) {
       return;
     }
-  
+
     setIsSubmitting(true);
     setFormError(null);
-  
+
     try {
       const [registrationResult, userInfoResult] = await Promise.all([
         createRegistration({
           ...data,
           created_by: user?.id || null,
           is_anonymous: isAnonymous,
-          existingRegistrationId: existingRegistration?.id,
+          existingRegistrationId: isUpdating ? existingRegistration?.id : undefined,
         }),
         user?.id
           ? writeUserInfo(user.id, {
-              industries: data.industries,
-              experience: data.experience,
-            })
-          : Promise.resolve(null), // If there's no user.id, we don't call writeUserInfo
+            industries: data.industries,
+            experience: data.experience,
+          })
+          : Promise.resolve(null),
       ]);
-  
+
       if (registrationResult.success) {
         setSubmitted(true);
         setRegistrationStatus(registrationResult.status);
       } else {
         throw new Error(registrationResult.error || 'Registration failed');
       }
-  
-      // Optionally, you can handle the userInfoResult here if needed
+
       if (userInfoResult && !userInfoResult.success) {
         console.error('Error writing user info:', userInfoResult.error);
       }
@@ -175,6 +178,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       setFormError(error instanceof Error ? error.message : 'An unexpected error occurred during registration');
     } finally {
       setIsSubmitting(false);
+      setIsUpdating(false);
     }
   });
 
@@ -212,33 +216,44 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
         >
           <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
           <p>{currentStep.description}</p>
-          {/* Minimal, understated, grey display of user information if found */}
           <div>
-
-          <p className="text-muted-foreground">{
-            // either "You're a guest" or "You're logged in as {user.email}"
-            `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)
-          }</p>
+            <p className="text-muted-foreground text-sm">
+              {`You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+            </p>
           </div>
           <Progress value={progress} className="w-full" />
         </div>
         {currentStep.component}
-        <div className="flex justify-between mt-2">
-          <Button type="button" onClick={() => setFormStep((prev) => Math.max(0, prev - 1))} disabled={formStep === 0 || isSubmitting}>
+        <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+          <Button
+            type="button"
+            onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
+            disabled={formStep === 0 || isSubmitting}
+            className="w-full sm:w-auto"
+          >
             Back
           </Button>
           {formStep < steps.length - 1 ? (
-            <Button type="button" onClick={handleNextStep} disabled={isSubmitting}>
+            <Button
+              type="button"
+              onClick={handleNextStep}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
               Next
             </Button>
           ) : (
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit Registration'}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              {isSubmitting ? 'Submitting...' : isUpdating ? 'Update Registration' : 'Submit Registration'}
             </Button>
           )}
         </div>
         {formError && (
-          <div className="error-message">
+          <div className="error-message mt-2 text-red-500 text-sm">
             {formError}
           </div>
         )}

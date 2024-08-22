@@ -58,7 +58,9 @@ export async function signInAnonymously() {
   return data.user;
 }
 
-export async function confirmRegistration(signature: string): Promise<RegistrationConfirm> {
+export async function confirmRegistration(
+  signature: string,
+): Promise<RegistrationConfirm> {
   const supabase = createClient();
 
   // Start a transaction
@@ -96,22 +98,33 @@ export async function confirmRegistration(signature: string): Promise<Registrati
     );
 
   if (
-    existingUser
+    existingUser &&
     // existingUser is a string
-    && typeof existingUser === "string"
+    typeof existingUser === "string"
   ) {
-    console.log(`An account with email ${email} already exists, userId is`, existingUser);
+    console.log(
+      `An account with email ${email} already exists, userId is`,
+      existingUser,
+    );
     return db.update(eventRegistrations)
-    .set({created_by: existingUser})
-    .where(eq(eventRegistrations.id, signature))
-    .then((result) => {
-      console.log(`Updated registration ${signature} with userId ${existingUser}`);
-      return { success: true as const, email: email, userId: existingUser };
-    })
-    .catch((error) => {
-      console.error(`Failed to update registration ${signature} with userId ${existingUser}:`, error);
-      return { success: false as const, error: "Email already in use & failed to update registration" };
-    })
+      .set({ created_by: existingUser })
+      .where(eq(eventRegistrations.id, signature))
+      .then((result) => {
+        console.log(
+          `Updated registration ${signature} with userId ${existingUser}`,
+        );
+        return { success: true as const, email: email, userId: existingUser };
+      })
+      .catch((error) => {
+        console.error(
+          `Failed to update registration ${signature} with userId ${existingUser}:`,
+          error,
+        );
+        return {
+          success: false as const,
+          error: "Email already in use & failed to update registration",
+        };
+      });
   } else if (existingUserError) {
     console.error("Error checking for existing user:", existingUserError);
     return { success: false, error: "Error checking email availability" };
@@ -167,7 +180,8 @@ export async function checkExistingRegistration(
     `,
     )
     .eq("email", email)
-    .eq("status", "confirmed")
+    // Confirmed or Pending
+    .in("status", ["confirmed", "pending"])
     .order("created_at", { ascending: false })
     .limit(1);
   // Return or error
@@ -175,7 +189,12 @@ export async function checkExistingRegistration(
     console.error("Error checking existing registration:", error);
     return null;
   }
-  return data[0] || null;
+  if (data[0]) {
+    console.debug("Existing registration found:", data[0]);
+    return data[0] as EventRegistrationWithSlot;
+  } else {
+    return null;
+  }
 }
 
 interface RegistrationResult {
