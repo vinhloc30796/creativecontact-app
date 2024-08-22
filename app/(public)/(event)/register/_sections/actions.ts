@@ -19,15 +19,12 @@ import {
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
-import { eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { Resend } from "resend";
-import {
-  // EventRegistration,
-  EventRegistrationWithSlot,
-  FormData,
-} from "./types";
-import { generateOTP } from "@/utils/otp";
+import { EventRegistrationWithSlot } from "@/app/types/EventRegistration";
+import { UserInfo } from "@/app/types/UserInfo";
+import { FormData } from "./types";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -58,7 +55,9 @@ export async function signInAnonymously() {
   return data.user;
 }
 
-export async function confirmRegistration(signature: string): Promise<RegistrationConfirm> {
+export async function confirmRegistration(
+  signature: string,
+): Promise<RegistrationConfirm> {
   const supabase = createClient();
 
   // Start a transaction
@@ -96,22 +95,33 @@ export async function confirmRegistration(signature: string): Promise<Registrati
     );
 
   if (
-    existingUser
+    existingUser &&
     // existingUser is a string
-    && typeof existingUser === "string"
+    typeof existingUser === "string"
   ) {
-    console.log(`An account with email ${email} already exists, userId is`, existingUser);
+    console.log(
+      `An account with email ${email} already exists, userId is`,
+      existingUser,
+    );
     return db.update(eventRegistrations)
-    .set({created_by: existingUser})
-    .where(eq(eventRegistrations.id, signature))
-    .then((result) => {
-      console.log(`Updated registration ${signature} with userId ${existingUser}`);
-      return { success: true as const, email: email, userId: existingUser };
-    })
-    .catch((error) => {
-      console.error(`Failed to update registration ${signature} with userId ${existingUser}:`, error);
-      return { success: false as const, error: "Email already in use & failed to update registration" };
-    })
+      .set({ created_by: existingUser })
+      .where(eq(eventRegistrations.id, signature))
+      .then((result) => {
+        console.log(
+          `Updated registration ${signature} with userId ${existingUser}`,
+        );
+        return { success: true as const, email: email, userId: existingUser };
+      })
+      .catch((error) => {
+        console.error(
+          `Failed to update registration ${signature} with userId ${existingUser}:`,
+          error,
+        );
+        return {
+          success: false as const,
+          error: "Email already in use & failed to update registration",
+        };
+      });
   } else if (existingUserError) {
     console.error("Error checking for existing user:", existingUserError);
     return { success: false, error: "Error checking email availability" };
@@ -154,28 +164,61 @@ export async function confirmRegistration(signature: string): Promise<Registrati
 }
 
 export async function checkExistingRegistration(
-  email: string,
-): Promise<EventRegistrationWithSlot | null> {
-  const supabase = createClient();
+  email: string
+): Promise<{ registration: EventRegistrationWithSlot | null; userInfo: UserInfo | null }> {
+  try {
+    // First, fetch the registration
+    const registrationResult = await db
+      .select({
+        registration: eventRegistrations,
+        slot: eventSlots,
+      })
+      .from(eventRegistrations)
+      .leftJoin(eventSlots, eq(eventRegistrations.slot, eventSlots.id))
+      .where(
+        and(
+          eq(eventRegistrations.email, email),
+          or(
+            eq(eventRegistrations.status, 'confirmed'),
+            eq(eventRegistrations.status, 'pending')
+          )
+        )
+      )
+      .orderBy(eventRegistrations.created_at)
+      .limit(1);
 
-  const { data, error } = await supabase
-    .from("event_registrations")
-    .select(
-      `
-      *,
-      event_slot:event_slots(*)
-    `,
-    )
-    .eq("email", email)
-    .eq("status", "confirmed")
-    .order("created_at", { ascending: false })
-    .limit(1);
-  // Return or error
-  if (error) {
+    let registration: EventRegistrationWithSlot | null = null;
+    let userInfo: UserInfo | null = null;
+
+    if (registrationResult[0] && registrationResult[0].slot) {
+      registration = {
+        ...registrationResult[0].registration,
+        slot_details: registrationResult[0].slot,
+        slot_time_start: registrationResult[0].slot.time_start.toISOString(),
+        slot_time_end: registrationResult[0].slot.time_end.toISOString(),
+        event_slot: registrationResult[0].slot,
+      } as EventRegistrationWithSlot;
+
+      // If we found a registration, fetch the user info
+      if (registration.created_by) {
+        const userInfoResult = await db
+          .select()
+          .from(userInfos)
+          .where(eq(userInfos.id, registration.created_by))
+          .limit(1);
+
+        userInfo = userInfoResult[0] as UserInfo | null;
+      }
+    }
+
+    console.debug("Existing registration found:", registration);
+    console.debug("User info found:", userInfo);
+
+    return { registration, userInfo };
+  } catch (error) {
     console.error("Error checking existing registration:", error);
-    return null;
+    return { registration: null, userInfo: null };
   }
-  return data[0] || null;
 }
 
 interface RegistrationResult {
@@ -192,6 +235,7 @@ export async function createRegistration(
     existingRegistrationId?: string;
   },
 ): Promise<RegistrationResult> {
+  console.debug("Creating registration with data:", formData);
   const existingRegistration = await checkExistingRegistration(formData.email);
   const isAnonymous: boolean = formData.is_anonymous;
   const status = isAnonymous ? "pending" : "confirmed";
@@ -200,7 +244,7 @@ export async function createRegistration(
     const dbResult: any = await db.transaction(async (tx) => {
       let registrationResult: EventRegistration;
 
-      if (existingRegistration) {
+      if (existingRegistration.registration) {
         // Update existing registration
         const updateResult = await tx.update(eventRegistrations)
           .set({
@@ -210,7 +254,7 @@ export async function createRegistration(
             phone: formData.phone,
             status: status,
           })
-          .where(eq(eventRegistrations.id, existingRegistration.id))
+          .where(eq(eventRegistrations.id, existingRegistration.registration.id))
           .returning();
         registrationResult = updateResult.map((r) => ({
           ...r,
@@ -310,22 +354,34 @@ export async function writeUserInfo(
     experience: ExperienceType;
   },
 ) {
+  console.log('Received professionalInfo:', professionalInfo);
+
+  if (!professionalInfo.industries || professionalInfo.industries.length === 0 || !professionalInfo.experience) {
+    console.error('Invalid professional info:', professionalInfo);
+    return { success: false, error: 'Invalid professional info' };
+  }
+
   try {
+    const updateSet = {
+      industries: professionalInfo.industries,
+      experience: professionalInfo.experience,
+    };
+
+    console.log('Updating with:', updateSet);
+
     const result = await db
       .insert(userInfos)
       .values({
-        id: userId as any, // Type assertion to bypass strict type checking
-        industries: professionalInfo.industries as any[], // Type assertion for array
-        experience: professionalInfo.experience,
+        id: userId,
+        ...updateSet,
       })
       .onConflictDoUpdate({
         target: userInfos.id,
-        set: {
-          industries: professionalInfo.industries as any[], // Type assertion for array
-          experience: professionalInfo.experience,
-        },
+        set: updateSet,
       })
       .returning();
+
+    console.log('Update result:', result);
 
     return { success: true, data: result[0] };
   } catch (error) {

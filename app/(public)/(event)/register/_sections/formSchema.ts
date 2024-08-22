@@ -1,7 +1,8 @@
 // File: app/(public)/(event)/register/_sections/formSchema.ts
 
 import { z } from "zod";
-import { industries, experienceLevels } from "@/drizzle/schema";
+import { experienceLevels } from "@/app/types/UserInfo";
+import { industries } from "@/app/types/UserInfo";
 
 export const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -10,14 +11,18 @@ export const formSchema = z.object({
   phone: z.string().refine((value) => /^\d{10}$/.test(value), {
     message: "Phone number must be 10 digits",
   }),
-  // IndustryInfoStep fields
-  industries: z.array(
-    z.enum(industries),
-  ).min(1, "Please select at least one industry").default([]),
-  experience: z.enum(experienceLevels),
   // DateSelectionStep fields
   slot: z.string().min(1, "Please select a time slot"),
   existingRegistrationId: z.string().optional(),
 });
 
+// Define the schema for ProfessionalInfoStep
+export const professionalInfoSchema = z.object({
+  industries: z.array(z.enum(industries)).min(1, "Please select at least one industry"),
+  experience: z.enum(experienceLevels),
+})
+
+
 export type FormData = z.infer<typeof formSchema>;
+export type ProfessionalInfoData = z.infer<typeof professionalInfoSchema>
+export type CombinedFormData = FormData & ProfessionalInfoData

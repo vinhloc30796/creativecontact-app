@@ -1,3 +1,5 @@
+// File: app/(public)/(event)/register/_sections/types.ts
+
 interface EventSlot {
 	id: string
 	created_at: string

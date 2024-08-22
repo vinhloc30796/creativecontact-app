@@ -12,6 +12,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { experienceLevels, industries } from "@/app/types/UserInfo";
 
 // Partial schema for auth.users
 export const authSchema = pgSchema("auth");
@@ -116,53 +117,24 @@ export const eventRegistrationLogs = pgTable("event_registration_logs", {
 
 /* postgres=> \d user_infos
                     Table "public.user_infos"
-    Column    |       Type       | Collation | Nullable | Default 
+    Column    |       Type       | Collation | Nullable | Default
 --------------+------------------+-----------+----------+---------
- id           | uuid             |           | not null | 
- display_name | text             |           |          | 
- location     | text             |           |          | 
- occupation   | text             |           |          | 
- about        | text             |           |          | 
- industries   | industry[]       |           |          | 
- experience   | experience_level |           |          | 
- field        | text             |           |          | 
+ id           | uuid             |           | not null |
+ display_name | text             |           |          |
+ location     | text             |           |          |
+ occupation   | text             |           |          |
+ about        | text             |           |          |
+ industries   | industry[]       |           |          |
+ experience   | experience_level |           |          |
 Indexes:
     "user_infos_pkey" PRIMARY KEY, btree (id)
     "idx_user_infos_industries" gin (industries)
 Foreign-key constraints:
     "user_infos_id_fkey" FOREIGN KEY (id) REFERENCES auth.users(id)
 Policies (row security enabled): (none)
-*/ 
-
-export const industries = [
-  'Advertising',
-  'Architecture',
-  'Arts and Crafts',
-  'Design',
-  'Fashion',
-  'Film, Video, and Photography',
-  'Music',
-  'Performing Arts',
-  'Publishing',
-  'Software and Interactive',
-  'Television and Radio',
-  'Visual Arts',
-  'Other'
-] as const;
-
+*/
 export const industryEnum = pgEnum('industry', industries);
-
-export const experienceLevels = [
-  'Entry',
-  'Junior',
-  'Mid-level',
-  'Senior',
-  'Manager',
-  'C-level'
-] as const;
-
 export const experienceEnum = pgEnum('experience_level', experienceLevels);
-
 export const userInfos = pgTable('user_infos', {
   id: uuid('id').primaryKey().references(() => authUsers.id),
   displayName: text('display_name'),

@@ -1,8 +1,8 @@
-// EmailExistedStep.tsx
+// File: app/(public)/(event)/register/_sections/EmailExistedStep.tsx
 
 import { Button } from '@/components/ui/button'
 import { dateFormatter, timeslotFormatter } from '@/lib/timezones'
-import { EventRegistrationWithSlot } from './types'
+import { EventRegistrationWithSlot } from '@/app/types/EventRegistration'
 
 interface EmailExistedStepProps {
 	existingRegistration: EventRegistrationWithSlot
@@ -11,22 +11,29 @@ interface EmailExistedStepProps {
 }
 
 export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: EmailExistedStepProps) {
+	const dateStr = dateFormatter.format(new Date(existingRegistration.slot_time_start))
+	const startTimeStr = timeslotFormatter.format(new Date(existingRegistration.slot_time_start))
+	const endTimeStr = timeslotFormatter.format(new Date(existingRegistration.slot_time_end))
 	return (
-		<div className="space-y-4">
+		// Prevent overflow-hidden from hiding the content
+		<div className="space-y-4 overflow-visible">
 			<h2 className="text-lg font-semibold text-primary">Existing Registration Found</h2>
-			<p>You have already registered for another slot with this email address. If you proceed, your existing registration will be cancelled.</p>
-			<p>
+			<p className="text-sm">
+				You have already registered for another slot with this email address.
+				You can either update your existing registration or keep it as is.
+				The existing registration will be cancelled only after you have submitted the update.
+			</p>
+			<p className="text-sm">
 				Existing registration details:
 				<br />
-				Date: {dateFormatter.format(new Date(existingRegistration.event_slot.time_start))}
+				Date: {dateStr}
 				<br />
-				Time: {timeslotFormatter.format(new Date(existingRegistration.event_slot.time_start))} - {timeslotFormatter.format(new Date(existingRegistration.event_slot.time_end))}
+				Time: {startTimeStr} - {endTimeStr}
 			</p>
-			<div className="flex space-x-4">
-				<Button onClick={onConfirm}>Proceed and Cancel Existing Registration</Button>
-				<Button variant="outline" onClick={onCancel}>
-					Keep Existing Registration
-				</Button>
+			{/* New line when overflow */}
+			<div className="flex flex-col gap-2">
+				<Button onClick={onConfirm} className="w-full">Update Existing Registration</Button>
+				<Button variant="outline" onClick={onCancel} className="w-full">Keep Existing Registration</Button>
 			</div>
 		</div>
 	)
