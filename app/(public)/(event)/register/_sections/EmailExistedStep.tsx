@@ -18,7 +18,11 @@ export function EmailExistedStep({ existingRegistration, onConfirm, onCancel }: 
 		// Prevent overflow-hidden from hiding the content
 		<div className="space-y-4 overflow-visible">
 			<h2 className="text-lg font-semibold text-primary">Existing Registration Found</h2>
-			<p className="text-sm">You have already registered for another slot with this email address. You can either update your existing registration or keep it as is.</p>
+			<p className="text-sm">
+				You have already registered for another slot with this email address.
+				You can either update your existing registration or keep it as is.
+				The existing registration will be cancelled only after you have submitted the update.
+			</p>
 			<p className="text-sm">
 				Existing registration details:
 				<br />
