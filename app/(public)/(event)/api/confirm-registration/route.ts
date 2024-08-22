@@ -1,12 +1,11 @@
 //File: app/api/confirm-registration/route.ts
 
 import { confirmRegistration } from "@/app/(public)/(event)/register/_sections/actions";
-import { sendConfirmationEmailWithICSAndQR } from "@/app/actions/email"; // Adjust the import path as necessary
+import { sendConfirmationEmailWithICSAndQR } from "@/app/actions/email/registration"; // Adjust the import path as necessary
 import { eventRegistrations, eventSlots } from "@/drizzle/schema";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import QRCode from "qrcode";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

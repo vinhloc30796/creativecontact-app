@@ -1,0 +1,49 @@
+import {
+  Body,
+  Button,
+  Container,
+  Heading,
+  Preview,
+  Section,
+  Text
+} from "@react-email/components";
+import * as React from "react";
+import { Layout } from "../components/Layout";
+
+const baseUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "";
+
+interface ConfirmationRequestProps {
+  confirmationUrl: string;
+}
+
+export const ConfirmationRequest: React.FC<ConfirmationRequestProps> = ({
+  confirmationUrl,
+}) => {
+  const previewText = `Complete your registration for Hoàn Tất Project`;
+
+  return (
+    <Layout>
+      <Preview>{previewText}</Preview>
+      <Body className="bg-white my-auto mx-auto font-sans">
+        <Container className="border border-solid border-gray-200 my-10 mx-auto p-5 max-w-[600px]">
+          <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">
+            Complete your registration
+          </Heading>
+          <Text className="text-base text-center mb-4">
+            👇 by clicking the link below 👇
+          </Text>
+          <Section className="text-center mt-8 mb-8">
+            <Button
+              className={`bg-[#f27151] text-white text-center px-6 py-3`}
+              href={confirmationUrl}
+            >
+              Confirm
+            </Button>
+          </Section>
+        </Container>
+      </Body>
+    </Layout>
+  );
+};
