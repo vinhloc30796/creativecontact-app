@@ -1,8 +1,9 @@
 // File: app/actions/email/sendSignIn.ts
+import React from 'react';
 import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { resend } from "./utils";
-
+import { SignInEmail } from '@/app/emails/templates/SignInEmail';
 
 export function sendSignInWithOtp(email: string, options?: {
   shouldCreateUser?: boolean;
@@ -31,13 +32,7 @@ export function sendSignInWithOtp(email: string, options?: {
         from: "Creative Contact <no-reply@creativecontact.vn>",
         to: email,
         subject: "Your Magic Link for Event Check-In",
-        html: `
-        <h1>Welcome to our Event!</h1>
-        <p>Here's your one-time password: <strong>${otp}</strong></p>
-        <p>Or click the link below to sign in and complete your check-in:</p>
-        <p><a href="${confirmationURL}">Sign In to Check-In</a></p>
-        <p>If you didn't request this email, please ignore it.</p>
-      `,
+        react: React.createElement(SignInEmail, { otp, confirmationURL }),
       });
     })
     .then((emailData) => {

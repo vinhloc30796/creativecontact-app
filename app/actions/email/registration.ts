@@ -7,6 +7,9 @@ import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import QRCode from "qrcode";
 import { generateICSFile, resend } from "./utils";
+import { ConfirmationRequest } from "@/app/emails/templates/ConfirmationRequest";
+import { ConfirmationWithICS } from "@/app/emails/templates/ConfirmationWithICS";
+import React from "react";
 
 export async function sendConfirmationRequestEmail(
   email: string,
@@ -43,14 +46,12 @@ export async function sendConfirmationRequestEmail(
         `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${registrationURL}`;
     }
 
+    // Send email
     const emailResponse = await resend.emails.send({
       from: "Creative Contact <no-reply@creativecontact.vn>",
       to: email,
       subject: "Confirm Your Event Registration",
-      html: `
-        <p>Please confirm your registration by clicking on this link:</p>
-        <p><a href="${confirmationURL}">Confirm Registration</a></p>
-        <p>This will also sign you in & confirm your email (<a href=mailto:${email}>${email}</a>) as the contact address for this registration.</p>`,
+      react: React.createElement(ConfirmationRequest, { confirmationUrl: confirmationURL })
     });
 
     console.log("Confirmation request email sent:", emailResponse);
@@ -88,23 +89,22 @@ export async function sendConfirmationEmailWithICSAndQR(
     const qrCodeBase64 = await QRCode.toDataURL(registrationId, {
       width: 300,
       errorCorrectionLevel: "H",
+      color: { dark: "#F27151"}
     });
     const qrCodeBuffer = new Buffer(qrCodeBase64.split(",")[1], "base64");
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${registrationId}&size=300x300&color=f27151&ecc=H`;
 
-    // Build email
-    const emailContent = `<h1>Your registration is confirmed!</h1>
-        <p>Event details:</p>
-        <ul>
-            <li>Date: ${dateStr}</li>
-            <li>Time: ${timeStartStr} - ${timeEndStr}</li>
-        </ul>
-        <img src="${qrCodeBase64}" alt="Registration QR Code" />`;
-
+    // Send email
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@creativecontact.vn>",
       to: email,
       subject: "Your Event Registration is Confirmed",
-      html: emailContent,
+      react: React.createElement(ConfirmationWithICS, {
+        participantName: "Participant Name",
+        eventDate: dateStr,
+        eventTime: `${timeStartStr} - ${timeEndStr}`,
+        qrCodeUrl: qrCodeUrl
+      }),
       attachments: [
         { filename: "event.ics", content: icsData },
         { filename: "qr-code.png", content: qrCodeBuffer },
