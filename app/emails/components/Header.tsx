@@ -3,9 +3,7 @@
 import * as React from "react";
 import { Img, Text } from "@react-email/components";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? `https://${process.env.NEXT_PUBLIC_APP_URL}`
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "localhost:3000";
 
 export const Header: React.FC = () => (
   <>

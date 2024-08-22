@@ -10,10 +10,6 @@ import {
 import * as React from "react";
 import { Layout } from "../components/Layout";
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
-
 interface ConfirmationRequestProps {
   confirmationUrl: string;
   participantName: string;

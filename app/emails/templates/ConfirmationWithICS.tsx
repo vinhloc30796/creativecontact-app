@@ -16,10 +16,6 @@ interface ConfirmationWithICSProps {
   qrCodeUrl: string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
-
 export const ConfirmationWithICS: React.FC<ConfirmationWithICSProps> = ({
   participantName,
   eventDate,
