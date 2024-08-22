@@ -184,35 +184,11 @@ const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
   )
 }
 
-const FieldInput = ({ form }: ProfessionalInfoStepProps) => (
-  <FormField
-    control={form.control}
-    name="field"
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>Field</FormLabel>
-        <FormControl>
-          <Input
-            placeholder="Enter your specific field or area of expertise"
-            {...field}
-          />
-        </FormControl>
-        <FormMessage />
-        <p className="text-sm text-gray-500">
-          Please provide your specific field or area of expertise within your industry.
-          For example: &quot;UX Design&quot;, &quot;Digital Marketing&quot;, &quot;Front-end Development&quot;, etc.
-        </p>
-      </FormItem>
-    )}
-  />
-)
-
 export function ProfessionalInfoStep({ form }: ProfessionalInfoStepProps) {
   return (
     <>
       <IndustrySelect form={form} />
       <ExperienceSelect form={form} />
-      <FieldInput form={form} />
     </>
   )
 }
