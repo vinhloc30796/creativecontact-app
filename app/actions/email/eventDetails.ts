@@ -1,13 +1,14 @@
 // File: app/actions/email/eventDetails.ts
 "use server";
 
-import { EventDetailsEmail } from "@/emails/templates/EventDetailsEmail";
 import { EventRegistration } from "@/app/types/EventRegistration";
 import { EventSlot } from "@/app/types/EventSlot";
 import { eventSlots } from "@/drizzle/schema";
+import { EventDetailsEmail } from "@/emails/templates/EventDetailsEmail";
 import { db } from "@/lib/db";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
 import { createClient } from "@/utils/supabase/server";
+import { render } from "@react-email/components";
 import { eq } from "drizzle-orm";
 import QRCode from "qrcode";
 import React from "react";
@@ -29,19 +30,22 @@ export async function sendEventDetailsEmail(
     const timeStartStr = timeslotFormatter.format(new Date(slot.time_start));
     const timeEndStr = timeslotFormatter.format(new Date(slot.time_end));
 
+    // Send email
+    const component: React.ReactNode = React.createElement(EventDetailsEmail, {
+      name: registration.name,
+      email: registration.email,
+      phone: registration.phone,
+      eventDate: dateStr,
+      eventTime: `${timeStartStr} - ${timeEndStr}`,
+      qrCodeUrl: qrCodeUrl,
+    });
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@creativecontact.vn>",
       to: [to],
       subject: "Your Event Registration Details",
-      react: React.createElement(EventDetailsEmail, {
-        name: registration.name,
-        email: registration.email,
-        phone: registration.phone,
-        eventDate: dateStr,
-        eventTime: `${timeStartStr} - ${timeEndStr}`,
-        qrCodeUrl: qrCodeUrl,
-      }),
+      react: component,
       attachments: [{ content: icsData, filename: "event.ics" }],
+      text: await render(component, { plainText: true }),
     });
 
     if (error) {

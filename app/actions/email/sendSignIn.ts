@@ -4,6 +4,7 @@ import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { resend } from "./utils";
 import { SignInEmail } from '@/emails/templates/SignInEmail';
+import { render } from '@react-email/components';
 
 export function sendSignInWithOtp(email: string, options?: {
   shouldCreateUser?: boolean;
@@ -21,18 +22,21 @@ export function sendSignInWithOtp(email: string, options?: {
       redirectTo: options?.redirectTo,
     },
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.error) throw response.error;
       linkData = response.data;
       console.log("Magic link confirmation URL:", linkData);
 
       const confirmationURL = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${options?.redirectTo || ""}`;
 
+      const component = React.createElement(SignInEmail, { otp, confirmationURL });
+
       return resend.emails.send({
         from: "Creative Contact <no-reply@creativecontact.vn>",
         to: email,
         subject: "Your Magic Link for Event Check-In",
-        react: React.createElement(SignInEmail, { otp, confirmationURL }),
+        react: component,
+        text: await render(component, { plainText: true }),
       });
     })
     .then((emailData) => {
