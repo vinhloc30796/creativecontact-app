@@ -103,7 +103,7 @@ export async function sendConfirmationEmailWithICSAndQR(
       errorCorrectionLevel: "H",
       color: { dark: "#F27151" },
     });
-    const qrCodeBuffer = new Buffer(qrCodeBase64.split(",")[1], "base64");
+    const qrCodeBuffer = Buffer.from(qrCodeBase64.split(",")[1], "base64");
     const qrCodeUrl =
       `https://api.qrserver.com/v1/create-qr-code/?data=${registrationId}&size=300x300&color=f27151&ecc=H`;
 
