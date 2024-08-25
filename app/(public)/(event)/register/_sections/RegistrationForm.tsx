@@ -151,8 +151,8 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       fields: ['slot'] as const,
     },
     {
-      title: 'Confirm Information',
-      description: 'Please review and confirm your information.',
+      title: 'Almost There!',
+      description: 'Please check if your information is correct.',
       component: <ConfirmationStep formData={form.getValues()} slots={initialEventSlots} />,
       fields: [] as const,
     },
@@ -351,7 +351,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
                 disabled={isSubmitting}
                 className="w-full sm:w-auto"
               >
-                {isSubmitting ? 'Submitting...' : isUpdating ? 'Update Registration' : 'Submit Registration'}
+                {isSubmitting ? 'Submitting...' : isUpdating ? 'Update' : 'Submit'}
               </Button>
             )}
           </div>
