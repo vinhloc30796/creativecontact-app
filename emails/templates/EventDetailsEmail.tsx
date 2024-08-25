@@ -21,13 +21,18 @@ export const EventDetailsEmail: React.FC<EventDetailsEmailProps> = ({
 }) => (
   <Layout>
     <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">Your Event Registration Details</Heading>
-    <Text>Here are the details of your event registration:</Text>
+    <Text>Hey, {name}! Here are the details of your event registration:</Text>
     <Section className="my-4">
-      <Text>Name: {name}</Text>
-      <Text>Email: {email}</Text>
-      <Text>Phone: {phone}</Text>
-      <Text>Event Date: {eventDate}</Text>
-      <Text>Event Time: {eventTime}</Text>
+      <ul className="list-none pl-0">
+        <li><Text className="text-base mb-4">📅 When: {eventDate}</Text></li>
+        <li><Text className="text-base mb-4">🕒 What Time: {eventTime}</Text></li>
+        <li>
+          <Text className="text-base mb-4">
+            📍 Where: NEO-<br />
+            393/7 Hai Bà Trưng, Phường 8, Quận 3, Hồ Chí Minh
+          </Text>
+        </li>
+      </ul>
     </Section>
     <Section className="mb-4">
       <Text className="font-bold">Your QR Code:</Text>
