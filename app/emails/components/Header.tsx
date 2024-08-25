@@ -8,7 +8,7 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "localhost:3000";
 export const Header: React.FC = () => (
   <>
     <Img
-      src={`${baseUrl}/logo-horizontal-transparent.png`}
+      src={`${baseUrl}/logo-full-horizontal-transparent.png`}
       alt="Creative Contact - Logo"
       className="w-full h-auto"
     />
