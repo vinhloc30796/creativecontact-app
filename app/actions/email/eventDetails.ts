@@ -1,7 +1,7 @@
 // File: app/actions/email/eventDetails.ts
 "use server";
 
-import { EventDetailsEmail } from "@/app/emails/templates/EventDetailsEmail";
+import { EventDetailsEmail } from "@/emails/templates/EventDetailsEmail";
 import { EventRegistration } from "@/app/types/EventRegistration";
 import { EventSlot } from "@/app/types/EventSlot";
 import { eventSlots } from "@/drizzle/schema";

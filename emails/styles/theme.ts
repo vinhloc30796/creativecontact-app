@@ -20,6 +20,10 @@ const colors = {
   foreground: 'hsl(11.25, 50%, 6.27%)',
 };
 
+export const woff2PlusJakartaSansLink = "https://fonts.gstatic.com/s/plusjakartasans/v8/LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yw.woff2";
+export const googlePlusJakartaSansLink = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap";
+export const googlePlusJakartaSansBoldLink = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700&display=swap";
+
 export const theme = {
   content: [
     './emails/**/*.{js,jsx,ts,tsx}',
@@ -28,7 +32,7 @@ export const theme = {
     colors: colors,
     extend: {
       fontFamily: {
-        sans: ['Arial', 'Helvetica', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Arial', 'Helvetica', 'sans-serif'],
       },
       spacing: {
         '1': '4px',

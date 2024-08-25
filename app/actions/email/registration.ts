@@ -7,8 +7,8 @@ import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import QRCode from "qrcode";
 import { generateICSFile, resend } from "./utils";
-import { ConfirmationRequest } from "@/app/emails/templates/ConfirmationRequest";
-import { ConfirmationWithICS } from "@/app/emails/templates/ConfirmationWithICS";
+import { ConfirmationRequest } from "@/emails/templates/ConfirmationRequest";
+import { ConfirmationWithICS } from "@/emails/templates/ConfirmationWithICS";
 import React from "react";
 
 export async function sendConfirmationRequestEmail(

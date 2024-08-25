@@ -4,6 +4,7 @@ import {
   Container,
   Heading,
   Preview,
+  render,
   Section,
   Text
 } from "@react-email/components";
@@ -29,7 +30,7 @@ export const ConfirmationRequest: React.FC<ConfirmationRequestProps> = ({
     <Layout>
       <Preview>{previewText}</Preview>
       <Body className="bg-white my-auto mx-auto font-sans">
-        <Container className="border border-solid border-gray-200 my-10 mx-auto p-5 max-w-[600px]">
+        <Container className="my-10 mx-auto p-5 max-w-[600px]">
           <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">
             Complete your registration
           </Heading>
@@ -58,3 +59,5 @@ export const ConfirmationRequest: React.FC<ConfirmationRequestProps> = ({
     </Layout>
   );
 };
+
+export default ConfirmationRequest;

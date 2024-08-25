@@ -28,9 +28,12 @@ export const ConfirmationWithICS: React.FC<ConfirmationWithICSProps> = ({
     <Layout>
       <Preview>{previewText}</Preview>
       <Body className="bg-white my-auto mx-auto font-sans">
-        <Container className="border border-solid border-gray-200 my-10 mx-auto p-5 max-w-[600px]">
+        <Container className="my-10 mx-auto p-5 max-w-[600px]">
           <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">
             Thanks for registering to Hoàn Tất Project 🤩
+          </Heading>
+          <Heading style={{ fontFamily: "'Plus Jakarta Sans', Arial, sans-serif", fontSize: '16px', lineHeight: '1.5' }}>
+            This text uses inline styles for better compatibility.
           </Heading>
           <Text className="text-base mb-4">
             Hey {participantName}!
@@ -69,3 +72,5 @@ export const ConfirmationWithICS: React.FC<ConfirmationWithICSProps> = ({
     </Layout>
   );
 };
+
+export default ConfirmationWithICS;
