@@ -31,7 +31,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Container className="max-w-[600px] mx-auto p-8">
             <Header />
             <main>
-              {children}
+            <Body className="bg-white my-auto mx-auto font-sans">
+              <Container className="my-4 mx-auto p-5 max-w-[600px]">
+                {children}
+              </Container>
+              </Body>
             </main>
             <Footer />
           </Container>

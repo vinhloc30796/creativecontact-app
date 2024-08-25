@@ -9,12 +9,12 @@ interface SignInEmailProps {
 
 export const SignInEmail: React.FC<SignInEmailProps> = ({ otp, confirmationURL }) => (
   <Layout>
-    <Container className="my-10 mx-auto p-5 max-w-[600px]">
-      <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">Welcome to our Event!</Heading>
-      <Section className="mb-4">
-        <Text className="mb-2">Here&apos;s your one-time password:</Text>
-        <Text className="font-bold text-lg">{otp}</Text>
-      </Section>
+    <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">Welcome to our Event!</Heading>
+    <Section className="mb-4">
+      <Text className="mb-2">Here&apos;s your one-time password:</Text>
+      <Text className="font-bold text-lg">{otp}</Text>
+    </Section>
+    <Section className="mb-4">
       <Text className="mb-4">Or click the button below to sign in and complete your check-in:</Text>
       <Button
         className={`bg-[#f27151] text-white text-center px-6 py-3`}
@@ -25,7 +25,7 @@ export const SignInEmail: React.FC<SignInEmailProps> = ({ otp, confirmationURL }
       <Text className="mt-4 text-sm text-gray-600">
         If you didn&apos;t request this email, please ignore it.
       </Text>
-    </Container>
+    </Section>
   </Layout>
 );
 
