@@ -22,7 +22,7 @@ export function EventRegistrationList({ eventRegistrations, searchError, userEma
     try {
       const response = await fetch('/signout', { method: 'POST' });
       if (response.ok) {
-        router.push('/');
+        router.push('/checkin');
       } else {
         console.error('Sign out failed');
       }
@@ -38,11 +38,11 @@ export function EventRegistrationList({ eventRegistrations, searchError, userEma
           const dateStr = dateFormatter.format(new Date(registration.slot_time_start));
           const timeStartStr = timeslotFormatter.format(new Date(registration.slot_time_start));
           const timeEndStr = timeslotFormatter.format(new Date(registration.slot_time_end));
-          return (
+          return ( 
             <React.Fragment key={registration.id}>
               <div className="border p-4 rounded-md">
                 <h3 className="font-semibold">Registration</h3>
-                <p><strong>Event:</strong> {registration.name}</p>
+                <p><strong>Name:</strong> {registration.name}</p>
                 <p><strong>Status:</strong> {registration.status}</p>
                 <p><strong>Slot Date:</strong> {dateStr}</p>
                 <p><strong>Slot Time:</strong> {timeStartStr} - {timeEndStr}</p>

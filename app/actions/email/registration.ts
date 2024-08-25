@@ -10,6 +10,7 @@ import { generateICSFile, resend } from "./utils";
 import { ConfirmationRequest } from "@/emails/templates/ConfirmationRequest";
 import { ConfirmationWithICS } from "@/emails/templates/ConfirmationWithICS";
 import React from "react";
+import { render } from "@react-email/components";
 
 export async function sendConfirmationRequestEmail(
   email: string,
@@ -50,16 +51,18 @@ export async function sendConfirmationRequestEmail(
     }
 
     // Send email
+    const component = React.createElement(ConfirmationRequest, {
+      confirmationUrl: confirmationURL,
+      participantName: participantName || "Creative friend",
+      eventDate: eventDate,
+      eventTime: eventTime,
+    });
     const emailResponse = await resend.emails.send({
       from: "Creative Contact <no-reply@creativecontact.vn>",
       to: email,
       subject: "Confirm Your Event Registration",
-      react: React.createElement(ConfirmationRequest, {
-        confirmationUrl: confirmationURL,
-        participantName: participantName || "Creative friend",
-        eventDate: eventDate,
-        eventTime: eventTime,
-      }),
+      react: component,
+      text: await render(component, { plainText: true }),
     });
 
     console.log("Confirmation request email sent:", emailResponse);
@@ -105,16 +108,18 @@ export async function sendConfirmationEmailWithICSAndQR(
       `https://api.qrserver.com/v1/create-qr-code/?data=${registrationId}&size=300x300&color=f27151&ecc=H`;
 
     // Send email
+    const component = React.createElement(ConfirmationWithICS, {
+      participantName: registrationName || "Creative friend",
+      eventDate: dateStr,
+      eventTime: `${timeStartStr} - ${timeEndStr}`,
+      qrCodeUrl: qrCodeUrl,
+    });
     const { data, error } = await resend.emails.send({
       from: "Creative Contact <no-reply@creativecontact.vn>",
       to: email,
       subject: "Your Event Registration is Confirmed",
-      react: React.createElement(ConfirmationWithICS, {
-        participantName: registrationName || "Creative friend",
-        eventDate: dateStr,
-        eventTime: `${timeStartStr} - ${timeEndStr}`,
-        qrCodeUrl: qrCodeUrl,
-      }),
+      react: component,
+      text: await render(component, { plainText: true }),
       attachments: [
         { filename: "event.ics", content: icsData },
         { filename: "qr-code.png", content: qrCodeBuffer },

@@ -35,12 +35,24 @@ export const ConfirmationRequest: React.FC<ConfirmationRequestProps> = ({
       <Text className="text-base font-bold mt-6 mb-2">
         Here&apos;s your registration details, {participantName}:
       </Text>
-      <Text className="text-base mb-1">
-        📅 When: {eventDate}
-      </Text>
-      <Text className="text-base mb-1">
-        🕒 What time: {eventTime}
-      </Text>
+      <ul className="list-none pl-0">
+        <li>
+          <Text className="text-base mb-1">
+            📅 When: {eventDate}
+          </Text>
+        </li>
+        <li>
+          <Text className="text-base mb-1">
+            🕒 What time: {eventTime}
+          </Text>
+        </li>
+        <li>
+          <Text className="text-base mb-4">
+            📍 Where: NEO-<br />
+            393/7 Hai Bà Trưng, Phường 8, Quận 3, Hồ Chí Minh
+          </Text>
+        </li>
+      </ul>
       <Text className="text-base text-center mb-4">
         👇 Please confirm by clicking the link below 👇
       </Text>

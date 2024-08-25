@@ -1,11 +1,4 @@
-import {
-  Body,
-  Container,
-  Heading,
-  Img,
-  Preview,
-  Text
-} from "@react-email/components";
+import { Heading, Img, Preview, Text } from "@react-email/components";
 import * as React from "react";
 import { Layout } from "../components/Layout";
 
@@ -39,16 +32,24 @@ export const ConfirmationWithICS: React.FC<ConfirmationWithICSProps> = ({
       <Text className="text-base font-bold mt-6 mb-2">
         Here&apos;s the details:
       </Text>
-      <Text className="text-base mb-1">
-        📅 When: {eventDate}
-      </Text>
-      <Text className="text-base mb-1">
-        🕒 What time: {eventTime}
-      </Text>
-      <Text className="text-base mb-4">
-        📍 Where: NEO-<br />
-        393/7 Hai Bà Trưng, Phường 8, Quận 3, Hồ Chí Minh
-      </Text>
+      <ul className="list-none pl-0">
+        <li>
+          <Text className="text-base mb-1">
+            📅 When: {eventDate}
+          </Text>
+        </li>
+        <li>
+          <Text className="text-base mb-1">
+            🕒 What time: {eventTime}
+          </Text>
+        </li>
+        <li>
+          <Text className="text-base mb-4">
+            📍 Where: NEO-<br />
+            393/7 Hai Bà Trưng, Phường 8, Quận 3, Hồ Chí Minh
+          </Text>
+        </li>
+      </ul>
       <Text className="text-base mb-4">
         Please show this ticket and QR code to us at the entrance, and let the goooooooood vibe begin!
       </Text>
