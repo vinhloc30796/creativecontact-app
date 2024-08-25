@@ -319,7 +319,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           <p>{currentStep.description}</p>
           <div>
             <p className="text-muted-foreground text-sm">
-              {`You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+              {isLoading ? 'Loading user information...' : `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
             </p>
           </div>
           <Progress value={progress} className="w-full" />
