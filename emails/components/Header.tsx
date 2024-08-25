@@ -12,8 +12,5 @@ export const Header: React.FC = () => (
       alt="Creative Contact - Logo"
       className="w-full h-auto"
     />
-    <Text className="text-4xl font-bold text-center my-6">
-      Creative Contact
-    </Text>
   </>
 );

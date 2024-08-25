@@ -20,7 +20,7 @@ export const EventDetailsEmail: React.FC<EventDetailsEmailProps> = ({
   qrCodeUrl
 }) => (
   <Layout>
-    <Container className="border border-solid border-gray-200 my-10 mx-auto p-5 max-w-[600px]">
+    <Container className="my-10 mx-auto p-5 max-w-[600px]">
       <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">Your Event Registration Details</Heading>
       <Text>Here are the details of your event registration:</Text>
       <Section className="my-4">
@@ -35,3 +35,5 @@ export const EventDetailsEmail: React.FC<EventDetailsEmailProps> = ({
     </Container>
   </Layout>
 );
+
+export default EventDetailsEmail;

@@ -3,7 +3,7 @@ import React from 'react';
 import { generateOTP } from "@/utils/otp";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { resend } from "./utils";
-import { SignInEmail } from '@/app/emails/templates/SignInEmail';
+import { SignInEmail } from '@/emails/templates/SignInEmail';
 
 export function sendSignInWithOtp(email: string, options?: {
   shouldCreateUser?: boolean;

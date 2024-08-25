@@ -1,7 +1,8 @@
+import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
+import { plusJakartaSans } from './fonts'
 import './globals.css'
-import { cn } from '@/lib/utils'
 
 const fontSans = FontSans({
 	subsets: ['latin'],
@@ -18,9 +19,9 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang="en" className={`${plusJakartaSans.variable} font-sans`} suppressHydrationWarning>
 			<head />
-			<body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>{children}</body>
+			<body className={cn('min-h-screen bg-background font-sans antialiased')}>{children}</body>
 		</html>
 	)
 }

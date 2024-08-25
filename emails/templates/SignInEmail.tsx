@@ -9,7 +9,7 @@ interface SignInEmailProps {
 
 export const SignInEmail: React.FC<SignInEmailProps> = ({ otp, confirmationURL }) => (
   <Layout>
-    <Container className="border border-solid border-gray-200 my-10 mx-auto p-5 max-w-[600px]">
+    <Container className="my-10 mx-auto p-5 max-w-[600px]">
       <Heading className="text-2xl font-bold text-center text-[#f27151] my-8">Welcome to our Event!</Heading>
       <Section className="mb-4">
         <Text className="mb-2">Here&apos;s your one-time password:</Text>
@@ -28,3 +28,5 @@ export const SignInEmail: React.FC<SignInEmailProps> = ({ otp, confirmationURL }
     </Container>
   </Layout>
 );
+
+export default SignInEmail;
