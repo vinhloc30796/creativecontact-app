@@ -32,7 +32,7 @@ export const theme = {
     colors: colors,
     extend: {
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Arial', 'Helvetica', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Century Gothic', 'Arial', 'Helvetica', 'sans-serif'],
       },
       spacing: {
         '1': '4px',

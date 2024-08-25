@@ -19,7 +19,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-plus-jakarta-sans)', 'Plus Jakarta Sans', 'Arial', 'Helvetica', 'sans-serif'],
+        sans: ['var(--font-plus-jakarta-sans)', 'Plus Jakarta Sans', 'Century Gothic', 'Arial', 'Helvetica', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
