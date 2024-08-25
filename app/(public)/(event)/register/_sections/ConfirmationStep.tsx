@@ -23,8 +23,7 @@ export function ConfirmationStep({ formData, slots }: ConfirmationStepProps) {
 	}
 
 	return (
-		<div className="space-y-4">
-			<h3 className="text-lg font-semibold">Please confirm your information:</h3>
+		<div className="space-y-4 mt-2">
 			<p>
 				<strong>Name:</strong> {formData.firstName} {formData.lastName}
 			</p>
