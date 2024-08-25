@@ -67,15 +67,12 @@ function RegistrationContent() {
           <p>Your registration has been successfully confirmed. Thank you for registering!</p>
           {emailStatus === 'sent' && <p>A confirmation email has been sent!</p>}
           {emailStatus === 'error' && <p>There was an error sending the confirmation email...</p>}
-        </div>
-
-        {isLoading ? (
-          <p>Loading user information...</p>
-        ) : (
-          <div className="space-y-2">
-            <p><strong>User ID:</strong> {user?.id || registrationInfo.userId || 'Not available'}</p>
+          <div>
+            <p className="text-muted-foreground text-sm">
+              {isLoading ? 'Loading user information...' : `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+            </p>
           </div>
-        )}
+        </div>
 
         <div className="space-y-2">
           <p>The confirmation email contains the following details:</p>
