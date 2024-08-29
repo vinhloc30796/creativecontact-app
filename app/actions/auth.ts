@@ -1,6 +1,6 @@
 'use server'
 
-import { authUsers } from '@/drizzle/schema'
+import { authUsers } from "@/drizzle/schema/event"
 import { db } from '@/lib/db'
 import { createClient } from '@/utils/supabase/server'
 import { eq } from 'drizzle-orm'

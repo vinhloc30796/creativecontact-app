@@ -3,7 +3,7 @@
 
 import { EventRegistration } from "@/app/types/EventRegistration";
 import { EventSlot } from "@/app/types/EventSlot";
-import { eventSlots } from "@/drizzle/schema";
+import { eventSlots } from "@/drizzle/schema/event";
 import { EventDetailsEmail } from "@/emails/templates/EventDetailsEmail";
 import { db } from "@/lib/db";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
