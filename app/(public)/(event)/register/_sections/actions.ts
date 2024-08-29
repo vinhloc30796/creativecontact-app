@@ -257,7 +257,8 @@ export async function createRegistration(
   const existingRegistration = await checkExistingRegistration(formData.email);
   // default isAnonymous to true, 
   // better to re-confirm the user's email address via sendConfirmationRequestEmail
-  const isAnonymous: boolean = await checkUserIsAnonymous(formData.email) || true;
+  // if null then true; if false then false; if true then true
+  const isAnonymous: boolean = (await checkUserIsAnonymous(formData.email)) ?? true;
   const status = isAnonymous ? "pending" : "confirmed";
 
   // Create or update the registration depending on 
