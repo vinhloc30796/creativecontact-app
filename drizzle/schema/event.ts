@@ -20,6 +20,7 @@ export const authUsers = authSchema.table("users", {
   id: uuid("id").primaryKey(),
   isAnonymous: boolean("is_anonymous").notNull(),
   email: text("email"),
+  emailConfirmedAt: timestamp("email_confirmed_at", { withTimezone: true }),
 });
 
 // Public schema
