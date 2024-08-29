@@ -3,7 +3,7 @@
 import { authUsers } from "@/drizzle/schema/event"
 import { db } from '@/lib/db'
 import { createClient } from '@/utils/supabase/server'
-import { eq } from 'drizzle-orm'
+import { eq, isNotNull } from 'drizzle-orm'
 import { cookies } from 'next/headers'
 
 export async function signInAnonymously() {
@@ -27,13 +27,39 @@ export async function checkUserIsAnonymous(email: string): Promise<boolean | nul
 		.where(eq(authUsers.email, email))
 		.limit(1)
 
+
 	if (result.length === 0) {
 		console.error('User not found')
 		return null
 	}
 
 	const data = result[0]
-	return data?.isAnonymous ?? null
+  const returning = data?.isAnonymous ?? null
+  console.log('checkUserIsAnonymous result', result, 'returning isAnonymous:', returning)
+  return returning
+}
+
+export async function checkUserEmailConfirmed(email: string): Promise<boolean | null> {
+	const result = await db
+		.select({ emailConfirmedAt: authUsers.emailConfirmedAt })
+		.from(authUsers)
+		.where(eq(authUsers.email, email))
+		.limit(1)
+
+  if (result.length === 0) {
+    console.error('User not found')
+    return null
+  } else {
+    const data = result[0]
+    const returning = !(
+      // email is not confirmed if emailConfirmedAt is null
+      data?.emailConfirmedAt === null || 
+      // email is not confirmed if emailConfirmedAt is undefined
+      data?.emailConfirmedAt === undefined
+    );
+    console.log('checkUserEmailConfirmed result', result, 'returning emailConfirmed: ', returning)
+    return returning
+  }
 }
 
 export async function getUserId(email: string): Promise<string | null> {

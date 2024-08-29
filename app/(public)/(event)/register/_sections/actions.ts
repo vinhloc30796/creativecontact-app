@@ -28,7 +28,7 @@ import { cookies } from "next/headers";
 import { Resend } from "resend";
 import { FormData } from "./types";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
-import { checkUserIsAnonymous, getUserId } from "@/app/actions/auth";
+import { checkUserEmailConfirmed, checkUserIsAnonymous, getUserId } from "@/app/actions/auth";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -47,13 +47,25 @@ export async function getRegistrationsForSlots(
   return data as EventRegistration[];
 }
 
-export async function signUpUser(email: string) {
+export async function signUpUser(email: string, isAnonymous: boolean = true) {
   const supabase = createClient();
   const password = Math.random().toString(36).slice(2, 10);
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) {
-    console.error("Error signing up user:", error);
+    console.error("signUpUser: Error signing up user:", error);
     return null;
+  } else if (isAnonymous && data.user) {
+    console.log("signUpUser: Sign up successfully, data is", data)
+    const { data: userData, error: userError } = await adminSupabaseClient.auth.admin.getUserById(data.user.id);
+    if (userError) {
+      console.error("signUpUser: Error fetching user:", userError);
+      return null;
+    }
+    await adminSupabaseClient.auth.admin.updateUserById(data.user.id, {
+      // @ts-ignore -- this works, but Supabase needs to update their types
+      is_anonymous: isAnonymous,
+      email_confirmed_at: null
+    });
   }
   return data.user;
 }
@@ -259,7 +271,8 @@ export async function createRegistration(
   // better to re-confirm the user's email address via sendConfirmationRequestEmail
   // if null then true; if false then false; if true then true
   const isAnonymous: boolean = (await checkUserIsAnonymous(formData.email)) ?? true;
-  const status = isAnonymous ? "pending" : "confirmed";
+  const emailConfirmed: boolean = (await checkUserEmailConfirmed(formData.email)) ?? false;
+  const status = (isAnonymous || !emailConfirmed) ? "pending" : "confirmed";
 
   // Create or update the registration depending on 
   // whether existingRegistration is null
@@ -315,8 +328,8 @@ export async function createRegistration(
       .from(eventSlots)
       .where(eq(eventSlots.id, formData.slot));
     // Handle emails after the DB transaction
-    if (isAnonymous) {
-      console.log(`User ${formData.email} is anonymous, sending confirmation request email`);
+    if (isAnonymous || !emailConfirmed) {
+      console.log(`isAnonymous || !emailConfirmed: ${isAnonymous || !emailConfirmed} - User ${formData.email} is anonymous, or their email is not confirmed, sending confirmation request email`);
       const dateStr = dateFormatter.format(new Date(slotData[0].time_start));
       const timeStartStr = timeslotFormatter.format(new Date(slotData[0].time_start));
       const timeEndStr = timeslotFormatter.format(new Date(slotData[0].time_end));
@@ -330,7 +343,7 @@ export async function createRegistration(
       );
       return { success: true, data: "sendConfirmationRequestEmail", status };
     } else {
-      console.log(`User ${formData.email} is not anonymous, sending confirmation email with ICS file and QR code`);
+      console.log(`User ${formData.email} is not anonymous and their email is confirmed, sending confirmation email with ICS file and QR code`);
       // Send confirmation email with ICS file and QR code
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
