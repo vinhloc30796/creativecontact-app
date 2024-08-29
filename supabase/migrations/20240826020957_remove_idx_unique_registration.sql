@@ -1,5 +1,5 @@
 -- Migration: drop_idx_unique_registration
--- Created at: 2024-08-26 02:00:00
+-- Created at: 2024-08-26 02:09:57
 -- Description: Drops the idx_unique_registration index from the event_registrations table
 
 -- Author: Loc Nguyen <vinhloc30796@gmail.com>
