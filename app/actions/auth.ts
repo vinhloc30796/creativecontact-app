@@ -37,3 +37,13 @@ export async function checkUserIsAnonymous(email: string): Promise<boolean | nul
 
 	return data?.isAnonymous ?? null
 }
+
+export async function getUserId(email: string): Promise<string | null> {
+	const result = await db
+		.select()
+		.from(authUsers)
+		.where(eq(authUsers.email, email))
+		.limit(1);
+
+	return result[0]?.id ?? null
+}

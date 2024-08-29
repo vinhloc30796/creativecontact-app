@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const email = requestUrl.searchParams.get("email");
   const token = requestUrl.searchParams.get("token");
   const type = requestUrl.searchParams.get("type");
+  const ignoreOtpExpired = requestUrl.searchParams.get("ignoreOtpExpired") === "true";
   const redirectTo = requestUrl.searchParams.get("redirect_to") || "/";
 
   if (!token || !type) {
@@ -29,8 +30,12 @@ export async function GET(request: NextRequest) {
     });
 
     if (error) {
-      console.error("Error verifying OTP:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      if (error.message === "OTP expired" && ignoreOtpExpired) {
+        console.log("OTP expired, but ignoring...");
+      } else {
+        console.error("Error verifying OTP:", error);
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
     }
 
     if (data.user && data.session) {
