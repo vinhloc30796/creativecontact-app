@@ -47,7 +47,7 @@ export async function sendConfirmationRequestEmail(
       linkData = linkResponse.data;
       console.log("Magic link confirmation URL:", linkData);
       confirmationURL =
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&type=magiclink&redirect_to=${registrationURL}`;
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&ignoreOtpExpired=true&type=magiclink&redirect_to=${registrationURL}`;
     }
 
     // Send email

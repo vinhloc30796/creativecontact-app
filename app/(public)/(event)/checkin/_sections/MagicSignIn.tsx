@@ -13,6 +13,7 @@ export function MagicSignIn() {
   const [email, setEmail] = useState<string>('');
   const [magicLinkSent, setMagicLinkSent] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const storedCountdown = localStorage.getItem('magicLinkCountdown');
@@ -52,10 +53,16 @@ export function MagicSignIn() {
   }, [magicLinkSent, countdown]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    await handleMagicLinkRequest(e, email, setMagicLinkSent);
-    setCountdown(60);
-    localStorage.setItem('magicLinkCountdown', '60');
-    localStorage.setItem('magicLinkTimestamp', Date.now().toString());
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await handleMagicLinkRequest(e, email, setMagicLinkSent);
+      setCountdown(60);
+      localStorage.setItem('magicLinkCountdown', '60');
+      localStorage.setItem('magicLinkTimestamp', Date.now().toString());
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -84,8 +91,8 @@ export function MagicSignIn() {
               required
             />
           </div>
-          <Button type="submit">
-            Send Magic Link
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? 'Sending...' : 'Send Magic Link'}
           </Button>
         </form>
       )}

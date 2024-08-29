@@ -18,11 +18,12 @@ import { DateSelectionStep } from './DateSelectionStep'
 import { ConfirmationStep } from './ConfirmationStep'
 import { EmailExistedStep } from './EmailExistedStep'
 import { ConfirmationPage } from './ConfirmationPage'
-import { createRegistration, signInAnonymously, checkExistingRegistration, writeUserInfo } from './actions'
+import { createRegistration, checkExistingRegistration, writeUserInfo, signUpUser } from './actions'
 import { createClient } from '@/utils/supabase/client'
 import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
 import { ProfessionalInfoStep } from './ProfessionalInfoStep'
+import { getUserId } from '@/app/actions/auth'
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[]
@@ -209,11 +210,11 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
-    console.log('Submit button clicked')
-    console.log('Current form values:', form.getValues())
-    console.log('Current professional info:', professionalInfoForm.getValues())
-    console.log('isUpdating:', isUpdating)
-    console.log('isSubmitting:', isSubmitting)
+    console.debug('Submit button clicked')
+    console.debug('Current form values:', form.getValues())
+    console.debug('Current professional info:', professionalInfoForm.getValues())
+    console.debug('isUpdating:', isUpdating)
+    console.debug('isSubmitting:', isSubmitting)
 
     if (isSubmitting) {
       console.log('Form is already submitting, returning early')
@@ -242,6 +243,39 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
         ...formData,
         ...professionalInfoData,
       }
+      
+      // Either:
+      // - formData.email is a confirmed email address (getUserId is not null)
+      // - user is logged-in with a confirmed email address, but registering for their friend (we should create a new user)
+      // - user is logged-in anonymously (a user is already created via signInAnonymously)
+      let formUserId: string
+      const dbUserId = await getUserId(formData.email)
+      if (dbUserId) {
+        // we found a user in the database, good, use that
+        formUserId = dbUserId
+      } else if (user?.email == formData.email) {
+        // we didn't find a user in the database,
+        // but we have a logged-in user with a confirmed email address
+        // and it is matching the email we are registering with
+        // so we should use that user
+        formUserId = user.id
+      } else if (user?.email != formData.email) {
+        // we didn't find a user in the database,
+        // and we have a logged-in user with a confirmed email address
+        // but it is not matching the email we are registering with
+        // so they're registering for another user
+        // we should create a new user with the email in the form
+        const newUser = await signUpUser(formData.email)
+        if (newUser) {
+          formUserId = newUser.id
+        } else {
+          throw new Error('Failed to create a new user')
+        }
+      } else {
+        // finally, if we got here, the user is not logged in
+        // so we should use the user.id from signInAnonymously
+        formUserId = user.id
+      }
 
       console.log('Combined data for submission:', combinedData)
 
@@ -252,8 +286,8 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           is_anonymous: isAnonymous,
           existingRegistrationId: isUpdating ? existingRegistration?.id : undefined,
         }),
-        user?.id && isProfessionalInfoValid
-          ? writeUserInfo(user.id, {
+        formUserId && isProfessionalInfoValid
+          ? writeUserInfo(formUserId, {
             industries: combinedData.industries,
             experience: combinedData.experience,
           })
