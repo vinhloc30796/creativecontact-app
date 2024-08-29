@@ -46,7 +46,7 @@ async function UploadPage({ params }: UploadPageProps) {
           <CardTitle>Event Not Found</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-4">The event "{eventSlug}" does not exist. Did you mean one of these?</p>
+          <p className="mb-4">The event &quot;{eventSlug}&quot; does not exist. Did you mean one of these?</p>
           <div className="space-y-2">
             {recentEvents.map((recentEvent) => (
               <Button key={recentEvent.id} asChild variant="outline" className="w-full">
@@ -69,7 +69,7 @@ async function UploadPage({ params }: UploadPageProps) {
         <CardTitle>Upload Files</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="mb-4">Upload files for event: {event.name}</p>
+        <p className="mb-4">Upload files for event: &quot;{event.name}&quot;</p>
         {/* TODO: Implement file upload form and logic */}
         <Button className="w-full" asChild>
           <Link href={emailLink}>Email Us</Link>
