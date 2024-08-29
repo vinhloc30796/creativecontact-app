@@ -2,7 +2,7 @@
 
 import { confirmRegistration } from "@/app/(public)/(event)/register/_sections/actions";
 import { sendConfirmationEmailWithICSAndQR } from "@/app/actions/email/registration"; // Adjust the import path as necessary
-import { eventRegistrations, eventSlots } from "@/drizzle/schema";
+import { eventRegistrations, eventSlots } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";

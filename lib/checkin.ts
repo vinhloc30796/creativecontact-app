@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { eventRegistrationLogs, eventRegistrations } from "@/drizzle/schema";
+import { eventRegistrationLogs, eventRegistrations } from "@/drizzle/schema/event";
 
 type RegistrationStatus = "pending" | "confirmed" | "checked-in" | "cancelled";
 

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { eventRegistrations, eventSlots, events } from "@/drizzle/schema";
+import { eventRegistrations, eventSlots, events } from "@/drizzle/schema/event";
 import { createClient } from "@/utils/supabase/server";
 
 // Define the schema for input validation

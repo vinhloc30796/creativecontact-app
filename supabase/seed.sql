@@ -133,8 +133,17 @@ INSERT INTO events (id, created_at, name, slug, created_by)
 VALUES (
     '10177076-f591-49c8-a87d-042ba7aa6345', -- Random UUID
     CURRENT_TIMESTAMP, -- Current timestamp
-    'Summer Tech Conference 2024',
-    'summer-tech-conf-2024',
+    'Hoàn Tất 2024',
+    'hoantat-2024',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
+);
+
+INSERT INTO events (id, created_at, name, slug, created_by)
+VALUES (
+    '9419ee07-81ed-4114-8143-1fff084d019a', -- Random UUID
+    CURRENT_TIMESTAMP, -- Current timestamp
+    'Trung Thu Creative Archive 2024',
+    'trungthu-creative-archive-2024',
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
 );
 
@@ -275,4 +284,43 @@ INSERT INTO event_registrations (
     'john.doe@example.com',                 -- email
     '+1234567890',                          -- phone
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==' -- qr_code (dummy base64 encoded image)
+);
+
+-- Seed artworks table
+INSERT INTO artworks (
+    id,
+    created_at,
+    title,
+    description,
+    max_assets
+) VALUES (
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    CURRENT_TIMESTAMP,
+    'Cosmic Harmony',
+    'An abstract representation of the universe''s interconnectedness',
+    5
+);
+
+-- Seed artwork_credits table
+INSERT INTO artwork_credits (
+    id,
+    artwork_id,
+    user_id,
+    role
+) VALUES (
+    'c7e9a123-3d45-4b8a-9f67-1e8d2f3a4b5c',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    '13f60da9-8dd4-42f9-8a57-c0569a158857',
+    'Artist'
+);
+
+-- Seed artwork_events table
+INSERT INTO artwork_events (
+    id,
+    artwork_id,
+    event_id
+) VALUES (
+    '72ac8c15-c9f2-4faa-b9f9-397e0b35fb92',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    '9419ee07-81ed-4114-8143-1fff084d019a'
 );

@@ -19,7 +19,7 @@ import {
   ExperienceType,
   IndustryType,
   userInfos,
-} from "@/drizzle/schema";
+} from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";

@@ -2,7 +2,7 @@ import RegisterPage from './_sections/_register'
 import { EventSlot } from '@/app/types/EventSlot'
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm'
-import { eventSlots } from '@/drizzle/schema'
+import { eventSlots } from "@/drizzle/schema/event"
 
 async function getEventSlots(event: string): Promise<EventSlot[]> {
 	console.log('Pulling event slots for event', event)

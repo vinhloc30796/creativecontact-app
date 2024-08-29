@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
-import { eventSlots } from '@/drizzle/schema';
+import { eventSlots } from "@/drizzle/schema/event";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
