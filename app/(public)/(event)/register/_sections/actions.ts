@@ -28,6 +28,7 @@ import { cookies } from "next/headers";
 import { Resend } from "resend";
 import { FormData } from "./types";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
+import { checkUserIsAnonymous } from "@/app/actions/auth";
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
@@ -242,9 +243,13 @@ export async function createRegistration(
 ): Promise<RegistrationResult> {
   console.debug("Creating registration with data:", formData);
   const existingRegistration = await checkExistingRegistration(formData.email);
-  const isAnonymous: boolean = formData.is_anonymous;
+  // default isAnonymous to true, 
+  // better to re-confirm the user's email address via sendConfirmationRequestEmail
+  const isAnonymous: boolean = await checkUserIsAnonymous(formData.email) || true;
   const status = isAnonymous ? "pending" : "confirmed";
 
+  // Create or update the registration depending on 
+  // whether existingRegistration is null
   try {
     const dbResult: any = await db.transaction(async (tx) => {
       let registrationResult: EventRegistration;
@@ -265,12 +270,10 @@ export async function createRegistration(
           .returning();
         registrationResult = updateResult.map((r) => ({
           ...r,
-          // map id
-          id: r.id as `${string}-${string}-${string}-${string}-${string}`,
-          created_by: r
-            .created_by as `${string}-${string}-${string}-${string}-${string}`,
-          slot: r.slot as `${string}-${string}-${string}-${string}-${string}`,
-        }))[0];
+          id: r.id,
+          created_by: r.created_by,
+          slot: r.slot,
+        } as EventRegistration))[0];
       } else {
         // Insert new registration
         const name: string = `${formData.lastName} ${formData.firstName}`;
@@ -291,19 +294,13 @@ export async function createRegistration(
           insertResult.map((r) => (r as EventRegistration))[0];
       }
 
-      // Update auth.users -- set isAnonymous to false if the user is no longer anonymous
-      await tx.update(authUsers)
-        .set({ isAnonymous: isAnonymous })
-        // @ts-ignore
-        .where(eq(authUsers.id, formData.created_by));
-
       return { success: true, registrationResult, status };
     });
 
-    // Find the slot data
+    // Send the emails by first finding the slot data
     const slotData = await db.select()
-    .from(eventSlots)
-    .where(eq(eventSlots.id, formData.slot));
+      .from(eventSlots)
+      .where(eq(eventSlots.id, formData.slot));
     // Handle emails after the DB transaction
     if (isAnonymous) {
       const dateStr = dateFormatter.format(new Date(slotData[0].time_start));
