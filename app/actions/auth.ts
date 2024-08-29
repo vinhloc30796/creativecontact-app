@@ -27,14 +27,12 @@ export async function checkUserIsAnonymous(email: string): Promise<boolean | nul
 		.where(eq(authUsers.email, email))
 		.limit(1)
 
-	const data = result[0]
-	const error = result.length === 0 ? new Error('User not found') : true
-
-	if (error) {
-		console.error('Error checking if user is anonymous:', error)
+	if (result.length === 0) {
+		console.error('User not found')
 		return null
 	}
 
+	const data = result[0]
 	return data?.isAnonymous ?? null
 }
 

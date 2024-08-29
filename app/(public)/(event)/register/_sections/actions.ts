@@ -316,6 +316,7 @@ export async function createRegistration(
       .where(eq(eventSlots.id, formData.slot));
     // Handle emails after the DB transaction
     if (isAnonymous) {
+      console.log(`User ${formData.email} is anonymous, sending confirmation request email`);
       const dateStr = dateFormatter.format(new Date(slotData[0].time_start));
       const timeStartStr = timeslotFormatter.format(new Date(slotData[0].time_start));
       const timeEndStr = timeslotFormatter.format(new Date(slotData[0].time_end));
@@ -329,6 +330,7 @@ export async function createRegistration(
       );
       return { success: true, data: "sendConfirmationRequestEmail", status };
     } else {
+      console.log(`User ${formData.email} is not anonymous, sending confirmation email with ICS file and QR code`);
       // Send confirmation email with ICS file and QR code
       await sendConfirmationEmailWithICSAndQR(
         formData.email,
