@@ -1,5 +1,5 @@
 -- Migration: create_artworks_and_related_tables
--- Created at: 2024-03-14 10:00:00
+-- Created at: 2024-08-29 07:09:35
 -- Description: Creates tables for artworks, artwork_credits, artwork_events, and artwork_assets
 
 -- Author: Loc Nguyen <vinhloc30796@gmail.com>
