@@ -82,6 +82,16 @@ function RegistrationContent() {
             <li>Any required materials or preparation</li>
             <li>Contact information for event organizers</li>
           </ul>
+          <p className="font-bold">
+            Please show us this QR code to the event organizers for check-in.
+          </p>
+          <p >
+            You can also self-check-in here on the day of the event: &nbsp;
+            <Link className='underline'
+              href={`https://app.creativecontact.com/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}`}>
+                /checkin
+            </Link>
+          </p>
         </div>
 
         <div className="bg-gray-100 p-4 rounded-md space-y-4">
