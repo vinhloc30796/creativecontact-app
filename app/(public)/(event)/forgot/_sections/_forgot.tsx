@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import styles from './_fotgot.module.scss'
 import { cn } from '@/lib/utils'
 import ForgotForm from './ForgotForm'
-import { BackgroundDiv } from '@/app/components/BackgroundDiv';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 interface ForgotPageProps {}
 

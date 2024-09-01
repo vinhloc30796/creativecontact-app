@@ -15,7 +15,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { login } from './actions';
-import { BackgroundDiv } from '@/app/components/BackgroundDiv';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),

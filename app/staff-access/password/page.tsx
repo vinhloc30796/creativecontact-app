@@ -2,7 +2,7 @@
 
 'use client'
 
-import { BackgroundDiv } from '@/app/components/BackgroundDiv'
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'

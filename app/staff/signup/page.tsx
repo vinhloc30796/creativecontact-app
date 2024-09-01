@@ -13,7 +13,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { signup } from './actions';
-import { BackgroundDiv } from "@/app/components/BackgroundDiv";
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),

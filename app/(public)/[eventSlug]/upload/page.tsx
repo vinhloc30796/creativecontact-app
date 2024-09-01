@@ -1,4 +1,4 @@
-import { BackgroundDiv } from "@/app/components/BackgroundDiv";
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { events } from "@/drizzle/schema/event";

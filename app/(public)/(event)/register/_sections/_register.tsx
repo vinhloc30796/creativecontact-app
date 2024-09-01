@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import RegisterWrapper from './wrapper'
 import { EventSlot } from '@/app/types/EventSlot'
 import RegistrationForm from './RegistrationForm'
-import { BackgroundDiv } from '@/app/components/BackgroundDiv';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 interface RegisterPageProps {
 	eventSlots: EventSlot[]

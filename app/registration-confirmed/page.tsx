@@ -11,7 +11,7 @@ import QRCode from "qrcode";
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import QRCodeWithHover from './QRCodeWithHover';
-import { BackgroundDiv } from '@/app/components/BackgroundDiv';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 function RegistrationContent() {
   const { user, isLoading } = useAuth();

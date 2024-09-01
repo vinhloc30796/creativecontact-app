@@ -11,7 +11,7 @@ import Link from 'next/link';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import { AlertCircle } from 'lucide-react';
 import { NextResponse } from 'next/server';
-import { BackgroundDiv } from '@/app/components/BackgroundDiv';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 export default function RegistrationError() {
   const supabase = createClient();

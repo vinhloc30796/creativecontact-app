@@ -5,7 +5,7 @@ import styles from './_checkin.module.scss'
 import { SuspenseEventLog } from './SuspenseEventLog'
 import QRScanButton from './QRScanButton'
 import SuspenseManualSearch from './SuspenseManualSearch'
-import { BackgroundDiv } from '@/app/components/BackgroundDiv';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 interface CheckinPageProps {
   userEmail: string;

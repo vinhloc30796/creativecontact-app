@@ -5,7 +5,7 @@ import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import styles from './_checkin.module.scss';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { BackgroundDiv } from '@/app/components/BackgroundDiv';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 interface CheckInContainerProps {
   children: ReactNode;
