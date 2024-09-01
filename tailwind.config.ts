@@ -1,13 +1,13 @@
 import type { Config } from "tailwindcss"
 
 const config = {
-  darkMode: ["class"],
+  darkMode: ["class", '[data-theme="trungthu-archive-2024"]'],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   prefix: "",
   theme: {
     container: {
@@ -55,6 +55,50 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'cc-rose': {
+          DEFAULT: '#ff257c',
+          50: '#fff1f7',
+          100: '#ffdbe9',
+          200: '#ffb6d3',
+          300: '#ff92be',
+          400: '#ff6ea8',
+          500: '#ff4992',
+          600: '#fe0065',
+          700: '#d80056',
+          800: '#b20047',
+          900: '#8c0038',
+          1000: '#660029',
+        },
+        'cc-cornell-red': {
+          DEFAULT: '#b70711',
+          50: '#ffebee',
+          100: '#ffc9d5',
+          200: '#ffa6bf',
+          300: '#ff83aa',
+          400: '#ff6095',
+          500: '#ff3d80',
+          600: '#ff005d',
+          700: '#d80056',
+          800: '#b20047',
+          900: '#8c0038',
+          1000: '#660029',
+        },
+        'cc-fuchsia-neutral': {
+          DEFAULT: '#f4dcea', // base-white
+          100: '#ebbed8',
+          200: '#e1a0c5',
+          300: '#d882b3',
+          400: '#ce649f',
+          500: '#c4478c',
+          600: '#ad3776',
+          700: '#8f2e60',
+          800: '#712449',
+          900: '#541b33',
+          1000: '#37121e',
+          base_white: '#f4dcea',
+          base_black: '#1C0909',
+        },
+        
       },
       borderRadius: {
         lg: "var(--radius)",

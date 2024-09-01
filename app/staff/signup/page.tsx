@@ -13,6 +13,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { signup } from './actions';
+import { BackgroundDiv } from "@/app/components/BackgroundDiv";
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -62,7 +63,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <BackgroundDiv>
       <Card className="w-full max-w-md">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -136,6 +137,6 @@ export default function SignupPage() {
           </form>
         </Form>
       </Card>
-    </div>
+    </BackgroundDiv>
   );
 }

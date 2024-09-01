@@ -11,6 +11,7 @@ import Link from 'next/link';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import { AlertCircle } from 'lucide-react';
 import { NextResponse } from 'next/server';
+import { BackgroundDiv } from '@/app/components/BackgroundDiv';
 
 export default function RegistrationError() {
   const supabase = createClient();
@@ -23,7 +24,7 @@ export default function RegistrationError() {
   };
 
   return (
-    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
+    <BackgroundDiv>
       <Card className="w-[400px] overflow-hidden relative z-10">
         <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
           style={{
@@ -73,6 +74,6 @@ export default function RegistrationError() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </BackgroundDiv>
   );
 }

@@ -1,20 +1,20 @@
 import { Card, CardContent } from '@/components/ui/card'
-import RegisterWrapper from '../../register/_sections/wrapper'
 import styles from './_fotgot.module.scss'
 import { cn } from '@/lib/utils'
 import ForgotForm from './ForgotForm'
+import { BackgroundDiv } from '@/app/components/BackgroundDiv';
 
 interface ForgotPageProps {}
 
 const ForgotPage = ({}: ForgotPageProps) => {
 	return (
-		<div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
+		<BackgroundDiv>
 			<Card className="w-[400px] overflow-hidden relative z-10">
 				<CardContent className="p-6">
 					<ForgotForm />
 				</CardContent>
 			</Card>
-		</div>
+		</BackgroundDiv>
 	)
 }
 

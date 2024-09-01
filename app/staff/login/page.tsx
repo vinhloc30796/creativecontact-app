@@ -15,6 +15,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { login } from './actions';
+import { BackgroundDiv } from '@/app/components/BackgroundDiv';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -70,7 +71,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <BackgroundDiv>
       <Card className="w-full max-w-md">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -143,6 +144,6 @@ export default function LoginPage() {
           </form>
         </Form>
       </Card>
-    </div>
+    </BackgroundDiv>
   );
 }

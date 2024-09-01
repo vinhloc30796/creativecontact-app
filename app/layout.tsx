@@ -1,13 +1,8 @@
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
-import { Inter as FontSans } from 'next/font/google'
 import { plusJakartaSans } from './fonts'
 import './globals.css'
-
-const fontSans = FontSans({
-	subsets: ['latin'],
-	variable: '--font-sans',
-})
+import { ThemeProvider } from '@/components/themes/theme-provider'
 
 export const metadata: Metadata = {
 	title: 'Creative Contact',
@@ -21,7 +16,11 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={`${plusJakartaSans.variable} font-sans`} suppressHydrationWarning>
 			<head />
-			<body className={cn('min-h-screen bg-background font-sans antialiased')}>{children}</body>
+			<body className={cn('min-h-screen bg-background font-sans antialiased')}>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+      </body>
 		</html>
 	)
 }

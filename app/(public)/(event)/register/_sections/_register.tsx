@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import RegisterWrapper from './wrapper'
 import { EventSlot } from '@/app/types/EventSlot'
 import RegistrationForm from './RegistrationForm'
+import { BackgroundDiv } from '@/app/components/BackgroundDiv';
 
 interface RegisterPageProps {
 	eventSlots: EventSlot[]
@@ -10,11 +11,11 @@ interface RegisterPageProps {
 
 const RegisterPage = ({ eventSlots }: RegisterPageProps) => {
 	return (
-		<div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
+		<BackgroundDiv>
 			<RegisterWrapper>
 				<RegistrationForm initialEventSlots={eventSlots} />
 			</RegisterWrapper>
-		</div>
+		</BackgroundDiv>
 	)
 }
 

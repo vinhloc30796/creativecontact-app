@@ -1,4 +1,3 @@
-// File: app/staff/checkin/_sections/page.tsx
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from '@/lib/utils'
@@ -6,6 +5,7 @@ import styles from './_checkin.module.scss'
 import { SuspenseEventLog } from './SuspenseEventLog'
 import QRScanButton from './QRScanButton'
 import SuspenseManualSearch from './SuspenseManualSearch'
+import { BackgroundDiv } from '@/app/components/BackgroundDiv';
 
 interface CheckinPageProps {
   userEmail: string;
@@ -13,18 +13,15 @@ interface CheckinPageProps {
 
 export default async function CheckinPage({ userEmail }: CheckinPageProps) {
   return (
-    <div className={cn('min-h-screen container flex items-center justify-center bg-slate-50', styles.container)}>
+    <BackgroundDiv>
       <Card className="w-[400px] overflow-hidden relative z-10">
         <CardHeader className="border-b">
-          <div className="flex gap-4 items-center">
-            <div className="aspect-square border rounded w-20 flex-shrink-0" style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}></div>
-            <div className="flex flex-col">
-              <CardTitle className="text-xl font-bold">Check-in for Event</CardTitle>
-              <div className="flex items-center justify-between">
-                <CardDescription className="text-muted-foreground">
-                  {userEmail ? `Logged in as: ${userEmail}` : 'User info not available'}
-                </CardDescription>
-              </div>
+          <div className="flex flex-col">
+            <CardTitle className="text-xl font-bold">Check-in for Event</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardDescription className="text-muted-foreground">
+                {userEmail ? `Logged in as: ${userEmail}` : 'User info not available'}
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -55,6 +52,6 @@ export default async function CheckinPage({ userEmail }: CheckinPageProps) {
           </form>
         </CardFooter>
       </Card>
-    </div>
+    </BackgroundDiv>
   )
 }
