@@ -8,7 +8,7 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "localhost:3000";
 export const Footer: React.FC = () => (
   <Section className="mt-2">
     <Img
-      src={`${baseUrl}/HoanTatProject-background-20240822.png`}
+      src={`${baseUrl}/hoantat-2024-background.png`}
       alt="Hoan Tat Project - Footer Banner"
       className="w-full h-auto my-8"
     />
