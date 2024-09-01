@@ -42,7 +42,7 @@ async function UploadPage({ params }: UploadPageProps) {
     });
 
     return (
-      <BackgroundDiv>
+      <BackgroundDiv eventSlug={eventSlug}>
         <Card className="w-[350px] mx-auto mt-10">
           <CardHeader
             className="border-b aspect-video bg-accent-foreground text-accent-foreground"
@@ -73,7 +73,7 @@ async function UploadPage({ params }: UploadPageProps) {
   const emailLink = createEmailLink(event);
 
   return (
-    <BackgroundDiv>
+    <BackgroundDiv eventSlug={eventSlug}>
       <Card className="w-[350px] mx-auto mt-10">
         <CardHeader
           className="border-b aspect-video bg-accent-foreground text-accent-foreground"
