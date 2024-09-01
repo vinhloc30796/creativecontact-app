@@ -1,7 +1,6 @@
 import styles from './_register.module.scss'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 interface RegisterWrapperProps {
 	children: React.ReactNode
@@ -13,7 +12,7 @@ const RegisterWrapper: React.FC<RegisterWrapperProps> = ({ children }) => {
 			<CardHeader
 				className="border-b aspect-video bg-accent-foreground text-accent-foreground"
 				style={{
-					backgroundImage: 'url(/HoanTatProject-background-20240822.png)',
+					backgroundImage: 'url(/hoantat-2024-background.png)',
 					backgroundSize: 'cover',
 				}}
 			></CardHeader>

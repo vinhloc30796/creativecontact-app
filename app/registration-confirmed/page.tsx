@@ -11,6 +11,7 @@ import QRCode from "qrcode";
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import QRCodeWithHover from './QRCodeWithHover';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 function RegistrationContent() {
   const { user, isLoading } = useAuth();
@@ -54,7 +55,7 @@ function RegistrationContent() {
     <Card className="w-[400px] overflow-hidden relative z-10">
       <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
         style={{
-          backgroundImage: 'url(/HoanTatProject-background-20240822.png)',
+          backgroundImage: 'url(/hoantat-2024-background.png)',
           backgroundSize: 'cover',
         }}
       />
@@ -117,10 +118,10 @@ function RegistrationContent() {
 
 export default function RegistrationConfirmed() {
   return (
-    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
+    <BackgroundDiv>
       <Suspense fallback={<div>Loading...</div>}>
         <RegistrationContent />
       </Suspense>
-    </div>
+    </BackgroundDiv>
   );
 }

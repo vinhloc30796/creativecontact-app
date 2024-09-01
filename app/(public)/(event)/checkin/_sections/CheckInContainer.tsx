@@ -5,6 +5,7 @@ import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import styles from './_checkin.module.scss';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 interface CheckInContainerProps {
   children: ReactNode;
@@ -12,11 +13,11 @@ interface CheckInContainerProps {
 
 export function CheckInContainer({ children }: CheckInContainerProps) {
   return (
-    <div className={cn('min-h-screen flex items-center justify-center', styles.container)} style={{ backgroundImage: 'url(/HoanTatProject-background-blur.png)', backgroundSize: 'cover' }}>
+    <BackgroundDiv className={cn(styles.container)}>
       <Card className="w-[400px] overflow-hidden relative z-10">
         <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
           style={{
-            backgroundImage: 'url(/HoanTatProject-background-20240822.png)',
+            backgroundImage: 'url(/hoantat-2024-background.png)',
             backgroundSize: 'cover',
           }}
         />
@@ -24,6 +25,6 @@ export function CheckInContainer({ children }: CheckInContainerProps) {
           {children}
         </CardContent>
       </Card>
-    </div>
+    </BackgroundDiv>
   );
 }

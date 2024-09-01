@@ -1,3 +1,4 @@
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { events } from "@/drizzle/schema/event";
@@ -41,41 +42,57 @@ async function UploadPage({ params }: UploadPageProps) {
     });
 
     return (
-      <Card className="w-[350px] mx-auto mt-10">
-        <CardHeader>
-          <CardTitle>Event Not Found</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4">The event &quot;{eventSlug}&quot; does not exist. Did you mean one of these?</p>
-          <div className="space-y-2">
-            {recentEvents.map((recentEvent) => (
-              <Button key={recentEvent.id} asChild variant="outline" className="w-full">
-                <Link href={`/${recentEvent.slug}/upload`}>
-                  {recentEvent.name}
-                </Link>
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <BackgroundDiv eventSlug={eventSlug}>
+        <Card className="w-[350px] mx-auto mt-10">
+          <CardHeader
+            className="border-b aspect-video bg-accent-foreground text-accent-foreground"
+            style={{
+              backgroundImage: `url(/${eventSlug}-background.png)`,
+              backgroundSize: 'cover',
+            }}
+          >
+          </CardHeader>
+          <CardContent className='p-6 flex flex-col gap-2'>
+            <CardTitle>Event Not Found</CardTitle>
+            <p className="mb-4">The event &quot;{eventSlug}&quot; does not exist. Did you mean one of these?</p>
+            <div className="space-y-2">
+              {recentEvents.map((recentEvent) => (
+                <Button key={recentEvent.id} asChild variant="outline" className="w-full">
+                  <Link href={`/${recentEvent.slug}/upload`}>
+                    {recentEvent.name}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </BackgroundDiv>
     );
   }
 
   const emailLink = createEmailLink(event);
 
   return (
-    <Card className="w-[350px] mx-auto mt-10">
-      <CardHeader>
-        <CardTitle>Upload Files</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="mb-4">Upload files for event: &quot;{event.name}&quot;</p>
-        {/* TODO: Implement file upload form and logic */}
-        <Button className="w-full" asChild>
-          <Link href={emailLink}>Email Us</Link>
-        </Button>
-      </CardContent>
-    </Card>
+    <BackgroundDiv eventSlug={eventSlug}>
+      <Card className="w-[350px] mx-auto mt-10">
+        <CardHeader
+          className="border-b aspect-video bg-accent-foreground text-accent-foreground"
+          style={{
+            backgroundImage: `url(/${eventSlug}-background.png)`,
+            backgroundSize: 'cover',
+          }}
+        >
+        </CardHeader>
+        <CardContent className='p-6 flex flex-col gap-2'>
+          <CardTitle>Upload Files</CardTitle>
+          <p className="mb-4">Upload files for event: &quot;{event.name}&quot;</p>
+          {/* TODO: Implement file upload form and logic */}
+          <Button className="w-full" asChild>
+            <Link href={emailLink}>Email Us</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </BackgroundDiv>
   );
 };
 
