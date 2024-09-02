@@ -3,18 +3,15 @@
 "use client";
 
 import React from 'react';
-import { createClient } from '@/utils/supabase/client';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import styles from '../(public)/(event)/checkin/_sections/_checkin.module.scss';
 import { AlertCircle } from 'lucide-react';
-import { NextResponse } from 'next/server';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 export default function RegistrationError() {
-  const supabase = createClient();
 
   const handleRetry = async () => {
     // Redirect to registration page

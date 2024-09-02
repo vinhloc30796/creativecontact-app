@@ -1,6 +1,8 @@
-import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { MediaUpload } from "@/components/uploads/media-upload";
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { events } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
@@ -85,9 +87,12 @@ async function UploadPage({ params }: UploadPageProps) {
         </CardHeader>
         <CardContent className='p-6 flex flex-col gap-2'>
           <CardTitle>Upload Files</CardTitle>
-          <p className="mb-4">Upload files for event: &quot;{event.name}&quot;</p>
-          {/* TODO: Implement file upload form and logic */}
-          <Button className="w-full" asChild>
+          <p className="mb-4">&quot;{event.name}&quot;</p>
+          <MediaUpload />
+          {/* Display: separator, then "Alternatively, email us" */}
+          <Separator className="my-4" />
+          <p className="text-sm text-foreground mb-2">Alternatively, you can email us:</p>
+          <Button variant="outline" className="w-full" asChild>
             <Link href={emailLink}>Email Us</Link>
           </Button>
         </CardContent>

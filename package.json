@@ -1,5 +1,5 @@
 {
-	"name": "creative-contact-prealpha",
+	"name": "creativecontact-app",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
@@ -7,6 +7,7 @@
 		"email": "email dev",
 		"email:build": "email build",
 		"build": "next build",
+		"test": "next test",
 		"start": "next start",
 		"lint": "next lint",
 		"db:migrate": "node -r esbuild-register db/migrate.ts"
@@ -28,8 +29,8 @@
 		"@react-email/hr": "0.0.10",
 		"@react-email/img": "0.0.10",
 		"@react-email/tailwind": "0.1.0",
-		"@supabase/ssr": "^0.4.0",
-		"@supabase/supabase-js": "^2.45.0",
+		"@supabase/ssr": "^0.5.1",
+		"@supabase/supabase-js": "^2.45.3",
 		"@tanstack/react-table": "^8.20.1",
 		"@types/ical": "^0.8.3",
 		"autoprefixer": "^10.4.20",
@@ -50,6 +51,7 @@
 		"react": "^18",
 		"react-day-picker": "^8.9.1",
 		"react-dom": "^18",
+		"react-dropzone": "^14.2.3",
 		"react-email": "3.0.1",
 		"react-hook-form": "^7.52.2",
 		"resend": "^3.5.0",
