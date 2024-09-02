@@ -24,6 +24,7 @@ import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
 import { ProfessionalInfoStep } from './ProfessionalInfoStep'
 import { getUserId } from '@/app/actions/auth'
+import { adminSupabaseClient } from '@/utils/supabase/server-admin'
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[]
@@ -264,12 +265,13 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
         // and we have a logged-in user with a confirmed email address
         // but it is not matching the email we are registering with
         // so they're registering for another user
-        // we should create a new user with the email in the form
-        const newUser = await signUpUser(formData.email)
+        // we should create an anonymous user 
+        // then update that user with the email and professional info from the form
+        const newUser = await signUpUser(formData.email, true);
         if (newUser) {
           formUserId = newUser.id
         } else {
-          throw new Error('Failed to create a new user')
+          throw new Error('Failed to create a new anonymous user');
         }
       } else {
         // finally, if we got here, the user is not logged in
