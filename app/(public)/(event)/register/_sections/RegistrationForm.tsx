@@ -19,7 +19,6 @@ import { ConfirmationStep } from './ConfirmationStep'
 import { EmailExistedStep } from './EmailExistedStep'
 import { ConfirmationPage } from './ConfirmationPage'
 import { createRegistration, checkExistingRegistration, writeUserInfo, signUpUser } from './actions'
-import { createClient } from '@/utils/supabase/client'
 import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
 import { ProfessionalInfoStep } from './ProfessionalInfoStep'
