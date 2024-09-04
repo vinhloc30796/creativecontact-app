@@ -2,24 +2,25 @@
 
 "use client";
 
-import { ArtworkInfoData, artworkInfoSchema } from '@/app/form-schemas/artwork-info';
-import { ContactInfoData, contactInfoSchema } from '@/app/form-schemas/contact-info';
-import { ProfessionalInfoData, professionalInfoSchema } from '@/app/form-schemas/professional-info';
-import { ArtworkInfoStep } from '@/components/artwork/ArtworkInfoStep';
+import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
+import { ContactInfoData, contactInfoSchema } from "@/app/form-schemas/contact-info";
+import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas/professional-info";
+import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from '@/components/ui/progress';
+import { Progress } from "@/components/ui/progress";
 import { MediaUpload } from "@/components/uploads/media-upload";
-import { ContactInfoStep } from '@/components/user/ContactInfoStep';
-import { ProfessionalInfoStep } from '@/components/user/ProfessionalInfoStep';
+import { ContactInfoStep } from "@/components/user/ContactInfoStep";
+import { ProfessionalInfoStep } from "@/components/user/ProfessionalInfoStep";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { useArtwork, ArtworkProvider } from '@/contexts/ArtworkContext';
-import { useAuth } from '@/hooks/useAuth';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useState, useCallback, useMemo } from 'react';
-import { FormProvider, useForm, UseFormReturn } from 'react-hook-form';
-import { v4 as uuidv4 } from 'uuid';
+import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
+import { useAuth } from "@/hooks/useAuth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useState } from "react";
+import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import { loadArtwork } from "./actions";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -46,7 +47,7 @@ function createEmailLink(event: {
   const emailSubject = `Upload Files for Event: ${event.name}`;
   const emailBody = `Hi Creative Contact,
 
-  I'd like to upload files for the event "${event.name}".`
+  I"d like to upload files for the event "${event.name}".`
   return `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 }
 
@@ -59,11 +60,11 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
             className="border-b aspect-video bg-accent-foreground text-accent-foreground"
             style={{
               backgroundImage: `url(/${eventSlug}-background.png)`,
-              backgroundSize: 'cover',
+              backgroundSize: "cover",
             }}
           >
           </CardHeader>
-          <CardContent className='p-6 flex flex-col gap-2'>
+          <CardContent className="p-6 flex flex-col gap-2">
             <CardTitle>Event Not Found</CardTitle>
             <p className="mb-4">The event &quot;{eventSlug}&quot; does not exist. Did you mean one of these?</p>
             <div className="space-y-2">
@@ -89,22 +90,23 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   // States
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
+  const [artworkAssets, setArtworkAssets] = useState<{ id: string; path: string; fullPath: string; }[]>([]);
   // Form setup
   const [formStep, setFormStep] = useState(0);
   const contactInfoForm = useForm<ContactInfoData>({
     resolver: zodResolver(contactInfoSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
-      email: '',
-      firstName: '',
-      lastName: '',
-      phone: '',
+      email: "",
+      firstName: "",
+      lastName: "",
+      phone: "",
     },
   });
 
   const professionalInfoForm = useForm<ProfessionalInfoData>({
     resolver: zodResolver(professionalInfoSchema),
-    mode: 'onSubmit',
+    mode: "onSubmit",
     defaultValues: {
       industries: [],
       experience: undefined,
@@ -113,11 +115,11 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
 
   const artworkForm = useForm<ArtworkInfoData>({
     resolver: zodResolver(artworkInfoSchema),
-    mode: 'onSubmit',
+    mode: "onSubmit",
     defaultValues: {
-      uuid: currentArtwork?.uuid || '',
-      title: currentArtwork?.title || '',
-      description: currentArtwork?.description || '',
+      uuid: currentArtwork?.uuid || "",
+      title: currentArtwork?.title || "",
+      description: currentArtwork?.description || "",
     },
   });
 
@@ -133,9 +135,9 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     }
     addArtwork(processedData);
     setCurrentArtwork(processedData);
-    artworkForm.setValue('uuid', processedData.uuid);
-    artworkForm.setValue('title', processedData.title);
-    artworkForm.setValue('description', processedData.description);
+    artworkForm.setValue("uuid", processedData.uuid);
+    artworkForm.setValue("title", processedData.title);
+    artworkForm.setValue("description", processedData.description);
     setArtworkUUID(processedData.uuid); // Update artworkUUID state
   };
 
@@ -148,45 +150,75 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     });
   };
 
+  const handleAssetUpload = (
+    results: { id: string; path: string; fullPath: string; }[],
+    errors: { message: string }[]
+  ) => {
+    console.log("results", results);
+    console.log("errors", errors);
+    if (errors.length > 0) {
+      console.error("errors", errors);
+    }
+    setArtworkAssets(results);
+  };
+
+  const handleValidation = async () => {
+    const contactInfoResult = await contactInfoForm.trigger();
+    console.log("contactInfoForm", contactInfoForm.formState.errors);
+    const professionalInfoResult = await professionalInfoForm.trigger();
+    console.log("professionalInfoForm", professionalInfoForm.formState.errors);
+    const artworkResult = await artworkForm.trigger();
+    console.log("artworkForm", artworkForm.formState.errors);
+    return contactInfoResult && professionalInfoResult && artworkResult;
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const contactInfoResult = await contactInfoForm.trigger();
-      console.log('contactInfoForm', contactInfoForm.formState.errors);
-      const professionalInfoResult = await professionalInfoForm.trigger();
-      console.log('professionalInfoForm', professionalInfoForm.formState.errors);
-      const artworkResult = await artworkForm.trigger();
-      console.log('artworkForm', artworkForm.formState.errors);
-      return contactInfoResult && professionalInfoResult && artworkResult;
+      const isValid = await handleValidation();
+      if (!isValid) return false;
+
+      const artworkData = artworkForm.getValues();
+      const result = await loadArtwork(
+        user?.id!,
+        artworkData, 
+        artworkAssets
+      );
+
+      console.log("Submission successful:", result);
+      return true;
     } catch (error) {
-      console.error('error', error);
+      console.error("error", error);
+      return false;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const steps = [
     {
-      title: 'Contact Information',
-      description: 'Please provide your contact information',
+      title: "Contact Information",
+      description: "Please provide your contact information",
       component: <ContactInfoStep form={contactInfoForm} />,
       form: contactInfoForm,
       handlePreSubmit: async (data: ContactInfoData) => {
         // Add any custom logic for contact info submission
-        console.log('Contact info submitted:', data);
+        console.log("Contact info submitted:", data);
       },
     },
     {
-      title: 'Professional Information',
-      description: 'Please provide your professional information',
+      title: "Professional Information",
+      description: "Please provide your professional information",
       component: <ProfessionalInfoStep form={professionalInfoForm} />,
       form: professionalInfoForm,
       handlePreSubmit: async (data: ProfessionalInfoData) => {
         // Add any custom logic for professional info submission
-        console.log('Professional info submitted:', data);
+        console.log("Professional info submitted:", data);
       },
     },
     {
-      title: 'Artwork Information',
-      description: 'Please provide more information about your artwork',
+      title: "Artwork Information",
+      description: "Please provide more information about your artwork",
       component: (
         <ArtworkInfoStep
           form={artworkForm}
@@ -197,16 +229,16 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       form: artworkForm,
       handlePreSubmit: async (data: ArtworkInfoData) => {
         // Add any custom logic for artwork info submission
-        console.log('Artwork info submitted:', data);
+        console.log("Artwork info submitted:", data);
         await handleArtworkSubmit(data);
       },
     },
     {
-      title: 'Upload Files',
-      description: `Upload files for ${currentArtwork?.title}`,
+      title: "Upload Files",
+      description: `Upload files for ${currentArtwork?.title ?? "your artwork"}`,
       component: (
         <>
-          <MediaUpload artworkUUID={artworkUUID || undefined} />
+          <MediaUpload artworkUUID={artworkUUID || undefined} onUpload={handleAssetUpload} />
           <p className="text-sm text-foreground mb-2">Or, you can email us:</p>
           <Button variant="outline" className="w-full" asChild>
             <Link href={emailLink}>Email Us</Link>
@@ -224,7 +256,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const progress = ((formStep + 1) / steps.length) * 100
 
   const handleNextStep = async () => {
-    console.log('formStep', formStep);
+    console.log("formStep", formStep);
     const currentStepData = steps[formStep];
     const form = currentStepData.form;
     if (form) {
@@ -234,7 +266,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       if (isValid) {
         setFormStep((prev) => prev + 1);
       } else {
-        console.error('invalid form', form.formState.errors);
+        console.error("invalid form", form.formState.errors);
       }
     }
   };
@@ -246,20 +278,20 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
             className="border-b aspect-video bg-accent-foreground text-accent-foreground"
             style={{
               backgroundImage: `url(/${eventSlug}-background.png)`,
-              backgroundSize: 'cover',
+              backgroundSize: "cover",
             }}
           >
           </CardHeader>
-          <CardContent className='p-6 flex flex-col gap-2'>
+          <CardContent className="p-6 flex flex-col gap-2">
             <div
-              className='flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md'
-              style={{ backgroundColor: '#F6EBE4' }}
+              className="flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md"
+              style={{ backgroundColor: "#F6EBE4" }}
             >
               <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
               <p>{currentStep.description}</p>
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {isLoading ? 'Loading user information...' : `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+                  {isLoading ? "Loading user information..." : `You"re ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
                 </p>
               </div>
               <Progress value={progress} className="w-full" />
@@ -282,7 +314,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
                     disabled={isSubmitting}
                     className="w-full sm:w-auto"
                   >
-                    {isSubmitting ? 'Loading...' : 'Next'}
+                    {isSubmitting ? "Loading..." : "Next"}
                   </Button>
                 ) : (
                   <Button
@@ -291,7 +323,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
                     disabled={isSubmitting}
                     className="w-full sm:w-auto"
                   >
-                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </Button>
                 )}
               </div>

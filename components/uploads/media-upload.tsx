@@ -10,9 +10,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 interface MediaUploadProps {
   artworkUUID?: string;
+  onUpload: (
+    results: { id: string; path: string; fullPath: string; }[],
+    errors: { message: string }[]
+  ) => void;
 }
 
-export function MediaUpload({ artworkUUID }: MediaUploadProps) {
+export function MediaUpload({ artworkUUID, onUpload }: MediaUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [totalSize, setTotalSize] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -62,16 +66,19 @@ export function MediaUpload({ artworkUUID }: MediaUploadProps) {
     setUploading(true)
     try {
       const supabase = createClient()
-      let errors = [];
+      let results: { id: string; path: string; fullPath: string; }[] = [];
+      let errors: { message: string }[] = [];
       for (const file of files) {
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
           console.error('Error uploading file:', error.message)
-          errors.push(error.message)
+          errors.push({ message: error.message })
         } else {
           console.log('Files uploaded successfully:', data)
+          results.push({ id: data.path, path: data.path, fullPath: data.fullPath })
         }
       }
+      onUpload(results, errors)
       return artworkUUID || null
     } catch (error) {
       console.error('Error uploading files:', error)

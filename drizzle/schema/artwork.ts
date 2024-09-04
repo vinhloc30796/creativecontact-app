@@ -36,7 +36,6 @@ export const artworks = pgTable("artworks", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   title: text("title").notNull(),
   description: text("description"),
-  maxAssets: integer("max_assets").notNull().default(5),
 });
 
 /* postgres=> \d artwork_credits
