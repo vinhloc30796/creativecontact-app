@@ -1,7 +1,6 @@
 // File: app/(public)/(event)/checkin/_utils/apiHelpers.ts
 "use client";
 
-import { sendSignInWithOtp } from "@/app/actions/email/sendSignIn";
 import { EventRegistrationWithSlot } from '@/app/types/EventRegistration';
 
 type SetEventRegistrations = React.Dispatch<React.SetStateAction<EventRegistrationWithSlot[] | null>>;

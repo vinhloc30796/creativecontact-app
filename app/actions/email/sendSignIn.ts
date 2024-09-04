@@ -1,16 +1,17 @@
 // File: app/actions/email/sendSignIn.ts
 import React from 'react';
 import { generateOTP } from "@/utils/otp";
-import { adminSupabaseClient } from "@/utils/supabase/server-admin";
+import { getAdminSupabaseClient } from "@/utils/supabase/server-admin";
 import { resend } from "./utils";
 import { SignInEmail } from '@/emails/templates/SignInEmail';
 import { render } from '@react-email/components';
 
-export function sendSignInWithOtp(email: string, options?: {
+export async function sendSignInWithOtp(email: string, options?: {
   shouldCreateUser?: boolean;
   redirectTo?: string;
   data?: Record<string, any>;
 }) {
+  const adminSupabaseClient = await getAdminSupabaseClient();
   const otp = generateOTP();
   let linkData: any;
 

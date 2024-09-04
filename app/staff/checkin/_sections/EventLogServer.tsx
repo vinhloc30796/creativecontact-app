@@ -3,7 +3,8 @@
 
 import { EventRegistrationLog } from '@/app/types/EventRegistrationLog';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { authUsers, eventRegistrationLogs, eventRegistrations } from "@/drizzle/schema/event";
+import { authUsers } from "@/drizzle/schema/user";
+import { eventRegistrationLogs, eventRegistrations } from "@/drizzle/schema/event";
 import { datetimeFormatter } from '@/lib/timezones';
 import { db } from '@/lib/db';
 import { desc, eq } from 'drizzle-orm';

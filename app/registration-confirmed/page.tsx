@@ -14,6 +14,7 @@ import QRCodeWithHover from './QRCodeWithHover';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 
 function RegistrationContent() {
+  const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
   const { user, isLoading } = useAuth();
   const searchParams = useSearchParams();
   const [registrationInfo, setRegistrationInfo] = useState({
@@ -89,7 +90,7 @@ function RegistrationContent() {
           <p >
             You can also self-check-in here on the day of the event: &nbsp;
             <Link className='underline'
-              href={`https://app.creativecontact.com/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}`}>
+              href={`${hostUrl}/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}`}>
                 /checkin
             </Link>
           </p>
@@ -107,7 +108,7 @@ function RegistrationContent() {
         <div className="flex flex-col space-y-2">
           <Button asChild>
             <Link href={
-              `https://creativecontact.vn/?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}`
+              `${hostUrl}/?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}`
             }>Go to Event Page</Link>
           </Button>
         </div>

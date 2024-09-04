@@ -1,13 +1,12 @@
 'use server'
 
-import { authUsers } from "@/drizzle/schema/event"
+import { authUsers } from "@/drizzle/schema/user"
 import { db } from '@/lib/db'
 import { createClient } from '@/utils/supabase/server'
 import { eq, isNotNull } from 'drizzle-orm'
 import { cookies } from 'next/headers'
 
 export async function signInAnonymously() {
-	const cookieStore = cookies()
 	const supabase = await createClient()
 
 	const { data, error } = await supabase.auth.signInAnonymously()

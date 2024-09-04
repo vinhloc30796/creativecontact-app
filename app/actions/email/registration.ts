@@ -4,7 +4,7 @@
 import { EventSlot } from "@/app/types/EventSlot";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
 import { generateOTP } from "@/utils/otp";
-import { adminSupabaseClient } from "@/utils/supabase/server-admin";
+import { getAdminSupabaseClient } from "@/utils/supabase/server-admin";
 import QRCode from "qrcode";
 import { generateICSFile, resend } from "./utils";
 import { ConfirmationRequest } from "@/emails/templates/ConfirmationRequest";
@@ -26,6 +26,7 @@ export async function sendConfirmationRequestEmail(
   let confirmationURL: string;
 
   try {
+    const adminSupabaseClient = await getAdminSupabaseClient();
     const linkResponse = await adminSupabaseClient.auth.admin.generateLink({
       type: "magiclink",
       email: email,

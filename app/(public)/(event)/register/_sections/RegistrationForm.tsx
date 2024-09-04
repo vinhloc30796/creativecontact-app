@@ -83,11 +83,11 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       firstName: '',
       lastName: '',
       phone: '',
-      
+
       // Professional Info
       industries: [],
       experience: undefined,
-      
+
       // Event Registration
       slot: '',
     }
@@ -289,10 +289,16 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           existingRegistrationId: isUpdating ? existingRegistration?.id : undefined,
         }),
         formUserId && combinedData.industries && combinedData.experience
-          ? writeUserInfo(formUserId, {
-            industries: combinedData.industries,
-            experience: combinedData.experience,
-          })
+          ? writeUserInfo(
+            formUserId,
+            {
+              firstName: combinedData.firstName,
+              lastName: combinedData.lastName,
+            },
+            {
+              industries: combinedData.industries,
+              experience: combinedData.experience,
+            })
           : Promise.resolve(null),
       ])
 

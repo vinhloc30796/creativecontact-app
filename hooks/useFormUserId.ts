@@ -1,14 +1,19 @@
-import { useCallback } from 'react';
 import { getUserId } from '@/app/actions/auth';
 import { signUpUser } from "@/app/actions/signUp";
-import { useAuth } from '@/hooks/useAuth'; // Assuming you have this hook
+import { authUsers, userInfos } from '@/drizzle/schema/user';
+import { useAuth } from '@/hooks/useAuth';
+import { db } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { useCallback, useEffect, useState } from 'react';
+
+import { ExperienceLevel, Industry, UserInfo } from '@/app/types/UserInfo';
 
 // Either:
 // - formData.email is a confirmed email address (getUserId is not null)
 // - user is logged-in with a confirmed email address, but registering for their friend (we should create a new user)
 // - user is logged-in anonymously (a user is already created via signInAnonymously)
 export function useFormUserId() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
   const resolveFormUserId = useCallback(async (formEmail: string): Promise<string> => {
     const dbUserId = await getUserId(formEmail);

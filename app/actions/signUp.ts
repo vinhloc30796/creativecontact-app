@@ -1,9 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
-import { adminSupabaseClient } from "@/utils/supabase/server-admin";
+"use server";
 
+import { createClient } from "@/utils/supabase/server";
+import { getAdminSupabaseClient } from "@/utils/supabase/server-admin";
 
 export async function signUpUser(email: string, isAnonymous: boolean = true) {
   const supabase = await createClient();
+  const adminSupabaseClient = await getAdminSupabaseClient();
   if (isAnonymous) {
     // then use signInAnonymously
     // first by creating an anonymous user

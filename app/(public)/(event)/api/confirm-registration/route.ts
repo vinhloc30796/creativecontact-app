@@ -4,12 +4,14 @@ import { confirmRegistration } from "@/app/(public)/(event)/register/_sections/a
 import { sendConfirmationEmailWithICSAndQR } from "@/app/actions/email/registration"; // Adjust the import path as necessary
 import { eventRegistrations, eventSlots } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
+import { getAdminSupabaseClient } from "@/utils/supabase/server-admin";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const registrationId = searchParams.get("signature");
+  const adminSupabaseClient = await getAdminSupabaseClient();
 
   if (!registrationId) {
     return NextResponse.json({ error: "Invalid signature/registrationId" }, {
@@ -64,6 +66,38 @@ export async function GET(request: Request) {
     } catch (error) {
       console.error("Failed to send confirmation email:", error);
       // Note: We're not returning here, as we still want to redirect the user
+    }
+
+    // Update the user's email after registration confirmation
+    if (result.userId) {
+      const userId = result.userId;
+      console.debug(`Updating user email for registration ${registrationId}`);
+      const { data: userData, error: userError } = await adminSupabaseClient.auth
+        .admin.getUserById(userId);
+
+      if (userError) {
+        console.error("Failed to fetch user:", userError);
+        // We don't return here because the registration is confirmed, even if email update fails
+      } else if (userData && userData.user) {
+        // Check if the user is anonymous
+        // Should double-check this, as the user may have signed in since the registration was created
+        const { data: authUpdateData, error: authUpdateError } = await adminSupabaseClient.auth.admin
+          .updateUserById(userId, {
+            email: result.email,
+            email_confirm: true,
+            // @ts-ignore -- this works, but Supabase needs to update their types
+            is_anonymous: false,
+          });
+        if (authUpdateError) {
+          console.error(
+            "Failed to update user email:",
+            authUpdateError,
+          );
+          // We don't return here because the registration is confirmed, even if email update fails
+        } else {
+          console.log("User email updated:", authUpdateData);
+        }
+      }
     }
 
     // Redirect to a confirmation success page
