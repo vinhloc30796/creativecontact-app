@@ -12,15 +12,15 @@ import { CalendarIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { getRegistrationsForSlots } from './actions';
-import { FormData } from './formSchema';
+import { EventRegistrationData } from './formSchema';
 import { formatDateTime, getAvailableCapacity, getSlotsForDate } from './utils';
 
 interface DateSelectionStepProps {
-  form: UseFormReturn<FormData>;
+  eventRegistrationForm: UseFormReturn<EventRegistrationData>;
   slots: EventSlot[];
 }
 
-export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
+export function DateSelectionStep({ eventRegistrationForm, slots }: DateSelectionStepProps) {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
   const [slotTouched, setSlotTouched] = useState(false);
@@ -83,11 +83,11 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
         <FormMessage />
       </FormItem>
       <FormField
-        control={form.control}
+        control={eventRegistrationForm.control}
         name="slot"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className={cn(slotTouched && form.formState.errors.slot ? 'text-destructive' : '', 'block mt-2')}>
+            <FormLabel className={cn(slotTouched && eventRegistrationForm.formState.errors.slot ? 'text-destructive' : '', 'block mt-2')}>
               <div className="flex justify-between">
                 <span>Pick a time slot</span>
               </div>
@@ -130,8 +130,8 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
                             )}
                             onClick={() => {
                               if (!isDisabled) {
-                                form.clearErrors('slot');
-                                form.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true });
+                                eventRegistrationForm.clearErrors('slot');
+                                eventRegistrationForm.setValue('slot', slot.id, { shouldTouch: true, shouldValidate: true });
                                 setSlotTouched(true);
                               }
                             }}
@@ -155,7 +155,7 @@ export function DateSelectionStep({ form, slots }: DateSelectionStepProps) {
                 </TableBody>
               </Table>
             </FormControl>
-            {slotTouched && form.formState.errors.slot && <FormMessage>{form.formState.errors.slot.message}</FormMessage>}
+            {slotTouched && eventRegistrationForm.formState.errors.slot && <FormMessage>{eventRegistrationForm.formState.errors.slot.message}</FormMessage>}
           </FormItem >
         )
         }

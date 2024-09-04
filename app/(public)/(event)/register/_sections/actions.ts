@@ -25,12 +25,9 @@ import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { and, eq, or } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { Resend } from "resend";
 import { FormData } from "./types";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
 import { checkUserEmailConfirmed, checkUserIsAnonymous, getUserId } from "@/app/actions/auth";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function getRegistrationsForSlots(
   slotIds: string[],

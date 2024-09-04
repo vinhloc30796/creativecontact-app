@@ -3,16 +3,19 @@ import { FormData } from './types'
 import { EventSlot } from '@/app/types/EventSlot'
 import { formatInTimeZone } from 'date-fns-tz'
 import { TIMEZONE } from '@/lib/timezones'
+import { ContactInfoData, EventRegistrationData, ProfessionalInfoData } from './formSchema'
 
 interface ConfirmationPageProps {
-	formData: FormData
+	contactInfoData: ContactInfoData
+	eventRegistrationData: EventRegistrationData
+	professionalInfoData: ProfessionalInfoData
 	slots: EventSlot[]
 	status: 'confirmed' | 'pending' | 'cancelled' | 'checked-in'
 }
 
-export function ConfirmationPage({ formData, slots, status }: ConfirmationPageProps) {
+export function ConfirmationPage({ contactInfoData, eventRegistrationData, professionalInfoData, slots, status }: ConfirmationPageProps) {
 
-	const selectedSlot = slots.find((slot) => slot.id === formData.slot)
+	const selectedSlot = slots.find((slot) => slot.id === eventRegistrationData.slot)
 
 	const formatSlotTime = (slot: EventSlot | undefined) => {
 		if (!slot) return 'No slot selected'
@@ -34,13 +37,13 @@ export function ConfirmationPage({ formData, slots, status }: ConfirmationPagePr
 				)}
 			</div>
 			<p>
-				<strong>Name:</strong> {formData.firstName} {formData.lastName}
+				<strong>Name:</strong> {contactInfoData.firstName} {contactInfoData.lastName}
 			</p>
 			<p>
-				<strong>Email:</strong> {formData.email}
+				<strong>Email:</strong> {contactInfoData.email}
 			</p>
 			<p>
-				<strong>Phone:</strong> {formData.phone}
+				<strong>Phone:</strong> {contactInfoData.phone}
 			</p>
 			<p>
 				<strong>Selected Time Slot:</strong> {formatSlotTime(selectedSlot)}

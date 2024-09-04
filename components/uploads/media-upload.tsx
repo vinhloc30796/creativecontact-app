@@ -8,7 +8,11 @@ import { createClient } from "@/utils/supabase/client"
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-export function MediaUpload() {
+interface MediaUploadProps {
+  onUpload: (uuid: string | null) => void;
+}
+
+export function MediaUpload({ onUpload }: MediaUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [totalSize, setTotalSize] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -54,22 +58,29 @@ export function MediaUpload() {
   const isOverLimit = totalSize > maxSize
   const bucketName = 'artwork_assets'
 
-  const handleUpload = async () => {
+  const handleUpload = async (): Promise<string | null> => {
     setUploading(true)
+    const artworkUUID = crypto.randomUUID(); // Generate a unique identifier for the artwork
     try {
       const supabase = createClient()
+      let errors = [];
       for (const file of files) {
-        const { data, error } = await supabase.storage.from(bucketName).upload(`${file.name}`, file, { upsert: false })
+        const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
           console.error('Error uploading file:', error.message)
+          errors.push(error.message)
         } else {
-          console.log('File uploaded successfully:', data)
+          console.log('Files uploaded successfully:', data)
         }
       }
+      onUpload(artworkUUID)
+      return artworkUUID;
     } catch (error) {
       console.error('Error uploading files:', error)
+      return null;
     } finally {
       setUploading(false)
+      return null;
     }
   }
 

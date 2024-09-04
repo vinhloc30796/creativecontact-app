@@ -3,7 +3,8 @@ import { EventSlot } from "@/app/types/EventSlot";
 import { createEvent } from "ics";
 import { Resend } from "resend";
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY!;
+export const resend = new Resend(resendApiKey);
 
 export function generateICSFile(slotData: EventSlot): Promise<string> {
   return new Promise((resolve, reject) => {
