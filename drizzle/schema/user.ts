@@ -44,6 +44,7 @@ export const userInfos = pgTable('user_infos', {
   firstName: text('first_name'),
   lastName: text('last_name'),
   displayName: text('display_name'),
+  phone: text('phone'),
   location: text('location'),
   occupation: text('occupation'),
   about: text('about'),

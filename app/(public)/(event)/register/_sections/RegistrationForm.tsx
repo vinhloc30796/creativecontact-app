@@ -292,6 +292,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           ? writeUserInfo(
             formUserId,
             {
+              phone: combinedData.phone,
               firstName: combinedData.firstName,
               lastName: combinedData.lastName,
             },

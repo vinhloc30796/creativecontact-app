@@ -326,6 +326,7 @@ export async function cancelExpiredRegistrations() {
 export async function writeUserInfo(
   userId: string,
   userInfo: {
+    phone: string;
     firstName: string;
     lastName: string;
   },
@@ -335,7 +336,7 @@ export async function writeUserInfo(
   },
 ) {
   console.log("Received professionalInfo:", professionalInfo);
-
+  // Validate professional info
   if (
     !professionalInfo.industries || professionalInfo.industries.length === 0 ||
     !professionalInfo.experience
@@ -344,8 +345,15 @@ export async function writeUserInfo(
     return { success: false, error: "Invalid professional info" };
   }
 
+  // Validate user info
+  if (!userInfo.phone || !userInfo.firstName || !userInfo.lastName) {
+    console.error("Invalid user info:", userInfo);
+    return { success: false, error: "Invalid user info" };
+  }
+
   try {
     const updateSet = {
+      phone: userInfo.phone,
       firstName: userInfo.firstName,
       lastName: userInfo.lastName,
       displayName: getDisplayName(userInfo.firstName, userInfo.lastName, true),
