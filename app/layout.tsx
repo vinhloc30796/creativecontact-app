@@ -1,26 +1,28 @@
+// File: app/layout.tsx
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
+import React from 'react'
 import { plusJakartaSans } from './fonts'
 import './globals.css'
-import { ThemeProvider } from '@/components/themes/theme-provider'
+import Providers from './providers'
 
 export const metadata: Metadata = {
-	title: 'Creative Contact',
+  title: 'Creative Contact',
 }
 
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode
+  children: React.ReactNode
 }>) {
-	return (
-		<html lang="en" className={`${plusJakartaSans.variable} font-sans`} suppressHydrationWarning>
-			<head />
-			<body className={cn('min-h-screen bg-background font-sans antialiased')}>
-        <ThemeProvider>
+  return (
+    <html lang="en" className={`${plusJakartaSans.variable} font-sans`} suppressHydrationWarning>
+      <head />
+      <body className={cn('min-h-screen bg-background font-sans antialiased')}>
+        <Providers>
           {children}
-        </ThemeProvider>
+        </Providers>
       </body>
-		</html>
-	)
+    </html>
+  )
 }

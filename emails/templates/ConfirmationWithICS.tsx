@@ -16,7 +16,8 @@ export const ConfirmationWithICS: React.FC<ConfirmationWithICSProps> = ({
   qrCodeUrl,
 }) => {
   const previewText = `Thanks for registering to Hoàn Tất Project!`;
-
+  const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
+  const utmContent = "ConfirmationWithICS"
   return (
     <Layout>
       <Preview>{previewText}</Preview>
@@ -53,14 +54,14 @@ export const ConfirmationWithICS: React.FC<ConfirmationWithICSProps> = ({
       <Text className="text-base mb-4">
         Please show this ticket and QR code to us at the entrance, and let the goooooooood vibe begin! <br />
         You can also self-check-in here on the day of the event: &nbsp;
-        <Link href="https://app.creativecontact.com/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}">
+        <Link href={`${hostUrl}/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${utmContent}`}>
           /checkin
         </Link>
       </Text>
       <Text className="text-base text-foreground">
         Mở mã QR này cho chúng mình tại sự kiện để check-in nhé! <br />
         Bạn cũng có thể tự check-in tại đây vào ngày sự kiện: &nbsp;
-        <Link href="https://app.creativecontact.com/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}">
+        <Link href={`${hostUrl}/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${utmContent}`}>
           /checkin
         </Link>
       </Text>

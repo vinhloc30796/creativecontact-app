@@ -12,22 +12,17 @@ import {
 } from "@/app/types/EventRegistration";
 import { RegistrationConfirm } from "@/app/types/RegistrationConfirm";
 import { UserInfo } from "@/app/types/UserInfo";
-import {
-  authUsers,
-  eventRegistrations,
-  eventSlots,
-  ExperienceType,
-  IndustryType,
-  userInfos,
-} from "@/drizzle/schema/event";
+import { authUsers, userInfos, ExperienceType, IndustryType, } from "@/drizzle/schema/user";
+import { eventRegistrations, eventSlots } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
-import { adminSupabaseClient } from "@/utils/supabase/server-admin";
+import { getAdminSupabaseClient } from "@/utils/supabase/server-admin";
 import { and, eq, or } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { FormData } from "./types";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
 import { checkUserEmailConfirmed, checkUserIsAnonymous, getUserId } from "@/app/actions/auth";
+import { getDisplayName } from "@/lib/name";
 
 export async function getRegistrationsForSlots(
   slotIds: string[],
@@ -45,7 +40,6 @@ export async function getRegistrationsForSlots(
 }
 
 export async function signInAnonymously() {
-  const cookieStore = cookies();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInAnonymously();
   // Return or error
@@ -85,15 +79,20 @@ export async function confirmRegistration(
   }
 
   // Store the user ID and email for later use
-  let userId = registration.created_by;
   let email: string = registration.email;
 
   // Check if user email already exists
+  const adminSupabaseClient = await getAdminSupabaseClient();
   const { data: existingUser, error: existingUserError } =
     await adminSupabaseClient.rpc(
       "get_user_id_by_email",
       { email: email },
     );
+
+  if (existingUserError) {
+    console.error("Error checking for existing user:", existingUserError);
+    return { success: false, error: "Error checking email availability" };
+  }
 
   if (
     existingUser &&
@@ -123,45 +122,9 @@ export async function confirmRegistration(
           error: "Email already in use & failed to update registration",
         };
       });
-  } else if (existingUserError) {
-    console.error("Error checking for existing user:", existingUserError);
-    return { success: false, error: "Error checking email availability" };
-  } else if (userId) {
-    // Update the user's email after registration confirmation
-    console.debug(`Updating user email for registration ${signature}`);
-    const { data: userData, error: userError } = await adminSupabaseClient.auth
-      .admin.getUserById(userId);
-
-    if (userError) {
-      console.error("Failed to fetch user:", userError);
-      // We don't return here because the registration is confirmed, even if email update fails
-    } else if (userData && userData.user) {
-      // Check if the user is anonymous
-      // Should double-check this, as the user may have signed in since the registration was created
-      if (userData.user.email === null || userData.user.email === "") {
-        const { error: authUpdateError } = await adminSupabaseClient.auth.admin
-          .updateUserById(userId, {
-            email: email,
-            email_confirm: true,
-            // @ts-ignore -- this works, but Supabase needs to update their types
-            is_anonymous: false,
-          });
-        if (authUpdateError) {
-          console.error(
-            "Failed to update user email:",
-            authUpdateError,
-          );
-          // We don't return here because the registration is confirmed, even if email update fails
-        }
-      }
-    }
   }
 
-  return {
-    success: true,
-    email: email,
-    userId: userId,
-  };
+  return { success: true, email: email, userId: existingUser };
 }
 
 export async function checkExistingRegistration(
@@ -362,13 +325,18 @@ export async function cancelExpiredRegistrations() {
 
 export async function writeUserInfo(
   userId: string,
+  userInfo: {
+    phone: string;
+    firstName: string;
+    lastName: string;
+  },
   professionalInfo: {
     industries: IndustryType[];
     experience: ExperienceType;
   },
 ) {
   console.log("Received professionalInfo:", professionalInfo);
-
+  // Validate professional info
   if (
     !professionalInfo.industries || professionalInfo.industries.length === 0 ||
     !professionalInfo.experience
@@ -377,13 +345,23 @@ export async function writeUserInfo(
     return { success: false, error: "Invalid professional info" };
   }
 
+  // Validate user info
+  if (!userInfo.phone || !userInfo.firstName || !userInfo.lastName) {
+    console.error("Invalid user info:", userInfo);
+    return { success: false, error: "Invalid user info" };
+  }
+
   try {
     const updateSet = {
+      phone: userInfo.phone,
+      firstName: userInfo.firstName,
+      lastName: userInfo.lastName,
+      displayName: getDisplayName(userInfo.firstName, userInfo.lastName, true),
       industries: professionalInfo.industries,
       experience: professionalInfo.experience,
     };
 
-    console.log("Updating with:", updateSet);
+    console.log("writeUserInfo updating with:", updateSet);
 
     const result = await db
       .insert(userInfos)
@@ -397,11 +375,11 @@ export async function writeUserInfo(
       })
       .returning();
 
-    console.log("Update result:", result);
+    console.log("writeUserInfo update result:", result);
 
     return { success: true, data: result[0] };
   } catch (error) {
-    console.error("Error writing user info:", error);
+    console.error("writeUserInfo error writing user info:", error);
     return { success: false, error: (error as Error).message };
   }
 }

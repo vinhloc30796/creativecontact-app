@@ -1,14 +1,45 @@
-import { useCallback } from 'react';
 import { getUserId } from '@/app/actions/auth';
 import { signUpUser } from "@/app/actions/signUp";
-import { useAuth } from '@/hooks/useAuth'; // Assuming you have this hook
+import { authUsers, userInfos } from '@/drizzle/schema/user';
+import { useAuth } from '@/hooks/useAuth';
+import { db } from '@/lib/db';
+import { eq } from 'drizzle-orm';
+import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ExperienceLevel, Industry, UserInfo } from '@/app/types/UserInfo';
+
+export interface UserData extends Omit<UserInfo, 'experience'> {
+  email: string;
+  isAnonymous: boolean;
+  emailConfirmedAt: Date | null;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  industries: Industry[];
+  experience: ExperienceLevel | null;
+}
+
+async function fetchUserData(userId: string): Promise<UserData | null> {
+  const response = await fetch(`/api/user/${userId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch user data');
+  }
+  return response.json();
+}
 
 // Either:
 // - formData.email is a confirmed email address (getUserId is not null)
 // - user is logged-in with a confirmed email address, but registering for their friend (we should create a new user)
 // - user is logged-in anonymously (a user is already created via signInAnonymously)
 export function useFormUserId() {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { data: userData, isLoading: isUserDataLoading } = useQuery({
+    queryKey: ['userData', user?.id],
+    queryFn: () => (user ? fetchUserData(user.id) : null),
+    enabled: !!user && !isAuthLoading,
+  });
+
+  const isLoading = isAuthLoading || isUserDataLoading;
 
   const resolveFormUserId = useCallback(async (formEmail: string): Promise<string> => {
     const dbUserId = await getUserId(formEmail);
@@ -49,5 +80,5 @@ export function useFormUserId() {
     throw new Error('Unable to resolve user ID');
   }, [user]);
 
-  return resolveFormUserId;
+  return { resolveFormUserId, userData, isLoading };
 }

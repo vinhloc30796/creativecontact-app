@@ -10,7 +10,8 @@ import {
     unique,
     uuid,
 } from "drizzle-orm/pg-core";
-import { authUsers, events } from "./event";
+import { authUsers } from "./user";
+import { events } from "./event";
 
 /* postgres=> \d artworks
                               Table "public.artworks"
