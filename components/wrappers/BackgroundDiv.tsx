@@ -9,7 +9,6 @@ interface BackgroundDivProps {
 
 export function BackgroundDiv({ children, className, eventSlug = 'hoantat-2024' }: BackgroundDivProps) {
   const backgroundImage = `/${eventSlug}-background-blur.png`;
-  console.debug(`Background image: ${backgroundImage}`);
 
   return (
     <div 

@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface MediaUploadProps {
-  onUpload: (uuid: string | null) => void;
+  artworkUUID?: string;
 }
 
-export function MediaUpload({ onUpload }: MediaUploadProps) {
+export function MediaUpload({ artworkUUID }: MediaUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [totalSize, setTotalSize] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -60,7 +60,6 @@ export function MediaUpload({ onUpload }: MediaUploadProps) {
 
   const handleUpload = async (): Promise<string | null> => {
     setUploading(true)
-    const artworkUUID = crypto.randomUUID(); // Generate a unique identifier for the artwork
     try {
       const supabase = createClient()
       let errors = [];
@@ -73,8 +72,7 @@ export function MediaUpload({ onUpload }: MediaUploadProps) {
           console.log('Files uploaded successfully:', data)
         }
       }
-      onUpload(artworkUUID)
-      return artworkUUID;
+      return artworkUUID || null
     } catch (error) {
       console.error('Error uploading files:', error)
       return null;
