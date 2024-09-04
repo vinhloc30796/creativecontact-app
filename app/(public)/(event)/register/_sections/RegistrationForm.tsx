@@ -21,8 +21,10 @@ import { ConfirmationPage } from './ConfirmationPage'
 import { ConfirmationStep } from './ConfirmationStep'
 import { DateSelectionStep } from './DateSelectionStep'
 import { EmailExistedStep } from './EmailExistedStep'
-import { checkExistingRegistration, createRegistration, signUpUser, writeUserInfo } from './actions'
+import { checkExistingRegistration, createRegistration, writeUserInfo } from './actions'
+import { signUpUser } from "@/app/actions/signUp"
 import { formSchema, FormData } from './formSchema'
+import { useFormUserId } from '@/hooks/useFormUserId'
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[]
@@ -33,6 +35,7 @@ type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData & Ev
 export default function RegistrationForm({ initialEventSlots }: RegistrationFormProps) {
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
+  const resolveFormUserId = useFormUserId();
   // States
   const [formStep, setFormStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -274,35 +277,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       // - formData.email is a confirmed email address (getUserId is not null)
       // - user is logged-in with a confirmed email address, but registering for their friend (we should create a new user)
       // - user is logged-in anonymously (a user is already created via signInAnonymously)
-      let formUserId: string
-      const dbUserId = await getUserId(contactInfoData.email)
-      if (dbUserId) {
-        // we found a user in the database, good, use that
-        formUserId = dbUserId
-      } else if (user?.email == contactInfoData.email) {
-        // we didn't find a user in the database,
-        // but we have a logged-in user with a confirmed email address
-        // and it is matching the email we are registering with
-        // so we should use that user
-        formUserId = user.id
-      } else if (user?.email != contactInfoData.email) {
-        // we didn't find a user in the database,
-        // and we have a logged-in user with a confirmed email address
-        // but it is not matching the email we are registering with
-        // so they're registering for another user
-        // we should create an anonymous user 
-        // then update that user with the email and professional info from the form
-        const newUser = await signUpUser(contactInfoData.email, true);
-        if (newUser) {
-          formUserId = newUser.id
-        } else {
-          throw new Error('Failed to create a new anonymous user');
-        }
-      } else {
-        // finally, if we got here, the user is not logged in
-        // so we should use the user.id from signInAnonymously
-        formUserId = user.id
-      }
+      const formUserId = await resolveFormUserId(contactInfoData.email);
 
       console.log('Combined data for submission:', combinedData)
 
