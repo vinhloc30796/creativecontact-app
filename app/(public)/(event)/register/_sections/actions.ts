@@ -25,17 +25,14 @@ import { createClient } from "@/utils/supabase/server";
 import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 import { and, eq, or } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { Resend } from "resend";
 import { FormData } from "./types";
 import { dateFormatter, timeslotFormatter } from "@/lib/timezones";
 import { checkUserEmailConfirmed, checkUserIsAnonymous, getUserId } from "@/app/actions/auth";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function getRegistrationsForSlots(
   slotIds: string[],
 ): Promise<EventRegistration[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.from("event_registrations").select(
     "*",
   ).in("slot", slotIds).in("status", ["confirmed", "pending"]);
@@ -47,54 +44,9 @@ export async function getRegistrationsForSlots(
   return data as EventRegistration[];
 }
 
-export async function signUpUser(email: string, isAnonymous: boolean = true) {
-  const supabase = createClient();
-  if (isAnonymous) {
-    // then use signInAnonymously
-    // first by creating an anonymous user
-    const { data: anonData, error: anonError } = await supabase.auth.signInAnonymously();
-    if (anonError || !anonData.user) {
-      console.error("signUpUser: Error signing in anonymously:", anonError);
-      return null;
-    }
-    // then get the anon user's id
-    const { data: userData, error: userError } = await adminSupabaseClient.auth.admin.getUserById(anonData.user.id);
-    if (userError || !userData.user) {
-      console.error("signUpUser: Error fetching user:", userError);
-      return null;
-    }
-    // then update the anon user's email
-    const {
-      data: updateData,
-      error: updateError
-    } = await adminSupabaseClient.auth.admin.updateUserById(anonData.user.id, {
-      email: email,
-      // @ts-ignore -- this works, but Supabase needs to update their types
-      is_anonymous: isAnonymous,
-      email_confirmed_at: null
-    });
-    if (updateError) {
-      console.error("signUpUser: Error updating user:", updateError);
-      return null;
-    }
-    console.log(`signUpUser: Anon user with email ${email} created:`, anonData.user);
-    return updateData.user
-  }
-
-  // use normal signUp otherwise
-  const password = Math.random().toString(36).slice(2, 10);
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) {
-    console.error("signUpUser: Error signing up user:", error);
-    return null;
-  }
-  console.log(`signUpUser: User with email ${email} signed up:`, data);
-  return data.user;
-}
-
 export async function signInAnonymously() {
   const cookieStore = cookies();
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.auth.signInAnonymously();
   // Return or error
   if (error) {
@@ -107,7 +59,7 @@ export async function signInAnonymously() {
 export async function confirmRegistration(
   signature: string,
 ): Promise<RegistrationConfirm> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Start a transaction
   const { data: registration, error: fetchError } = await supabase.from(
@@ -394,7 +346,7 @@ export async function createRegistration(
 }
 
 export async function cancelExpiredRegistrations() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     await supabase.rpc("cancel_expired_registrations");

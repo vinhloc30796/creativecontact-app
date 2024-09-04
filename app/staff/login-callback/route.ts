@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 export async function GET(request: Request) {
   // Initialize the Supabase client
   const cookieStore = cookies()
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // Get the auth code from the URL
   const requestUrl = new URL(request.url)

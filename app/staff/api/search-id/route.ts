@@ -14,7 +14,7 @@ const searchSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Get the current user's session
     const { data: { user } } = await supabase.auth.getUser();

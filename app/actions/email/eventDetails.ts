@@ -61,7 +61,7 @@ export async function sendEventDetailsEmail(
 }
 
 export async function sendForgotEmail(identifier: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data: registrations, error } = await supabase

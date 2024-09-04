@@ -4,10 +4,10 @@ import React from 'react'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { UseFormReturn } from 'react-hook-form'
-import { FormData } from './formSchema'
+import { ContactInfoData } from "@/app/form-schemas/contact-info"
 
 interface ContactInfoStepProps {
-	form: UseFormReturn<FormData>
+	form: UseFormReturn<ContactInfoData>
 }
 
 export function ContactInfoStep({ form }: ContactInfoStepProps) {

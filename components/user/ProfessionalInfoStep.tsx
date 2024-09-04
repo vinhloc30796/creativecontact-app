@@ -1,5 +1,6 @@
 // File: app/(public)/(event)/register/_sections/ProfessionalInfoStep.tsx
 
+import { ProfessionalInfoData } from "@/app/form-schemas/professional-info"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -9,23 +10,19 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown } from "lucide-react"
 import React from 'react'
-import { useForm, UseFormReturn } from 'react-hook-form'
-import { professionalInfoSchema, ProfessionalInfoData } from './formSchema'
+import { UseFormReturn } from 'react-hook-form'
 
 interface ProfessionalInfoStepProps {
   form: UseFormReturn<ProfessionalInfoData>
-  onSubmit: (data: ProfessionalInfoData) => void
-  renderButtons: (onSubmit: () => void) => React.ReactNode
 }
 
 const industriesMapper = [
@@ -57,17 +54,7 @@ const experienceLevelsMapper = [
 
 type ExperienceType = typeof experienceLevelsMapper[number]['value']
 
-
-interface ProfessionalInfoStepProps {
-  onSubmit: (data: ProfessionalInfoData) => void
-  initialData?: Partial<ProfessionalInfoData>
-}
-
-interface SelectProps {
-  form: UseFormReturn<ProfessionalInfoData>
-}
-
-const IndustrySelect = ({ form }: SelectProps) => {
+const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -128,14 +115,14 @@ const IndustrySelect = ({ form }: SelectProps) => {
               </Command>
             </PopoverContent>
           </Popover>
-          <FormMessage />
+          <FormMessage>{form.formState.errors.industries?.message}</FormMessage>
         </FormItem>
       )}
     />
   )
 }
 
-const ExperienceSelect = ({ form }: SelectProps) => {
+const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -193,25 +180,19 @@ const ExperienceSelect = ({ form }: SelectProps) => {
               </Command>
             </PopoverContent>
           </Popover>
-          <FormMessage />
+          <FormMessage>{form.formState.errors.experience?.message}</FormMessage>
         </FormItem>
       )}
     />
   )
 }
 
-export function ProfessionalInfoStep({ form, onSubmit, renderButtons }: ProfessionalInfoStepProps) {
-  const handleSubmit = (data: ProfessionalInfoData) => {
-    onSubmit(data)
-  }
+export function ProfessionalInfoStep({ form }: ProfessionalInfoStepProps) {
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <IndustrySelect form={form} />
-        <ExperienceSelect form={form} />
-        {renderButtons(() => form.handleSubmit(handleSubmit)())}
-      </form>
-    </Form>
+    <div className="space-y-4">
+      <IndustrySelect form={form} />
+      <ExperienceSelect form={form} />
+    </div>
   )
 }

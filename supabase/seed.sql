@@ -212,14 +212,12 @@ INSERT INTO artworks (
     id,
     created_at,
     title,
-    description,
-    max_assets
+    description
 ) VALUES (
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
     CURRENT_TIMESTAMP,
     'Cosmic Harmony',
-    'An abstract representation of the universe''s interconnectedness',
-    5
+    'An abstract representation of the universe''s interconnectedness'
 );
 
 -- Seed artwork_credits table

@@ -67,24 +67,33 @@
 	[data-theme="trungthu-archive-2024"] {
 		--background: 335 52% 88%;
 		--foreground: 325 52% 9%;
+
 		--card: 335 52% 88%;
 		--card-foreground: 325 52% 9%;
+
 		--popover: 335 52% 88%;
 		--popover-foreground: 325 52% 9%;
+
 		--primary: 104 56% 43%;
 		--primary-foreground: 325 52% 9%;
+
 		--secondary: 336 100% 57%;
 		--secondary-foreground: 325 52% 9%;
+
 		--muted: 334 53% 20%;
 		--muted-foreground: 325 52% 55%;
+
 		--accent: 87 86% 62%;
 		--accent-foreground: 325 52% 9%;
+
 		--destructive: 0 85% 60%;
 		--destructive-foreground: 325 52% 9%;
-		--border: 334 53% 20%;
-		--input: 334 53% 20%;
+
+		--border: 325.85 52.0% 75.49%;
+		--input: 325.85 52.0% 75.49%;
 		--ring: 87 86% 40%;
-		--radius: 0.5rem;
+		
+		--radius: 0.1rem;
 	  }
 }
 

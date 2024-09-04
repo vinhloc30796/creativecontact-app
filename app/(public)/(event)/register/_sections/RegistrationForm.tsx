@@ -2,36 +2,40 @@
 
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Form } from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import styles from './_register.module.scss'
-import { formSchema, professionalInfoSchema, FormData, ProfessionalInfoData, CombinedFormData } from './formSchema'
-import { EventRegistration } from './types'
+import { getUserId } from '@/app/actions/auth'
+import { ContactInfoData, contactInfoSchema } from '@/app/form-schemas/contact-info'
+import { EventRegistrationData, eventRegistrationSchema } from '@/app/form-schemas/event-registration'
+import { ProfessionalInfoData, professionalInfoSchema } from '@/app/form-schemas/professional-info'
 import { EventRegistrationWithSlot } from '@/app/types/EventRegistration'
 import { EventSlot } from '@/app/types/EventSlot'
-import { ContactInfoStep } from './ContactInfoStep'
-import { DateSelectionStep } from './DateSelectionStep'
-import { ConfirmationStep } from './ConfirmationStep'
-import { EmailExistedStep } from './EmailExistedStep'
-import { ConfirmationPage } from './ConfirmationPage'
-import { createRegistration, checkExistingRegistration, writeUserInfo, signUpUser } from './actions'
+import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
-import { ProfessionalInfoStep } from './ProfessionalInfoStep'
-import { getUserId } from '@/app/actions/auth'
-import { adminSupabaseClient } from '@/utils/supabase/server-admin'
+import { cn } from '@/lib/utils'
+import { zodResolver } from '@hookform/resolvers/zod'
+import React, { useState } from 'react'
+import { FormProvider, useForm, UseFormReturn } from 'react-hook-form'
+import { ContactInfoStep } from '../../../../../components/user/ContactInfoStep'
+import { ProfessionalInfoStep } from '../../../../../components/user/ProfessionalInfoStep'
+import { ConfirmationPage } from './ConfirmationPage'
+import { ConfirmationStep } from './ConfirmationStep'
+import { DateSelectionStep } from './DateSelectionStep'
+import { EmailExistedStep } from './EmailExistedStep'
+import { checkExistingRegistration, createRegistration, writeUserInfo } from './actions'
+import { signUpUser } from "@/app/actions/signUp"
+import { formSchema, FormData } from './formSchema'
+import { useFormUserId } from '@/hooks/useFormUserId'
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[]
 }
 
+type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData & EventRegistrationData>;
+
 export default function RegistrationForm({ initialEventSlots }: RegistrationFormProps) {
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
+  const resolveFormUserId = useFormUserId();
   // States
   const [formStep, setFormStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -42,15 +46,21 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   const [existingRegistration, setExistingRegistration] = useState<EventRegistrationWithSlot | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    mode: 'onChange',
+  const contactInfoForm = useForm<ContactInfoData>({
+    resolver: zodResolver(contactInfoSchema),
+    mode: 'onSubmit',
     defaultValues: {
       email: '',
       firstName: '',
       lastName: '',
       phone: '',
-      // Date selection fields
+    },
+  })
+
+  const eventRegistrationForm = useForm<EventRegistrationData>({
+    resolver: zodResolver(eventRegistrationSchema),
+    mode: 'onSubmit',
+    defaultValues: {
       slot: '',
     },
   })
@@ -64,29 +74,56 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     },
   })
 
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      // Contact Info
+      email: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+      
+      // Professional Info
+      industries: [],
+      experience: undefined,
+      
+      // Event Registration
+      slot: '',
+    }
+  })
+
   // Update this function to sync professionalInfo state with the form
   const updateProfessionalInfo = (data: ProfessionalInfoData) => {
     console.debug('Updating professionalInfoForm values to:', data)
     professionalInfoForm.reset(data) // Reset the form with new data
   }
 
-  const validateFormData = async () => {
-    const result = await form.trigger()
+  const validateContactInfo = async () => {
+    const result = await contactInfoForm.trigger()
     console.log('Form validation result:', result)
     if (!result) {
-      console.error('Form validation errors:', form.formState.errors)
+      console.error('Form validation errors:', contactInfoForm.formState.errors)
     }
     return result
   }
 
-  const validateProfessionalInfo = () => {
-    const professionalInfoData = professionalInfoForm.getValues()
-    const validationResult = professionalInfoSchema.safeParse(professionalInfoData)
-    console.log('professionalInfoData', professionalInfoData, 'Professional info validation result:', validationResult.success)
-    if (!validationResult.success) {
-      console.error('Professional info validation errors:', validationResult.error.errors)
+  const validateEventRegistration = async () => {
+    const result = await eventRegistrationForm.trigger()
+    console.log('Event registration form validation result:', result)
+    if (!result) {
+      console.error('Event registration form validation errors:', eventRegistrationForm.formState.errors)
     }
-    return validationResult.success
+    return result
+  }
+
+  const validateProfessionalInfo = async () => {
+    const result = await professionalInfoForm.trigger()
+    console.log('Professional info validation result:', result)
+    if (!result) {
+      console.error('Professional info validation errors:', professionalInfoForm.formState.errors)
+    }
+    return result
   }
 
 
@@ -107,54 +144,37 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     {
       title: 'Contact Information',
       description: 'Please provide your contact information',
-      component: <ContactInfoStep form={form} />,
+      component: <ContactInfoStep form={contactInfoForm} />,
+      form: contactInfoForm,
       fields: ['email', 'firstName', 'lastName', 'phone'] as const,
     },
     {
       title: 'Professional Information',
       description: 'Please provide your professional information',
-      component: (
-        <ProfessionalInfoStep
-          form={professionalInfoForm}
-          onSubmit={(data) => {
-            updateProfessionalInfo(data)
-            setFormStep((prev) => Math.min(steps.length - 1, prev + 1))
-          }}
-          renderButtons={(onSubmit) => (
-            <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
-              <Button
-                type="button"
-                onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
-                disabled={formStep === 0 || isSubmitting}
-                className="w-full sm:w-auto"
-              >
-                Back
-              </Button>
-              <Button
-                type="button"
-                onClick={onSubmit}
-                disabled={isSubmitting}
-                className="w-full sm:w-auto"
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        />
-        
-      ),
-      fields: [] as const,
+      component: <ProfessionalInfoStep form={professionalInfoForm} />,
+      form: professionalInfoForm,
+      fields: [
+        'industries',
+        'experience',
+      ] as const,
     },
     {
       title: 'Select A Date',
       description: 'Please select a slot for the event.',
-      component: <DateSelectionStep form={form} slots={initialEventSlots} />,
+      component: <DateSelectionStep eventRegistrationForm={eventRegistrationForm} slots={initialEventSlots} />,
+      form: eventRegistrationForm,
       fields: ['slot'] as const,
     },
     {
       title: 'Almost There!',
       description: 'Please check if your information is correct.',
-      component: <ConfirmationStep formData={form.getValues()} slots={initialEventSlots} />,
+      component: <ConfirmationStep
+        contactInfoData={contactInfoForm.getValues()}
+        eventRegistrationData={eventRegistrationForm.getValues()}
+        professionalInfoData={professionalInfoForm.getValues()}
+        slots={initialEventSlots}
+      />,
+      form: form,
       fields: [] as const,
     },
   ]
@@ -164,24 +184,20 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   // Calculate progress percentage
   const progress = ((formStep + 1) / steps.length) * 100
 
-  const validateStep = async () => {
-    const fieldsToValidate = currentStep.fields
-    const result = await form.trigger(fieldsToValidate)
+  const validateStep = async (step: number) => {
+    const form = steps[step].form
+    const result = await form.trigger()
     return result
   }
 
   const handleNextStep = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
-    if (formStep === 1) {
-      // Professional Info step is handled by its own form
-      return
-    }
-    const isStepValid = await validateStep()
+    const isStepValid = await validateStep(formStep)
     if (isStepValid) {
       if (formStep === 0) {
         // Check for existing registration after email is entered
-        const email = form.getValues('email')
-        const {registration: existingRegistration, userInfo: existingUserInfo } = await checkExistingRegistration(email)
+        const email = contactInfoForm.getValues('email')
+        const { registration: existingRegistration, userInfo: existingUserInfo } = await checkExistingRegistration(email)
         if (existingRegistration) {
           setExistingRegistration(existingRegistration)
         }
@@ -192,7 +208,13 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       }
       setFormStep((prev) => Math.min(steps.length - 1, prev + 1))
     } else {
-      console.log('Validation failed:', form.formState.errors)
+      // Merge errors from all forms
+      const formErrors = {
+        ...contactInfoForm.formState.errors,
+        ...eventRegistrationForm.formState.errors,
+        ...professionalInfoForm.formState.errors,
+      }
+      console.log('Validation failed:', formErrors)
     }
   }
 
@@ -205,13 +227,16 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   const handleKeepExistingRegistration = () => {
     setExistingRegistration(null);
     setFormStep(0); // Go back to contact info step
-    form.reset(); // Reset the form
+    // Reset the forms
+    contactInfoForm.reset();
+    eventRegistrationForm.reset();
+    professionalInfoForm.reset();
   }
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
     console.debug('Submit button clicked')
-    console.debug('Current form values:', form.getValues())
+    console.debug('Current contact:', contactInfoForm.getValues())
     console.debug('Current professional info:', professionalInfoForm.getValues())
     console.debug('isUpdating:', isUpdating)
     console.debug('isSubmitting:', isSubmitting)
@@ -225,58 +250,34 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
     setFormError(null)
 
     try {
-      const isFormValid = await validateFormData()
+      const isContactInfoValid = await validateContactInfo()
+      const isEventRegistrationValid = await validateEventRegistration()
       const isProfessionalInfoValid = validateProfessionalInfo()
 
-      console.log('Form validation result:', isFormValid)
+      console.log('Contact info validation result:', isContactInfoValid)
+      console.log('Event registration validation result:', isEventRegistrationValid)
       console.log('Professional info validation result:', isProfessionalInfoValid)
 
-      if (!isFormValid || !isProfessionalInfoValid) {
+      if (!isContactInfoValid || !isEventRegistrationValid || !isProfessionalInfoValid) {
         console.error('Form validation failed')
         setIsSubmitting(false)
         return
       }
 
-      const formData = form.getValues()
+      const contactInfoData = contactInfoForm.getValues()
+      const eventRegistrationData = eventRegistrationForm.getValues()
       const professionalInfoData = professionalInfoForm.getValues()
-      const combinedData: CombinedFormData = {
-        ...formData,
+      const combinedData = {
+        ...contactInfoData,
+        ...eventRegistrationData,
         ...professionalInfoData,
       }
-      
+
       // Either:
       // - formData.email is a confirmed email address (getUserId is not null)
       // - user is logged-in with a confirmed email address, but registering for their friend (we should create a new user)
       // - user is logged-in anonymously (a user is already created via signInAnonymously)
-      let formUserId: string
-      const dbUserId = await getUserId(formData.email)
-      if (dbUserId) {
-        // we found a user in the database, good, use that
-        formUserId = dbUserId
-      } else if (user?.email == formData.email) {
-        // we didn't find a user in the database,
-        // but we have a logged-in user with a confirmed email address
-        // and it is matching the email we are registering with
-        // so we should use that user
-        formUserId = user.id
-      } else if (user?.email != formData.email) {
-        // we didn't find a user in the database,
-        // and we have a logged-in user with a confirmed email address
-        // but it is not matching the email we are registering with
-        // so they're registering for another user
-        // we should create an anonymous user 
-        // then update that user with the email and professional info from the form
-        const newUser = await signUpUser(formData.email, true);
-        if (newUser) {
-          formUserId = newUser.id
-        } else {
-          throw new Error('Failed to create a new anonymous user');
-        }
-      } else {
-        // finally, if we got here, the user is not logged in
-        // so we should use the user.id from signInAnonymously
-        formUserId = user.id
-      }
+      const formUserId = await resolveFormUserId(contactInfoData.email);
 
       console.log('Combined data for submission:', combinedData)
 
@@ -287,7 +288,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           is_anonymous: isAnonymous,
           existingRegistrationId: isUpdating ? existingRegistration?.id : undefined,
         }),
-        formUserId && isProfessionalInfoValid
+        formUserId && combinedData.industries && combinedData.experience
           ? writeUserInfo(formUserId, {
             industries: combinedData.industries,
             experience: combinedData.experience,
@@ -332,7 +333,13 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   }
 
   if (submitted) {
-    return <ConfirmationPage formData={form.getValues()} slots={initialEventSlots} status={registrationStatus} />
+    return <ConfirmationPage
+      contactInfoData={contactInfoForm.getValues()}
+      eventRegistrationData={eventRegistrationForm.getValues()}
+      professionalInfoData={professionalInfoForm.getValues()}
+      slots={initialEventSlots}
+      status={registrationStatus}
+    />
   }
 
   if (existingRegistration) {
@@ -344,10 +351,10 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={(e) => e.preventDefault()} className={cn('flex flex-col gap-2', styles.form)}>
+    <FormProvider {...currentStep.form as FormContextType}>
+      <form onSubmit={(e) => e.preventDefault()} className={cn('flex flex-col gap-2')}>
         <div
-          className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
+          className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20')}
           style={{ backgroundColor: '#F6EBE4' }}
         >
           <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
@@ -360,43 +367,41 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           <Progress value={progress} className="w-full" />
         </div>
         {currentStep.component}
-        {formStep !== 1 && (
-          <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+        <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+          <Button
+            type="button"
+            onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
+            disabled={formStep === 0 || isSubmitting}
+            className="w-full sm:w-auto"
+          >
+            Back
+          </Button>
+          {formStep < steps.length - 1 ? (
             <Button
               type="button"
-              onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
-              disabled={formStep === 0 || isSubmitting}
+              onClick={handleNextStep}
+              disabled={isSubmitting}
               className="w-full sm:w-auto"
             >
-              Back
+              Next
             </Button>
-            {formStep < steps.length - 1 ? (
-              <Button
-                type="button"
-                onClick={handleNextStep}
-                disabled={isSubmitting}
-                className="w-full sm:w-auto"
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full sm:w-auto"
-              >
-                {isSubmitting ? 'Submitting...' : isUpdating ? 'Update' : 'Submit'}
-              </Button>
-            )}
-          </div>
-        )}
+          ) : (
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              {isSubmitting ? 'Submitting...' : isUpdating ? 'Update' : 'Submit'}
+            </Button>
+          )}
+        </div>
         {formError && (
           <div className="error-message mt-2 text-red-500 text-sm">
             {formError}
           </div>
         )}
       </form>
-    </Form>
+    </FormProvider>
   )
 }

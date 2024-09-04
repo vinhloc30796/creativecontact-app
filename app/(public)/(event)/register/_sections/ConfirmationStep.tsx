@@ -1,17 +1,20 @@
-import React from 'react'
-import { FormData } from './types'
-import { EventSlot } from '@/app/types/EventSlot'
-import { formatInTimeZone } from 'date-fns-tz'
+import { ContactInfoData } from "@/app/form-schemas/contact-info";
+import { EventRegistrationData } from "@/app/form-schemas/event-registration";
+import { ProfessionalInfoData } from "@/app/form-schemas/professional-info";
+import { EventSlot } from '@/app/types/EventSlot';
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface ConfirmationStepProps {
-	formData: FormData
+	contactInfoData: ContactInfoData
+	eventRegistrationData: EventRegistrationData
+	professionalInfoData: ProfessionalInfoData
 	slots: EventSlot[]
 }
 
-export function ConfirmationStep({ formData, slots }: ConfirmationStepProps) {
+export function ConfirmationStep({ contactInfoData, eventRegistrationData, professionalInfoData, slots }: ConfirmationStepProps) {
 	const timeZone = 'Asia/Bangkok' // UTC+7
 
-	const selectedSlot = slots.find((slot) => slot.id === formData.slot)
+	const selectedSlot = slots.find((slot) => slot.id === eventRegistrationData.slot)
 
 	const formatSlotTime = (slot: EventSlot | undefined) => {
 		if (!slot) return 'No slot selected'
@@ -25,13 +28,13 @@ export function ConfirmationStep({ formData, slots }: ConfirmationStepProps) {
 	return (
 		<div className="space-y-4 mt-2">
 			<p>
-				<strong>Name:</strong> {formData.firstName} {formData.lastName}
+				<strong>Name:</strong> {contactInfoData.firstName} {contactInfoData.lastName}
 			</p>
 			<p>
-				<strong>Email:</strong> {formData.email}
+				<strong>Email:</strong> {contactInfoData.email}
 			</p>
 			<p>
-				<strong>Phone:</strong> {formData.phone}
+				<strong>Phone:</strong> {contactInfoData.phone}
 			</p>
 			<p>
 				<strong>Selected Time Slot:</strong> {formatSlotTime(selectedSlot)}

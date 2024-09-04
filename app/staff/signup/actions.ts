@@ -13,7 +13,7 @@ type SignupResult =
   | { success: false; error: string };
 
 export async function signup(formData: FormData): Promise<SignupResult> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const data = { email, password };

@@ -8,7 +8,7 @@ import { cookies } from 'next/headers'
 
 export async function signInAnonymously() {
 	const cookieStore = cookies()
-	const supabase = createClient()
+	const supabase = await createClient()
 
 	const { data, error } = await supabase.auth.signInAnonymously()
 
