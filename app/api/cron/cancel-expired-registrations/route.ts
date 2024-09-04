@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
-	const supabase = createClient()
+	const supabase = await createClient()
 
 	try {
 		await supabase.rpc('cancel_expired_registrations')

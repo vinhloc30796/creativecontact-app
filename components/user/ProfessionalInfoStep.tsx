@@ -1,6 +1,6 @@
 // File: app/(public)/(event)/register/_sections/ProfessionalInfoStep.tsx
 
-import { ProfessionalInfoData } from '@/app/(public)/(event)/register/_sections/formSchema'
+import { ProfessionalInfoData } from "@/app/form-schemas/professional-info"
 import { Button } from "@/components/ui/button"
 import {
   Command,

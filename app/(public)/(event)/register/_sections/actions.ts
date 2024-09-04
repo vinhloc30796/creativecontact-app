@@ -32,7 +32,7 @@ import { checkUserEmailConfirmed, checkUserIsAnonymous, getUserId } from "@/app/
 export async function getRegistrationsForSlots(
   slotIds: string[],
 ): Promise<EventRegistration[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.from("event_registrations").select(
     "*",
   ).in("slot", slotIds).in("status", ["confirmed", "pending"]);
@@ -46,7 +46,7 @@ export async function getRegistrationsForSlots(
 
 export async function signInAnonymously() {
   const cookieStore = cookies();
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.auth.signInAnonymously();
   // Return or error
   if (error) {
@@ -59,7 +59,7 @@ export async function signInAnonymously() {
 export async function confirmRegistration(
   signature: string,
 ): Promise<RegistrationConfirm> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Start a transaction
   const { data: registration, error: fetchError } = await supabase.from(
@@ -346,7 +346,7 @@ export async function createRegistration(
 }
 
 export async function cancelExpiredRegistrations() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     await supabase.rpc("cancel_expired_registrations");

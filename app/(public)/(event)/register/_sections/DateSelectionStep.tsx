@@ -12,7 +12,7 @@ import { CalendarIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { getRegistrationsForSlots } from './actions';
-import { EventRegistrationData } from './formSchema';
+import { EventRegistrationData } from "@/app/form-schemas/event-registration"
 import { formatDateTime, getAvailableCapacity, getSlotsForDate } from './utils';
 
 interface DateSelectionStepProps {

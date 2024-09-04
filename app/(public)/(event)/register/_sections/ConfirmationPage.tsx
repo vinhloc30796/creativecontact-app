@@ -1,9 +1,9 @@
-import React from 'react'
-import { FormData } from './types'
+import { ContactInfoData } from "@/app/form-schemas/contact-info"
+import { EventRegistrationData } from "@/app/form-schemas/event-registration"
+import { ProfessionalInfoData } from "@/app/form-schemas/professional-info"
 import { EventSlot } from '@/app/types/EventSlot'
-import { formatInTimeZone } from 'date-fns-tz'
 import { TIMEZONE } from '@/lib/timezones'
-import { ContactInfoData, EventRegistrationData, ProfessionalInfoData } from './formSchema'
+import { formatInTimeZone } from 'date-fns-tz'
 
 interface ConfirmationPageProps {
 	contactInfoData: ContactInfoData

@@ -21,6 +21,7 @@ import { useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { loadArtwork } from "./actions";
+import { useFormUserId } from "@/hooks/useFormUserId";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -52,39 +53,9 @@ function createEmailLink(event: {
 }
 
 export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
-  if (!eventData) {
-    return (
-      <BackgroundDiv eventSlug={eventSlug}>
-        <Card className="w-[400px] mx-auto mt-10">
-          <CardHeader
-            className="border-b aspect-video bg-accent-foreground text-accent-foreground"
-            style={{
-              backgroundImage: `url(/${eventSlug}-background.png)`,
-              backgroundSize: "cover",
-            }}
-          >
-          </CardHeader>
-          <CardContent className="p-6 flex flex-col gap-2">
-            <CardTitle>Event Not Found</CardTitle>
-            <p className="mb-4">The event &quot;{eventSlug}&quot; does not exist. Did you mean one of these?</p>
-            <div className="space-y-2">
-              {recentEvents.map((recentEvent) => (
-                <Button key={recentEvent.id} asChild variant="outline" className="w-full">
-                  <Link href={`/${recentEvent.slug}/upload`}>
-                    {recentEvent.name}
-                  </Link>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </BackgroundDiv>
-    );
-  }
-
-  const emailLink = createEmailLink(eventData);
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
+  const resolveFormUserId = useFormUserId();
   // Context
   const { currentArtwork, artworks, setCurrentArtwork, addArtwork } = useArtwork();
   // States
@@ -122,6 +93,37 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       description: currentArtwork?.description || "",
     },
   });
+
+  if (!eventData) {
+    return (
+      <BackgroundDiv eventSlug={eventSlug}>
+        <Card className="w-[400px] mx-auto mt-10">
+          <CardHeader
+            className="border-b aspect-video bg-accent-foreground text-accent-foreground"
+            style={{
+              backgroundImage: `url(/${eventSlug}-background.png)`,
+              backgroundSize: "cover",
+            }}
+          >
+          </CardHeader>
+          <CardContent className="p-6 flex flex-col gap-2">
+            <CardTitle>Event Not Found</CardTitle>
+            <p className="mb-4">The event &quot;{eventSlug}&quot; does not exist. Did you mean one of these?</p>
+            <div className="space-y-2">
+              {recentEvents.map((recentEvent) => (
+                <Button key={recentEvent.id} asChild variant="outline" className="w-full">
+                  <Link href={`/${recentEvent.slug}/upload`}>
+                    {recentEvent.name}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </BackgroundDiv>
+    );
+  }
+  const emailLink = createEmailLink(eventData);
 
   // Actions
   const handleArtworkSubmit = async (data: ArtworkInfoData) => {
@@ -177,10 +179,14 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     try {
       const isValid = await handleValidation();
       if (!isValid) return false;
-
+      // Get form values
+      const contactInfoData = contactInfoForm.getValues();
+      const professionalInfoData = professionalInfoForm.getValues();
       const artworkData = artworkForm.getValues();
+      // Hook into user ID
+      const formUserId = await resolveFormUserId(contactInfoData.email);
       const result = await loadArtwork(
-        user?.id!,
+        formUserId,
         artworkData, 
         artworkAssets
       );

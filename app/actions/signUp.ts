@@ -3,7 +3,7 @@ import { adminSupabaseClient } from "@/utils/supabase/server-admin";
 
 
 export async function signUpUser(email: string, isAnonymous: boolean = true) {
-  const supabase = createClient();
+  const supabase = await createClient();
   if (isAnonymous) {
     // then use signInAnonymously
     // first by creating an anonymous user

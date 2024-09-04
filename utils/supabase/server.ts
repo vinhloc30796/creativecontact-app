@@ -1,9 +1,9 @@
 // File: utils/supabase/server.ts
 
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 
-export function createClient() {
+export async function createClient() {
+	const { cookies } = await import('next/headers') 
 	const cookieStore = cookies()
 	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 	const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
