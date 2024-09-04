@@ -13,7 +13,7 @@ import { Progress } from '@/components/ui/progress'
 import { useAuth } from '@/hooks/useAuth'; // Import the new hook
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FormProvider, useForm, UseFormReturn } from 'react-hook-form'
 import { ContactInfoStep } from '../../../../../components/user/ContactInfoStep'
 import { ProfessionalInfoStep } from '../../../../../components/user/ProfessionalInfoStep'
@@ -35,7 +35,7 @@ type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData & Ev
 export default function RegistrationForm({ initialEventSlots }: RegistrationFormProps) {
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
-  const resolveFormUserId = useFormUserId();
+  const { resolveFormUserId, userData, isLoading: isUserDataLoading } = useFormUserId();
   // States
   const [formStep, setFormStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -45,7 +45,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   const [registrationStatus, setRegistrationStatus] = useState<'pending' | 'confirmed' | 'checked-in' | 'cancelled'>('pending');
   const [existingRegistration, setExistingRegistration] = useState<EventRegistrationWithSlot | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-
+  // Form setup
   const contactInfoForm = useForm<ContactInfoData>({
     resolver: zodResolver(contactInfoSchema),
     mode: 'onSubmit',
@@ -92,6 +92,23 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       slot: '',
     }
   })
+  
+  // Effects
+  useEffect(() => {
+    if (userData && !isLoading) {
+      // Auto-fill form fields
+      contactInfoForm.reset({
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+      });
+      professionalInfoForm.reset({
+        industries: userData.industries || [],
+        experience: userData.experience || undefined,
+      });
+    }
+  }, [userData, isLoading]);
 
   // Update this function to sync professionalInfo state with the form
   const updateProfessionalInfo = (data: ProfessionalInfoData) => {

@@ -17,7 +17,7 @@ import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
 import { useAuth } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { loadArtwork } from "./actions";
@@ -55,7 +55,7 @@ function createEmailLink(event: {
 export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
-  const resolveFormUserId = useFormUserId();
+  const { resolveFormUserId, userData, isLoading: isUserDataLoading } = useFormUserId();
   // Context
   const { currentArtwork, artworks, setCurrentArtwork, addArtwork } = useArtwork();
   // States
@@ -93,6 +93,23 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       description: currentArtwork?.description || "",
     },
   });
+  
+  // Effects
+  useEffect(() => {
+    if (userData && !isLoading) {
+      // Auto-fill form fields
+      contactInfoForm.reset({
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+      });
+      professionalInfoForm.reset({
+        industries: userData.industries || [],
+        experience: userData.experience || undefined,
+      });
+    }
+  }, [userData, isLoading]);
 
   if (!eventData) {
     return (
