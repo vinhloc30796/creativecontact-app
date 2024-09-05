@@ -108,7 +108,7 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
         experience: userData.experience || undefined,
       });
     }
-  }, [userData, isLoading]);
+  }, [userData, isLoading, professionalInfoForm, contactInfoForm]);
 
   // Update this function to sync professionalInfo state with the form
   const updateProfessionalInfo = (data: ProfessionalInfoData) => {

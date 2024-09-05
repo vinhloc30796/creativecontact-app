@@ -20,8 +20,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
-import { loadArtwork } from "./actions";
+import { createArtwork, insertArtworkAssets } from "./actions";
 import { useFormUserId } from "@/hooks/useFormUserId";
+import { createEmailLink } from "@/lib/links";
+import { useRouter } from "next/navigation";
+import { writeUserInfo } from "../../(event)/register/_sections/actions";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -39,18 +42,7 @@ interface UploadPageClientProps {
 
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>;
 
-function createEmailLink(event: {
-  id: string;
-  name: string;
-  slug: string;
-}) {
-  const email = `hello+${event.slug}@creativecontact.vn`;
-  const emailSubject = `Upload Files for Event: ${event.name}`;
-  const emailBody = `Hi Creative Contact,
 
-  I"d like to upload files for the event "${event.name}".`
-  return `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-}
 
 export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
   // Auth
@@ -62,6 +54,9 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
   const [artworkAssets, setArtworkAssets] = useState<{ id: string; path: string; fullPath: string; }[]>([]);
+  const [isNewArtwork, setIsNewArtwork] = useState(true);
+  // Router
+  const router = useRouter();
   // Form setup
   const [formStep, setFormStep] = useState(0);
   const contactInfoForm = useForm<ContactInfoData>({
@@ -93,7 +88,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       description: currentArtwork?.description || "",
     },
   });
-  
+
   // Effects
   useEffect(() => {
     if (userData && !isLoading) {
@@ -109,7 +104,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         experience: userData.experience || undefined,
       });
     }
-  }, [userData, isLoading]);
+  }, [userData, isLoading, professionalInfoForm, contactInfoForm]);
 
   if (!eventData) {
     return (
@@ -154,19 +149,22 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     }
     addArtwork(processedData);
     setCurrentArtwork(processedData);
-    artworkForm.setValue("uuid", processedData.uuid);
-    artworkForm.setValue("title", processedData.title);
-    artworkForm.setValue("description", processedData.description);
+    artworkForm.setValue("uuid", processedData?.uuid || "");
+    artworkForm.setValue("title", processedData?.title || "");
+    artworkForm.setValue("description", processedData?.description || "");
     setArtworkUUID(processedData.uuid); // Update artworkUUID state
-  };
 
-  const handleExistingArtworkSelect = (artwork: ArtworkInfoData) => {
-    setCurrentArtwork(artwork);
-    artworkForm.reset({
-      uuid: artwork.uuid,
-      title: artwork.title,
-      description: artwork.description,
-    });
+    // Create artwork in the database
+    if (isNewArtwork) {
+    const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
+    const createResult = await createArtwork(
+        formUserId,
+        processedData
+      );
+      console.log("Artwork created:", createResult);
+    } else {
+      console.log("Using existing artwork:", processedData.uuid);
+    }
   };
 
   const handleAssetUpload = (
@@ -200,15 +198,44 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       const contactInfoData = contactInfoForm.getValues();
       const professionalInfoData = professionalInfoForm.getValues();
       const artworkData = artworkForm.getValues();
+      // Debug
+      console.debug('Submit button clicked')
+      console.debug('Current contact:', contactInfoForm.getValues())
+      console.debug('Current professional info:', professionalInfoForm.getValues())
+      console.debug('isSubmitting:', isSubmitting)
       // Hook into user ID
       const formUserId = await resolveFormUserId(contactInfoData.email);
-      const result = await loadArtwork(
+      // Write user info
+      const writeUserInfoResult = await writeUserInfo(
         formUserId,
-        artworkData, 
+        {
+          phone: contactInfoData.phone,
+          firstName: contactInfoData.firstName,
+          lastName: contactInfoData.lastName,
+        },
+        {
+          industries: professionalInfoData.industries,
+          experience: professionalInfoData.experience,
+        }
+      );
+      console.log("Write user info successful:", writeUserInfoResult);
+      // Insert assets
+      const insertAssetsResult = await insertArtworkAssets(
+        artworkData.uuid,
         artworkAssets
       );
 
-      console.log("Submission successful:", result);
+      console.log("Insert assets successful:", insertAssetsResult);
+
+      // Redirect to upload-confirmed page
+      const params = new URLSearchParams({
+        email: contactInfoData.email,
+        userId: formUserId,
+        artworkId: artworkData.uuid,
+        emailSent: 'true' // Assuming email was sent successfully
+      });
+      // Use router.push for client-side navigation
+      router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
       return true;
     } catch (error) {
       console.error("error", error);
@@ -246,7 +273,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         <ArtworkInfoStep
           form={artworkForm}
           artworks={artworks}
-          handleExistingArtworkSelect={handleExistingArtworkSelect}
+          setIsNewArtwork={setIsNewArtwork}
         />
       ),
       form: artworkForm,
@@ -260,13 +287,12 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       title: "Upload Files",
       description: `Upload files for ${currentArtwork?.title ?? "your artwork"}`,
       component: (
-        <>
-          <MediaUpload artworkUUID={artworkUUID || undefined} onUpload={handleAssetUpload} />
-          <p className="text-sm text-foreground mb-2">Or, you can email us:</p>
-          <Button variant="outline" className="w-full" asChild>
-            <Link href={emailLink}>Email Us</Link>
-          </Button>
-        </>
+        <MediaUpload
+          artworkUUID={artworkUUID || undefined}
+          emailLink={emailLink}
+          onUpload={handleAssetUpload} 
+          isNewArtwork={isNewArtwork}
+        />
       ),
       form: null,
       handlePreSubmit: null,
@@ -314,7 +340,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
               <p>{currentStep.description}</p>
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {isLoading ? "Loading user information..." : `You"re ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+                  {isLoading ? "Loading user information..." : `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
                 </p>
               </div>
               <Progress value={progress} className="w-full" />
