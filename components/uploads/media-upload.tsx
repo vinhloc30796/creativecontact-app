@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Progress } from "@/components/ui/progress"
+import { Reorder } from "framer-motion"
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -12,7 +13,7 @@ import Link from 'next/link'
 import { useCallback, useState, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -147,40 +148,35 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
                       {uploadedFiles.length} files uploaded
                     </Badge>
                   </DialogTrigger>
-                  <DialogContent
-                    className="max-h-[75vh] overflow-y-auto"
-                    >
+                  <DialogContent className="max-h-[75vh] overflow-y-auto" >
                     <DialogHeader>
                       <DialogTitle>Uploaded Files</DialogTitle>
+                      <DialogDescription>
+                        This reordering is for fun.
+                        It doesn't affect the order of the files in the database.
+                      </DialogDescription>
                     </DialogHeader>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>File</TableHead>
-                          <TableHead className="text-center">Reorder</TableHead>
+                          <TableHead className="mx-auto">File</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {uploadedFiles.map((file, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="flex items-center">
-                              <div className="truncate">
-                                <span>{truncateFileName(file.name, 50)}</span>
-                                <br />
-                                <span className="text-muted-foreground">{formatSize(file.size)}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <button
-                                type="button"
-                                className="text-muted-foreground"
-                                onClick={() => console.log('reorder file', file)}
-                              >
-                                <GripVertical className="h-4 w-4" />
-                              </button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        <Reorder.Group axis="y" onReorder={setUploadedFiles} values={uploadedFiles} className="w-full">
+                          {uploadedFiles.map((file) => (
+                            <Reorder.Item key={file.name} value={file} className="w-full" as="tr">
+                              <TableCell className="flex items-center w-full">
+                                <GripVertical className="h-4 w-4 text-muted-foreground cursor-move mr-2" />
+                                <div className="truncate">
+                                  <span>{truncateFileName(file.name, 50)}</span>
+                                  <br />
+                                  <span className="text-muted-foreground">{formatSize(file.size)}</span>
+                                </div>
+                              </TableCell>
+                            </Reorder.Item>
+                          ))}
+                        </Reorder.Group>
                       </TableBody>
                     </Table>
                   </DialogContent>
