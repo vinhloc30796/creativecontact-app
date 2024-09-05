@@ -30,18 +30,13 @@ function getAssetType(path: string): "image" | "video" | "audio" | "font" | null
   return null;
 }
 
-export async function loadArtwork(
+export async function createArtwork(
   uploaderId: string,
   artworkData: {
     uuid: string;
     title: string;
     description: string;
-  },
-  artworkAssets: {
-    id: string;
-    path: string;
-    fullPath: string;
-  }[]
+  }
 ) {
   const result = await db.transaction(async (tx) => {
     const [artwork] = await tx.insert(artworksTable).values({
@@ -50,23 +45,36 @@ export async function loadArtwork(
       description: artworkData.description,
     }).returning();
 
-    const assets = await tx.insert(artworkAssetsTable).values(
-      artworkAssets.map((asset: any) => ({
-        artworkId: artwork.id,
-        filePath: asset.path,
-        assetType: getAssetType(asset.path),
-        description: asset.description || null,
-      }))
-    ).returning();
-
     await tx.insert(artworkCreditsTable).values({
       artworkId: artwork.id,
       userId: uploaderId,
       role: "Uploader",
     });
 
-    return { artwork, assets };
+    return { artwork };
   });
 
+  return result;
+}
+
+export async function insertArtworkAssets(
+  artworkId: string,
+  artworkAssets: {
+    id: string;
+    path: string;
+    fullPath: string;
+  }[]
+) {
+  const result = await db.transaction(async (tx) => {
+    const assets = await tx.insert(artworkAssetsTable).values(
+      artworkAssets.map((asset: any) => ({
+        artworkId: artworkId,
+        filePath: asset.path,
+        assetType: getAssetType(asset.path),
+        description: asset.description || null,
+      }))
+    ).returning();
+    return assets;
+  });
   return result;
 }

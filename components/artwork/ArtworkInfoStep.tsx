@@ -1,5 +1,5 @@
 import { ArtworkInfoData } from '@/app/form-schemas/artwork-info'
-import { FormControl, FormField, FormDescription, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from '@/components/ui/textarea'
@@ -22,9 +22,7 @@ function ExistingArtworkSelector({ form, artworks }: { form: UseFormReturn<Artwo
     if (selectedArtwork) {
       const artwork = artworks.find(a => a.uuid === selectedArtwork)
       if (artwork) {
-        form.setValue('title', artwork.title)
-        form.setValue('description', artwork.description)
-        // Add other fields as necessary
+        form.reset(artwork)
       }
     }
   }, [selectedArtwork, artworks, form])
@@ -33,10 +31,18 @@ function ExistingArtworkSelector({ form, artworks }: { form: UseFormReturn<Artwo
     <FormItem>
       <FormLabel>Existing artwork</FormLabel>
       <FormDescription>Select one if you want to update an existing artwork</FormDescription>
-      <Select onValueChange={setSelectedArtwork} value={selectedArtwork}>
+      <Select onValueChange={
+        (value) => {
+          setSelectedArtwork(value)
+          form.reset({
+            uuid: value,
+            ...artworks.find(a => a.uuid === value)
+          })
+        }
+      } defaultValue=''>
         <FormControl>
           <SelectTrigger>
-            <SelectValue placeholder="Select an existing artwork" />
+            <SelectValue />
           </SelectTrigger>
         </FormControl>
         <SelectContent>

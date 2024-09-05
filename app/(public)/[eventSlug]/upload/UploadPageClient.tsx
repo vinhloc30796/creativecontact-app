@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
-import { loadArtwork } from "./actions";
+import { createArtwork, insertArtworkAssets } from "./actions";
 import { useFormUserId } from "@/hooks/useFormUserId";
 import { createEmailLink } from "@/lib/links";
 import { useRouter } from "next/navigation";
@@ -151,6 +151,14 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     artworkForm.setValue("title", processedData.title);
     artworkForm.setValue("description", processedData.description);
     setArtworkUUID(processedData.uuid); // Update artworkUUID state
+
+    // Create artwork in the database
+    const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
+    const createResult = await createArtwork(
+      formUserId,
+      processedData
+    );
+    console.log("Artwork created:", createResult);
   };
 
   const handleExistingArtworkSelect = (artwork: ArtworkInfoData) => {
@@ -195,19 +203,18 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       const artworkData = artworkForm.getValues();
       // Hook into user ID
       const formUserId = await resolveFormUserId(contactInfoData.email);
-      const result = await loadArtwork(
-        formUserId,
-        artworkData,
+      const insertAssetsResult = await insertArtworkAssets(
+        artworkData.uuid,
         artworkAssets
       );
 
-      console.log("Submission successful:", result);
-      
+      console.log("Insert assets successful:", insertAssetsResult);
+
       // Redirect to upload-confirmed page
       const params = new URLSearchParams({
         email: contactInfoData.email,
         userId: formUserId,
-        artworkId: result.artwork.id, // Assuming the result contains an id field
+        artworkId: artworkData.uuid,
         emailSent: 'true' // Assuming email was sent successfully
       });
       // Use router.push for client-side navigation
