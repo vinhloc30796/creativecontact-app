@@ -314,7 +314,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
               <p>{currentStep.description}</p>
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {isLoading ? "Loading user information..." : `You"re ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+                  {isLoading ? "Loading user information..." : `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
                 </p>
               </div>
               <Progress value={progress} className="w-full" />

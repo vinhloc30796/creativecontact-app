@@ -9,7 +9,7 @@ import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
 import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -111,6 +111,12 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
     }
   }
 
+  const pendingSize = useMemo(() => files.reduce((acc, file) => acc + file.size, 0), [files]);
+  const uploadedSize = useMemo(() => uploadedFiles.reduce((acc, file) => acc + file.size, 0), [uploadedFiles]);
+  const pendingPercentage = (pendingSize / maxSize) * 100;
+  const uploadedPercentage = (uploadedSize / maxSize) * 100;
+  const remainingPercentage = 100 - pendingPercentage - uploadedPercentage;
+
   return (
     <div className="w-full max-w-md mx-auto bg-background">
       <form onSubmit={(e) => { e.preventDefault(); handleUpload(); }}>
@@ -128,7 +134,9 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
         <div className="flex flex-col">
           <div className="mt-4 flex items-center">
             <p className="text-sm font-medium flex-grow">
-              Using <span className="font-bold">{formatSize(totalSize)}</span> out of 25MB limit
+              <span className="font-bold">{formatSize(uploadedSize)}</span> uploaded,{' '}
+              <span className="font-bold">{formatSize(pendingSize)}</span> pending.{' '}
+              Total: <span className="font-bold">{formatSize(uploadedSize + pendingSize)}</span> of 25MB limit
             </p>
             {uploadedFiles.length > 0 && (
               <Dialog>
@@ -167,10 +175,20 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
               <span className="text-xs">Over the 25MB limit</span>
             </div>
           )}
-          <Progress
-            value={(totalSize / maxSize) * 100}
-            className={`mt-2 ${isOverLimit ? "bg-destructive" : ""}`}
-          />
+          <div className="mt-2 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary float-left"
+              style={{ width: `${uploadedPercentage}%` }}
+            />
+            <div
+              className="h-full bg-secondary float-left"
+              style={{ width: `${pendingPercentage}%` }}
+            />
+            <div
+              className="h-full bg-muted float-left"
+              style={{ width: `${remainingPercentage}%` }}
+            />
+          </div>
         </div>
 
         {files.length > 0 && (
