@@ -1,8 +1,8 @@
 // File: app/(public)/[eventSlug]/upload/actions.ts
 "use server"
 
+import { artworkAssets as artworkAssetsTable, artworkCredits as artworkCreditsTable, artworks as artworksTable } from "@/drizzle/schema/artwork";
 import { db } from "@/lib/db";
-import { artworks as artworksTable, artworkAssets as artworkAssetsTable, artworkCredits as artworkCreditsTable } from "@/drizzle/schema/artwork";
 
 function getAssetType(path: string): "image" | "video" | "audio" | "font" | null {
   // Return "image", "video", "audio", "font"
