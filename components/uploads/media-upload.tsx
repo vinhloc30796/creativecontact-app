@@ -204,7 +204,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                       <DialogTitle>Uploaded Files</DialogTitle>
                       <DialogDescription>
                         This reordering is for fun.
-                        It doesn't affect the order of the files in the database.
+                        It doesn&apos;t affect the order of the files in the database.
                       </DialogDescription>
                     </DialogHeader>
                     <Table>

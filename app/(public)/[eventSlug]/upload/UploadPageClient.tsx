@@ -104,7 +104,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         experience: userData.experience || undefined,
       });
     }
-  }, [userData, isLoading]);
+  }, [userData, isLoading, professionalInfoForm, contactInfoForm]);
 
   if (!eventData) {
     return (
