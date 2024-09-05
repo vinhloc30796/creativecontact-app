@@ -6,10 +6,11 @@ import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { createClient } from "@/utils/supabase/client"
+import { toast } from "sonner"
 import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload } from 'lucide-react'
+import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import Link from 'next/link'
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -77,9 +78,17 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
           console.error('Error uploading file:', error.message)
+          toast.error("Error Uploading File", {
+            description: `${file.name}: ${error.message}`,
+            duration: 3000,
+          })
           errors.push({ message: error.message })
         } else {
           console.log('Files uploaded successfully:', data)
+          toast.success("File Uploaded", {
+            description: `${file.name} has been successfully uploaded.`,
+            duration: 3000,
+          })
           results.push({ id: data.path, path: data.path, fullPath: data.fullPath })
         }
       }
