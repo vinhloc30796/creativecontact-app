@@ -8,7 +8,7 @@ export async function getArtworksByUploader(uploaderId: string) {
   try {
     const artworks = await db
       .select({
-        id: artworksTable.id,
+        uuid: artworksTable.id,
         title: artworksTable.title,
         description: artworksTable.description,
         createdAt: artworksTable.createdAt,

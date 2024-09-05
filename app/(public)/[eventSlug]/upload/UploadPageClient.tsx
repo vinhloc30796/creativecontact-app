@@ -24,6 +24,7 @@ import { createArtwork, insertArtworkAssets } from "./actions";
 import { useFormUserId } from "@/hooks/useFormUserId";
 import { createEmailLink } from "@/lib/links";
 import { useRouter } from "next/navigation";
+import { writeUserInfo } from "../../(event)/register/_sections/actions";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -53,6 +54,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
   const [artworkAssets, setArtworkAssets] = useState<{ id: string; path: string; fullPath: string; }[]>([]);
+  const [isNewArtwork, setIsNewArtwork] = useState(true);
   // Router
   const router = useRouter();
   // Form setup
@@ -147,27 +149,22 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     }
     addArtwork(processedData);
     setCurrentArtwork(processedData);
-    artworkForm.setValue("uuid", processedData.uuid);
-    artworkForm.setValue("title", processedData.title);
-    artworkForm.setValue("description", processedData.description);
+    artworkForm.setValue("uuid", processedData?.uuid || "");
+    artworkForm.setValue("title", processedData?.title || "");
+    artworkForm.setValue("description", processedData?.description || "");
     setArtworkUUID(processedData.uuid); // Update artworkUUID state
 
     // Create artwork in the database
+    if (isNewArtwork) {
     const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
     const createResult = await createArtwork(
-      formUserId,
-      processedData
-    );
-    console.log("Artwork created:", createResult);
-  };
-
-  const handleExistingArtworkSelect = (artwork: ArtworkInfoData) => {
-    setCurrentArtwork(artwork);
-    artworkForm.reset({
-      uuid: artwork.uuid,
-      title: artwork.title,
-      description: artwork.description,
-    });
+        formUserId,
+        processedData
+      );
+      console.log("Artwork created:", createResult);
+    } else {
+      console.log("Using existing artwork:", processedData.uuid);
+    }
   };
 
   const handleAssetUpload = (
@@ -201,8 +198,28 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       const contactInfoData = contactInfoForm.getValues();
       const professionalInfoData = professionalInfoForm.getValues();
       const artworkData = artworkForm.getValues();
+      // Debug
+      console.debug('Submit button clicked')
+      console.debug('Current contact:', contactInfoForm.getValues())
+      console.debug('Current professional info:', professionalInfoForm.getValues())
+      console.debug('isSubmitting:', isSubmitting)
       // Hook into user ID
       const formUserId = await resolveFormUserId(contactInfoData.email);
+      // Write user info
+      const writeUserInfoResult = await writeUserInfo(
+        formUserId,
+        {
+          phone: contactInfoData.phone,
+          firstName: contactInfoData.firstName,
+          lastName: contactInfoData.lastName,
+        },
+        {
+          industries: professionalInfoData.industries,
+          experience: professionalInfoData.experience,
+        }
+      );
+      console.log("Write user info successful:", writeUserInfoResult);
+      // Insert assets
       const insertAssetsResult = await insertArtworkAssets(
         artworkData.uuid,
         artworkAssets
@@ -256,7 +273,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         <ArtworkInfoStep
           form={artworkForm}
           artworks={artworks}
-          handleExistingArtworkSelect={handleExistingArtworkSelect}
+          setIsNewArtwork={setIsNewArtwork}
         />
       ),
       form: artworkForm,
@@ -273,7 +290,9 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         <MediaUpload
           artworkUUID={artworkUUID || undefined}
           emailLink={emailLink}
-          onUpload={handleAssetUpload} />
+          onUpload={handleAssetUpload} 
+          isNewArtwork={isNewArtwork}
+        />
       ),
       form: null,
       handlePreSubmit: null,

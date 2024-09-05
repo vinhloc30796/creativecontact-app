@@ -10,45 +10,97 @@ import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
 import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload, GripVertical } from 'lucide-react'
 import Link from 'next/link'
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useState, useMemo, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useQuery } from '@tanstack/react-query'
 
 interface MediaUploadProps {
   artworkUUID?: string;
   emailLink: string;
+  isNewArtwork: boolean;
   onUpload: (
     results: { id: string; path: string; fullPath: string; }[],
     errors: { message: string }[]
   ) => void;
 }
 
-export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadProps) {
+export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: MediaUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [totalSize, setTotalSize] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: number }[]>([])
   const maxSize = 25 * 1024 * 1024 // 25MB in bytes
+  const bucketName = 'artwork_assets'
+
+  const { data: existingAssetsData } = useQuery({
+    queryKey: ['existingAssets', artworkUUID],
+    queryFn: async () => {
+      if (isNewArtwork || !artworkUUID) return null;
+      const supabase = createClient();
+      // First get the list of files
+      const { data: fileList, error } = await supabase
+        .storage
+        .from('artwork_assets')
+        .list(artworkUUID);
+      if (error) throw error;
+      // Then get the size of each file
+      const filesWithSizes = await Promise.all(fileList.map(async (file) => {
+        try {
+          const { data } = await supabase
+            .storage
+          .from('artwork_assets')
+          .getPublicUrl(`${artworkUUID}/${file.name}`);
+          const response = await fetch(data.publicUrl, { method: 'HEAD' });
+          const size = parseInt(response.headers.get('Content-Length') || '0', 10);
+          return { ...file, size };
+        } catch (error) {
+          console.error('Error getting public URL:', error);
+          return { ...file, size: 0 };
+        }
+      }));
+      return filesWithSizes;
+    },
+    enabled: !isNewArtwork && !!artworkUUID
+  });
+
+  useEffect(() => {
+    if (existingAssetsData) {
+      const existingFiles = existingAssetsData.map(asset => ({
+        name: `File ${asset.id}`,
+        size: asset.size
+      }));
+      setUploadedFiles(existingFiles);
+      const existingTotalSize = existingAssetsData.reduce((acc, asset) => acc + asset.size, 0);
+      setTotalSize(existingTotalSize);
+    }
+  }, [existingAssetsData]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newFiles = [...files, ...acceptedFiles]
     setFiles(newFiles)
-    const newTotalSize = newFiles.reduce((acc, file) => acc + file.size, 0)
+    const newTotalSize = newFiles.reduce((acc, file) => acc + file.size, 0) + totalSize
     setTotalSize(newTotalSize)
-  }, [files])
+  }, [files, totalSize])
 
   const removeFile = (fileToRemove: File) => {
     const newFiles = files.filter(file => file !== fileToRemove)
     setFiles(newFiles)
-    const newTotalSize = newFiles.reduce((acc, file) => acc + file.size, 0)
+    const newTotalSize = newFiles.reduce((acc, file) => acc + file.size, 0) + 
+      uploadedFiles.reduce((acc, file) => acc + file.size, 0)
     setTotalSize(newTotalSize)
   }
 
   const resetFiles = () => {
     setFiles([])
-    setTotalSize(0)
-    setUploadedFiles([])
+    if (isNewArtwork) {
+      setTotalSize(0)
+      setUploadedFiles([])
+    } else {
+      const existingTotalSize = uploadedFiles.reduce((acc, file) => acc + file.size, 0)
+      setTotalSize(existingTotalSize)
+    }
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -70,7 +122,6 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
   }
 
   const isOverLimit = totalSize > maxSize
-  const bucketName = 'artwork_assets'
 
   const handleUpload = async (): Promise<string | null> => {
     setUploading(true)
@@ -104,7 +155,7 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
       }
       setUploadedFiles(prevFiles => [...prevFiles, ...uploadedFilesList]);
       setFiles(remainingFiles);
-      setTotalSize(remainingFiles.reduce((acc, file) => acc + file.size, 0));
+      setTotalSize(prevSize => prevSize - uploadedFilesList.reduce((acc, file) => acc + file.size, 0));
       onUpload(results, errors)
       return artworkUUID || null
     } catch (error) {
