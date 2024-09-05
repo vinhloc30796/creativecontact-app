@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
-import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload } from 'lucide-react'
+import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload, GripVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -79,6 +79,7 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
       let errors: { message: string }[] = [];
       let successCount = 0;
       let uploadedFilesList: { name: string; size: number }[] = [];
+      let remainingFiles: File[] = [];
       for (const file of files) {
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
@@ -88,6 +89,7 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
             duration: 3000,
           })
           errors.push({ message: error.message })
+          remainingFiles.push(file)
         } else {
           console.log('Files uploaded successfully:', data)
           toast.success("File Uploaded", {
@@ -99,7 +101,9 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
           successCount++;
         }
       }
-      setUploadedFiles(uploadedFilesList);
+      setUploadedFiles(prevFiles => [...prevFiles, ...uploadedFilesList]);
+      setFiles(remainingFiles);
+      setTotalSize(remainingFiles.reduce((acc, file) => acc + file.size, 0));
       onUpload(results, errors)
       return artworkUUID || null
     } catch (error) {
@@ -135,39 +139,55 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
           <div className="mt-4 flex items-center">
             <p className="text-sm font-medium flex-grow">
               <span className="font-bold">{formatSize(uploadedSize)}</span> uploaded,{' '}
-              <span className="font-bold">{formatSize(pendingSize)}</span> pending.{' '}
-              Total: <span className="font-bold">{formatSize(uploadedSize + pendingSize)}</span> of 25MB limit
-            </p>
-            {uploadedFiles.length > 0 && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Badge variant="outline" className="ml-2 cursor-pointer">
-                    {uploadedFiles.length} files uploaded
-                  </Badge>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Uploaded Files</DialogTitle>
-                  </DialogHeader>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>File Name</TableHead>
-                        <TableHead>Size</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {uploadedFiles.map((file, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{file.name}</TableCell>
-                          <TableCell>{formatSize(file.size)}</TableCell>
+              <span className="font-bold">{formatSize(pendingSize)}</span> pending.{' '}<br />
+              Total: <span className="font-bold">{formatSize(uploadedSize + pendingSize)}</span> of 25MB limit{uploadedFiles.length > 0 && (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Badge variant="secondary" className="ml-2 cursor-pointer">
+                      {uploadedFiles.length} files uploaded
+                    </Badge>
+                  </DialogTrigger>
+                  <DialogContent
+                    className="max-h-[75vh] overflow-y-auto"
+                    >
+                    <DialogHeader>
+                      <DialogTitle>Uploaded Files</DialogTitle>
+                    </DialogHeader>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>File</TableHead>
+                          <TableHead className="text-center">Reorder</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </DialogContent>
-              </Dialog>
-            )}
+                      </TableHeader>
+                      <TableBody>
+                        {uploadedFiles.map((file, index) => (
+                          <TableRow key={index}>
+                            <TableCell className="flex items-center">
+                              <div className="truncate">
+                                <span>{truncateFileName(file.name, 50)}</span>
+                                <br />
+                                <span className="text-muted-foreground">{formatSize(file.size)}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <button
+                                type="button"
+                                className="text-muted-foreground"
+                                onClick={() => console.log('reorder file', file)}
+                              >
+                                <GripVertical className="h-4 w-4" />
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </p>
+
           </div>
           {isOverLimit && (
             <div className="flex items-center text-destructive mt-2">
