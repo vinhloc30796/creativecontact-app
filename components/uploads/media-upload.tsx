@@ -1,22 +1,27 @@
 "use client"
 
+import { Button } from '@/components/ui/button'
+import { Progress } from "@/components/ui/progress"
+import { Separator } from '@/components/ui/separator'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { createClient } from "@/utils/supabase/client"
+import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Upload, File, AlertCircle, Trash2 } from 'lucide-react'
-import { Progress } from "@/components/ui/progress"
-import { createClient } from "@/utils/supabase/client"
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import Link from 'next/link'
 
 interface MediaUploadProps {
   artworkUUID?: string;
+  emailLink: string;
   onUpload: (
     results: { id: string; path: string; fullPath: string; }[],
     errors: { message: string }[]
   ) => void;
 }
 
-export function MediaUpload({ artworkUUID, onUpload }: MediaUploadProps) {
+
+export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [totalSize, setTotalSize] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -103,11 +108,12 @@ export function MediaUpload({ artworkUUID, onUpload }: MediaUploadProps) {
             Drag &apos;n&apos; drop some files here, or click to select files
           </p>
         </div>
-
-        <div className="mt-4">
-          <p className="text-sm font-medium">
-            Using <span className="font-bold">{formatSize(totalSize)}</span> out of 25MB limit
-          </p>
+        <div className="flex flex-col">
+          <div className="mt-4 flex items-center">
+            <p className="text-sm font-medium flex-grow">
+              Using <span className="font-bold">{formatSize(totalSize)}</span> out of 25MB limit
+            </p>
+          </div>
           {isOverLimit && (
             <div className="flex items-center text-destructive mt-2">
               <AlertCircle className="h-4 w-4 mr-1" />
@@ -153,16 +159,40 @@ export function MediaUpload({ artworkUUID, onUpload }: MediaUploadProps) {
           </Table>
         )}
 
-        <div className="flex mt-4 space-x-2">
-          <Button
-            type="button"
-            className="w-full font-bold"
-            variant="destructive-outline"
-            onClick={resetFiles}
-            disabled={uploading || files.length === 0}
-          >
-            Reset
-          </Button>
+        <div className="flex mt-4 space-x-2 items-center">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-full"
+                >
+                  <Link href={emailLink}>
+                    <MailIcon className="h-4 w-4" aria-label="Email Us" />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Email Us</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  type="button"
+                  variant="destructive-outline"
+                  className="w-full"
+                  onClick={resetFiles}
+                  disabled={uploading || files.length === 0}
+                >
+                  <RefreshCw className="h-4 w-4" aria-label="Reset" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Reset</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <Separator orientation="vertical" className="h-6" />
           <Button
             type="submit"
             className="w-full font-bold"
@@ -170,7 +200,6 @@ export function MediaUpload({ artworkUUID, onUpload }: MediaUploadProps) {
           >
             {uploading ? 'Uploading...' : 'Upload Files'}
           </Button>
-
         </div>
       </form>
     </div>

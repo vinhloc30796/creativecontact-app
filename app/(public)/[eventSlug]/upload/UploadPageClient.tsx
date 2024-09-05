@@ -22,6 +22,7 @@ import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { loadArtwork } from "./actions";
 import { useFormUserId } from "@/hooks/useFormUserId";
+import { createEmailLink } from "@/lib/links";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -39,18 +40,7 @@ interface UploadPageClientProps {
 
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>;
 
-function createEmailLink(event: {
-  id: string;
-  name: string;
-  slug: string;
-}) {
-  const email = `hello+${event.slug}@creativecontact.vn`;
-  const emailSubject = `Upload Files for Event: ${event.name}`;
-  const emailBody = `Hi Creative Contact,
 
-  I"d like to upload files for the event "${event.name}".`
-  return `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-}
 
 export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
   // Auth
@@ -93,7 +83,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       description: currentArtwork?.description || "",
     },
   });
-  
+
   // Effects
   useEffect(() => {
     if (userData && !isLoading) {
@@ -204,7 +194,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       const formUserId = await resolveFormUserId(contactInfoData.email);
       const result = await loadArtwork(
         formUserId,
-        artworkData, 
+        artworkData,
         artworkAssets
       );
 
@@ -260,13 +250,10 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       title: "Upload Files",
       description: `Upload files for ${currentArtwork?.title ?? "your artwork"}`,
       component: (
-        <>
-          <MediaUpload artworkUUID={artworkUUID || undefined} onUpload={handleAssetUpload} />
-          <p className="text-sm text-foreground mb-2">Or, you can email us:</p>
-          <Button variant="outline" className="w-full" asChild>
-            <Link href={emailLink}>Email Us</Link>
-          </Button>
-        </>
+        <MediaUpload
+          artworkUUID={artworkUUID || undefined}
+          emailLink={emailLink}
+          onUpload={handleAssetUpload} />
       ),
       form: null,
       handlePreSubmit: null,
