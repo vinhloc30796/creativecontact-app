@@ -23,6 +23,7 @@ import { v4 as uuidv4 } from "uuid";
 import { loadArtwork } from "./actions";
 import { useFormUserId } from "@/hooks/useFormUserId";
 import { createEmailLink } from "@/lib/links";
+import { useRouter } from "next/navigation";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -52,6 +53,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
   const [artworkAssets, setArtworkAssets] = useState<{ id: string; path: string; fullPath: string; }[]>([]);
+  // Router
+  const router = useRouter();
   // Form setup
   const [formStep, setFormStep] = useState(0);
   const contactInfoForm = useForm<ContactInfoData>({
@@ -199,6 +202,16 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       );
 
       console.log("Submission successful:", result);
+      
+      // Redirect to upload-confirmed page
+      const params = new URLSearchParams({
+        email: contactInfoData.email,
+        userId: formUserId,
+        artworkId: result.artwork.id, // Assuming the result contains an id field
+        emailSent: 'true' // Assuming email was sent successfully
+      });
+      // Use router.push for client-side navigation
+      router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
       return true;
     } catch (error) {
       console.error("error", error);
