@@ -11,6 +11,8 @@ import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -21,11 +23,11 @@ interface MediaUploadProps {
   ) => void;
 }
 
-
 export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [totalSize, setTotalSize] = useState(0)
   const [uploading, setUploading] = useState(false)
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: number }[]>([])
   const maxSize = 25 * 1024 * 1024 // 25MB in bytes
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -45,6 +47,7 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
   const resetFiles = () => {
     setFiles([])
     setTotalSize(0)
+    setUploadedFiles([])
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -74,6 +77,8 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
       const supabase = createClient()
       let results: { id: string; path: string; fullPath: string; }[] = [];
       let errors: { message: string }[] = [];
+      let successCount = 0;
+      let uploadedFilesList: { name: string; size: number }[] = [];
       for (const file of files) {
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
@@ -90,8 +95,11 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
             duration: 3000,
           })
           results.push({ id: data.path, path: data.path, fullPath: data.fullPath })
+          uploadedFilesList.push({ name: file.name, size: file.size })
+          successCount++;
         }
       }
+      setUploadedFiles(uploadedFilesList);
       onUpload(results, errors)
       return artworkUUID || null
     } catch (error) {
@@ -122,6 +130,36 @@ export function MediaUpload({ artworkUUID, emailLink, onUpload }: MediaUploadPro
             <p className="text-sm font-medium flex-grow">
               Using <span className="font-bold">{formatSize(totalSize)}</span> out of 25MB limit
             </p>
+            {uploadedFiles.length > 0 && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Badge variant="outline" className="ml-2 cursor-pointer">
+                    {uploadedFiles.length} files uploaded
+                  </Badge>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Uploaded Files</DialogTitle>
+                  </DialogHeader>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>File Name</TableHead>
+                        <TableHead>Size</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {uploadedFiles.map((file, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{file.name}</TableCell>
+                          <TableCell>{formatSize(file.size)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
           {isOverLimit && (
             <div className="flex items-center text-destructive mt-2">
