@@ -8,8 +8,16 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import { useQuery } from '@tanstack/react-query';
 
-function UploadConfirmedContent() {
+interface UploadConfirmedContentProps {
+  params: {
+    eventSlug: string;
+  };
+}
+
+function UploadConfirmedContent({ params }: UploadConfirmedContentProps) {
+  const { eventSlug } = params;
   const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
   const { user, isLoading } = useAuth();
   const searchParams = useSearchParams();
@@ -32,12 +40,25 @@ function UploadConfirmedContent() {
     setEmailStatus(emailSent ? 'sent' : 'error');
   }, [searchParams]);
 
+  const { data: artwork, isLoading: isArtworkLoading, error: artworkError } = useQuery({
+    queryKey: ['artwork', uploadInfo.artworkId],
+    queryFn: async () => {
+      if (!uploadInfo.artworkId) return null;
+      const response = await fetch(`/api/artworks/${uploadInfo.artworkId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch artwork');
+      }
+      return response.json();
+    },
+    enabled: !!uploadInfo.artworkId,
+  });
+
   return (
-    <BackgroundDiv>
+    <BackgroundDiv eventSlug={eventSlug}>
       <Card className="w-[400px] overflow-hidden relative z-10">
         <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
           style={{
-            backgroundImage: 'url(/upload-confirmed-background.png)',
+            backgroundImage: `url(/${eventSlug}-background.png)`,
             backgroundSize: 'cover',
           }}
         />
@@ -71,7 +92,22 @@ function UploadConfirmedContent() {
           </div>
 
           <div className="bg-gray-100 p-4 rounded-md space-y-4">
-            <p><strong>Artwork ID:</strong> {uploadInfo.artworkId || 'Not available'}</p>
+            {isArtworkLoading ? (
+              <p>Loading artwork information...</p>
+            ) : artworkError ? (
+              <p>Error loading artwork information. Please try again.</p>
+            ) : artwork ? (
+              <>
+                <p><strong>Artwork ID:</strong> {artwork.id}</p>
+                <ul className='list-disc list-inside'>
+                  <li><strong>Title:</strong> {artwork.title}</li>
+                  <li><strong>Description:</strong> {artwork.description}</li>
+                </ul>
+                {/* Add more artwork details as needed */}
+              </>
+            ) : (
+              <p>No artwork information available.</p>
+            )}
           </div>
         </CardContent>
       </Card>
