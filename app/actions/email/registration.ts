@@ -38,17 +38,18 @@ export async function sendConfirmationRequestEmail(
         redirectTo: registrationURL,
       },
     });
-
+    
+    const escapedEmail = encodeURIComponent(email);
     if (linkResponse.error) {
       console.warn("Magic link generation failed:", linkResponse.error);
       // Fallback to a direct confirmation URL without the magic link
       confirmationURL =
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/confirm-registration?signature=${signature}&email=${email}`;
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/confirm-registration?signature=${signature}&email=${escapedEmail}`;
     } else {
       linkData = linkResponse.data;
       console.log("Magic link confirmation URL:", linkData);
       confirmationURL =
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${email}&ignoreOtpExpired=true&type=magiclink&redirect_to=${registrationURL}`;
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${escapedEmail}&ignoreOtpExpired=true&type=magiclink&redirect_to=${registrationURL}`;
     }
 
     // Send email

@@ -27,10 +27,10 @@ interface MediaUploadProps {
 }
 
 export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: MediaUploadProps) {
-  const [files, setFiles] = useState<File[]>([])
-  const [totalSize, setTotalSize] = useState(0)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
+  const [existingFiles, setExistingFiles] = useState<{ id: string; path: string; fullPath: string; name: string; size: number }[]>([])
+  const [uploadedFiles, setUploadedFiles] = useState<{ id: string; path: string; fullPath: string; name: string; size: number }[]>([])
   const [uploading, setUploading] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: number }[]>([])
   const maxSize = 25 * 1024 * 1024 // 25MB in bytes
   const bucketName = 'artwork_assets'
 
@@ -50,8 +50,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
         try {
           const { data } = await supabase
             .storage
-          .from('artwork_assets')
-          .getPublicUrl(`${artworkUUID}/${file.name}`);
+            .from('artwork_assets')
+            .getPublicUrl(`${artworkUUID}/${file.name}`);
           const response = await fetch(data.publicUrl, { method: 'HEAD' });
           const size = parseInt(response.headers.get('Content-Length') || '0', 10);
           return { ...file, size };
@@ -68,38 +68,29 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
   useEffect(() => {
     if (existingAssetsData) {
       const existingFiles = existingAssetsData.map(asset => ({
+        id: asset.id,
+        path: asset.name,
+        fullPath: `${artworkUUID}/${asset.name}`,
         name: `File ${asset.id}`,
         size: asset.size
       }));
-      setUploadedFiles(existingFiles);
-      const existingTotalSize = existingAssetsData.reduce((acc, asset) => acc + asset.size, 0);
-      setTotalSize(existingTotalSize);
+      setExistingFiles(existingFiles);
     }
   }, [existingAssetsData]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const newFiles = [...files, ...acceptedFiles]
-    setFiles(newFiles)
-    const newTotalSize = newFiles.reduce((acc, file) => acc + file.size, 0) + totalSize
-    setTotalSize(newTotalSize)
-  }, [files, totalSize])
+    setPendingFiles(prevFiles => [...prevFiles, ...acceptedFiles])
+  }, [])
 
   const removeFile = (fileToRemove: File) => {
-    const newFiles = files.filter(file => file !== fileToRemove)
-    setFiles(newFiles)
-    const newTotalSize = newFiles.reduce((acc, file) => acc + file.size, 0) + 
-      uploadedFiles.reduce((acc, file) => acc + file.size, 0)
-    setTotalSize(newTotalSize)
+    setPendingFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove))
   }
 
   const resetFiles = () => {
-    setFiles([])
+    setPendingFiles([])
     if (isNewArtwork) {
-      setTotalSize(0)
+      setExistingFiles([])
       setUploadedFiles([])
-    } else {
-      const existingTotalSize = uploadedFiles.reduce((acc, file) => acc + file.size, 0)
-      setTotalSize(existingTotalSize)
     }
   }
 
@@ -121,6 +112,11 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
     return truncatedName + ext
   }
 
+  const pendingSize = useMemo(() => pendingFiles.reduce((acc, file) => acc + file.size, 0), [pendingFiles]);
+  const existingSize = useMemo(() => existingFiles.reduce((acc, file) => acc + file.size, 0), [existingFiles]);
+  const uploadedSize = useMemo(() => uploadedFiles.reduce((acc, file) => acc + file.size, 0), [uploadedFiles]);
+  const totalSize = pendingSize + existingSize + uploadedSize;
+
   const isOverLimit = totalSize > maxSize
 
   const handleUpload = async (): Promise<string | null> => {
@@ -130,9 +126,9 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
       let results: { id: string; path: string; fullPath: string; }[] = [];
       let errors: { message: string }[] = [];
       let successCount = 0;
-      let uploadedFilesList: { name: string; size: number }[] = [];
+      let uploadedFilesList: { id: string; path: string; fullPath: string; name: string; size: number }[] = [];
       let remainingFiles: File[] = [];
-      for (const file of files) {
+      for (const file of pendingFiles) {
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
           console.error('Error uploading file:', error.message)
@@ -149,14 +145,19 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
             duration: 3000,
           })
           results.push({ id: data.path, path: data.path, fullPath: data.fullPath })
-          uploadedFilesList.push({ name: file.name, size: file.size })
+          uploadedFilesList.push({ 
+            id: data.path, 
+            path: data.path, 
+            fullPath: data.fullPath, 
+            name: file.name, 
+            size: file.size 
+          })
           successCount++;
         }
       }
       setUploadedFiles(prevFiles => [...prevFiles, ...uploadedFilesList]);
-      setFiles(remainingFiles);
-      setTotalSize(prevSize => prevSize - uploadedFilesList.reduce((acc, file) => acc + file.size, 0));
-      onUpload(results, errors)
+      setPendingFiles(remainingFiles);
+      onUpload(uploadedFilesList, errors)
       return artworkUUID || null
     } catch (error) {
       console.error('Error uploading files:', error)
@@ -167,11 +168,10 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
     }
   }
 
-  const pendingSize = useMemo(() => files.reduce((acc, file) => acc + file.size, 0), [files]);
-  const uploadedSize = useMemo(() => uploadedFiles.reduce((acc, file) => acc + file.size, 0), [uploadedFiles]);
   const pendingPercentage = (pendingSize / maxSize) * 100;
+  const existingPercentage = (existingSize / maxSize) * 100;
   const uploadedPercentage = (uploadedSize / maxSize) * 100;
-  const remainingPercentage = 100 - pendingPercentage - uploadedPercentage;
+  const remainingPercentage = 100 - pendingPercentage - existingPercentage - uploadedPercentage;
 
   return (
     <div className="w-full max-w-md mx-auto bg-background">
@@ -190,18 +190,20 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
         <div className="flex flex-col">
           <div className="mt-4 flex items-center">
             <p className="text-sm font-medium flex-grow">
+              <span className="font-bold">{formatSize(existingSize)}</span> existing,{' '}
               <span className="font-bold">{formatSize(uploadedSize)}</span> uploaded,{' '}
               <span className="font-bold">{formatSize(pendingSize)}</span> pending.{' '}<br />
-              Total: <span className="font-bold">{formatSize(uploadedSize + pendingSize)}</span> of 25MB limit{uploadedFiles.length > 0 && (
+              Total: <span className="font-bold">{formatSize(totalSize)}</span> of 25MB limit
+              {(existingFiles.length > 0 || uploadedFiles.length > 0) && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Badge variant="secondary" className="ml-2 cursor-pointer">
-                      {uploadedFiles.length} files uploaded
+                      {existingFiles.length + uploadedFiles.length} files
                     </Badge>
                   </DialogTrigger>
                   <DialogContent className="max-h-[75vh] overflow-y-auto" >
                     <DialogHeader>
-                      <DialogTitle>Uploaded Files</DialogTitle>
+                      <DialogTitle>Existing and Uploaded Files</DialogTitle>
                       <DialogDescription>
                         This reordering is for fun.
                         It doesn&apos;t affect the order of the files in the database.
@@ -214,6 +216,20 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                         </TableRow>
                       </TableHeader>
                       <TableBody>
+                        <Reorder.Group axis="y" onReorder={setExistingFiles} values={existingFiles} className="w-full">
+                          {existingFiles.map((file) => (
+                            <Reorder.Item key={file.name} value={file} className="w-full" as="tr">
+                              <TableCell className="flex items-center w-full">
+                                <GripVertical className="h-4 w-4 text-muted-foreground cursor-move mr-2" />
+                                <div className="truncate">
+                                  <span>{truncateFileName(file.name, 50)}</span>
+                                  <br />
+                                  <span className="text-muted-foreground">{formatSize(file.size)}</span>
+                                </div>
+                              </TableCell>
+                            </Reorder.Item>
+                          ))}
+                        </Reorder.Group>
                         <Reorder.Group axis="y" onReorder={setUploadedFiles} values={uploadedFiles} className="w-full">
                           {uploadedFiles.map((file) => (
                             <Reorder.Item key={file.name} value={file} className="w-full" as="tr">
@@ -234,7 +250,6 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                 </Dialog>
               )}
             </p>
-
           </div>
           {isOverLimit && (
             <div className="flex items-center text-destructive mt-2">
@@ -245,10 +260,14 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           <div className="mt-2 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
             <div
               className="h-full bg-primary float-left"
-              style={{ width: `${uploadedPercentage}%` }}
+              style={{ width: `${existingPercentage}%` }}
             />
             <div
               className="h-full bg-secondary float-left"
+              style={{ width: `${uploadedPercentage}%` }}
+            />
+            <div
+              className="h-full bg-tertiary float-left"
               style={{ width: `${pendingPercentage}%` }}
             />
             <div
@@ -258,7 +277,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           </div>
         </div>
 
-        {files.length > 0 && (
+        {pendingFiles.length > 0 && (
           <Table className="mt-4">
             <TableHeader>
               <TableRow>
@@ -267,7 +286,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {files.map((file, index) => (
+              {pendingFiles.map((file, index) => (
                 <TableRow key={index}>
                   <TableCell className="flex items-center">
                     <div className="truncate">
@@ -316,7 +335,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                   variant="destructive-outline"
                   className="w-full"
                   onClick={resetFiles}
-                  disabled={uploading || files.length === 0}
+                  disabled={uploading || pendingFiles.length === 0}
                 >
                   <RefreshCw className="h-4 w-4" aria-label="Reset" />
                 </Button>
@@ -328,7 +347,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           <Button
             type="submit"
             className="w-full font-bold"
-            disabled={uploading || isOverLimit || files.length === 0}
+            disabled={uploading || isOverLimit || pendingFiles.length === 0}
           >
             {uploading ? 'Uploading...' : 'Upload Files'}
           </Button>
