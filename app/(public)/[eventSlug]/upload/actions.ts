@@ -1,6 +1,7 @@
 // File: app/(public)/[eventSlug]/upload/actions.ts
 "use server"
 
+import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { artworkAssets as artworkAssetsTable, artworkCredits as artworkCreditsTable, artworks as artworksTable } from "@/drizzle/schema/artwork";
 import { db } from "@/lib/db";
 
@@ -48,7 +49,7 @@ export async function createArtwork(
     await tx.insert(artworkCreditsTable).values({
       artworkId: artwork.id,
       userId: uploaderId,
-      role: "Uploader",
+      title: "Uploader",
     });
 
     return { artwork };
@@ -75,6 +76,24 @@ export async function insertArtworkAssets(
       }))
     ).returning();
     return assets;
+  });
+  return result;
+}
+
+export async function insertArtworkCredit(
+  artworkId: string,
+  userId: string,
+  title: string
+) {
+  const result = await db.transaction(async (tx) => {
+    const credits = await tx.insert(artworkCreditsTable).values(
+      {
+        artworkId: artworkId,
+        userId: userId,
+        title: title,
+      }
+    ).returning();
+    return credits;
   });
   return result;
 }

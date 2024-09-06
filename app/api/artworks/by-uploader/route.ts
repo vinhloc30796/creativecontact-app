@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(artworkCreditsTable.userId, uploaderId),
-          eq(artworkCreditsTable.role, "Uploader")
+          eq(artworkCreditsTable.title, "Uploader")
         )
       )
       .orderBy(desc(artworksTable.createdAt));

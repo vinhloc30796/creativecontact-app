@@ -46,7 +46,7 @@ export const artworks = pgTable("artworks", {
  id         | uuid |           | not null | gen_random_uuid()
  artwork_id | uuid |           | not null | 
  user_id    | uuid |           | not null | 
- role       | text |           |          | 
+ title      | text |           |          | 
 Indexes:
     "artwork_credits_pkey" PRIMARY KEY, btree (id)
     "artwork_credits_artwork_id_user_id_key" UNIQUE CONSTRAINT, btree (artwork_id, user_id)
@@ -61,7 +61,7 @@ export const artworkCredits = pgTable("artwork_credits", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   artworkId: uuid("artwork_id").notNull().references(() => artworks.id, { onDelete: "cascade" }),
   userId: uuid("user_id").notNull().references(() => authUsers.id, { onDelete: "cascade" }),
-  role: text("role"),
+  title: text("title"),
 }, (table) => ({
   uniqueArtworkUser: unique("unique_artwork_user").on(table.artworkId, table.userId),
 }));
