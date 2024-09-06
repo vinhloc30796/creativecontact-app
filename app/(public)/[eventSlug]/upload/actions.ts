@@ -66,6 +66,9 @@ export async function insertArtworkAssets(
     fullPath: string;
   }[]
 ) {
+  if (artworkAssets.length === 0) {
+    return [];
+  }
   const result = await db.transaction(async (tx) => {
     const assets = await tx.insert(artworkAssetsTable).values(
       artworkAssets.map((asset: any) => ({

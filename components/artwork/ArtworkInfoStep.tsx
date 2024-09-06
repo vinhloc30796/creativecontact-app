@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/useAuth'
 import { useQuery } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
@@ -71,12 +72,17 @@ export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNe
   const { data: fetchedArtworks, isLoading, error } = useQuery({
     queryKey: ['artworks', user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) {
+        console.warn("No user id found to fetch artworks");
+        return [];
+      }
       const response = await fetch(`/api/artworks/by-uploader?uploaderId=${user.id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch artworks');
       }
-      return response.json();
+      const data = await response.json();
+      console.log("Fetched artworks for user:", user.id, data);
+      return data.artworks;
     },
     enabled: !!user?.id,
   });
@@ -144,7 +150,13 @@ export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNe
         </>
       ) : (
         <>
-          {isLoading && <p>Loading existing artworks...</p>}
+          {isLoading && 
+            // Muted text with loading icon
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-muted-foreground">Loading existing artworks...</span>
+            </div>
+          }
           {error && <p>Error loading existing artworks. Please try again.</p>}
           {fetchedArtworks && <ExistingArtworkSelector form={form} artworks={fetchedArtworks} />}
         </>

@@ -1,6 +1,7 @@
 // File: app/api/auth/confirm/route.ts
-import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { getAdminSupabaseClient } from "@/utils/supabase/server-admin";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
 
+
     if (!email || !token) {
       console.error("Missing email or token");
       return NextResponse.json({ error: "Invalid session data" }, { status: 400 });
@@ -24,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     // Now verify the OTP
     console.log("Verifying OTP for email:", email, "with token:", token);
-    const { data, error } = await supabase.auth.verifyOtp({ 
+    const { data, error } = await supabase.auth.verifyOtp({
       token_hash: token,
       type: 'email'
     });
@@ -39,11 +41,21 @@ export async function GET(request: NextRequest) {
     }
 
     if (data.user && data.session) {
+      const adminSupabaseClient = await getAdminSupabaseClient();
+      const { data: authUpdateData, error: authUpdateError } = await adminSupabaseClient.auth.admin
+        .updateUserById(data.user.id, {
+          email: email,
+          email_confirm: true,
+          // @ts-ignore -- this works, but Supabase needs to update their types
+          is_anonymous: false,
+        });
+      console.log("Auth update data:", authUpdateData);
+      console.log("Auth update error:", authUpdateError);
       // Successfully verified and logged in
       // Set the session in a cookie
       const response = NextResponse.redirect(redirectTo);
       await supabase.auth.setSession(data.session);
-      
+
       return response;
     } else {
       // Verification successful but no session created (unlikely scenario)
