@@ -16,7 +16,7 @@ export const ConfirmationWithICS: React.FC<ConfirmationWithICSProps> = ({
   qrCodeUrl,
 }) => {
   const previewText = `Thanks for registering to Hoàn Tất Project!`;
-  const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
+  const hostUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const utmContent = "ConfirmationWithICS"
   return (
     <Layout>

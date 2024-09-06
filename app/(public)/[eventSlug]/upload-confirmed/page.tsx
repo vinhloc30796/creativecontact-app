@@ -18,7 +18,7 @@ interface UploadConfirmedContentProps {
 
 function UploadConfirmedContent({ params }: UploadConfirmedContentProps) {
   const { eventSlug } = params;
-  const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || "http://localhost:3000";
+  const hostUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const { user, isLoading } = useAuth();
   const searchParams = useSearchParams();
   const [uploadInfo, setUploadInfo] = useState({
