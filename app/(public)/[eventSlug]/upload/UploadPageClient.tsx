@@ -29,6 +29,7 @@ import { v4 as uuidv4 } from "uuid";
 import { writeUserInfo } from "../../(event)/register/_sections/actions";
 import { createArtwork, insertArtworkAssets, insertArtworkCredit } from "./actions";
 import { signUpUser } from "@/app/actions/signUp";
+import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -240,6 +241,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         artworkAssets
       );
       console.log("Insert assets successful:", insertAssetsResult);
+
       // Signup anonymously for each co-artist
       // and write their info to the database
       // then insert the artwork credits
@@ -281,6 +283,22 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         artworkId: artworkData.uuid,
         emailSent: 'true' // Assuming email was sent successfully
       });
+      // Send artwork details email
+      if (insertAssetsResult) {
+        const contactInfoData = contactInfoForm.getValues();
+        const artworkData = artworkForm.getValues();
+        
+        // Send confirmation email
+        const emailResult = await sendArtworkUploadConfirmationEmail(
+          contactInfoData.email,
+          `${contactInfoData.firstName} ${contactInfoData.lastName}`,
+          artworkData.title,
+          eventSlug
+        );
+
+        // Update the params to include the email sending status
+        params.set('emailSent', emailResult.success ? 'true' : 'false');
+      }
       // Use router.push for client-side navigation
       router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
       return true;
