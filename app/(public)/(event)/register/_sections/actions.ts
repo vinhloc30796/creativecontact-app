@@ -332,7 +332,7 @@ export async function writeUserInfo(
   },
   professionalInfo: {
     industries: IndustryType[];
-    experience: ExperienceType;
+    experience: ExperienceType | null;
   },
 ) {
   console.log("Received professionalInfo:", professionalInfo);

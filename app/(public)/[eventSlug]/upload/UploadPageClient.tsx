@@ -3,28 +3,32 @@
 "use client";
 
 import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
+import { ArtworkCreditInfoData, artworkCreditInfoSchema } from "@/app/form-schemas/artwork-credit-info";
 import { ContactInfoData, contactInfoSchema } from "@/app/form-schemas/contact-info";
 import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas/professional-info";
+import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ContactInfoStep } from "@/components/user/ContactInfoStep";
 import { ProfessionalInfoStep } from "@/components/user/ProfessionalInfoStep";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
 import { useAuth } from "@/hooks/useAuth";
+import { useFormUserId } from "@/hooks/useFormUserId";
+import { createEmailLink } from "@/lib/links";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
-import { createArtwork, insertArtworkAssets } from "./actions";
-import { useFormUserId } from "@/hooks/useFormUserId";
-import { createEmailLink } from "@/lib/links";
-import { useRouter } from "next/navigation";
 import { writeUserInfo } from "../../(event)/register/_sections/actions";
+import { createArtwork, insertArtworkAssets, insertArtworkCredit } from "./actions";
+import { signUpUser } from "@/app/actions/signUp";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -41,8 +45,6 @@ interface UploadPageClientProps {
 }
 
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>;
-
-
 
 export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
   // Auth
@@ -86,6 +88,14 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       uuid: currentArtwork?.uuid || "",
       title: currentArtwork?.title || "",
       description: currentArtwork?.description || "",
+    },
+  });
+
+  const artworkCreditForm = useForm<ArtworkCreditInfoData>({
+    resolver: zodResolver(artworkCreditInfoSchema),
+    mode: "onSubmit",
+    defaultValues: {
+      coartists: [],
     },
   });
 
@@ -186,7 +196,9 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     console.log("professionalInfoForm", professionalInfoForm.formState.errors);
     const artworkResult = await artworkForm.trigger();
     console.log("artworkForm", artworkForm.formState.errors);
-    return contactInfoResult && professionalInfoResult && artworkResult;
+    const artworkCreditResult = await artworkCreditForm.trigger();
+    console.log("artworkCreditForm", artworkCreditForm.formState.errors);
+    return contactInfoResult && professionalInfoResult && artworkResult && artworkCreditResult;
   };
 
   const handleSubmit = async () => {
@@ -198,10 +210,13 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       const contactInfoData = contactInfoForm.getValues();
       const professionalInfoData = professionalInfoForm.getValues();
       const artworkData = artworkForm.getValues();
+      const artworkCreditData = artworkCreditForm.getValues();
       // Debug
       console.debug('Submit button clicked')
       console.debug('Current contact:', contactInfoForm.getValues())
       console.debug('Current professional info:', professionalInfoForm.getValues())
+      console.debug('Current artwork info:', artworkForm.getValues())
+      console.debug('Current artwork credit info:', artworkCreditForm.getValues())
       console.debug('isSubmitting:', isSubmitting)
       // Hook into user ID
       const formUserId = await resolveFormUserId(contactInfoData.email);
@@ -224,8 +239,40 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         artworkData.uuid,
         artworkAssets
       );
-
       console.log("Insert assets successful:", insertAssetsResult);
+      // Signup anonymously for each co-artist
+      // and write their info to the database
+      // then insert the artwork credits
+      for (const coartist of artworkCreditData.coartists || []) {
+        // sign up the coartist
+        const signupResult = await signUpUser(coartist.email);
+        console.log("Signup anonymous successful:", signupResult);
+        if (!signupResult) {
+          console.error("Signup anonymous failed:", signupResult);
+          return false;
+        }
+        // write the coartist's info to the database
+        const writeUserInfoResult = await writeUserInfo(
+          signupResult.id,
+          {
+            phone: "",
+            firstName: coartist.first_name,
+            lastName: coartist.last_name,
+          },
+          {
+            industries: [],
+            experience: null,
+          }
+        );
+        console.log("Write user info successful:", writeUserInfoResult);
+        // insert the artwork credits
+        const insertArtworkCreditResult = await insertArtworkCredit(
+          artworkData.uuid,
+          signupResult.id,
+          coartist.title
+        );
+        console.log("Insert artwork credit successful:", insertArtworkCreditResult);
+      }
 
       // Redirect to upload-confirmed page
       const params = new URLSearchParams({
@@ -270,17 +317,25 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       title: "Artwork Information",
       description: "Please provide more information about your artwork",
       component: (
-        <ArtworkInfoStep
-          form={artworkForm}
-          artworks={artworks}
-          setIsNewArtwork={setIsNewArtwork}
-        />
+        <>
+          <ArtworkInfoStep
+            form={artworkForm}
+            artworks={artworks}
+            setIsNewArtwork={setIsNewArtwork}
+          />
+          <Separator className="my-2" />
+          <ArtworkCreditInfoStep form={artworkCreditForm} />
+        </>
       ),
       form: artworkForm,
       handlePreSubmit: async (data: ArtworkInfoData) => {
         // Add any custom logic for artwork info submission
         console.log("Artwork info submitted:", data);
         await handleArtworkSubmit(data);
+        // Handle artwork credit info
+        const artworkCreditData = artworkCreditForm.getValues();
+        console.log("Artwork credit info submitted:", artworkCreditData);
+        // Add logic to save artwork credit info
       },
     },
     {

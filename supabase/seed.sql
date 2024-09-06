@@ -225,12 +225,12 @@ INSERT INTO artwork_credits (
     id,
     artwork_id,
     user_id,
-    role
+    title
 ) VALUES (
     'c7e9a123-3d45-4b8a-9f67-1e8d2f3a4b5c',
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
     '13f60da9-8dd4-42f9-8a57-c0569a158857',
-    'Artist'
+    'Uploader'
 );
 
 -- Seed artwork_events table
