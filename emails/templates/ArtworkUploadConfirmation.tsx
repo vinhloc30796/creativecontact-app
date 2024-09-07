@@ -14,15 +14,15 @@ import * as React from "react";
 import { Layout } from "../components/Layout";
 
 interface ArtworkUploadConfirmationProps {
-  confirmationUrl: string;
   uploaderName: string;
   artworkTitle: string;
+  confirmationUrl?: string;
 }
 
 export const ArtworkUploadConfirmation: React.FC<ArtworkUploadConfirmationProps> = ({
-  confirmationUrl,
   uploaderName,
   artworkTitle,
+  confirmationUrl,
 }) => {
   const previewText = `Confirm your email for Hoàn Tất Project artwork submission`;
 
@@ -50,17 +50,21 @@ export const ArtworkUploadConfirmation: React.FC<ArtworkUploadConfirmationProps>
           </Text>
         </li>
       </ul>
-      <Text className="text-base text-center mb-4">
-        Please confirm your email address by clicking the link below:
-      </Text>
-      <Section className="text-center mt-4">
-        <Button
-          className={`bg-[#f27151] text-white text-center px-6 py-3`}
-          href={confirmationUrl}
-        >
-          Confirm Email
-        </Button>
-      </Section>
+      {confirmationUrl && (
+        <>
+          <Text className="text-base text-center mb-4">
+            Please confirm your email address by clicking the link below:
+          </Text>
+          <Section className="text-center mt-4">
+            <Button
+              className={`bg-[#f27151] text-white text-center px-6 py-3`}
+              href={confirmationUrl}
+            >
+              Confirm Email
+            </Button>
+          </Section>
+        </>
+      )}
       <Text className="text-sm text-center mt-6">
         If you did not submit this artwork, please disregard this email.
       </Text>

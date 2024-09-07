@@ -12,7 +12,8 @@ export async function sendArtworkUploadConfirmationEmail(
   email: string,
   uploaderName: string,
   artworkTitle: string,
-  eventSlug: string
+  eventSlug: string,
+  shouldConfirmEmail: boolean = true
 ) {
   const confirmationURL = `${process.env.NEXT_PUBLIC_APP_URL}/${eventSlug}`;
   let confirmationLink: string;
@@ -34,16 +35,21 @@ export async function sendArtworkUploadConfirmationEmail(
       console.error("Magic link generation failed:", linkResponse.error);
       throw new Error("Failed to generate magic link");
     }
-
-    const linkData = linkResponse.data;
-    const escapedEmail = encodeURIComponent(email);
-    confirmationLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${escapedEmail}&ignoreOtpExpired=true&type=magiclink&redirect_to=${confirmationURL}`;
+    // Build confirmation link
+    let confirmationLink: string | undefined;
+    if (shouldConfirmEmail) {
+      const linkData = linkResponse.data;
+      const escapedEmail = encodeURIComponent(email);
+      confirmationLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${escapedEmail}&ignoreOtpExpired=true&type=magiclink&redirect_to=${confirmationURL}`;
+    } else {
+      confirmationLink = undefined;
+    }
 
     // Send email
     const component = React.createElement(ArtworkUploadConfirmation, {
-      confirmationUrl: confirmationLink,
       uploaderName: uploaderName || "Creative artist",
       artworkTitle: artworkTitle,
+      confirmationUrl: confirmationLink,
     });
     const emailResponse = await resend.emails.send({
       from: "Creative Contact <no-reply@creativecontact.vn>",
