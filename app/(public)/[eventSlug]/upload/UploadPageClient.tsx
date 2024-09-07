@@ -30,6 +30,7 @@ import { writeUserInfo } from "../../(event)/register/_sections/actions";
 import { createArtwork, insertArtworkAssets, insertArtworkCredit } from "./actions";
 import { signUpUser } from "@/app/actions/signUp";
 import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
+import { checkUserIsAnonymous } from "@/app/actions/auth";
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -287,13 +288,15 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       if (insertAssetsResult) {
         const contactInfoData = contactInfoForm.getValues();
         const artworkData = artworkForm.getValues();
+        const shouldConfirmEmail = (await checkUserIsAnonymous(contactInfoData.email)) ?? true;
         
         // Send confirmation email
         const emailResult = await sendArtworkUploadConfirmationEmail(
           contactInfoData.email,
           `${contactInfoData.firstName} ${contactInfoData.lastName}`,
           artworkData.title,
-          eventSlug
+          eventSlug,
+          shouldConfirmEmail
         );
 
         // Update the params to include the email sending status
