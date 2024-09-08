@@ -10,7 +10,8 @@
 		"test": "next test",
 		"start": "next start",
 		"lint": "next lint",
-		"db:migrate": "node -r esbuild-register db/migrate.ts"
+		"db:migrate": "node -r esbuild-register db/migrate.ts",
+		"extract": "formatjs extract app/**/*.{ts,tsx,jsx,js} --ignore='**/*.d.ts' --out-file ./extracted/en.json"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.9.0",
@@ -48,6 +49,10 @@
 		"drizzle-orm": "^0.32.2",
 		"framer-motion": "^11.5.4",
 		"fs": "0.0.1-security",
+		"i18next": "^23.14.0",
+		"i18next-chained-backend": "^4.6.2",
+		"i18next-http-backend": "^2.6.1",
+		"i18next-resources-to-backend": "^1.2.1",
 		"ics": "^3.7.6",
 		"lucide-react": "^0.424.0",
 		"next": "14.2.5",
@@ -61,6 +66,7 @@
 		"react-dropzone": "^14.2.3",
 		"react-email": "3.0.1",
 		"react-hook-form": "^7.52.2",
+		"react-i18next": "^15.0.1",
 		"resend": "^3.5.0",
 		"sass": "^1.77.8",
 		"sonner": "^1.5.0",
@@ -70,6 +76,7 @@
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
+		"@formatjs/cli": "^6.2.12",
 		"@tanstack/eslint-plugin-query": "^5.53.0",
 		"@types/node": "^22",
 		"@types/pg": "^8.11.6",

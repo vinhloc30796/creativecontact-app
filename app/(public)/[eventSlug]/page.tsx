@@ -11,6 +11,5 @@ interface EventPageProps {
 
 export default function EventPage({ params }: EventPageProps) {
   // Get event slug from url
-  const { eventSlug } = params;
-  redirect(`/${eventSlug}/upload`);
+  redirect(`/${params.eventSlug}/upload`);
 }

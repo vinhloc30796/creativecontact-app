@@ -1,5 +1,5 @@
-import { getUserId } from '@/app/actions/auth';
-import { signUpUser } from "@/app/actions/signUp";
+import { getUserId } from '@/app/actions/user/auth';
+import { signUpUser } from "@/app/actions/user/signUp";
 import { authUsers, userInfos } from '@/drizzle/schema/user';
 import { useAuth } from '@/hooks/useAuth';
 import { db } from '@/lib/db';

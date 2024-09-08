@@ -2,8 +2,12 @@
 
 "use client";
 
-import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
+import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
+import { checkUserIsAnonymous } from "@/app/actions/user/auth";
+import { signUpUser } from "@/app/actions/user/signUp";
+import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
 import { ArtworkCreditInfoData, artworkCreditInfoSchema } from "@/app/form-schemas/artwork-credit-info";
+import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
 import { ContactInfoData, contactInfoSchema } from "@/app/form-schemas/contact-info";
 import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas/professional-info";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
@@ -26,11 +30,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
-import { writeUserInfo } from "../../(event)/register/_sections/actions";
 import { createArtwork, insertArtworkAssets, insertArtworkCredit } from "./actions";
-import { signUpUser } from "@/app/actions/signUp";
-import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
-import { checkUserIsAnonymous } from "@/app/actions/auth";
+import { useTranslation, Trans } from "react-i18next";
+
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -61,6 +63,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const [isNewArtwork, setIsNewArtwork] = useState(true);
   // Router
   const router = useRouter();
+  // I18n
+  const { t } = useTranslation(["eventSlug"], { keyPrefix: "UploadPageClient" });
   // Form setup
   const [formStep, setFormStep] = useState(0);
   const contactInfoForm = useForm<ContactInfoData>({
@@ -125,14 +129,23 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           <CardHeader
             className="border-b aspect-video bg-accent-foreground text-accent-foreground"
             style={{
-              backgroundImage: `url(/${eventSlug}-background.png)`,
+              backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
               backgroundSize: "cover",
             }}
           >
           </CardHeader>
           <CardContent className="p-6 flex flex-col gap-2">
-            <CardTitle>Event Not Found</CardTitle>
-            <p className="mb-4">The event &quot;{eventSlug}&quot; does not exist. Did you mean one of these?</p>
+            <CardTitle>
+              {t("EventNotFound.text")}
+            </CardTitle>
+            <p className="mb-4">
+              <Trans
+                i18nKey="eventSlug:UploadPageClient.EventNotFound.description"
+                values={{ eventSlug }}
+              >
+                The event <strong>{eventSlug}</strong> does not exist. Perhaps you meant one of the following events?
+              </Trans>
+            </p>
             <div className="space-y-2">
               {recentEvents.map((recentEvent) => (
                 <Button key={recentEvent.id} asChild variant="outline" className="w-full">
@@ -168,8 +181,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
 
     // Create artwork in the database
     if (isNewArtwork) {
-    const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
-    const createResult = await createArtwork(
+      const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
+      const createResult = await createArtwork(
         formUserId,
         processedData
       );
@@ -289,7 +302,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         const contactInfoData = contactInfoForm.getValues();
         const artworkData = artworkForm.getValues();
         const shouldConfirmEmail = (await checkUserIsAnonymous(contactInfoData.email)) ?? true;
-        
+
         // Send confirmation email
         const emailResult = await sendArtworkUploadConfirmationEmail(
           contactInfoData.email,
@@ -315,8 +328,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
 
   const steps = [
     {
-      title: "Contact Information",
-      description: "Please provide your contact information",
+      title: t("step.ContactInfoStep.title"),
+      description: t("step.ContactInfoStep.description"),
       component: <ContactInfoStep form={contactInfoForm} />,
       form: contactInfoForm,
       handlePreSubmit: async (data: ContactInfoData) => {
@@ -325,8 +338,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: "Professional Information",
-      description: "Please provide your professional information",
+      title: t("step.ProfessionalInfoStep.title"),
+      description: t("step.ProfessionalInfoStep.description"),
       component: <ProfessionalInfoStep form={professionalInfoForm} />,
       form: professionalInfoForm,
       handlePreSubmit: async (data: ProfessionalInfoData) => {
@@ -366,7 +379,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         <MediaUpload
           artworkUUID={artworkUUID || undefined}
           emailLink={emailLink}
-          onUpload={handleAssetUpload} 
+          onUpload={handleAssetUpload}
           isNewArtwork={isNewArtwork}
         />
       ),
@@ -416,7 +429,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
               <p>{currentStep.description}</p>
               <div>
                 <p className="text-muted-foreground text-sm">
-                  {isLoading ? "Loading user information..." : `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+                  {isLoading ? t("state.loading") : (user?.email ? t("state.loggedIn", { email: user.email }) : t("state.loggedOut"))}
                 </p>
               </div>
               <Progress value={progress} className="w-full" />
@@ -430,7 +443,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
                   disabled={formStep === 0 || isSubmitting}
                   className="w-full sm:w-auto"
                 >
-                  Back
+                  {t("Button.back")}
                 </Button>
                 {formStep < steps.length - 1 ? (
                   <Button
@@ -439,7 +452,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
                     disabled={isSubmitting}
                     className="w-full sm:w-auto"
                   >
-                    {isSubmitting ? "Loading..." : "Next"}
+                    {isSubmitting ? t("Button.loading") : t("Button.next")}
                   </Button>
                 ) : (
                   <Button
@@ -448,7 +461,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
                     disabled={isSubmitting}
                     className="w-full sm:w-auto"
                   >
-                    {isSubmitting ? "Submitting..." : "Submit"}
+                    {isSubmitting ? t("Button.submitting") : t("Button.submit")}
                   </Button>
                 )}
               </div>

@@ -1,0 +1,38 @@
+{
+  "UploadPageClient": {
+    "EventNotFound": {
+      "text": "Sự kiện Không Tồn tại",
+      "description": "Sự kiện <strong>{{eventSlug}}</strong> không tồn tại. Có phải bạn đang tìm một trong các sự kiện sau đây không?"
+    },
+    "step": {
+      "ContactInfoStep": {
+        "title": "Thông tin Liên hệ",
+        "description": "Vui lòng cung cấp thông tin liên hệ của bạn"
+      },
+      "ProfessionalInfoStep": {
+        "title": "Thông tin Chuyên môn",
+        "description": "Vui lòng cung cấp thông tin chuyên môn của bạn"
+      },
+      "ArtworkInfoStep": {
+        "title": "Thông tin Tác phẩm",
+        "description": "Vui lòng cung cấp thông tin tác phẩm của bạn"
+      },
+      "MediaUpload": {
+        "title": "Tải File",
+        "description": "Tải tệp cho tác phẩm của bạn"
+      }
+    },
+    "state": {
+      "loading": "Đang tải thông tin người dùng...",
+      "loggedIn": "Bạn đã đăng nhập với email {{email}}",
+      "loggedOut": "Bạn là khách"
+    },
+    "Button": {
+      "back": "Trở lại",
+      "next": "Tiếp tục",
+      "submit": "Gửi",
+      "submitting": "Đang gửi...",
+      "loading": "Đang tải..."
+    }
+  }
+}

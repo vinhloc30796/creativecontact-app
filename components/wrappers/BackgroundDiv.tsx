@@ -9,12 +9,13 @@ interface BackgroundDivProps {
 
 export function BackgroundDiv({ children, className, eventSlug = 'hoantat-2024' }: BackgroundDivProps) {
   const backgroundImage = `/${eventSlug}-background-blur.png`;
+  const fallbackImage = '/bg.jpg';
 
   return (
     <div 
       className={cn("min-h-screen flex items-center justify-center", className)}
       style={{
-        backgroundImage: `url(${backgroundImage})`,
+        backgroundImage: `url(${backgroundImage}), url(${fallbackImage})`,
         backgroundSize: 'cover',
         backgroundColor: 'rgba(0, 0, 0, 0.5)'
       }}

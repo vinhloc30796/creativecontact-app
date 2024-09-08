@@ -1,0 +1,39 @@
+{
+  "UploadPageClient": {
+    "EventNotFound": {
+      "text": "Event Not Found",
+      "description": "The event <strong>{{eventSlug}}</strong> does not exist. Perhaps you meant one of the following events?"
+    },
+    "step": {
+      "ContactInfoStep": {
+        "title": "Contact Information",
+        "description": "Please provide your contact information"
+      },
+      "ProfessionalInfoStep": {
+        "title": "Professional Information",
+        "description": "Please provide your professional information"
+      },
+      "ArtworkInfoStep": {
+        "title": "Artwork Information",
+        "description": "Please provide more information about your artwork"
+      },
+      "MediaUpload": {
+        "title": "Upload Files",
+        "description": "Upload files for your artwork"
+      }
+    },
+    "state": {
+      "loading": "Loading user information...",
+      "loggedIn": "You're logged in as {{email}}",
+      "loggedOut": "You're a guest"
+    },
+    "Button": {
+      "back": "Back",
+      "next": "Next",
+      "submit": "Submit",
+      "upload": "Upload",
+      "submitting": "Submitting...",
+      "loading": "Loading..."
+    }
+  }
+}

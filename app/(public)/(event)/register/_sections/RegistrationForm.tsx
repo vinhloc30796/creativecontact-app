@@ -2,7 +2,7 @@
 
 'use client'
 
-import { getUserId } from '@/app/actions/auth'
+import { getUserId } from '@/app/actions/user/auth'
 import { ContactInfoData, contactInfoSchema } from '@/app/form-schemas/contact-info'
 import { EventRegistrationData, eventRegistrationSchema } from '@/app/form-schemas/event-registration'
 import { ProfessionalInfoData, professionalInfoSchema } from '@/app/form-schemas/professional-info'
@@ -21,8 +21,9 @@ import { ConfirmationPage } from './ConfirmationPage'
 import { ConfirmationStep } from './ConfirmationStep'
 import { DateSelectionStep } from './DateSelectionStep'
 import { EmailExistedStep } from './EmailExistedStep'
-import { checkExistingRegistration, createRegistration, writeUserInfo } from './actions'
-import { signUpUser } from "@/app/actions/signUp"
+import { checkExistingRegistration, createRegistration } from './actions'
+import { writeUserInfo } from "@/app/actions/user/writeUserInfo"
+import { signUpUser } from "@/app/actions/user/signUp"
 import { formSchema, FormData } from './formSchema'
 import { useFormUserId } from '@/hooks/useFormUserId'
 
