@@ -6,7 +6,7 @@ import ChainedBackend from 'i18next-chained-backend'
 
 import { initReactI18next } from "react-i18next";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const hostUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 const resourcesLangCard = {
   en: {
@@ -77,7 +77,7 @@ i18n
         })
       ],
       backendOptions: [{
-        loadPath: `${apiUrl}/translations/{{lng}}/{{ns}}.json`
+        loadPath: `${hostUrl}/translations/{{lng}}/{{ns}}.json`
       }]
     },
     lng: "en", // Default language
