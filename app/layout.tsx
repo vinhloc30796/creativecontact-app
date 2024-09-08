@@ -14,19 +14,18 @@ export const metadata: Metadata = {
 
 interface RootLayoutProps {
   children: React.ReactNode
-  lang: string
 }
 
 export async function generateStaticParams() {
   return languages.map((lang: string) => ({ lang }))
 }
 
-export default function RootLayout({ children, lang }: RootLayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang={lang} className={`${plusJakartaSans.variable} font-sans`} suppressHydrationWarning>
+    <html className={`${plusJakartaSans.variable} font-sans`} suppressHydrationWarning>
       <head />
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
-        <Providers lang={lang}>
+        <Providers>
           {children}
         </Providers>
       </body>

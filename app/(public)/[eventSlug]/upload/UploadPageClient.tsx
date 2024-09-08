@@ -64,7 +64,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   // Router
   const router = useRouter();
   // I18n
-  const { t } = useTranslation(["eventSlug"], { keyPrefix: "UploadPageClient" });
+  const { t, i18n } = useTranslation(["eventSlug"], { keyPrefix: "UploadPageClient" });
   // Form setup
   const [formStep, setFormStep] = useState(0);
   const contactInfoForm = useForm<ContactInfoData>({
@@ -295,7 +295,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         email: contactInfoData.email,
         userId: formUserId,
         artworkId: artworkData.uuid,
-        emailSent: 'true' // Assuming email was sent successfully
+        emailSent: 'true', // Assuming email was sent successfully,
+        lang: i18n.language,
       });
       // Send artwork details email
       if (insertAssetsResult) {
@@ -348,8 +349,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: "Artwork Information",
-      description: "Please provide more information about your artwork",
+      title: t("step.ArtworkInfoStep.title"),
+      description: t("step.ArtworkInfoStep.description"),
       component: (
         <>
           <ArtworkInfoStep
@@ -373,8 +374,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: "Upload Files",
-      description: `Upload files for ${currentArtwork?.title ?? "your artwork"}`,
+      title: t("step.MediaUpload.title"),
+      description: t("step.MediaUpload.description", { artworkTitle: currentArtwork?.title ?? t("step.MediaUpload.fallback") }),
       component: (
         <MediaUpload
           artworkUUID={artworkUUID || undefined}

@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
 import React from 'react'
 import { UseFormReturn } from 'react-hook-form'
+import { useTranslation, Trans } from "react-i18next";
 
 interface ProfessionalInfoStepProps {
   form: UseFormReturn<ProfessionalInfoData>
@@ -55,7 +56,10 @@ const experienceLevelsMapper = [
 type ExperienceType = typeof experienceLevelsMapper[number]['value']
 
 const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
+  // State
   const [open, setOpen] = React.useState(false)
+  // I18n
+  const { t } = useTranslation(["ProfessionalInfoStep"], { keyPrefix: "IndustrySelect" });
 
   return (
     <FormField
@@ -63,7 +67,7 @@ const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
       name="industries"
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>Industries (Select all that apply)</FormLabel>
+          <FormLabel>{t("label")}</FormLabel>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
@@ -77,16 +81,16 @@ const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
                   )}
                 >
                   {field.value?.length
-                    ? `${field.value.length} industries selected`
-                    : "Select industries"}
+                    ? t("selected", { count: field.value.length })
+                    : t("select")}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-[300px] p-0">
               <Command>
-                <CommandInput placeholder="Search industry..." />
-                <CommandEmpty>No industry found.</CommandEmpty>
+                <CommandInput placeholder={t("search")} />
+                <CommandEmpty>{t("noIndustryFound")}</CommandEmpty>
                 <CommandGroup>
                   <CommandList>
                     {industriesMapper.map((industry) => (
@@ -123,7 +127,10 @@ const IndustrySelect = ({ form }: ProfessionalInfoStepProps) => {
 }
 
 const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
+  // State
   const [open, setOpen] = React.useState(false)
+  // I18n
+  const { t } = useTranslation(["ProfessionalInfoStep"], { keyPrefix: "ExperienceSelect" });
 
   return (
     <FormField
@@ -131,7 +138,7 @@ const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
       name="experience"
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>Experience Level</FormLabel>
+          <FormLabel>{t("label")}</FormLabel>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
@@ -146,15 +153,15 @@ const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
                 >
                   {field.value
                     ? experienceLevelsMapper.find((level) => level.value === field.value)?.label
-                    : "Select experience level"}
+                    : t("select")}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0">
               <Command>
-                <CommandInput placeholder="Search level..." />
-                <CommandEmpty>No level found.</CommandEmpty>
+                <CommandInput placeholder={t("search")} />
+                <CommandEmpty>{t("noExperienceFound")}</CommandEmpty>
                 <CommandGroup>
                   <CommandList>
                     {experienceLevelsMapper.map((level) => (
@@ -188,6 +195,8 @@ const ExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
 }
 
 export function ProfessionalInfoStep({ form }: ProfessionalInfoStepProps) {
+  // I18n
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-4">

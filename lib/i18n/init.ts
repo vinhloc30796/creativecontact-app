@@ -6,6 +6,8 @@ import ChainedBackend from 'i18next-chained-backend'
 
 import { initReactI18next } from "react-i18next";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 const resourcesLangCard = {
   en: {
     translation: {
@@ -53,8 +55,12 @@ i18n
   .init({
     backend: {
       backends: [
-        HttpBackend, // if a namespace can't be loaded via normal http-backend loadPath, then the inMemoryLocalBackend will try to return the correct resources
-        // with dynamic import, you have to use the "default" key of the module ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#importing_defaults )
+        // if a namespace can't be loaded via normal http-backend loadPath, 
+        //then the inMemoryLocalBackend will try to return the correct resources
+        HttpBackend, 
+        // with dynamic import, 
+        // you have to use the "default" key of the module
+        // ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#importing_defaults )
         resourcesToBackend((language, namespace, callback) => {
           const filePath = `./translations/${language}/${namespace}.json`
           console.log("resourcesToBackend: trying to load resources from", filePath);
@@ -71,14 +77,15 @@ i18n
         })
       ],
       backendOptions: [{
-        loadPath: 'http://localhost:3000/translations/{{lng}}/{{ns}}.json'
+        loadPath: `${apiUrl}/translations/{{lng}}/{{ns}}.json`
       }]
     },
     lng: "en", // Default language
     fallbackLng: "en",
     interpolation: {
       escapeValue: false
-    }
+    },
+    partialBundledLanguages: true
   })
 
 export default i18n;

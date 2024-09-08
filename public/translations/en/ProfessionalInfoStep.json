@@ -1,0 +1,19 @@
+{
+  "IndustrySelect": {
+    "label": "Industries (Select all that apply)",
+    "placeholder": "Search industries",
+    "selected": "{{count}} industries selected",
+    "select": "Select industries",
+    "search": "Search industry...",
+    "noIndustryFound": "No industry found.",
+    "atLeastOneIndustry": "Please select at least one industry"
+  },
+  "ExperienceSelect": {
+    "label": "Experience",
+    "placeholder": "Search experience",
+    "select": "Select experience",
+    "search": "Search experience...",
+    "noExperienceFound": "No experience found.",
+    "experienceLevel": "Please select an experience level"
+  }
+}

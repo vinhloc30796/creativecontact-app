@@ -8,15 +8,19 @@ import { Input } from '@/components/ui/input';
 import { Edit, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 interface ArtworkCreditInfoStepProps {
   form: UseFormReturn<ArtworkCreditInfoData>;
 }
 
 export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
+  // State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newCoartist, setNewCoartist] = useState({ first_name: '', last_name: '', email: '', title: '' });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  // I18n
+  const { t } = useTranslation('ArtworkCreditInfoStep');
 
   const addCoartist = () => {
     const currentCoartists = form.getValues().coartists || [];
@@ -54,14 +58,12 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <FormLabel>Credit Co-artists</FormLabel>
+        <FormLabel>{t('label')}</FormLabel>
         <Badge variant="secondary">
           {form.watch('coartists')?.filter((coartist: ArtworkCreditData) => coartist.first_name !== '' || coartist.last_name !== '').length || 0}
         </Badge>
       </div>
-      <FormDescription>
-        Add information about co-artists who contributed to this artwork.
-      </FormDescription>
+      <FormDescription>{t('description')}</FormDescription>
       {form.watch('coartists')?.filter((coartist: ArtworkCreditData) => coartist.first_name !== '' || coartist.last_name !== '').map((coartist: ArtworkCreditData, index: number) => (
         <Card key={index} className="mb-4">
           <CardContent className="flex justify-between items-center p-4">
@@ -80,7 +82,7 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
               className="mt-4"
             >
               <Edit className="h-4 w-4 mr-2" />
-              Edit
+              {t('edit')}
             </Button>
             <Button onClick={() => removeCoartist(index)}
               variant="destructive"
@@ -88,7 +90,7 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
               className="mt-4"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Remove
+              {t('remove')}
             </Button>
           </CardFooter>
         </Card>
@@ -103,30 +105,30 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
             className="mt-4"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Co-artist
+            {t('add')}
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingIndex !== null ? 'Edit Co-artist' : 'Add Co-artist'}</DialogTitle>
+            <DialogTitle>{editingIndex !== null ? t('dialog.update_label') : t('dialog.add_label')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex space-x-4">
               <FormItem className="flex-1">
-                <FormLabel>First Name</FormLabel>
+                <FormLabel>{t('dialog.first_name')}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter first name"
+                    placeholder={t('dialog.first_name_placeholder')}
                     value={newCoartist.first_name}
                     onChange={(e) => setNewCoartist({ ...newCoartist, first_name: e.target.value })}
                   />
                 </FormControl>
               </FormItem>
               <FormItem className="flex-1">
-                <FormLabel>Last Name</FormLabel>
+                <FormLabel>{t('dialog.last_name')}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter last name"
+                    placeholder={t('dialog.last_name_placeholder')}
                     value={newCoartist.last_name}
                     onChange={(e) => setNewCoartist({ ...newCoartist, last_name: e.target.value })}
                   />
@@ -134,10 +136,10 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
               </FormItem>
             </div>
             <FormItem>
-              <FormLabel>Co-artist Email</FormLabel>
+              <FormLabel>{t('dialog.email')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Enter co-artist's email"
+                  placeholder={t('dialog.email_placeholder')}
                   type="email"
                   value={newCoartist.email}
                   onChange={(e) => setNewCoartist({ ...newCoartist, email: e.target.value })}
@@ -145,17 +147,17 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
               </FormControl>
             </FormItem>
             <FormItem>
-              <FormLabel>Co-artist Title</FormLabel>
+              <FormLabel>{t('dialog.title')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Enter co-artist's title"
+                  placeholder={t('dialog.title_placeholder')}
                   value={newCoartist.title}
                   onChange={(e) => setNewCoartist({ ...newCoartist, title: e.target.value })}
                 />
               </FormControl>
             </FormItem>
             <Button type="button" onClick={addCoartist}>
-              {editingIndex !== null ? 'Update Co-artist' : 'Add Co-artist'}
+              {editingIndex !== null ? t('dialog.update_button') : t('dialog.add_button')}
             </Button>
           </div>
         </DialogContent>

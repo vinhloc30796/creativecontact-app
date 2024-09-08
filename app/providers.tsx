@@ -9,24 +9,37 @@ import React, { useEffect, useState } from "react";
 // import { IntlProvider } from "react-intl";
 import { I18nProvider } from "@/lib/i18n/i18nProvider";
 import { languages } from "@/lib/i18n/settings";
+import { Suspense } from "react";
+import { Loading } from "@/components/Loading";
 
 export async function generateStaticParams() {
   return languages.map((lang: string) => ({ lang }))
 }
 
-export default function Providers({ children, lang }: { children: React.ReactNode, lang: string }) {
-  const [queryClient] = React.useState(() => new QueryClient())
+export async function SearchParamsProvider({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
-  const [language, setLanguage] = useState(lang)
+  const [language, setLanguage] = useState(searchParams.get('lang') || 'en')
+
+  return (
+    <I18nProvider lng={language} fallbackLng="en">
+      {children}
+    </I18nProvider>
+  )
+}
+
+export default function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = React.useState(() => new QueryClient())
 
   return (
     <ThemeProvider>
-      <I18nProvider lng={language} fallbackLng="en">
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <Toaster visibleToasts={9} closeButton={true} />
-        </QueryClientProvider>
-      </I18nProvider>
-    </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <Suspense fallback={<Loading />}>
+          <SearchParamsProvider>
+            {children}
+            <Toaster visibleToasts={9} closeButton={true} />
+          </SearchParamsProvider>
+        </Suspense>
+      </QueryClientProvider>
+    </ThemeProvider >
   )
 }

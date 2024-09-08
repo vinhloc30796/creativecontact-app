@@ -15,6 +15,7 @@ import { useDropzone } from 'react-dropzone'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation, Trans } from 'react-i18next'
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -33,6 +34,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
   const [uploading, setUploading] = useState(false)
   const maxSize = 25 * 1024 * 1024 // 25MB in bytes
   const bucketName = 'artwork_assets'
+  // I18n
+  const { t } = useTranslation(['media-upload'])
 
   const { data: existingAssetsData } = useQuery({
     queryKey: ['existingAssets', artworkUUID],
@@ -76,7 +79,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
       }));
       setExistingFiles(existingFiles);
     }
-  }, [existingAssetsData]);
+  }, [existingAssetsData, artworkUUID]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setPendingFiles(prevFiles => [...prevFiles, ...acceptedFiles])
@@ -132,7 +135,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
           console.error('Error uploading file:', error.message)
-          toast.error("Error Uploading File", {
+          toast.error(t("toast.error.title"), {
             description: `${file.name}: ${error.message}`,
             duration: 3000,
           })
@@ -140,8 +143,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           remainingFiles.push(file)
         } else {
           console.log('Files uploaded successfully:', data)
-          toast.success("File Uploaded", {
-            description: `${file.name} has been successfully uploaded.`,
+          toast.success(t("toast.success.title"), {
+            description: t("toast.success.description", { file: file.name }),
             duration: 3000,
           })
           results.push({ id: data.path, path: data.path, fullPath: data.fullPath })
@@ -184,35 +187,51 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           <input {...getInputProps()} />
           <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
           <p className="mt-2 text-sm text-muted-foreground">
-            Drag &apos;n&apos; drop some files here, or click to select files
+            {t("form.dropzone")}
           </p>
         </div>
         <div className="flex flex-col">
           <div className="mt-4 flex items-center">
             <p className="text-sm font-medium flex-grow">
-              <span className="font-bold">{formatSize(existingSize)}</span> existing,{' '}
-              <span className="font-bold">{formatSize(uploadedSize)}</span> uploaded,{' '}
-              <span className="font-bold">{formatSize(pendingSize)}</span> pending.{' '}<br />
-              Total: <span className="font-bold">{formatSize(totalSize)}</span> of 25MB limit
+              <Trans
+                i18nKey="media-upload:form.size.existing"
+                values={{ count: formatSize(existingSize) }}
+                components={{ strong: <strong /> }}
+              />{', '}
+              <Trans
+                i18nKey="media-upload:form.size.uploaded"
+                values={{ count: formatSize(uploadedSize) }}
+                components={{ strong: <strong /> }}
+              />{', '}
+              <Trans
+                i18nKey="media-upload:form.size.pending"
+                values={{ count: formatSize(pendingSize) }}
+                components={{ strong: <strong /> }}
+              />{' '}
+              <br />
+              <Trans
+                i18nKey="media-upload:form.size.total"
+                values={{ count: formatSize(totalSize), limit: "25MB" }}
+                components={{ strong: <strong /> }}
+              />
               {(existingFiles.length > 0 || uploadedFiles.length > 0) && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Badge variant="secondary" className="ml-2 cursor-pointer">
-                      {existingFiles.length + uploadedFiles.length} files
+                      {t("dialog.badge", { count: existingFiles.length + uploadedFiles.length })}
                     </Badge>
                   </DialogTrigger>
                   <DialogContent className="max-h-[75vh] overflow-y-auto" >
                     <DialogHeader>
-                      <DialogTitle>Existing and Uploaded Files</DialogTitle>
+                      <DialogTitle>{t("dialog.title")}</DialogTitle>
                       <DialogDescription>
-                        This reordering is for fun.
-                        It doesn&apos;t affect the order of the files in the database.
+                        {t("dialog.description")}
                       </DialogDescription>
                     </DialogHeader>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="mx-auto">File</TableHead>
+                          <TableHead className="mx-auto">{t("table.file")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -254,7 +273,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           {isOverLimit && (
             <div className="flex items-center text-destructive mt-2">
               <AlertCircle className="h-4 w-4 mr-1" />
-              <span className="text-xs">Over the 25MB limit</span>
+              <span className="text-xs">{t("alert.overLimit", { limit: maxSize })}</span>
             </div>
           )}
           <div className="mt-2 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
@@ -281,8 +300,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           <Table className="mt-4">
             <TableHeader>
               <TableRow>
-                <TableHead>File</TableHead>
-                <TableHead className="text-center">Remove</TableHead>
+                <TableHead>{t("table.file")}</TableHead>
+                <TableHead className="text-center">{t("table.remove")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -324,7 +343,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                   </Link>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Email Us</TooltipContent>
+              <TooltipContent>{t("button.email")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <TooltipProvider>
@@ -340,7 +359,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                   <RefreshCw className="h-4 w-4" aria-label="Reset" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Reset</TooltipContent>
+              <TooltipContent>{t("button.reset")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <Separator orientation="vertical" className="h-6" />
@@ -349,7 +368,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
             className="w-full font-bold"
             disabled={uploading || isOverLimit || pendingFiles.length === 0}
           >
-            {uploading ? 'Uploading...' : 'Upload Files'}
+            {uploading ? t("button.uploading") : t("button.upload")}
           </Button>
         </div>
       </form>

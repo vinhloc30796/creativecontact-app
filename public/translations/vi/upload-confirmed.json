@@ -1,0 +1,32 @@
+{
+  "UploadConfirmed": {
+    "title": "Đã Xác nhận Tải Tác phẩm",
+    "description": "Tác phẩm của bạn đã được tải thành công. Cảm ơn bạn đã gửi tác phẩm!",
+    "email": {
+      "sent": "Email xác nhận đã được gửi!",
+      "error": "Có lỗi khi gửi email xác nhận... Vui lòng liên hệ chúng tôi tại <a>{{email}}</a>"
+    },
+    "user": {
+      "loading": "Đang tải thông tin người dùng...",
+      "guest": "Bạn là khách",
+      "loggedIn": "Bạn đã đăng nhập với email {{email}}"
+    },
+    "details": {
+      "title": "Email xác nhận chứa các chi tiết sau:",
+      "points": {
+        "submission": "Xác nhận tải tác phẩm của bạn",
+        "artwork": "Chi tiết tác phẩm của bạn",
+        "review": "Bước tiếp theo trong quá trình review",
+        "contact": "Thông tin liên hệ cho bất kỳ thắc mắc nào"
+      }
+    },
+    "artwork": {
+      "loading": "Đang tải thông tin tác phẩm...",
+      "error": "Có lỗi khi tải thông tin tác phẩm. Vui lòng thử lại.",
+      "notFound": "Không có thông tin tác phẩm nào.",
+      "id": "ID Tác phẩm",
+      "title": "Tiêu đề",
+      "description": "Mô tả"
+    }
+  }
+}

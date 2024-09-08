@@ -1,0 +1,23 @@
+{
+  "isNewArtwork": {
+    "labelTrue": "Tác phẩm Mới",
+    "labelFalse": "Tác phẩm Có sẵn",
+    "descriptionTrue": "Tạo tác phẩm mới",
+    "descriptionFalse": "Chọn tác phẩm có sẵn"
+  },
+  "title": {
+    "label": "Tên",
+    "placeholder": "Tên tác phẩm của bạn"
+  },
+  "description": {
+    "label": "Mô tả",
+    "placeholder": "Mô tả tác phẩm của bạn"
+  },
+  "loadingExistingArtworks": "Đang tải tác phẩm...",
+  "ExistingArtworkSelector": {
+    "label": "Tác phẩm Có sẵn",
+    "description": "Chọn một tác phẩm nếu bạn muốn cập nhật tác phẩm có sẵn",
+    "noArtworksFound": "Không tìm thấy tác phẩm",
+    "error": "Lỗi khi tải tác phẩm. Vui lòng thử lại."
+  }
+}

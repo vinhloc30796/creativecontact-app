@@ -19,7 +19,8 @@
       },
       "MediaUpload": {
         "title": "Upload Files",
-        "description": "Upload files for your artwork"
+        "description": "Upload files for {{artworkTitle}}",
+        "fallback": "your artwork"
       }
     },
     "state": {

@@ -19,7 +19,8 @@
       },
       "MediaUpload": {
         "title": "Tải File",
-        "description": "Tải tệp cho tác phẩm của bạn"
+        "description": "Tải file cho {{artworkTitle}}",
+        "fallback": "tác phẩm của bạn"
       }
     },
     "state": {

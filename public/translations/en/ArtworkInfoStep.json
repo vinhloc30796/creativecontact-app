@@ -1,0 +1,23 @@
+{
+  "isNewArtwork": {
+    "labelTrue": "New Artwork",
+    "labelFalse": "Existing Artwork",
+    "descriptionTrue": "Create a new artwork",
+    "descriptionFalse": "Select an existing artwork"
+  },
+  "title": {
+    "label": "Title",
+    "placeholder": "Title of your artwork"
+  },
+  "description": {
+    "label": "Description",
+    "placeholder": "Description of your artwork"
+  },
+  "loadingExistingArtworks": "Loading existing artworks...",
+  "ExistingArtworkSelector": {
+    "label": "Existing Artwork",
+    "description": "Select an existing artwork if you want to update an existing artwork",
+    "noArtworksFound": "No artworks found",
+    "error": "Error loading artworks. Please try again."
+  }
+}

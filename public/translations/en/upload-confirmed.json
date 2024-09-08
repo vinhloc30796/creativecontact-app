@@ -1,0 +1,32 @@
+{
+  "UploadConfirmed": {
+    "title": "Upload Confirmed",
+    "description": "Your upload has been successfully confirmed. Thank you for your submission!",
+    "email": {
+      "sent": "A confirmation email has been sent!",
+      "error": "There was an error sending the confirmation email... Please contact us at <a>{{email}}</a>"
+    },
+    "user": {
+      "loading": "Loading user information...",
+      "guest": "You're a guest",
+      "loggedIn": "You're logged in as {{email}}"
+    },
+    "details": {
+      "title": "The confirmation email contains the following details:",
+      "points": {
+        "submission": "Confirmation of your artwork submission",
+        "artwork": "Details of your uploaded artwork",
+        "review": "Next steps in the review process",
+        "contact": "Contact information for any inquiries"
+      }
+    },
+    "artwork": {
+      "loading": "Loading artwork information...",
+      "error": "Error loading artwork information. Please try again.",
+      "notFound": "No artwork information available.",
+      "id": "Artwork ID",
+      "title": "Title",
+      "description": "Description"
+    }
+  }
+}
