@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
+import { checkUserIsAnonymous } from '@/app/actions/user/auth';
 
 const supabase = createClient();
 
@@ -32,7 +33,7 @@ interface AuthState {
           const { data: { user } } = await supabase.auth.getUser();
           
           if (user) {
-            const isAnonymous = user.is_anonymous || true;
+            const isAnonymous = user.email ? await checkUserIsAnonymous(user.email) || true : true;
             updateAuthState(user, isAnonymous);
           } else {
             // If no session, attempt anonymous sign-in

@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 
 interface ArtworkInfoStepProps {
   form: UseFormReturn<ArtworkInfoData>
@@ -20,7 +21,10 @@ function ExistingArtworkSelector({ form, artworks }: {
   form: UseFormReturn<ArtworkInfoData>,
   artworks: ArtworkInfoData[],
 }) {
+  // State
   const [selectedArtwork, setSelectedArtwork] = useState<string>('')
+  // I18n
+  const { t } = useTranslation(['ArtworkInfoStep'], { keyPrefix: 'ExistingArtworkSelector' })
 
   useEffect(() => {
     if (selectedArtwork) {
@@ -33,8 +37,8 @@ function ExistingArtworkSelector({ form, artworks }: {
 
   return (
     <FormItem>
-      <FormLabel>Existing artwork</FormLabel>
-      <FormDescription>Select one if you want to update an existing artwork</FormDescription>
+      <FormLabel>{t('label')}</FormLabel>
+      <FormDescription>{t('description')}</FormDescription>
       <Select onValueChange={
         (value) => {
           setSelectedArtwork(value)
@@ -57,7 +61,7 @@ function ExistingArtworkSelector({ form, artworks }: {
               </SelectItem>
             ))
           ) : (
-            <SelectItem value="error" disabled>No artworks found</SelectItem>
+            <SelectItem value="error" disabled>{t('noArtworksFound')}</SelectItem>
           )}
         </SelectContent>
       </Select>
@@ -66,8 +70,11 @@ function ExistingArtworkSelector({ form, artworks }: {
 }
 
 export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNewArtwork }: ArtworkInfoStepProps) {
+  // State
   const { user } = useAuth();
   const [isNewArtwork, setIsNewArtwork] = useState(true);
+  // I18n
+  const { t } = useTranslation(['ArtworkInfoStep'])
 
   const { data: fetchedArtworks, isLoading, error } = useQuery({
     queryKey: ['artworks', user?.id],
@@ -97,10 +104,10 @@ export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNe
       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
         <div className="space-y-0.5">
           <FormLabel className="text-base">
-            {isNewArtwork ? 'New Artwork' : 'Existing Artwork'}
+            {isNewArtwork ? t('isNewArtwork.labelTrue') : t('isNewArtwork.labelFalse')}
           </FormLabel>
           <FormDescription>
-            {isNewArtwork ? 'Create a new artwork' : 'Select an existing artwork'}
+            {isNewArtwork ? t('isNewArtwork.descriptionTrue') : t('isNewArtwork.descriptionFalse')}
           </FormDescription>
         </div>
         <FormControl>
@@ -126,9 +133,9 @@ export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNe
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel>{t('title.label')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Title of your artwork" {...field} />
+                  <Input placeholder={t('title.placeholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -139,9 +146,9 @@ export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNe
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>{t('description.label')}</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description of your artwork" {...field} />
+                  <Textarea placeholder={t('description.placeholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -154,10 +161,10 @@ export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNe
             // Muted text with loading icon
             <div className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-muted-foreground">Loading existing artworks...</span>
+              <span className="text-muted-foreground">{t('loadingExistingArtworks')}</span>
             </div>
           }
-          {error && <p>Error loading existing artworks. Please try again.</p>}
+          {error && <p>{t('ExistingArtworkSelector.error')}</p>}
           {fetchedArtworks && <ExistingArtworkSelector form={form} artworks={fetchedArtworks} />}
         </>
       )}

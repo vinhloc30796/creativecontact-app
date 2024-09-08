@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation, Trans } from 'react-i18next';
 
 interface UploadConfirmedContentProps {
   params: {
@@ -17,16 +18,21 @@ interface UploadConfirmedContentProps {
 }
 
 function UploadConfirmedContent({ params }: UploadConfirmedContentProps) {
-  const { eventSlug } = params;
   const hostUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const { user, isLoading } = useAuth();
+  // Params
+  const { eventSlug } = params;
   const searchParams = useSearchParams();
+  // Auth
+  const { user, isLoading } = useAuth();
+  // State
   const [uploadInfo, setUploadInfo] = useState({
     email: '',
     userId: '',
     artworkId: ''
   });
   const [emailStatus, setEmailStatus] = useState<'sent' | 'error'>('sent');
+  // I18n
+  const { t } = useTranslation(["upload-confirmed"], { keyPrefix: "UploadConfirmed" });
 
   useEffect(() => {
     const info = {
@@ -67,46 +73,49 @@ function UploadConfirmedContent({ params }: UploadConfirmedContentProps) {
             className='flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20'
             style={{ backgroundColor: '#F6EBE4' }}
           >
-            <h2 className="text-2xl font-semibold text-primary">Upload Confirmed</h2>
-            <p>Your upload has been successfully confirmed. Thank you for your submission!</p>
-            {emailStatus === 'sent' && <p>A confirmation email has been sent!</p>}
+            <h2 className="text-2xl font-semibold text-primary">{t("title")}</h2>
+            <p>{t("description")}</p>
+            {emailStatus === 'sent' && <p>{t("email.sent")}</p>}
             {emailStatus === 'error' && <p>
-              There was an error sending the confirmation email...
-              Please contact us at <a href="mailto:hello@creativecontact.vn" className='underline'>hello@creativecontact.vn</a>
+              <Trans
+                i18nKey="email.error"
+                values={{ email: "creative.contact.vn@gmail.com" }}
+                components={{ a: <a href="mailto:creative.contact.vn@gmail.com" className='underline' /> }}
+              />
             </p>}
             <div>
               <p className="text-muted-foreground text-sm">
-                {isLoading ? 'Loading user information...' : `You're ` + (user?.email ? `logged in as ${user.email}` : `a guest`)}
+                {isLoading ? t("user.loading") : (user?.email ? t("user.loggedIn", { email: user.email }) : t("user.guest"))}
               </p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <p>The confirmation email contains the following details:</p>
+            <p>{t("details.title")}</p>
             <ul className="list-disc list-inside">
-              <li>Confirmation of your artwork submission</li>
-              <li>Details of your uploaded artwork</li>
-              <li>Next steps in the review process</li>
-              <li>Contact information for any inquiries</li>
+              <li>{t("details.points.submission")}</li>
+              <li>{t("details.points.artwork")}</li>
+              <li>{t("details.points.review")}</li>
+              <li>{t("details.points.contact")}</li>
             </ul>
           </div>
 
           <div className="bg-gray-100 p-4 rounded-md space-y-4">
             {isArtworkLoading ? (
-              <p>Loading artwork information...</p>
+              <p>{t("artwork.loading")}</p>
             ) : artworkError ? (
-              <p>Error loading artwork information. Please try again.</p>
+              <p>{t("artwork.error")}</p>
             ) : artwork ? (
               <>
-                <p><strong>Artwork ID:</strong> {artwork.id}</p>
+                <p><strong>{t("artwork.id")}:</strong> {artwork.id}</p>
                 <ul className='list-disc list-inside'>
-                  <li><strong>Title:</strong> {artwork.title}</li>
-                  <li><strong>Description:</strong> {artwork.description}</li>
+                  <li><strong>{t("artwork.title")}:</strong> {artwork.title}</li>
+                  <li><strong>{t("artwork.description")}:</strong> {artwork.description}</li>
                 </ul>
                 {/* Add more artwork details as needed */}
               </>
             ) : (
-              <p>No artwork information available.</p>
+              <p>{t("artwork.notFound")}</p>
             )}
           </div>
         </CardContent>

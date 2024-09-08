@@ -1,0 +1,39 @@
+{
+  "toast": {
+    "error": {
+      "title": "Lỗi Tải File"
+    },
+    "success": {
+      "title": "Đã Tải File",
+      "description": "{{file}} đã được tải lên thành công."
+    }
+  },
+  "form": {
+    "label": "Tải File",
+    "dropzone": "Kéo thả file vào đây, hoặc nhấn để chọn file",
+    "size": {
+      "existing": "Có sẵn <strong>{{count}}</strong>",
+      "uploaded": "đã tải <strong>{{count}}</strong>",
+      "pending": "đang chờ <strong>{{count}}</strong>",
+      "total": "Tổng: <strong>{{count}}</strong> trên giới hạn {{limit}}"
+    }
+  },
+  "dialog": {
+    "title": "File Có sẵn và File Đã tải",
+    "description": "Sắp xếp cho vui thôi. Hiện thứ tự chưa ảnh hưởng tới lưu trữ file.",
+    "badge": "{{count}} file"
+  },
+  "alert": {
+    "overLimit": "Đã vượt quá giới hạn {{limit}}"
+  },
+  "pending_table": {
+    "file": "File",
+    "remove": "Xóa"
+  },
+  "button": {
+    "email": "Email Tụi tui",
+    "reset": "Xóa",
+    "uploading": "Đang tải...",
+    "upload": "Tải file"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "ContactInfoStep": {
+    "email": {
+      "label": "Email",
+      "placeholder": "vi.du@gmail.com"
+    },
+    "firstName": {
+      "label": "Tên",
+      "placeholder": "Văn An"
+    },
+    "lastName": {
+      "label": "Họ",
+      "placeholder": "Nguyễn"
+    },
+    "phone": {
+      "label": "Số điện thoại",
+      "placeholder": "1234567890"
+    }
+  }
+}

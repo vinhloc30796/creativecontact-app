@@ -2,7 +2,7 @@
 
 "use server";
 
-import { checkUserEmailConfirmed } from "@/app/actions/auth";
+import { checkUserEmailConfirmed } from "@/app/actions/user/auth";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

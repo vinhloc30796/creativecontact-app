@@ -1,0 +1,10 @@
+{
+  "LangCard": {
+    "cardTitle": "Bienvenue dans notre Application",
+    "cardDescription": "Apprenez à utiliser le composant Trans",
+    "regularText": "Ceci est une traduction régulière.",
+    "transText": "Voici un exemple de composant <strong>Trans</strong> avec un <3>lien<1/></3>.",
+    "linkText": "documentation",
+    "switchLanguage": "Passer à la langue vietnamienne"
+  }
+}

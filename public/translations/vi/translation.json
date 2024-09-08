@@ -1,0 +1,10 @@
+{
+  "LangCard": {
+    "cardTitle": "Chào mừng đến với ứng dụng của chúng tôi",
+    "cardDescription": "Học cách sử dụng thành phần Trans",
+    "regularText": "Đây là một ví dụ về dịch thuật thông thường.",
+    "transText": "Đây là một ví dụ về thành phần <strong>Trans</strong> với một <3>liên kết<1/></3>.",
+    "linkText": "tài liệu",
+    "switchLanguage": "Chuyển sang tiếng Anh"
+  }
+}

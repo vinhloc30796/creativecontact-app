@@ -6,7 +6,7 @@ import { industries } from "@/app/types/UserInfo";
 
 // Define the schema for ProfessionalInfoStep
 export const professionalInfoSchema = z.object({
-  industries: z.array(z.enum(industries)).min(1, "Please select at least one industry"),
+  industries: z.array(z.enum(industries)).min(1, { message: "Please select at least one industry" }),
   experience: z.enum(experienceLevels),
 })
 

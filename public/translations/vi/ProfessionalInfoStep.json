@@ -1,0 +1,19 @@
+{
+  "IndustrySelect": {
+    "label": "Ngành nghề (Chọn tất cả các ngành phù hợp)",
+    "placeholder": "Tìm kiếm ngành nghề",
+    "selected": "{{count}} ngành nghề đã chọn",
+    "select": "Chọn ngành nghề",
+    "search": "Tìm kiếm ngành nghề...",
+    "noIndustryFound": "Không tìm thấy ngành nghề.",
+    "atLeastOneIndustry": "Vui lòng chọn ít nhất một ngành nghề"
+  },
+  "ExperienceSelect": {
+    "label": "Kinh nghiệm",
+    "placeholder": "Tìm kiếm kinh nghiệm",
+    "select": "Chọn kinh nghiệm",
+    "search": "Tìm kiếm mức kinh nghiệm...",
+    "noExperienceFound": "Không tìm thấy mức kinh nghiệm.",
+    "experienceLevel": "Vui lòng chọn mức kinh nghiệm"
+  }
+}

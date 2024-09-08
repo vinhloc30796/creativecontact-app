@@ -6,7 +6,6 @@ import { events } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
 import UploadPageClient from './UploadPageClient';
-import { ArtworkProvider } from "@/contexts/ArtworkContext";
 
 interface UploadPageProps {
   params: {

@@ -1,0 +1,20 @@
+{
+  "ContactInfoStep": {
+    "email": {
+      "label": "Email",
+      "placeholder": "example@gmail.com"
+    },
+    "firstName": {
+      "label": "First Name",
+      "placeholder": "John"
+    },
+    "lastName": {
+      "label": "Last Name",
+      "placeholder": "Doe"
+    },
+    "phone": {
+      "label": "Phone",
+      "placeholder": "1234567890"
+    }
+  }
+}
