@@ -2,7 +2,9 @@
 
 "use client";
 
+import { EventNotFound } from "@/app/(public)/[eventSlug]/EventNotFound";
 import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
+import { sendArtworkCreditRequestEmail } from "@/app/actions/email/creditRequest";
 import { checkUserIsAnonymous } from "@/app/actions/user/auth";
 import { signUpUser } from "@/app/actions/user/signUp";
 import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
@@ -13,7 +15,7 @@ import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { MediaUpload } from "@/components/uploads/media-upload";
@@ -25,15 +27,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFormUserId } from "@/hooks/useFormUserId";
 import { createEmailLink } from "@/lib/links";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
-import { createArtwork, insertArtworkAssets, insertArtworkCredit } from "./actions";
-import { useTranslation, Trans } from "react-i18next";
-import { sendArtworkCreditRequestEmail } from "@/app/actions/email/creditRequest";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
+import { createArtwork, insertArtworkAssets, insertArtworkCredit, insertArtworkEvents } from "./actions";
 
 
 interface UploadPageClientProps {
@@ -126,40 +126,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
 
   if (!eventData) {
     return (
-      <BackgroundDiv eventSlug={eventSlug}>
-        <Card className="w-[400px] mx-auto mt-10">
-          <CardHeader
-            className="border-b aspect-video bg-accent-foreground text-accent-foreground"
-            style={{
-              backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
-              backgroundSize: "cover",
-            }}
-          >
-          </CardHeader>
-          <CardContent className="p-6 flex flex-col gap-2">
-            <CardTitle>
-              {t("EventNotFound.text")}
-            </CardTitle>
-            <p className="mb-4">
-              <Trans
-                i18nKey="eventSlug:UploadPageClient.EventNotFound.description"
-                values={{ eventSlug }}
-              >
-                The event <strong>{eventSlug}</strong> does not exist. Perhaps you meant one of the following events?
-              </Trans>
-            </p>
-            <div className="space-y-2">
-              {recentEvents.map((recentEvent) => (
-                <Button key={recentEvent.id} asChild variant="outline" className="w-full">
-                  <Link href={`/${recentEvent.slug}/upload`}>
-                    {recentEvent.name}
-                  </Link>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </BackgroundDiv>
+      <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />
     );
   }
   const emailLink = createEmailLink(eventData);
@@ -188,7 +155,11 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         formUserId,
         processedData
       );
-      console.log("Artwork created:", createResult);
+      const insertArtworkEventsResult = await insertArtworkEvents(
+        createResult.artwork.id,
+        eventSlug
+      );
+      console.log("Artwork created:", createResult, "and artwork events inserted:", insertArtworkEventsResult);
     } else {
       console.log("Using existing artwork:", processedData.uuid);
     }
@@ -451,8 +422,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           </CardHeader>
           <CardContent className="p-6 flex flex-col gap-2">
             <div
-              className="flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md"
-              style={{ backgroundColor: "#F6EBE4" }}
+              className="flex flex-col space-y-2 p-4 bg-primary bg-opacity-10 rounded-md"
             >
               <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
               <p>{currentStep.description}</p>
@@ -488,7 +458,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
                     type="submit"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
                   >
                     {isSubmitting ? t("Button.submitting") : t("Button.submit")}
                   </Button>
