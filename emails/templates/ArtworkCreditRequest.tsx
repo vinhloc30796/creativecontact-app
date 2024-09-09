@@ -72,7 +72,7 @@ export const ArtworkCreditRequest: React.FC<ArtworkCreditRequestProps> = ({
       </Text>
       <Text className="text-base">
         Best regards,<br />
-        The Hoàn Tất Project Team
+        Creative Contact
       </Text>
     </Layout>
   );
