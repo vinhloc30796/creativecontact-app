@@ -300,8 +300,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           <Table className="mt-4">
             <TableHeader>
               <TableRow>
-                <TableHead>{t("table.file")}</TableHead>
-                <TableHead className="text-center">{t("table.remove")}</TableHead>
+                <TableHead>{t("pending_table.file")}</TableHead>
+                <TableHead className="text-center">{t("pending_table.remove")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

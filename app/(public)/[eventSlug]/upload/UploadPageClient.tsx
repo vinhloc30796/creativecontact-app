@@ -32,6 +32,7 @@ import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { createArtwork, insertArtworkAssets, insertArtworkCredit } from "./actions";
 import { useTranslation, Trans } from "react-i18next";
+import { sendArtworkCreditRequestEmail } from "@/app/actions/email/creditRequest";
 
 
 interface UploadPageClientProps {
@@ -64,7 +65,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   // Router
   const router = useRouter();
   // I18n
-  const { t, i18n } = useTranslation(["eventSlug"], { keyPrefix: "UploadPageClient" });
+  const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
   // Form setup
   const [formStep, setFormStep] = useState(0);
   const contactInfoForm = useForm<ContactInfoData>({
@@ -278,9 +279,14 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           {
             industries: [],
             experience: null,
-          }
+          },
+          false
         );
-        console.log("Write user info successful:", writeUserInfoResult);
+        if (writeUserInfoResult.success) {
+          console.log("Write user info successful:", writeUserInfoResult);
+        } else {
+          console.error("Write user info failed:", writeUserInfoResult);
+        }
         // insert the artwork credits
         const insertArtworkCreditResult = await insertArtworkCredit(
           artworkData.uuid,
@@ -288,6 +294,14 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           coartist.title
         );
         console.log("Insert artwork credit successful:", insertArtworkCreditResult);
+        // send the artwork credit request email
+        const emailResult = await sendArtworkCreditRequestEmail(
+          coartist.email,
+          `${coartist.first_name} ${coartist.last_name}`,
+          artworkData.title,
+          eventSlug
+        );
+        console.log("Credit request email sent:", emailResult);
       }
 
       // Redirect to upload-confirmed page
@@ -296,7 +310,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         userId: formUserId,
         artworkId: artworkData.uuid,
         emailSent: 'true', // Assuming email was sent successfully,
-        lang: i18n.language,
+        lang: i18n?.language || 'en',
       });
       // Send artwork details email
       if (insertAssetsResult) {
@@ -317,7 +331,9 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         params.set('emailSent', emailResult.success ? 'true' : 'false');
       }
       // Use router.push for client-side navigation
-      router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
+      console.debug("Redirecting to confirmation page with params", params.toString());
+      await router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
+      console.debug("Redirected to confirmation page");
       return true;
     } catch (error) {
       console.error("error", error);
@@ -329,8 +345,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
 
   const steps = [
     {
-      title: t("step.ContactInfoStep.title"),
-      description: t("step.ContactInfoStep.description"),
+      title: t("formSteps:ContactInfoStep.title"),
+      description: t("formSteps:ContactInfoStep.description"),
       component: <ContactInfoStep form={contactInfoForm} />,
       form: contactInfoForm,
       handlePreSubmit: async (data: ContactInfoData) => {
@@ -339,8 +355,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: t("step.ProfessionalInfoStep.title"),
-      description: t("step.ProfessionalInfoStep.description"),
+      title: t("formSteps:ProfessionalInfoStep.title"),
+      description: t("formSteps:ProfessionalInfoStep.description"),
       component: <ProfessionalInfoStep form={professionalInfoForm} />,
       form: professionalInfoForm,
       handlePreSubmit: async (data: ProfessionalInfoData) => {
@@ -349,8 +365,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: t("step.ArtworkInfoStep.title"),
-      description: t("step.ArtworkInfoStep.description"),
+      title: t("formSteps:ArtworkInfoStep.title"),
+      description: t("formSteps:ArtworkInfoStep.description"),
       component: (
         <>
           <ArtworkInfoStep
@@ -374,8 +390,10 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: t("step.MediaUpload.title"),
-      description: t("step.MediaUpload.description", { artworkTitle: currentArtwork?.title ?? t("step.MediaUpload.fallback") }),
+      title: t("formSteps:MediaUpload.title"),
+      description: t("formSteps:MediaUpload.description", {
+        artworkTitle: currentArtwork?.title ?? t("formSteps:MediaUpload.fallback")
+      }),
       component: (
         <MediaUpload
           artworkUUID={artworkUUID || undefined}
@@ -416,7 +434,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           <CardHeader
             className="border-b aspect-video bg-accent-foreground text-accent-foreground"
             style={{
-              backgroundImage: `url(/${eventSlug}-background.png)`,
+              backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
               backgroundSize: "cover",
             }}
           >

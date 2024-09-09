@@ -1,0 +1,27 @@
+{
+  "ContactInfoStep": {
+    "title": "Contact Information",
+    "description": "Please provide your contact information"
+  },
+  "ProfessionalInfoStep": {
+    "title": "Professional Information",
+    "description": "Please provide your professional information"
+  },
+  "ArtworkInfoStep": {
+    "title": "Artwork Information",
+    "description": "Please provide more information about your artwork"
+  },
+  "MediaUpload": {
+    "title": "Upload Files",
+    "description": "Upload files for {{artworkTitle}}",
+    "fallback": "your artwork"
+  },
+  "Button": {
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "upload": "Upload",
+    "submitting": "Submitting...",
+    "loading": "Loading..."
+  }
+}

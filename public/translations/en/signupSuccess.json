@@ -1,0 +1,11 @@
+{
+  "title": "Sign Up Successful!",
+  "description": "Thank you for signing up. Your account has been created successfully.",
+  "nextSteps": "Here are your next steps:",
+  "step1": "Check your email for a confirmation",
+  "step2": "Complete your profile",
+  "step3": "Explore our platform",
+  "backToHome": "Back to Home",
+  "goDashboard": "Dashboard (Coming Soon)",
+  "comingSoon": "Dashboard access coming soon!"
+}

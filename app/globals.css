@@ -63,7 +63,8 @@
 		--radius: 0.1rem;
 	}
 
-	/* https://www.realtimecolors.com/?colors=e4aac2-551b33-75cf54-db0058-c98e36&fonts=Inter-Inter */
+	/* https://coolors.co/e4aac2-551b33-75cf54-db0058-c98e36 */
+	/* https://www.realtimecolors.com/?colors=e4aac2-551b33-75cf54-db0058-c98e36&fonts=Plus%20Jakarta%20Sans-Plus%20Jakarta%20Sans */
 	[data-theme="trungthu-archive-2024"] {
 		--background: 335 52% 88%;
 		--foreground: 325 52% 9%;
@@ -95,6 +96,39 @@
 		
 		--radius: 0.1rem;
 	  }
+	
+	/* https://coolors.co/f3f1f2-010101-dea3a5-f86134-283bdd */
+	/* https://www.realtimecolors.com/?colors=010101-F3F1F2-F86134-283BDD-dea3a5&fonts=Plus%20Jakarta%20Sans-Plus%20Jakarta%20Sans */
+	[data-theme="early-access-2024"] {
+		--background: 330 8% 95%;
+		--foreground: 0 0% 0%;
+		
+		--card: 330 8% 95%;
+		--card-foreground: 0 0% 0%;
+		
+		--popover: 330 8% 95%;
+		--popover-foreground: 0 0% 0%;
+		
+		--primary: 14 93% 59%;
+		--primary-foreground: 0 0% 0%;
+		--secondary: 358 47% 75%;
+		--secondary-foreground: 0 0% 0%;
+		
+		--muted: 330 8% 20%;
+		--muted-foreground: 0 0% 70%;
+		
+		--accent: 234 73% 51%;
+		--accent-foreground: 330 8% 95%;
+		
+		--destructive: 0 85% 60%;
+		--destructive-foreground: 0 0% 0%;
+		
+		--border: 330 8% 20%;
+		--input: 330 8% 20%;
+		--ring: 234 73% 40%;
+		
+		--radius: 0.1rem;
+	}
 }
 
 @layer base {

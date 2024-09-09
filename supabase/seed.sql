@@ -147,6 +147,15 @@ VALUES (
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
 );
 
+INSERT INTO events (id, created_at, name, slug, created_by)
+VALUES (
+    '849fb451-1129-4f6a-8daf-9ad32a26c172', -- Random UUID
+    CURRENT_TIMESTAMP, -- Current timestamp
+    'Early Access 2024',
+    'early-access-2024',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
+);
+
 -- Static special slot
 INSERT INTO event_slots (id, created_at, event, time_start, time_end, capacity, special_notes)
 VALUES (

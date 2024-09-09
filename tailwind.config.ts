@@ -1,7 +1,13 @@
 import type { Config } from "tailwindcss"
 
 const config = {
-  darkMode: ["class", '[data-theme="trungthu-archive-2024"]'],
+  darkMode: [
+    "class",
+    '[data-theme="trungthu-archive-2024"]',
+    // For some reason: Type 'string' is not assignable to type 'undefined'.ts(2322)
+    // @ts-ignore
+    '[data-theme="early-access-2024"]' 
+  ],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
