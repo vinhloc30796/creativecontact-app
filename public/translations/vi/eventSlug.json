@@ -14,5 +14,13 @@
     "submit": "Gửi",
     "submitting": "Đang gửi...",
     "loading": "Đang tải..."
+  },
+  "UploadSuccess": {
+    "title": "Tải thành công",
+    "description": "Tác phẩm của bạn đã được tải thành công. Web sẽ chuyển hướng đến trang xác nhận trong giây lát."
+  },
+  "UploadFailure": {
+    "title": "Tải thất bại",
+    "description": "Có lỗi khi tải tác phẩm của bạn: {{value}}. Vui lòng thử lại."
   }
 }

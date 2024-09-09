@@ -16,11 +16,12 @@ export async function writeUserInfo(
     industries: IndustryType[];
     experience: ExperienceType | null;
   },
-  validate: boolean = true
+  validateProfessionalInfo: boolean = true,
+  validateUserInfo: boolean = true
 ) {
   console.log("Received professionalInfo:", professionalInfo);
   // Validate professional info
-  if (validate) {
+  if (validateProfessionalInfo) {
     if (!professionalInfo.industries || professionalInfo.industries.length === 0 ||
       !professionalInfo.experience) {
       console.error("Invalid professional info:", professionalInfo);
@@ -29,9 +30,11 @@ export async function writeUserInfo(
   }
 
   // Validate user info
-  if (!userInfo.phone || !userInfo.firstName || !userInfo.lastName) {
-    console.error("Invalid user info:", userInfo);
-    return { success: false, error: "Invalid user info" };
+  if (validateUserInfo) {
+    if (!userInfo.phone || !userInfo.firstName || !userInfo.lastName) {
+      console.error("Invalid user info:", userInfo);
+      return { success: false, error: "Invalid user info" };
+    }
   }
 
   try {
