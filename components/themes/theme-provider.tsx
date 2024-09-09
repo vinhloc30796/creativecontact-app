@@ -12,6 +12,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const eventThemes: { [key: string]: string } = {
     'hoantat-2024': 'light',
     'trungthu-archive-2024': 'trungthu-archive-2024',
+    'early-access-2024': 'early-access-2024',
     // Add more event slugs and their corresponding theme names here
   }
 
