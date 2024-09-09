@@ -28,7 +28,7 @@ export function ConfirmationPage({ contactInfoData, eventRegistrationData, profe
 
 	return (
 		<div className="space-y-4">
-			<div className="flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20" style={{ backgroundColor: '#F6EBE4' }}>
+			<div className="flex flex-col space-y-2 p-4 bg-primary bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20">
 				<h2 className="text-2xl font-semibold text-primary">Registration {status === 'confirmed' ? 'Confirmed' : 'Submitted'}</h2>
 				{status === 'confirmed' ? (
 					<p>Thank you for registering! Your registration is confirmed. We&apos;ve sent you an email with the event details and a calendar invite.</p>

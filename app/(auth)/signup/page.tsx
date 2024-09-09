@@ -139,8 +139,7 @@ export default function SignupPage() {
         />
         <CardContent className="p-6 flex flex-col gap-2">
           <div
-            className="flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md"
-            style={{ backgroundColor: '#F6EBE4' }}
+            className="flex flex-col space-y-2 p-4 bg-primary bg-opacity-10 rounded-md"
           >
             <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
             <p>{currentStep.description}</p>

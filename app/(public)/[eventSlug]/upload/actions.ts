@@ -2,8 +2,10 @@
 "use server"
 
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
-import { artworkAssets as artworkAssetsTable, artworkCredits as artworkCreditsTable, artworks as artworksTable } from "@/drizzle/schema/artwork";
+import { artworkAssets as artworkAssetsTable, artworkCredits as artworkCreditsTable, artworkEvents, artworks as artworksTable } from "@/drizzle/schema/artwork";
+import { events } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
 
 function getAssetType(path: string): "image" | "video" | "audio" | "font" | null {
   // Return "image", "video", "audio", "font"
@@ -97,6 +99,29 @@ export async function insertArtworkCredit(
       }
     ).returning();
     return credits;
+  });
+  return result;
+}
+
+export async function insertArtworkEvents(
+  artworkId: string,
+  eventSlug: string
+) {
+  const result = await db.transaction(async (tx) => {
+    const event = await tx.query.events.findFirst({
+      where: eq(events.slug, eventSlug),
+      columns: { id: true }
+    });
+
+    if (!event) {
+      throw new Error(`Event with slug ${eventSlug} not found`);
+    }
+
+    const artworkEvent = await tx.insert(artworkEvents).values({
+      artworkId: artworkId,
+      eventId: event.id,
+    }).returning();
+    return artworkEvent;
   });
   return result;
 }
