@@ -10,7 +10,7 @@
   },
   "form": {
     "label": "Upload Files",
-    "dropzone": "Drag &apos;n&apos; drop some files here, or click to select files",
+    "dropzone": "Drag 'n' drop some files here, or click to select files",
     "size": {
       "existing": "<strong>{{count}}</strong> existing",
       "uploaded": "<strong>{{count}}</strong> uploaded",
@@ -20,7 +20,7 @@
   },
   "dialog": {
     "title": "Existing and Uploaded Files",
-    "description": "This reordering is for fun. It doesn&apos;t affect the order of the files in the database.",
+    "description": "This reordering is for fun. It doesn't affect the order of the files in the database.",
     "badge": "{{count}} files"
   },
   "alert": {

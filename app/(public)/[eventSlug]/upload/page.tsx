@@ -15,7 +15,7 @@ interface UploadPageProps {
 
 export default async function UploadPage({ params }: UploadPageProps) {
   const { eventSlug } = params;
-  const eventData = await await db.query.events.findFirst({
+  const eventData = await db.query.events.findFirst({
     where: eq(events.slug, eventSlug),
     columns: { id: true, name: true, slug: true }
   });

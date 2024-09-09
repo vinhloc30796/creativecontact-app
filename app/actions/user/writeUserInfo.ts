@@ -15,14 +15,17 @@ export async function writeUserInfo(
   professionalInfo: {
     industries: IndustryType[];
     experience: ExperienceType | null;
-  }
+  },
+  validate: boolean = true
 ) {
   console.log("Received professionalInfo:", professionalInfo);
   // Validate professional info
-  if (!professionalInfo.industries || professionalInfo.industries.length === 0 ||
-    !professionalInfo.experience) {
-    console.error("Invalid professional info:", professionalInfo);
-    return { success: false, error: "Invalid professional info" };
+  if (validate) {
+    if (!professionalInfo.industries || professionalInfo.industries.length === 0 ||
+      !professionalInfo.experience) {
+      console.error("Invalid professional info:", professionalInfo);
+      return { success: false, error: "Invalid professional info" };
+    }
   }
 
   // Validate user info
