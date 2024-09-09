@@ -34,7 +34,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           name="firstName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tên</FormLabel>
+              <FormLabel>{t('ContactInfoStep.firstName.label')}</FormLabel>
               <FormControl>
                 <Input placeholder={t('ContactInfoStep.firstName.placeholder')} {...field} />
               </FormControl>
