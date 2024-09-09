@@ -22,7 +22,7 @@ export const ArtworkCreditRequest: React.FC<ArtworkCreditRequestProps> = ({
   artistName,
   artworkTitle,
 }) => {
-  const previewText = `You've been credited for your artwork on Hoàn Tất Project`;
+  const previewText = `You've been credited for your artwork on Creative Contact`;
 
   return (
     <Layout>
@@ -34,7 +34,7 @@ export const ArtworkCreditRequest: React.FC<ArtworkCreditRequestProps> = ({
         Dear {artistName},
       </Text>
       <Text className="text-base mb-4">
-        We're excited to inform you that your artwork, "{artworkTitle}", has been credited on our platform. We appreciate your contribution to the Hoàn Tất Project and would like to invite you to join our community.
+        We're excited to inform you that your artwork, "{artworkTitle}", has been credited on our platform. We appreciate your contribution to the Creative Contact community and would like to invite you to join our community.
       </Text>
       <Text className="text-base mb-4">
         To claim your account and become an active member of our platform, please click the button below:
