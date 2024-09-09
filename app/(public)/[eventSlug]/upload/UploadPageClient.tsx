@@ -26,13 +26,14 @@ import { useFormUserId } from "@/hooks/useFormUserId";
 import { createEmailLink } from "@/lib/links";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { createArtwork, insertArtworkAssets, insertArtworkCredit } from "./actions";
 import { useTranslation, Trans } from "react-i18next";
 import { sendArtworkCreditRequestEmail } from "@/app/actions/email/creditRequest";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 
 interface UploadPageClientProps {
@@ -52,6 +53,8 @@ interface UploadPageClientProps {
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>;
 
 export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
+  // Router
+  const router = useRouter();
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
   const { resolveFormUserId, userData, isLoading: isUserDataLoading } = useFormUserId();
@@ -62,8 +65,6 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
   const [artworkAssets, setArtworkAssets] = useState<{ id: string; path: string; fullPath: string; }[]>([]);
   const [isNewArtwork, setIsNewArtwork] = useState(true);
-  // Router
-  const router = useRouter();
   // I18n
   const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
   // Form setup
@@ -280,6 +281,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
             industries: [],
             experience: null,
           },
+          false,
           false
         );
         if (writeUserInfoResult.success) {
@@ -304,7 +306,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         console.log("Credit request email sent:", emailResult);
       }
 
-      // Redirect to upload-confirmed page
+      // Prepare params for the confirmation page
       const params = new URLSearchParams({
         email: contactInfoData.email,
         userId: formUserId,
@@ -330,13 +332,21 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         // Update the params to include the email sending status
         params.set('emailSent', emailResult.success ? 'true' : 'false');
       }
-      // Use router.push for client-side navigation
+      // Show success toast
+      toast.success(t("UploadSuccess.title"), {
+        description: t("UploadSuccess.description"),
+        duration: 5000,
+      });
+      // Use window.location for a full page reload and navigation
       console.debug("Redirecting to confirmation page with params", params.toString());
-      await router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
-      console.debug("Redirected to confirmation page");
-      return true;
+      // window.location.href = `/${eventSlug}/upload-confirmed?${params.toString()}`;
+      return router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
     } catch (error) {
       console.error("error", error);
+      toast.error(t("UploadFailure.title"), {
+        description: t("UploadFailure.description", { value: error }),
+        duration: 5000,
+      });
       return false;
     } finally {
       setIsSubmitting(false);
