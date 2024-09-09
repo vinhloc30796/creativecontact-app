@@ -416,7 +416,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           <CardHeader
             className="border-b aspect-video bg-accent-foreground text-accent-foreground"
             style={{
-              backgroundImage: `url(/${eventSlug}-background.png)`,
+              backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
               backgroundSize: "cover",
             }}
           >
