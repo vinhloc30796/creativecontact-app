@@ -64,7 +64,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   // Router
   const router = useRouter();
   // I18n
-  const { t, i18n } = useTranslation(["eventSlug"], { keyPrefix: "UploadPageClient" });
+  const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
   // Form setup
   const [formStep, setFormStep] = useState(0);
   const contactInfoForm = useForm<ContactInfoData>({
@@ -329,8 +329,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
 
   const steps = [
     {
-      title: t("step.ContactInfoStep.title"),
-      description: t("step.ContactInfoStep.description"),
+      title: t("formSteps:ContactInfoStep.title"),
+      description: t("formSteps:ContactInfoStep.description"),
       component: <ContactInfoStep form={contactInfoForm} />,
       form: contactInfoForm,
       handlePreSubmit: async (data: ContactInfoData) => {
@@ -339,8 +339,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: t("step.ProfessionalInfoStep.title"),
-      description: t("step.ProfessionalInfoStep.description"),
+      title: t("formSteps:ProfessionalInfoStep.title"),
+      description: t("formSteps:ProfessionalInfoStep.description"),
       component: <ProfessionalInfoStep form={professionalInfoForm} />,
       form: professionalInfoForm,
       handlePreSubmit: async (data: ProfessionalInfoData) => {
@@ -349,8 +349,8 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: t("step.ArtworkInfoStep.title"),
-      description: t("step.ArtworkInfoStep.description"),
+      title: t("formSteps:ArtworkInfoStep.title"),
+      description: t("formSteps:ArtworkInfoStep.description"),
       component: (
         <>
           <ArtworkInfoStep
@@ -374,8 +374,10 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       },
     },
     {
-      title: t("step.MediaUpload.title"),
-      description: t("step.MediaUpload.description", { artworkTitle: currentArtwork?.title ?? t("step.MediaUpload.fallback") }),
+      title: t("formSteps:MediaUpload.title"),
+      description: t("formSteps:MediaUpload.description", {
+        artworkTitle: currentArtwork?.title ?? t("formSteps:MediaUpload.fallback")
+      }),
       component: (
         <MediaUpload
           artworkUUID={artworkUUID || undefined}

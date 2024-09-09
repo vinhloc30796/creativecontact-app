@@ -1,0 +1,27 @@
+{
+  "ContactInfoStep": {
+    "title": "Thông tin Liên hệ",
+    "description": "Vui lòng cung cấp thông tin liên hệ của bạn"
+  },
+  "ProfessionalInfoStep": {
+    "title": "Thông tin Chuyên môn",
+    "description": "Vui lòng cung cấp thông tin chuyên môn của bạn"
+  },
+  "ArtworkInfoStep": {
+    "title": "Thông tin Tác phẩm",
+    "description": "Vui lòng cung cấp thông tin tác phẩm của bạn"
+  },
+  "MediaUpload": {
+    "title": "Tải File",
+    "description": "Tải file cho {{artworkTitle}}",
+    "fallback": "tác phẩm của bạn"
+  },
+  "Button": {
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "upload": "Upload",
+    "submitting": "Submitting...",
+    "loading": "Loading..."
+  }
+}
