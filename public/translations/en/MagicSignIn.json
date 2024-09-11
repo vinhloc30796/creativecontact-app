@@ -1,0 +1,13 @@
+{
+    "title": "Magic Sign-In",
+    "login": {
+        "description": "Please login with your email"
+    },
+    "checkin": {
+        "description": "Please check-in with your email"
+    },
+    "success": "Magic link sent! Please check your email to continue.",
+    "countdown": "You can request a new link in {countdown} seconds.",
+    "sending": "Sending...",
+    "send": "Send Magic Link"
+}

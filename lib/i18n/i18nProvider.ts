@@ -1,6 +1,6 @@
 'use client'
 
-import i18n from './init'
+import i18n from './init-client'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 

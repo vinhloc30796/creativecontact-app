@@ -5,7 +5,7 @@ import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { CheckInContainer } from './_sections/CheckInContainer';
 import { UserDetails } from './_sections/UserDetails';
-import { MagicSignIn } from './_sections/MagicSignIn';
+import { MagicSignIn } from '../../../../components/auth/MagicSignIn';
 
 export default function CheckInPage() {
   const { user, isLoading, error, isAnonymous } = useAuth();
@@ -17,7 +17,7 @@ export default function CheckInPage() {
       ) : (user && !isAnonymous) ? (
         <UserDetails user={user} />
       ) : (
-        <MagicSignIn />
+        <MagicSignIn purpose="checkin" />
       )}
       {error && <p className="text-red-500">{error}</p>}
     </CheckInContainer>

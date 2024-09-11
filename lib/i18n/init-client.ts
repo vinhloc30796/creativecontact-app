@@ -1,12 +1,14 @@
-import path from 'path';
+'use client';
 import i18n from "i18next";
+import ChainedBackend from 'i18next-chained-backend';
+import HttpBackend from 'i18next-http-backend';
 import resourcesToBackend from 'i18next-resources-to-backend';
-import HttpBackend from 'i18next-http-backend'
-import ChainedBackend from 'i18next-chained-backend'
-
-import { initReactI18next } from "react-i18next";
+import { useEffect, useState } from 'react';
+import { initReactI18next, useTranslation as useTranslationOrg } from "react-i18next";
+import { buildResources } from "./settings";
 
 const hostUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const runsOnServerSide = typeof window === 'undefined'
 
 const resourcesLangCard = {
   en: {
@@ -57,24 +59,8 @@ i18n
       backends: [
         // if a namespace can't be loaded via normal http-backend loadPath, 
         //then the inMemoryLocalBackend will try to return the correct resources
-        HttpBackend, 
-        // with dynamic import, 
-        // you have to use the "default" key of the module
-        // ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#importing_defaults )
-        resourcesToBackend((language, namespace, callback) => {
-          const filePath = `./translations/${language}/${namespace}.json`
-          console.log("resourcesToBackend: trying to load resources from", filePath);
-          import(filePath)
-            .then((resources) => {
-              console.log("resourcesToBackend: loaded resources", resources, "from", filePath);
-              callback(null, resources)
-            })
-            .catch((error) => {
-              console.error("resourcesToBackend: error loading resources", error);
-              console.error("current location:", process.cwd());
-              callback(error, null)
-            })
-        })
+        HttpBackend,
+        resourcesToBackend(buildResources)
       ],
       backendOptions: [{
         loadPath: `${hostUrl}/translations/{{lng}}/{{ns}}.json`
@@ -89,3 +75,29 @@ i18n
   })
 
 export default i18n;
+
+interface UseTranslationOptions {
+  keyPrefix?: string
+}
+
+export function useTranslation(lng: string, ns: string | string[], options: UseTranslationOptions = {}) {
+  const ret = useTranslationOrg(ns, options)
+  const { i18n } = ret
+  if (runsOnServerSide && lng && i18n.resolvedLanguage !== lng) {
+    i18n.changeLanguage(lng)
+  } else {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [activeLng, setActiveLng] = useState(i18n.resolvedLanguage)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (activeLng === i18n.resolvedLanguage) return
+      setActiveLng(i18n.resolvedLanguage)
+    }, [activeLng, i18n.resolvedLanguage])
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (!lng || i18n.resolvedLanguage === lng) return
+      i18n.changeLanguage(lng)
+    }, [lng, i18n])
+  }
+  return ret
+}
