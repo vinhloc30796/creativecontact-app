@@ -1,21 +1,20 @@
 "use client"
 
 import { Button } from '@/components/ui/button'
-import { Progress } from "@/components/ui/progress"
-import { Reorder } from "framer-motion"
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
-import { AlertCircle, MailIcon, RefreshCw, Trash2, Upload, GripVertical } from 'lucide-react'
+import { AlertCircle, RefreshCw, Trash2, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState, useMemo, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation, Trans } from 'react-i18next'
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -27,77 +26,24 @@ interface MediaUploadProps {
   ) => void;
 }
 
-export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: MediaUploadProps) {
-  const [pendingFiles, setPendingFiles] = useState<File[]>([])
-  const [existingFiles, setExistingFiles] = useState<{ id: string; path: string; fullPath: string; name: string; size: number }[]>([])
-  const [uploadedFiles, setUploadedFiles] = useState<{ id: string; path: string; fullPath: string; name: string; size: number }[]>([])
-  const [uploading, setUploading] = useState(false)
-  const maxSize = 25 * 1024 * 1024 // 25MB in bytes
-  const bucketName = 'artwork_assets'
-  // I18n
-  const { t } = useTranslation(['media-upload'])
+interface SupabaseFile {
+  id: string;
+  path: string;
+  fullPath: string;
+  name: string;
+  size: number;
+}
 
-  const { data: existingAssetsData } = useQuery({
-    queryKey: ['existingAssets', artworkUUID],
-    queryFn: async () => {
-      if (isNewArtwork || !artworkUUID) return null;
-      const supabase = createClient();
-      // First get the list of files
-      const { data: fileList, error } = await supabase
-        .storage
-        .from('artwork_assets')
-        .list(artworkUUID);
-      if (error) throw error;
-      // Then get the size of each file
-      const filesWithSizes = await Promise.all(fileList.map(async (file) => {
-        try {
-          const { data } = await supabase
-            .storage
-            .from('artwork_assets')
-            .getPublicUrl(`${artworkUUID}/${file.name}`);
-          const response = await fetch(data.publicUrl, { method: 'HEAD' });
-          const size = parseInt(response.headers.get('Content-Length') || '0', 10);
-          return { ...file, size };
-        } catch (error) {
-          console.error('Error getting public URL:', error);
-          return { ...file, size: 0 };
-        }
-      }));
-      return filesWithSizes;
-    },
-    enabled: !isNewArtwork && !!artworkUUID
-  });
+interface FileTableProps {
+  files: SupabaseFile[];
+  isReadonly: boolean;
+  thumbnailFile: string | null;
+  setThumbnailFile: (file: string | null) => void;
+  removeFile: (file: SupabaseFile) => void;
+}
 
-  useEffect(() => {
-    if (existingAssetsData) {
-      const existingFiles = existingAssetsData.map(asset => ({
-        id: asset.id,
-        path: asset.name,
-        fullPath: `${artworkUUID}/${asset.name}`,
-        name: `File ${asset.id}`,
-        size: asset.size
-      }));
-      setExistingFiles(existingFiles);
-    }
-  }, [existingAssetsData, artworkUUID]);
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setPendingFiles(prevFiles => [...prevFiles, ...acceptedFiles])
-  }, [])
-
-  const removeFile = (fileToRemove: File) => {
-    setPendingFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove))
-  }
-
-  const resetFiles = () => {
-    setPendingFiles([])
-    if (isNewArtwork) {
-      setExistingFiles([])
-      setUploadedFiles([])
-    }
-  }
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbnailFile, setThumbnailFile, removeFile }) => {
+  const { t } = useTranslation(['media-upload']);
 
   const formatSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
@@ -115,10 +61,125 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
     return truncatedName + ext
   }
 
+  return (
+    <Table className="mt-4">
+      <TableHeader>
+        <TableRow>
+          <TableHead className="text-center">{t("pending_table.thumbnail")}</TableHead>
+          <TableHead>{t("pending_table.file")}</TableHead>
+          {!isReadonly && <TableHead className="text-center">{t("pending_table.remove")}</TableHead>}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {files.map((file, index) => (
+          <TableRow key={index}>
+            <TableCell className="text-center">
+              <RadioGroup
+                className="flex items-center justify-center"
+                value={thumbnailFile || ''} onValueChange={setThumbnailFile}>
+                <RadioGroupItem value={file.name} id={`thumbnail-${index}`} disabled={isReadonly} />
+              </RadioGroup>
+            </TableCell>
+            <TableCell className="flex items-center">
+              <div className="truncate">
+                <span>{truncateFileName(file.name)}</span>
+                <br />
+                <span className="text-muted-foreground">{formatSize(file.size)}</span>
+              </div>
+            </TableCell>
+            {!isReadonly && (
+              <TableCell className="text-center">
+                <button
+                  type="button"
+                  className="text-destructive"
+                  onClick={() => removeFile(file)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </TableCell>
+            )}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: MediaUploadProps) {
+  // Constants
+  const maxSize = 25 * 1024 * 1024 // 25MB in bytes
+  const bucketName = 'artwork_assets'
+  // Use Query
+  const queryClient = useQueryClient()
+  // States
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [thumbnailFile, setThumbnailFile] = useState<string | null>(null)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  // I18n
+  const { t } = useTranslation(['media-upload'])
+
+  const { data: uploadedFiles = [], isLoading: isUploadedFilesLoading, error: uploadedFilesError } = useQuery({
+    queryKey: ['uploadedFiles', artworkUUID],
+    queryFn: async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .storage
+        .from(bucketName)
+        .list(artworkUUID);
+
+      if (error) {
+        console.error('Error fetching uploaded files:', error);
+        return [];
+      }
+
+      return data.map(file => ({
+        id: file.id,
+        path: file.name,
+        fullPath: `${artworkUUID}/${file.name}`,
+        name: file.name,
+        size: file.metadata?.size || 0
+      }));
+    },
+    enabled: !!artworkUUID
+  });
+
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    setPendingFiles(prevFiles => [...prevFiles, ...acceptedFiles])
+  }, [])
+
+  const removeFile = (fileToRemove: File) => {
+    setPendingFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove))
+    if (thumbnailFile === fileToRemove.name) {
+      setThumbnailFile(null)
+    }
+  }
+
+  const resetFiles = () => {
+    setPendingFiles([])
+    if (isNewArtwork) {
+      queryClient.setQueryData(['uploadedFiles', artworkUUID], [])
+    }
+    setThumbnailFile(null)
+  }
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+
+  const formatSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
   const pendingSize = useMemo(() => pendingFiles.reduce((acc, file) => acc + file.size, 0), [pendingFiles]);
-  const existingSize = useMemo(() => existingFiles.reduce((acc, file) => acc + file.size, 0), [existingFiles]);
-  const uploadedSize = useMemo(() => uploadedFiles.reduce((acc, file) => acc + file.size, 0), [uploadedFiles]);
-  const totalSize = pendingSize + existingSize + uploadedSize;
+  const uploadedSize = useMemo(() => {
+    if (isUploadedFilesLoading) return 0;
+    return uploadedFiles.reduce((acc, file) => acc + file.size, 0);
+  }, [uploadedFiles, isUploadedFilesLoading]);
+  const totalSize = pendingSize + uploadedSize;
 
   const isOverLimit = totalSize > maxSize
 
@@ -131,6 +192,39 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
       let successCount = 0;
       let uploadedFilesList: { id: string; path: string; fullPath: string; name: string; size: number }[] = [];
       let remainingFiles: File[] = [];
+
+      // Remove all files in the existing storage folder before uploading new files
+      if (artworkUUID) {
+        const { data: fileList, error } = await supabase
+          .storage
+          .from(bucketName)
+          .list(artworkUUID);
+        if (error) {
+          console.error('Error listing files:', error.message);
+        } else {
+          for (const file of fileList) {
+            const { error: deleteError } = await supabase
+              .storage
+              .from(bucketName)
+              .remove([`${artworkUUID}/${file.name}`]);
+            if (deleteError) {
+              console.error('Error deleting file:', deleteError.message);
+              toast.error(t("delete-toast.error.title"), {
+                description: `${file.name}: ${deleteError.message}`,
+                duration: 3000,
+              })
+            } else {
+              console.log('File deleted successfully:', file.name)
+              toast.success(t("delete-toast.success.title"), {
+                description: t("delete-toast.success.description", { file: file.name }),
+                duration: 3000,
+              })
+            }
+          }
+        }
+      }
+
+      // Upload files
       for (const file of pendingFiles) {
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
         if (error) {
@@ -148,19 +242,24 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
             duration: 3000,
           })
           results.push({ id: data.path, path: data.path, fullPath: data.fullPath })
-          uploadedFilesList.push({ 
-            id: data.path, 
-            path: data.path, 
-            fullPath: data.fullPath, 
-            name: file.name, 
-            size: file.size 
+          uploadedFilesList.push({
+            id: data.path,
+            path: data.path,
+            fullPath: data.fullPath,
+            name: file.name,
+            size: file.size
           })
           successCount++;
         }
       }
-      setUploadedFiles(prevFiles => [...prevFiles, ...uploadedFilesList]);
+      // Update the uploaded files list in the query cache
+      queryClient.setQueryData(['uploadedFiles', artworkUUID], (oldData: any) => [...(oldData || []), ...uploadedFilesList]);
       setPendingFiles(remainingFiles);
       onUpload(uploadedFilesList, errors)
+
+      // Recalculate uploadedSize after upload
+      queryClient.invalidateQueries({ queryKey: ['uploadedFiles', artworkUUID] });
+
       return artworkUUID || null
     } catch (error) {
       console.error('Error uploading files:', error)
@@ -172,9 +271,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
   }
 
   const pendingPercentage = (pendingSize / maxSize) * 100;
-  const existingPercentage = (existingSize / maxSize) * 100;
   const uploadedPercentage = (uploadedSize / maxSize) * 100;
-  const remainingPercentage = 100 - pendingPercentage - existingPercentage - uploadedPercentage;
+  const remainingPercentage = 100 - pendingPercentage - uploadedPercentage;
 
   return (
     <div className="w-full max-w-md mx-auto bg-background">
@@ -191,84 +289,49 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           </p>
         </div>
         <div className="flex flex-col">
-          <div className="mt-4 flex items-center">
-            <p className="text-sm font-medium flex-grow">
-              <Trans
-                i18nKey="media-upload:form.size.existing"
-                values={{ count: formatSize(existingSize) }}
-                components={{ strong: <strong /> }}
-              />{', '}
+          <div className="mt-4 flex flex-col items-left">
+            <p className="text-sm font-medium flex-grow text-muted-foreground">
               <Trans
                 i18nKey="media-upload:form.size.uploaded"
                 values={{ count: formatSize(uploadedSize) }}
                 components={{ strong: <strong /> }}
-              />{', '}
+              />
+              {uploadedFiles && (
+                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                  <SheetTrigger asChild>
+                    <Badge variant="secondary" className="ml-2 cursor-pointer">
+                      {t("dialog.badge", { count: uploadedFiles.length })}
+                    </Badge>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>{t("dialog.title")}</SheetTitle>
+                      <SheetDescription>{t("dialog.description")}</SheetDescription>
+                    </SheetHeader>
+                    <FileTable
+                      files={uploadedFiles}
+                      isReadonly={true}
+                      thumbnailFile={thumbnailFile}
+                      setThumbnailFile={setThumbnailFile}
+                      removeFile={() => {}}
+                    />
+                  </SheetContent>
+                </Sheet>
+              )}
+              {', '}
+              <br />
               <Trans
                 i18nKey="media-upload:form.size.pending"
                 values={{ count: formatSize(pendingSize) }}
                 components={{ strong: <strong /> }}
               />{' '}
-              <br />
               <Trans
                 i18nKey="media-upload:form.size.total"
-                values={{ count: formatSize(totalSize), limit: "25MB" }}
+                values={{ count: formatSize(pendingSize), limit: "25MB" }}
                 components={{ strong: <strong /> }}
               />
-              {(existingFiles.length > 0 || uploadedFiles.length > 0) && (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Badge variant="secondary" className="ml-2 cursor-pointer">
-                      {t("dialog.badge", { count: existingFiles.length + uploadedFiles.length })}
-                    </Badge>
-                  </DialogTrigger>
-                  <DialogContent className="max-h-[75vh] overflow-y-auto" >
-                    <DialogHeader>
-                      <DialogTitle>{t("dialog.title")}</DialogTitle>
-                      <DialogDescription>
-                        {t("dialog.description")}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="mx-auto">{t("pending_table.file")}</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <Reorder.Group axis="y" onReorder={setExistingFiles} values={existingFiles} className="w-full">
-                          {existingFiles.map((file) => (
-                            <Reorder.Item key={file.name} value={file} className="w-full" as="tr">
-                              <TableCell className="flex items-center w-full">
-                                <GripVertical className="h-4 w-4 text-muted-foreground cursor-move mr-2" />
-                                <div className="truncate">
-                                  <span>{truncateFileName(file.name, 50)}</span>
-                                  <br />
-                                  <span className="text-muted-foreground">{formatSize(file.size)}</span>
-                                </div>
-                              </TableCell>
-                            </Reorder.Item>
-                          ))}
-                        </Reorder.Group>
-                        <Reorder.Group axis="y" onReorder={setUploadedFiles} values={uploadedFiles} className="w-full">
-                          {uploadedFiles.map((file) => (
-                            <Reorder.Item key={file.name} value={file} className="w-full" as="tr">
-                              <TableCell className="flex items-center w-full">
-                                <GripVertical className="h-4 w-4 text-muted-foreground cursor-move mr-2" />
-                                <div className="truncate">
-                                  <span>{truncateFileName(file.name, 50)}</span>
-                                  <br />
-                                  <span className="text-muted-foreground">{formatSize(file.size)}</span>
-                                </div>
-                              </TableCell>
-                            </Reorder.Item>
-                          ))}
-                        </Reorder.Group>
-                      </TableBody>
-                    </Table>
-                  </DialogContent>
-                </Dialog>
-              )}
             </p>
+
           </div>
           {isOverLimit && (
             <div className="flex items-center text-destructive mt-2">
@@ -277,10 +340,6 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
             </div>
           )}
           <div className="mt-2 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary float-left"
-              style={{ width: `${existingPercentage}%` }}
-            />
             <div
               className="h-full bg-secondary float-left"
               style={{ width: `${uploadedPercentage}%` }}
@@ -295,57 +354,26 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
             />
           </div>
         </div>
-
         {pendingFiles.length > 0 && (
-          <Table className="mt-4">
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("pending_table.file")}</TableHead>
-                <TableHead className="text-center">{t("pending_table.remove")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pendingFiles.map((file, index) => (
-                <TableRow key={index}>
-                  <TableCell className="flex items-center">
-                    <div className="truncate">
-                      <span>{truncateFileName(file.name)}</span>
-                      <br />
-                      <span className="text-muted-foreground">{formatSize(file.size)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <button
-                      type="button"
-                      className="text-destructive"
-                      onClick={() => removeFile(file)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <FileTable
+            files={pendingFiles.map(file => ({
+              id: file.name,
+              path: file.name,
+              fullPath: file.name,
+              name: file.name,
+              size: file.size
+            }))}
+            isReadonly={false}
+            thumbnailFile={thumbnailFile}
+            setThumbnailFile={setThumbnailFile}
+            removeFile={
+              (file: SupabaseFile) => {
+                removeFile(file as unknown as File)
+              }
+            }
+          />
         )}
-
         <div className="flex mt-4 space-x-2 items-center">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full"
-                >
-                  <Link href={emailLink}>
-                    <MailIcon className="h-4 w-4" aria-label="Email Us" />
-                  </Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{t("button.email")}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -370,6 +398,13 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
           >
             {uploading ? t("button.uploading") : t("button.upload")}
           </Button>
+        </div>
+        <div className="flex space-x-2 items-center">
+          <p className="text-sm text-muted-foreground mt-4">
+            {t("button.email_description")} <Link href={emailLink} className="text-primary hover:underline">
+              {t("button.email")}
+            </Link>
+          </p>
         </div>
       </form>
     </div>

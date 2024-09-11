@@ -30,7 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { createArtwork, insertArtworkAssets, insertArtworkCredit, insertArtworkEvents } from "./actions";
@@ -147,23 +147,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     artworkForm.setValue("title", processedData?.title || "");
     artworkForm.setValue("description", processedData?.description || "");
     setArtworkUUID(processedData.uuid); // Update artworkUUID state
-
-    // Create artwork in the database
-    if (isNewArtwork) {
-      const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
-      const createResult = await createArtwork(
-        formUserId,
-        processedData
-      );
-      const insertArtworkEventsResult = await insertArtworkEvents(
-        createResult.artwork.id,
-        eventSlug
-      );
-      console.log("Artwork created:", createResult, "and artwork events inserted:", insertArtworkEventsResult);
-    } else {
-      console.log("Using existing artwork:", processedData.uuid);
-    }
-  };
+  }
 
   const handleAssetUpload = (
     results: { id: string; path: string; fullPath: string; }[],
@@ -222,6 +206,21 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         }
       );
       console.log("Write user info successful:", writeUserInfoResult);
+      // Create artwork in the database
+      if (isNewArtwork) {
+        const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
+        const createResult = await createArtwork(
+          formUserId,
+          artworkData
+        );
+        const insertArtworkEventsResult = await insertArtworkEvents(
+          createResult.artwork.id,
+          eventSlug
+        );
+        console.log("Artwork created:", createResult, "and artwork events inserted:", insertArtworkEventsResult);
+      } else {
+        console.log("Using existing artwork:", artworkData.uuid);
+      }
       // Insert assets
       const insertAssetsResult = await insertArtworkAssets(
         artworkData.uuid,
@@ -373,9 +372,11 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     },
     {
       title: t("formSteps:MediaUpload.title"),
-      description: t("formSteps:MediaUpload.description", {
-        artworkTitle: currentArtwork?.title ?? t("formSteps:MediaUpload.fallback")
-      }),
+      description: <Trans
+        i18nKey="formSteps:MediaUpload.description"
+        values={{ artworkTitle: currentArtwork?.title ?? t("formSteps:MediaUpload.fallback") }}
+        components={{ strong: <strong /> }}
+      />,
       component: (
         <MediaUpload
           artworkUUID={artworkUUID || undefined}

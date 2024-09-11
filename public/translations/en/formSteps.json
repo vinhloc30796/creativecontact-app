@@ -13,7 +13,7 @@
   },
   "MediaUpload": {
     "title": "Upload Files",
-    "description": "Upload files for {{artworkTitle}}",
+    "description": "Upload files for {{artworkTitle}}. When you click <strong>Upload</strong>, we will overwrite the old files (if any).",
     "fallback": "your artwork"
   },
   "Button": {
