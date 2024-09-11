@@ -1,26 +1,25 @@
 import { ArtworkInfoData } from '@/app/form-schemas/artwork-info'
+import { Badge } from '@/components/ui/badge'
+import { Button } from "@/components/ui/button"
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from '@/components/ui/switch'
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/useAuth'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 interface ArtworkInfoStepProps {
+  artworks: ArtworkInfoData[],
   form: UseFormReturn<ArtworkInfoData>
-  artworks: ArtworkInfoData[]
-  setIsNewArtwork: (isNewArtwork: boolean) => void
 }
 
-function ExistingArtworkSelector({ form, artworks }: {
-  form: UseFormReturn<ArtworkInfoData>,
-  artworks: ArtworkInfoData[],
-}) {
+function ExistingArtworkSidepane({ artworks, isOpen, setIsOpen }: { artworks: ArtworkInfoData[], isOpen: boolean, setIsOpen: (isOpen: boolean) => void }) {
   // State
   const [selectedArtwork, setSelectedArtwork] = useState<string>('')
   // I18n
@@ -30,49 +29,47 @@ function ExistingArtworkSelector({ form, artworks }: {
     if (selectedArtwork) {
       const artwork = artworks.find(a => a.uuid === selectedArtwork)
       if (artwork) {
-        form.reset(artwork)
+        setIsOpen(false)
       }
     }
-  }, [selectedArtwork, artworks, form])
+  }, [selectedArtwork, artworks, setIsOpen])
 
   return (
-    <FormItem>
-      <FormLabel>{t('label')}</FormLabel>
-      <FormDescription>{t('description')}</FormDescription>
-      <Select onValueChange={
-        (value) => {
-          setSelectedArtwork(value)
-          const selectedArtwork = artworks.find(a => a.uuid === value)
-          if (selectedArtwork) {
-            form.reset(selectedArtwork)
-          }
-        }
-      } defaultValue=''>
-        <FormControl>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-        </FormControl>
-        <SelectContent>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t('selectArtworkTitle')}</SheetTitle>
+          <SheetDescription>{t('selectArtworkDescription')}</SheetDescription>
+        </SheetHeader>
+        <ScrollArea className="h-[calc(100vh-200px)] mt-6">
           {artworks && artworks.length > 0 ? (
-            artworks.map((artwork) => (
-              <SelectItem key={artwork.uuid} value={artwork.uuid}>
-                {artwork.title} (UUID: {artwork.uuid})
-              </SelectItem>
-            ))
+            <Table>
+              <TableBody>
+                {artworks.map((artwork) => (
+                  <TableRow key={artwork.uuid}>
+                    <TableCell className="font-medium">
+                      <h2 className="font-semibold">{artwork.title}</h2>
+                      <p className="text-muted-foreground text-xs">{artwork.uuid}</p>
+                    </TableCell>
+                    <TableCell>{artwork.description}</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
-            <SelectItem value="error" disabled>{t('noArtworksFound')}</SelectItem>
+            <div className="text-center py-4 text-muted-foreground">{t('noArtworksFound')}</div>
           )}
-        </SelectContent>
-      </Select>
-    </FormItem>
+        </ScrollArea>
+      </SheetContent>
+    </Sheet>
   )
 }
 
-export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNewArtwork }: ArtworkInfoStepProps) {
+export function ArtworkInfoStep({ form }: ArtworkInfoStepProps) {
   // State
   const { user } = useAuth();
-  const [isNewArtwork, setIsNewArtwork] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   // I18n
   const { t } = useTranslation(['ArtworkInfoStep'])
 
@@ -94,78 +91,62 @@ export function ArtworkInfoStep({ form, artworks, setIsNewArtwork: parentSetIsNe
     enabled: !!user?.id,
   });
 
-  useEffect(() => {
-    // Set the uuid field based on whether it's a new artwork or not
-    form.setValue('uuid', isNewArtwork ? '' : form.getValues('uuid'));
-  }, [isNewArtwork, form]);
-
   return (
     <>
-      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-        <div className="space-y-0.5">
-          <FormLabel className="text-base">
-            {isNewArtwork ? t('isNewArtwork.labelTrue') : t('isNewArtwork.labelFalse')}
-          </FormLabel>
-          <FormDescription>
-            {isNewArtwork ? t('isNewArtwork.descriptionTrue') : t('isNewArtwork.descriptionFalse')}
-          </FormDescription>
+      <FormField
+        control={form.control}
+        name="title"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t('title.label')}</FormLabel>
+            <FormControl>
+              <Input placeholder={t('title.placeholder')} {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t('description.label')}</FormLabel>
+            <FormControl>
+              <Textarea placeholder={t('description.placeholder')} {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      {isLoading &&
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span className="text-muted-foreground">{t('loadingExistingArtworks')}</span>
         </div>
-        <FormControl>
-          <Switch
-            checked={isNewArtwork}
-            onCheckedChange={(checked) => {
-              setIsNewArtwork(checked);
-              parentSetIsNewArtwork(checked);
-              if (checked) {
-                form.reset({ uuid: '', title: '', description: '' });
-                setIsNewArtwork(true);
-                parentSetIsNewArtwork(true);
-              }
-            }}
-          />
-        </FormControl>
-      </FormItem>
-
-      {isNewArtwork ? (
+      }
+      {error && <p>{t('ExistingArtworkSelector.error')}</p>}
+      {fetchedArtworks && (
         <>
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('title.label')}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t('title.placeholder')} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('description.label')}</FormLabel>
-                <FormControl>
-                  <Textarea placeholder={t('description.placeholder')} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </>
-      ) : (
-        <>
-          {isLoading && 
-            // Muted text with loading icon
-            <div className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-muted-foreground">{t('loadingExistingArtworks')}</span>
-            </div>
-          }
-          {error && <p>{t('ExistingArtworkSelector.error')}</p>}
-          {fetchedArtworks && <ExistingArtworkSelector form={form} artworks={fetchedArtworks} />}
+          <p className="mb-2">
+            {fetchedArtworks.length > 0
+              ? (
+                <div className="flex items-center justify-between">
+                  <p className="text-sm">
+                    {t('ExistingArtworkSelector.existingArtworksCount')}
+                  </p>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer"
+                    onClick={() => setIsOpen(true)}
+                  >
+                    &nbsp;{fetchedArtworks.length}&nbsp;
+                  </Badge>
+                </div>
+              )
+              : t('ExistingArtworkSelector.noExistingArtworks')}
+          </p>
+          <ExistingArtworkSidepane artworks={fetchedArtworks} isOpen={isOpen} setIsOpen={setIsOpen} />
         </>
       )}
     </>

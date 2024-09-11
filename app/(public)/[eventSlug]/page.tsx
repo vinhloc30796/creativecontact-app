@@ -90,7 +90,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
               eventSlug={eventSlug}
               eventTitle={eventData.name}
               artworkCount={artworkCount}
-              countdown={10}
+              countdown={undefined}
             />
           </div>
         </Suspense>

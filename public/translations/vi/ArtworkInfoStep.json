@@ -18,6 +18,10 @@
     "label": "Tác phẩm Có sẵn",
     "description": "Chọn một tác phẩm nếu bạn muốn cập nhật tác phẩm có sẵn",
     "noArtworksFound": "Không tìm thấy tác phẩm",
-    "error": "Lỗi khi tải tác phẩm. Vui lòng thử lại."
+    "error": "Lỗi khi tải tác phẩm. Vui lòng thử lại.",
+    "existingArtworksCount": "Tác phẩm Hiện có",
+    "noExistingArtworks": "Chưa có tác phẩm nào",
+    "selectArtworkTitle": "Tác phẩm của Bạn",
+    "selectArtworkDescription": "Đây là những tác phẩm bạn đã đăng ở sự kiện này"
   }
 }

@@ -355,7 +355,6 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           <ArtworkInfoStep
             form={artworkForm}
             artworks={artworks}
-            setIsNewArtwork={setIsNewArtwork}
           />
           <Separator className="my-2" />
           <ArtworkCreditInfoStep form={artworkCreditForm} />
@@ -382,7 +381,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
           artworkUUID={artworkUUID || undefined}
           emailLink={emailLink}
           onUpload={handleAssetUpload}
-          isNewArtwork={isNewArtwork}
+          isNewArtwork={true}
         />
       ),
       form: null,
