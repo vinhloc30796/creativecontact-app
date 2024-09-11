@@ -17,7 +17,8 @@
   },
   "UploadSuccess": {
     "title": "Tải thành công",
-    "description": "Tác phẩm của bạn đã được tải thành công. Web sẽ chuyển hướng đến trang xác nhận trong giây lát."
+    "description": "Tác phẩm của bạn đã được tải thành công. Web sẽ chuyển hướng đến trang xác nhận trong giây lát.",
+    "action": "Đến Trang xác nhận"
   },
   "UploadFailure": {
     "title": "Tải thất bại",
