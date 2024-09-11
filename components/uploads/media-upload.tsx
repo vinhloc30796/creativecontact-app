@@ -231,7 +231,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="mx-auto">{t("table.file")}</TableHead>
+                          <TableHead className="mx-auto">{t("pending_table.file")}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>

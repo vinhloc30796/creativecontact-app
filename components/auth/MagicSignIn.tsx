@@ -3,18 +3,27 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import styles from './_checkin.module.scss';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { handleMagicLinkRequest } from '../_utils/apiHelpers';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { handleMagicLinkRequest } from '../../app/(public)/(event)/checkin/_utils/apiHelpers';
+import { useTranslation } from 'react-i18next';
 
-export function MagicSignIn() {
+interface MagicSignInProps {
+  purpose: 'login' | 'checkin';
+}
+
+export function MagicSignIn({ purpose }: MagicSignInProps) {
+  // State
   const [email, setEmail] = useState<string>('');
   const [magicLinkSent, setMagicLinkSent] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  // I18n
+  const { t } = useTranslation('MagicSignIn');
 
+  // Effects
   useEffect(() => {
     const storedCountdown = localStorage.getItem('magicLinkCountdown');
     const storedTimestamp = localStorage.getItem('magicLinkTimestamp');
@@ -67,17 +76,14 @@ export function MagicSignIn() {
 
   return (
     <>
-      <div
-        className={cn('flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20', styles.step)}
-        style={{ backgroundColor: '#F6EBE4' }}
-      >
-        <h2 className="text-2xl font-semibold text-primary">Magic Sign-In</h2>
-        <p>Please enter your email for magic sign-in before check-in</p>
+      <div className='flex flex-col gap-2 bg-primary/10 p-4 mb-2'>
+        <h1 className='text-2xl font-semibold text-primary'>{t(`title`)}</h1>
+        <p>{t(`${purpose}.description`)}</p>
       </div>
       {magicLinkSent ? (
-        <div>
-          <p>Magic link sent! Please check your email to continue.</p>
-          <p>You can request a new link in {countdown} seconds.</p>
+        <div className="flex flex-col">
+          <p>{t(`success`)}</p>
+          <p>{t(`countdown`, { countdown })}</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -91,8 +97,8 @@ export function MagicSignIn() {
               required
             />
           </div>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Sending...' : 'Send Magic Link'}
+          <Button type="submit" disabled={isLoading} className='w-full'>
+            {isLoading ? t(`sending`) : t(`send`)}
           </Button>
         </form>
       )}

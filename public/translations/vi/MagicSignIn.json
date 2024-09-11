@@ -1,0 +1,13 @@
+{
+    "title": "Magic Sign-In",
+    "login": {
+        "description": "Vui lòng đăng nhập với email của bạn"
+    },
+    "checkin": {
+        "description": "Vui lòng check-in với email của bạn"
+    },
+    "success": "Đã gửi magic link! Vui lòng kiểm tra email của bạn để tiếp tục.",
+    "countdown": "Bạn có thể yêu cầu link mới trong {countdown} giây.",
+    "sending": "Đang gửi...",
+    "send": "Gửi Magic Link"
+}
