@@ -13,7 +13,7 @@
   },
   "MediaUpload": {
     "title": "Tải File",
-    "description": "Tải file cho {{artworkTitle}}. Khi bạn nhấn <strong>Tải file</strong>, tụi mình sẽ ghi đè lên các file cũ (nếu có).",
+    "description": "Tải file cho {{artworkTitle}}. Nhớ chọn ảnh bìa nha! Khi bạn nhấn <strong>Tải file</strong>, tụi mình sẽ ghi đè lên các file cũ (nếu có).",
     "fallback": "tác phẩm của bạn"
   },
   "Button": {

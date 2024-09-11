@@ -21,8 +21,8 @@
     "label": "Tải File",
     "dropzone": "Kéo thả file vào đây, hoặc nhấn để chọn file",
     "size": {
-      "uploaded": "Đã tải <strong>{{count}}</strong> (sẽ ghi đè)",
-      "pending": "đang chờ <strong>{{count}}</strong>",
+      "uploaded": "Đã tải <strong>{{count}}</strong> (sẽ ghi đè). Xem lại: ",
+      "pending": "Đang chờ <strong>{{count}}</strong>",
       "total": "trên giới hạn {{limit}}"
     },
     "upload_description": "Nhấn <strong>Tải file</strong> sẽ ghi đè lên các file."

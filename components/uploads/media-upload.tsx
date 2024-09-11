@@ -1,20 +1,25 @@
 "use client"
 
+// NextJS
+import Link from 'next/link'
+// ShadCN
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { createClient } from "@/utils/supabase/client"
-import { toast } from "sonner"
-import { AlertCircle, RefreshCw, Trash2, Upload } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useState, useMemo, useEffect } from 'react'
-import { useDropzone } from 'react-dropzone'
-import { Badge } from '@/components/ui/badge'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useTranslation, Trans } from 'react-i18next'
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { AlertCircle, RefreshCw, Upload } from 'lucide-react'
+import { useDropzone } from 'react-dropzone'
+import { toast } from "sonner"
+// Database, query, states, i18n
+import { createClient } from "@/utils/supabase/client"
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+// Custom
+import { FileTable } from './FileTable'
+// Types
+import { SupabaseFile } from '@/app/types/SupabaseFile'
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -25,85 +30,6 @@ interface MediaUploadProps {
     errors: { message: string }[]
   ) => void;
 }
-
-interface SupabaseFile {
-  id: string;
-  path: string;
-  fullPath: string;
-  name: string;
-  size: number;
-}
-
-interface FileTableProps {
-  files: SupabaseFile[];
-  isReadonly: boolean;
-  thumbnailFile: string | null;
-  setThumbnailFile: (file: string | null) => void;
-  removeFile: (file: SupabaseFile) => void;
-}
-
-const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbnailFile, setThumbnailFile, removeFile }) => {
-  const { t } = useTranslation(['media-upload']);
-
-  const formatSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
-
-  const truncateFileName = (name: string, maxLength: number = 20) => {
-    if (name.length <= maxLength) return name
-    const extIndex = name.lastIndexOf('.')
-    const ext = extIndex !== -1 ? name.slice(extIndex) : ''
-    const truncatedName = name.slice(0, maxLength - ext.length - 3) + '...'
-    return truncatedName + ext
-  }
-
-  return (
-    <Table className="mt-4">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-center">{t("pending_table.thumbnail")}</TableHead>
-          <TableHead>{t("pending_table.file")}</TableHead>
-          {!isReadonly && <TableHead className="text-center">{t("pending_table.remove")}</TableHead>}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {files.map((file, index) => (
-          <TableRow key={index}>
-            <TableCell className="text-center">
-              <RadioGroup
-                className="flex items-center justify-center"
-                value={thumbnailFile || ''} onValueChange={setThumbnailFile}>
-                <RadioGroupItem value={file.name} id={`thumbnail-${index}`} disabled={isReadonly} />
-              </RadioGroup>
-            </TableCell>
-            <TableCell className="flex items-center">
-              <div className="truncate">
-                <span>{truncateFileName(file.name)}</span>
-                <br />
-                <span className="text-muted-foreground">{formatSize(file.size)}</span>
-              </div>
-            </TableCell>
-            {!isReadonly && (
-              <TableCell className="text-center">
-                <button
-                  type="button"
-                  className="text-destructive"
-                  onClick={() => removeFile(file)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </TableCell>
-            )}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
 
 export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: MediaUploadProps) {
   // Constants
@@ -144,16 +70,30 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
     enabled: !!artworkUUID
   });
 
+  useEffect(() => {
+    if (uploadedFiles.length > 0 && !thumbnailFile) {
+      setThumbnailFile(uploadedFiles[0].name);
+    }
+  }, [uploadedFiles, thumbnailFile]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    setPendingFiles(prevFiles => [...prevFiles, ...acceptedFiles])
-  }, [])
+    setPendingFiles(prevFiles => {
+      const newFiles = [...prevFiles, ...acceptedFiles];
+      if (newFiles.length > 0 && !thumbnailFile) {
+        setThumbnailFile(newFiles[0].name);
+      }
+      return newFiles;
+    })
+  }, [thumbnailFile])
 
   const removeFile = (fileToRemove: File) => {
-    setPendingFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove))
-    if (thumbnailFile === fileToRemove.name) {
-      setThumbnailFile(null)
-    }
+    setPendingFiles(prevFiles => {
+      const newFiles = prevFiles.filter(file => file !== fileToRemove);
+      if (thumbnailFile === fileToRemove.name) {
+        setThumbnailFile(newFiles.length > 0 ? newFiles[0].name : null);
+      }
+      return newFiles;
+    })
   }
 
   const resetFiles = () => {
@@ -313,7 +253,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
                       isReadonly={true}
                       thumbnailFile={thumbnailFile}
                       setThumbnailFile={setThumbnailFile}
-                      removeFile={() => {}}
+                      removeFile={() => { }}
                     />
                   </SheetContent>
                 </Sheet>

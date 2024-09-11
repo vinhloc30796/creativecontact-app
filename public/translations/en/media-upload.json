@@ -21,7 +21,7 @@
     "label": "Upload Files",
     "dropzone": "Drag 'n' drop some files here, or click to select files",
     "size": {
-      "uploaded": "<strong>{{count}}</strong> uploaded (to be overwritten)",
+      "uploaded": "<strong>{{count}}</strong> uploaded (to be overwritten). Review: ",
       "pending": "<strong>{{count}}</strong> pending",
       "total": "out of {{limit}} limit"
     },
