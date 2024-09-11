@@ -128,7 +128,7 @@ export function ArtworkInfoStep({ form }: ArtworkInfoStepProps) {
       {error && <p>{t('ExistingArtworkSelector.error')}</p>}
       {fetchedArtworks && (
         <>
-          <p className="mb-2">
+          <div className="mb-2">
             {fetchedArtworks.length > 0
               ? (
                 <div className="flex items-center justify-between">
@@ -144,8 +144,11 @@ export function ArtworkInfoStep({ form }: ArtworkInfoStepProps) {
                   </Badge>
                 </div>
               )
-              : t('ExistingArtworkSelector.noExistingArtworks')}
-          </p>
+              : <p className="text-sm">
+                {t('ExistingArtworkSelector.noExistingArtworks')}
+              </p>
+            }
+          </div>
           <ExistingArtworkSidepane artworks={fetchedArtworks} isOpen={isOpen} setIsOpen={setIsOpen} />
         </>
       )}

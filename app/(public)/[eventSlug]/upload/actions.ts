@@ -66,6 +66,7 @@ export async function insertArtworkAssets(
     id: string;
     path: string;
     fullPath: string;
+    isThumbnail: boolean;
   }[]
 ) {
   if (artworkAssets.length === 0) {
@@ -78,6 +79,7 @@ export async function insertArtworkAssets(
         filePath: asset.path,
         assetType: getAssetType(asset.path),
         description: asset.description || null,
+        isThumbnail: asset.isThumbnail,
       }))
     ).returning();
     return assets;

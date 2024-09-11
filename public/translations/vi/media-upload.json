@@ -8,19 +8,28 @@
       "description": "{{file}} đã được tải lên thành công."
     }
   },
+  "delete-toast": {
+    "error": {
+      "title": "Lỗi Xóa File"
+    },
+    "success": {
+      "title": "Đã Xóa File",
+      "description": "{{file}} đã được xóa thành công."
+    }
+  },
   "form": {
     "label": "Tải File",
     "dropzone": "Kéo thả file vào đây, hoặc nhấn để chọn file",
     "size": {
-      "existing": "Có sẵn <strong>{{count}}</strong>",
-      "uploaded": "đã tải <strong>{{count}}</strong>",
-      "pending": "đang chờ <strong>{{count}}</strong>",
-      "total": "Tổng: <strong>{{count}}</strong> trên giới hạn {{limit}}"
-    }
+      "uploaded": "Đã tải <strong>{{count}}</strong> (sẽ ghi đè). Xem lại: ",
+      "pending": "Đang chờ <strong>{{count}}</strong>",
+      "total": "trên giới hạn {{limit}}"
+    },
+    "upload_description": "Nhấn <strong>Tải file</strong> sẽ ghi đè lên các file."
   },
   "dialog": {
-    "title": "File Có sẵn và File Đã tải",
-    "description": "Sắp xếp cho vui thôi. Hiện thứ tự chưa ảnh hưởng tới lưu trữ file.",
+    "title": "File Đã tải",
+    "description": "Ảnh bìa đã chọn sẽ không sửa được. Nếu bạn muốn sửa, vui lòng quay về bước Tải file.",
     "badge": "{{count}} file"
   },
   "alert": {
@@ -28,9 +37,11 @@
   },
   "pending_table": {
     "file": "File",
-    "remove": "Xóa"
+    "remove": "Xóa",
+    "thumbnail": "Ảnh bìa"
   },
   "button": {
+    "email_description": "Cần trợ giúp? ",
     "email": "Email Tụi mình",
     "reset": "Xóa",
     "uploading": "Đang tải...",

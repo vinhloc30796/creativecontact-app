@@ -8,19 +8,28 @@
       "description": "{{file}} has been successfully uploaded."
     }
   },
+  "delete-toast": {
+    "error": {
+      "title": "Error Deleting File"
+    },
+    "success": {
+      "title": "File Deleted",
+      "description": "{{file}} has been successfully deleted."
+    }
+  },
   "form": {
     "label": "Upload Files",
     "dropzone": "Drag 'n' drop some files here, or click to select files",
     "size": {
-      "existing": "<strong>{{count}}</strong> existing",
-      "uploaded": "<strong>{{count}}</strong> uploaded",
+      "uploaded": "<strong>{{count}}</strong> uploaded (to be overwritten). Review: ",
       "pending": "<strong>{{count}}</strong> pending",
-      "total": "Total: <strong>{{count}}</strong> of {{limit}} limit"
-    }
+      "total": "out of {{limit}} limit"
+    },
+    "upload_description": "Clicking <strong>Upload</strong> will overwrite the files."
   },
   "dialog": {
-    "title": "Existing and Uploaded Files",
-    "description": "This reordering is for fun. It doesn't affect the order of the files in the database.",
+    "title": "Uploaded Files",
+    "description": "Selected thumbnail cannot be changed. If you want to change it, please go back to the Upload Files step.",
     "badge": "{{count}} files"
   },
   "alert": {
@@ -28,9 +37,11 @@
   },
   "pending_table": {
     "file": "File",
-    "remove": "Remove"
+    "remove": "Remove",
+    "thumbnail": "Thumbnail"
   },
   "button": {
+    "email_description": "Need help? ",
     "email": "Email Us",
     "reset": "Reset",
     "uploading": "Uploading...",
