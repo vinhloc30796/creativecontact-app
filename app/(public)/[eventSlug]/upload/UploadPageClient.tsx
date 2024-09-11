@@ -303,15 +303,17 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         // Update the params to include the email sending status
         params.set('emailSent', emailResult.success ? 'true' : 'false');
       }
+      const confirmedUrl = `/${eventSlug}/upload-confirmed?${params.toString()}`;
       // Show success toast
       toast.success(t("UploadSuccess.title"), {
-        description: t("UploadSuccess.description"),
+        description: t("UploadSuccess.description", { confirmedUrl }),
+        action: <a href={confirmedUrl}>{t("UploadSuccess.action")}</a>,
         duration: 5000,
       });
       // Use window.location for a full page reload and navigation
       console.debug("Redirecting to confirmation page with params", params.toString());
       // window.location.href = `/${eventSlug}/upload-confirmed?${params.toString()}`;
-      return router.push(`/${eventSlug}/upload-confirmed?${params.toString()}`);
+      return await router.push(confirmedUrl);
     } catch (error) {
       console.error("error", error);
       toast.error(t("UploadFailure.title"), {

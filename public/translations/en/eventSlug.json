@@ -18,7 +18,8 @@
   },
   "UploadSuccess": {
     "title": "Upload Success",
-    "description": "Your artwork has been uploaded successfully. The web will redirect to the confirmation page in a moment."
+    "description": "Your artwork has been uploaded successfully. The web will redirect to the confirmation page in a moment.",
+    "action": "Go to Confirmation"
   },
   "UploadFailure": {
     "title": "Upload Failure",
