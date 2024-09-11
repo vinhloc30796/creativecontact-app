@@ -34,6 +34,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { createArtwork, insertArtworkAssets, insertArtworkCredit, insertArtworkEvents } from "./actions";
+import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile";
 
 
 interface UploadPageClientProps {
@@ -63,7 +64,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   // States
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
-  const [artworkAssets, setArtworkAssets] = useState<{ id: string; path: string; fullPath: string; }[]>([]);
+  const [artworkAssets, setArtworkAssets] = useState<ThumbnailSupabaseFile[]>([]);
   const [isNewArtwork, setIsNewArtwork] = useState(true);
   // I18n
   const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
@@ -150,7 +151,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   }
 
   const handleAssetUpload = (
-    results: { id: string; path: string; fullPath: string; }[],
+    results: ThumbnailSupabaseFile[],
     errors: { message: string }[]
   ) => {
     console.log("results", results);

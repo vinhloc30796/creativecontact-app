@@ -19,14 +19,14 @@ import { Trans, useTranslation } from 'react-i18next'
 // Custom
 import { FileTable } from './FileTable'
 // Types
-import { SupabaseFile } from '@/app/types/SupabaseFile'
+import { SupabaseFile, ThumbnailSupabaseFile } from '@/app/types/SupabaseFile'
 
 interface MediaUploadProps {
   artworkUUID?: string;
   emailLink: string;
   isNewArtwork: boolean;
   onUpload: (
-    results: { id: string; path: string; fullPath: string; }[],
+    results: ThumbnailSupabaseFile[],
     errors: { message: string }[]
   ) => void;
 }
@@ -64,7 +64,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
         path: file.name,
         fullPath: `${artworkUUID}/${file.name}`,
         name: file.name,
-        size: file.metadata?.size || 0
+        size: file.metadata?.size || 0,
+        isThumbnail: file.name === thumbnailFile
       }));
     },
     enabled: !!artworkUUID
@@ -130,7 +131,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
       let results: { id: string; path: string; fullPath: string; }[] = [];
       let errors: { message: string }[] = [];
       let successCount = 0;
-      let uploadedFilesList: { id: string; path: string; fullPath: string; name: string; size: number }[] = [];
+      let uploadedFilesList: ThumbnailSupabaseFile[] = [];
       let remainingFiles: File[] = [];
 
       // Remove all files in the existing storage folder before uploading new files
@@ -187,7 +188,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
             path: data.path,
             fullPath: data.fullPath,
             name: file.name,
-            size: file.size
+            size: file.size,
+            isThumbnail: file.name === thumbnailFile
           })
           successCount++;
         }
@@ -301,7 +303,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
               path: file.name,
               fullPath: file.name,
               name: file.name,
-              size: file.size
+              size: file.size,
+              isThumbnail: file.name === thumbnailFile
             }))}
             isReadonly={false}
             thumbnailFile={thumbnailFile}

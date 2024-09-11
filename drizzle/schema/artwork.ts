@@ -9,6 +9,7 @@ import {
     timestamp,
     unique,
     uuid,
+    boolean,
 } from "drizzle-orm/pg-core";
 import { authUsers } from "./user";
 import { events } from "./event";
@@ -132,4 +133,5 @@ export const artworkAssets = pgTable("artwork_assets", {
   assetType: assetTypeEnum("asset_type"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   bucketId: text("bucket_id").notNull().default("artwork_assets"),
+  isThumbnail: boolean("is_thumbnail").notNull().default(false),
 });
