@@ -12,10 +12,10 @@ interface UploadStatisticsProps {
   eventSlug: string;
   eventTitle: string;
   artworkCount: number;
-  countdown: number;
+  countdown: number | undefined;
 }
 
-export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdown = 10 }: UploadStatisticsProps) => {
+export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdown }: UploadStatisticsProps) => {
   // Router
   const router = useRouter();
   // State
@@ -24,9 +24,11 @@ export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdow
   const { t } = useTranslation(["UploadStatistics"]);
 
   useEffect(() => {
+    if (countdown === undefined) return;
+
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
+        if (prevTime === undefined || prevTime <= 1) {
           clearInterval(timer);
           router.push(`/${eventSlug}/upload`);
           return 0;
@@ -36,32 +38,31 @@ export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdow
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [eventSlug, router]);
+  }, [eventSlug, router, countdown]);
 
-  const progress = ((countdown - timeLeft) / countdown) * 100;
+  const progress = countdown !== undefined ? ((countdown - (timeLeft ?? 0)) / countdown) * 100 : 0;
 
   return (
-    <BackgroundDiv eventSlug={eventSlug}>
-      <Card className="w-[450px] mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">{eventTitle}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 flex flex-col items-center">
-            <h1 className="text-8xl font-bold text-accent">{artworkCount}</h1>
-            <p className="text-sm text-muted-foreground">
-              {t("description")}
-            </p>
-          </div>
-          <Button asChild className="w-full mb-4">
-            <a href={`/${eventSlug}/upload`}>{t("upload")}</a>
-          </Button>
-          <div className="text-center text-sm text-muted-foreground mb-2">
-            {t("redirecting", { countdown: timeLeft })}
-          </div>
-          <Progress value={progress} className="w-full" />
-        </CardContent>
-      </Card>
-    </BackgroundDiv>
+    <Card className="w-[450px] mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">{eventTitle}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-4 flex flex-col items-center">
+          <h1 className="text-8xl font-bold text-primary">{artworkCount}</h1>
+          <p className="text-sm text-muted-foreground">
+            {t("description")}
+          </p>
+        </div>
+        {countdown !== undefined && (
+          <>
+            <div className="text-center text-sm text-muted-foreground mb-2">
+              {t("redirecting", { countdown: timeLeft })}
+            </div>
+            <Progress value={progress} className="w-full" />
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

@@ -15,6 +15,10 @@ export async function handleStaffAccess(req: NextRequest) {
   const isPasswordPage = pathname === "/staff-access/password";
   // Staff pages
   const isStaffRoute = pathname.startsWith("/staff/");
+  // Return early if it's not a staff route
+  if (!isStaffRoute) {
+    return NextResponse.next();
+  }
   const isLoginPage = pathname === "/staff/login";
   const isSignOutPage = pathname === "/staff/signout";
   const isSignUpPage = pathname === "/staff/signup";
