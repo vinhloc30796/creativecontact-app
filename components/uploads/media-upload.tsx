@@ -20,6 +20,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { FileTable } from './FileTable'
 // Types
 import { SupabaseFile, ThumbnailSupabaseFile } from '@/app/types/SupabaseFile'
+import { toNonAccentVietnamese } from '@/lib/vietnamese'
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -65,7 +66,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
         fullPath: `${artworkUUID}/${file.name}`,
         name: file.name,
         size: file.metadata?.size || 0,
-        isThumbnail: file.name === thumbnailFile
+        isThumbnail: toNonAccentVietnamese(file.name) === toNonAccentVietnamese(thumbnailFile || '')
       }));
     },
     enabled: !!artworkUUID
@@ -87,9 +88,9 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
     })
   }, [thumbnailFile])
 
-  const removeFile = (fileToRemove: File) => {
+  const removeFile = (fileToRemove: File | SupabaseFile) => {
     setPendingFiles(prevFiles => {
-      const newFiles = prevFiles.filter(file => file !== fileToRemove);
+      const newFiles = prevFiles.filter(file => file.name !== fileToRemove.name);
       if (thumbnailFile === fileToRemove.name) {
         setThumbnailFile(newFiles.length > 0 ? newFiles[0].name : null);
       }
@@ -167,7 +168,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
 
       // Upload files
       for (const file of pendingFiles) {
-        const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${file.name}`, file, { upsert: false })
+        const normalizedFileName = toNonAccentVietnamese(file.name)
+        const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${normalizedFileName}`, file, { upsert: false })
         if (error) {
           console.error('Error uploading file:', error.message)
           toast.error(t("toast.error.title"), {
@@ -309,11 +311,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
             isReadonly={false}
             thumbnailFile={thumbnailFile}
             setThumbnailFile={setThumbnailFile}
-            removeFile={
-              (file: SupabaseFile) => {
-                removeFile(file as unknown as File)
-              }
-            }
+            removeFile={removeFile}
           />
         )}
         <div className="flex mt-4 space-x-2 items-center">

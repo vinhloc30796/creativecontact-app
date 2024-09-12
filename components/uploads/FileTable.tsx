@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-import { SupabaseFile } from '@/app/types/SupabaseFile'
+import { SupabaseFile, ThumbnailSupabaseFile } from '@/app/types/SupabaseFile'
 
 interface FileTableProps {
-  files: SupabaseFile[];
+  files: ThumbnailSupabaseFile[];
   isReadonly: boolean;
   thumbnailFile: string | null;
   setThumbnailFile: (file: string | null) => void;
-  removeFile: (file: SupabaseFile) => void;
+  removeFile: (file: ThumbnailSupabaseFile) => void;
 }
 
 export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbnailFile, setThumbnailFile, removeFile }) => {
@@ -34,6 +34,21 @@ export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbna
     return truncatedName + ext
   }
 
+  const handleRemoveFile = (file: ThumbnailSupabaseFile) => {
+    removeFile(file);
+    if (thumbnailFile === file.name) {
+      setThumbnailFile(null);
+    }
+  }
+
+  const handleThumbnailChange = (fileName: string) => {
+    setThumbnailFile(fileName);
+    // Update the is_thumbnail property for all files
+    files.forEach(file => {
+      file.isThumbnail = file.name === fileName;
+    });
+  }
+
   return (
     <Table className="mt-4">
       <TableHeader>
@@ -49,8 +64,14 @@ export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbna
             <TableCell className="text-center">
               <RadioGroup
                 className="flex items-center justify-center"
-                value={thumbnailFile || ''} onValueChange={setThumbnailFile}>
-                <RadioGroupItem value={file.name} id={`thumbnail-${index}`} disabled={isReadonly} />
+                value={thumbnailFile || ''} 
+                onValueChange={handleThumbnailChange}>
+                <RadioGroupItem 
+                  value={file.name} 
+                  id={`thumbnail-${index}`} 
+                  disabled={isReadonly}
+                  checked={file.isThumbnail} 
+                />
               </RadioGroup>
             </TableCell>
             <TableCell className="flex items-center">
@@ -65,7 +86,8 @@ export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbna
                 <button
                   type="button"
                   className="text-destructive"
-                  onClick={() => removeFile(file)}
+                  onClick={() => handleRemoveFile(file)}
+                  aria-label={`Remove ${file.name}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
