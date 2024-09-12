@@ -43,13 +43,10 @@ export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdow
   const progress = countdown !== undefined ? ((countdown - (timeLeft ?? 0)) / countdown) * 100 : 0;
 
   return (
-    <Card className="w-[450px] mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">{eventTitle}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 flex flex-col items-center">
-          <h1 className="text-8xl font-bold text-primary">{artworkCount}</h1>
+    <div>
+      <h2 className="text-2xl font-bold text-center text-accent">{eventTitle}</h2>
+      <div className="mb-4 flex flex-col items-center">
+          <h3 className="text-8xl font-bold text-primary">{artworkCount}</h3>
           <p className="text-sm text-muted-foreground">
             {t("description")}
           </p>
@@ -62,7 +59,6 @@ export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdow
             <Progress value={progress} className="w-full" />
           </>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }
