@@ -30,6 +30,7 @@ import { ContactInfoStep } from "@/components/user/ContactInfoStep";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { toast } from "sonner";
 // Hooks, contexts, i18n
+import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
 import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useFormUserId } from "@/hooks/useFormUserId";
@@ -40,9 +41,8 @@ import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
 // Utils
 import { createEmailLink } from "@/lib/links";
-import { normalizeFileNameForS3 } from '@/lib/s3_convention';
-import { toNonAccentVietnamese } from '@/lib/vietnamese';
 import { v4 as uuidv4 } from "uuid";
+import { performUpload } from "./client";
 
 
 interface UploadPageClientProps {
@@ -62,6 +62,16 @@ interface UploadPageClientProps {
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>;
 
 export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
+  return (
+    <ArtworkProvider>
+      <ThumbnailProvider>
+        <UploadPageContent eventSlug={eventSlug} eventData={eventData} recentEvents={recentEvents} />
+      </ThumbnailProvider>
+    </ArtworkProvider>
+  );
+}
+
+function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
   // Router
   const router = useRouter();
   // Auth
@@ -69,10 +79,11 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const { resolveFormUserId, userData, isLoading: isUserDataLoading } = useFormUserId();
   // Context
   const { currentArtwork, artworks, setCurrentArtwork, addArtwork } = useArtwork();
+  const { thumbnailFileName } = useThumbnail(); // Use the context here
   // States
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
-  const [artworkAssets, setArtworkAssets] = useState<ThumbnailSupabaseFile[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isNewArtwork, setIsNewArtwork] = useState(true);
   // I18n
   const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
@@ -156,22 +167,12 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     artworkForm.setValue("title", processedData?.title || "");
     artworkForm.setValue("description", processedData?.description || "");
     setArtworkUUID(processedData.uuid); // Update artworkUUID state
+    console.log("artworkUUID set to:", processedData.uuid);
   }
 
-  const handleAssetUpload = (
-    results: ThumbnailSupabaseFile[],
-    errors: { message: string }[]
-  ) => {
-    console.log("results", results);
-    console.log("errors", errors);
-    if (errors.length > 0) {
-      console.error("errors", errors);
-    }
-    setArtworkAssets(results.map(asset => ({
-      ...asset,
-      name: normalizeFileNameForS3(toNonAccentVietnamese(asset.name)),
-      isThumbnail: normalizeFileNameForS3(toNonAccentVietnamese(asset.name)) === normalizeFileNameForS3(toNonAccentVietnamese(results[0].name))
-    })));
+  // Callback function to update pending files
+  const handlePendingFilesUpdate = (files: File[]) => {
+    setPendingFiles(files);
   };
 
   const handleValidation = async () => {
@@ -234,10 +235,32 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       } else {
         console.log("Using existing artwork:", artworkData.uuid);
       }
+      // Perform media upload
+      if (pendingFiles.length == 0) {
+        toast.error("No files to upload");
+        return false;
+      } else if (!artworkUUID) {
+        toast.error("Artwork UUID not set");
+        return false;
+      } else if (!thumbnailFileName) {
+        toast.error("Thumbnail file not set");
+        return false;
+      }
+      const files = pendingFiles.map(file => new File([file], file.name, { type: file.type }));
+      const { results: uploadedResults, errors: uploadErrors } = await performUpload(artworkUUID, files, thumbnailFileName);
+      if (uploadErrors.length > 0) {
+        console.error("handleAssetUpload: errors", uploadErrors);
+        toast.error(
+          t("UploadFailure.title"), {
+          description: t("UploadFailure.description", { value: uploadErrors }),
+          duration: 5000,
+        });
+        return false;
+      }
       // Insert assets
       const insertAssetsResult = await insertArtworkAssets(
         artworkData.uuid,
-        artworkAssets
+        uploadedResults
       );
       console.log("Insert assets successful:", insertAssetsResult);
 
@@ -391,15 +414,21 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
         components={{ strong: <strong /> }}
       />,
       component: (
-        <MediaUpload
-          artworkUUID={artworkUUID || undefined}
-          emailLink={emailLink}
-          onUpload={handleAssetUpload}
-          isNewArtwork={true}
-        />
+        <>
+          <MediaUpload
+            artworkUUID={artworkUUID || undefined}
+            emailLink={emailLink}
+            isNewArtwork={true}
+            // Pass the callback function
+            onPendingFilesUpdate={handlePendingFilesUpdate}
+          />
+        </>
       ),
       form: null,
-      handlePreSubmit: null,
+      handlePreSubmit: async (data: ArtworkInfoData) => {
+        // Add any custom logic for artwork info submission
+        console.log("Artwork asset submitted:", data);
+      },
     },
   ];
 
@@ -409,7 +438,7 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
   const progress = ((formStep + 1) / steps.length) * 100
 
   const handleNextStep = async () => {
-    console.log("formStep", formStep);
+    console.log("Current formStep:", formStep);
     const currentStepData = steps[formStep];
     const form = currentStepData.form;
     if (form) {
@@ -417,72 +446,73 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
       currentStepData.handlePreSubmit && await currentStepData.handlePreSubmit(formData as any);
       const isValid = await form.trigger();
       if (isValid) {
-        setFormStep((prev) => prev + 1);
+        setFormStep((prev) => {
+          console.log("Updating formStep to:", prev + 1);
+          return prev + 1;
+        });
       } else {
         console.error("invalid form", form.formState.errors);
       }
     }
   };
   return (
-    <ArtworkProvider>
-      <BackgroundDiv eventSlug={eventSlug}>
-        <Card className="w-[400px] mx-auto mt-10">
-          <CardHeader
-            className="border-b aspect-video bg-accent-foreground text-accent-foreground"
-            style={{
-              backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
-              backgroundSize: "cover",
-            }}
+    <BackgroundDiv eventSlug={eventSlug}>
+      <Card className="w-[400px] mx-auto mt-10">
+        <CardHeader
+          className="border-b aspect-video bg-accent-foreground text-accent-foreground"
+          style={{
+            backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
+            backgroundSize: "cover",
+          }}
+        >
+        </CardHeader>
+        <CardContent className="p-6 flex flex-col gap-2">
+          <div
+            className="flex flex-col space-y-2 p-4 bg-primary bg-opacity-10 rounded-md"
           >
-          </CardHeader>
-          <CardContent className="p-6 flex flex-col gap-2">
-            <div
-              className="flex flex-col space-y-2 p-4 bg-primary bg-opacity-10 rounded-md"
-            >
-              <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
-              <p>{currentStep.description}</p>
-              <div>
-                <p className="text-muted-foreground text-sm">
-                  {isLoading ? t("state.loading") : (user?.email ? t("state.loggedIn", { email: user.email }) : t("state.loggedOut"))}
-                </p>
-              </div>
-              <Progress value={progress} className="w-full" />
+            <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
+            <p>{currentStep.description}</p>
+            <div>
+              <p className="text-muted-foreground text-sm">
+                {isLoading ? t("state.loading") : (user?.email ? t("state.loggedIn", { email: user.email }) : t("state.loggedOut"))}
+              </p>
             </div>
-            <FormProvider {...currentStep.form as unknown as FormContextType}>
-              {currentStep.component}
-              <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+            <Progress value={progress} className="w-full" />
+          </div>
+          <FormProvider {...currentStep.form as unknown as FormContextType}>
+            {currentStep.component || <div>Loading Media Upload...</div>}
+            <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+              <Button
+                type="button"
+                onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
+                disabled={formStep === 0 || isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                {t("Button.back")}
+              </Button>
+              {formStep < steps.length - 1 ? (
                 <Button
                   type="button"
-                  onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
-                  disabled={formStep === 0 || isSubmitting}
+                  onClick={handleNextStep}
+                  disabled={isSubmitting}
                   className="w-full sm:w-auto"
                 >
-                  {t("Button.back")}
+                  {isSubmitting ? t("Button.loading") : t("Button.next")}
                 </Button>
-                {formStep < steps.length - 1 ? (
-                  <Button
-                    type="button"
-                    onClick={handleNextStep}
-                    disabled={isSubmitting}
-                    className="w-full sm:w-auto"
-                  >
-                    {isSubmitting ? t("Button.loading") : t("Button.next")}
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
-                  >
-                    {isSubmitting ? t("Button.submitting") : t("Button.submit")}
-                  </Button>
-                )}
-              </div>
-            </FormProvider>
-          </CardContent>
-        </Card>
-      </BackgroundDiv>
-    </ArtworkProvider>
+              ) : (
+                <Button
+                  type="submit"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
+                >
+                  {isSubmitting ? t("Button.submitting") : t("Button.submit")}
+                </Button>
+              )}
+            </div>
+          </FormProvider>
+        </CardContent>
+      </Card>
+    </BackgroundDiv>
   );
 }

@@ -6,17 +6,17 @@ import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 // Types
 import { ThumbnailSupabaseFile } from '@/app/types/SupabaseFile'
+import { useThumbnail } from "@/contexts/ThumbnailContext"
 
 interface FileTableProps {
   files: ThumbnailSupabaseFile[];
   isReadonly: boolean;
-  thumbnailFile: string | null;
-  setThumbnailFile: (file: string | null) => void;
   removeFile: (file: ThumbnailSupabaseFile) => void;
 }
 
-export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbnailFile, setThumbnailFile, removeFile }) => {
+export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, removeFile }) => {
   const { t } = useTranslation(['media-upload']);
+  const { thumbnailFileName, setThumbnailFileName } = useThumbnail();
 
   const formatSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
@@ -36,16 +36,18 @@ export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbna
 
   const handleRemoveFile = (file: ThumbnailSupabaseFile) => {
     removeFile(file);
-    if (thumbnailFile === file.name) {
-      setThumbnailFile(null);
-    }
+    setThumbnailFileName(null);
   }
 
   const handleThumbnailChange = (fileName: string) => {
-    setThumbnailFile(fileName);
+    setThumbnailFileName(fileName);
     // Update the is_thumbnail property for all files
     files.forEach(file => {
-      file.isThumbnail = file.name === fileName;
+      const matched = file.name === fileName
+      file.isThumbnail = matched;
+      if (matched) {
+        console.log("matched", matched, "for file", file.name);
+      }
     });
   }
 
@@ -64,7 +66,7 @@ export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, thumbna
             <TableCell className="text-center">
               <RadioGroup
                 className="flex items-center justify-center"
-                value={thumbnailFile || ''} 
+                value={file.isThumbnail ? file.name : ''} 
                 onValueChange={handleThumbnailChange}>
                 <RadioGroupItem 
                   value={file.name} 
