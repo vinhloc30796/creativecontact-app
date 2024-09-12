@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Image from 'next/image';
 import { createClient } from '@supabase/supabase-js';
+import Link from 'next/link';
 
 // Define the props interface for the EventPage component
 interface EventPageProps {
@@ -152,43 +153,42 @@ export default async function EventPage({ params, searchParams }: EventPageProps
                     index % 2 === 0 ? 'justify-start' : 'justify-end'
                   } my-16`}
                 >
-                  <Card 
-                    className={`hover:shadow-lg transition-shadow duration-300 bg-primary`}
-                    style={{ width: `${size}vw`, maxWidth: '600px' }}
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-xl sm:text-2xl mb-2 break-words text-primary-foreground">{artwork.title}</CardTitle>
-                      <CardDescription
-                        className="text-primary-foreground"
-                      >
-                        <time dateTime={artwork.createdAt.toISOString()} className="text-sm text-primary-foreground">
-                          {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                        </time>
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-primary-foreground">
+                  <Link href={`/artwork/${artwork.id}`} passHref>
+                    <Card 
+                      className={`hover:shadow-lg transition-all duration-300 bg-primary cursor-pointer group overflow-hidden relative`}
+                      style={{ width: `${size}vw`, maxWidth: '600px' }}
+                    >
                       {artwork.thumbnail && (
-                        <div className="mb-4">
+                        <div className="relative">
                           <Image
                             src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${artwork.thumbnail.filePath}`}
                             alt={artwork.title}
                             width={300}
                             height={200}
                             objectFit="cover"
-                            className="rounded-md"
+                            className="w-full"
                           />
+                          <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
                         </div>
                       )}
-                      <p className="mt-4 text-primary-foreground text-sm sm:text-base break-words">{artwork.description}</p>
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {artwork.assets.map((asset, assetIndex) => (
-                          <Badge key={assetIndex} variant="secondary" className="text-xs sm:text-sm">
-                            {asset.assetType}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                      <CardContent className="text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute inset-0 flex flex-col justify-center p-4 overflow-y-auto">
+                        <CardTitle className="text-xl sm:text-2xl mb-2 break-words text-primary-foreground">{artwork.title}</CardTitle>
+                        <CardDescription className="text-primary-foreground">
+                          <time dateTime={artwork.createdAt.toISOString()} className="text-sm text-primary-foreground">
+                            {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          </time>
+                        </CardDescription>
+                        <p className="mt-4 text-primary-foreground text-sm sm:text-base break-words">{artwork.description}</p>
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {artwork.assets.map((asset, assetIndex) => (
+                            <Badge key={assetIndex} variant="secondary" className="text-xs sm:text-sm">
+                              {asset.assetType}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </div>
               );
             })}
