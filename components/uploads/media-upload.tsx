@@ -21,6 +21,7 @@ import { FileTable } from './FileTable'
 // Types
 import { SupabaseFile, ThumbnailSupabaseFile } from '@/app/types/SupabaseFile'
 import { toNonAccentVietnamese } from '@/lib/vietnamese'
+import { normalizeFileNameForS3 } from '@/lib/s3_convention';
 
 interface MediaUploadProps {
   artworkUUID?: string;
@@ -66,7 +67,7 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
         fullPath: `${artworkUUID}/${file.name}`,
         name: file.name,
         size: file.metadata?.size || 0,
-        isThumbnail: toNonAccentVietnamese(file.name) === toNonAccentVietnamese(thumbnailFile || '')
+        isThumbnail: normalizeFileNameForS3(toNonAccentVietnamese(file.name)) === normalizeFileNameForS3(toNonAccentVietnamese(thumbnailFile || ''))
       }));
     },
     enabled: !!artworkUUID
@@ -74,7 +75,9 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
 
   useEffect(() => {
     if (uploadedFiles.length > 0 && !thumbnailFile) {
-      setThumbnailFile(uploadedFiles[0].name);
+      const normVietnamese = toNonAccentVietnamese(uploadedFiles[0].name);
+      const normFileName = normalizeFileNameForS3(normVietnamese);
+      setThumbnailFile(normFileName);
     }
   }, [uploadedFiles, thumbnailFile]);
 
@@ -144,6 +147,8 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
         if (error) {
           console.error('Error listing files:', error.message);
         } else {
+          let deletedFiles: string[] = [];
+          let deleteErrors: { file: string; message: string }[] = [];
           for (const file of fileList) {
             const { error: deleteError } = await supabase
               .storage
@@ -151,50 +156,70 @@ export function MediaUpload({ artworkUUID, isNewArtwork, emailLink, onUpload }: 
               .remove([`${artworkUUID}/${file.name}`]);
             if (deleteError) {
               console.error('Error deleting file:', deleteError.message);
-              toast.error(t("delete-toast.error.title"), {
-                description: `${file.name}: ${deleteError.message}`,
-                duration: 3000,
-              })
+              deleteErrors.push({ file: file.name, message: deleteError.message });
             } else {
-              console.log('File deleted successfully:', file.name)
-              toast.success(t("delete-toast.success.title"), {
-                description: t("delete-toast.success.description", { file: file.name }),
-                duration: 3000,
-              })
+              console.log('File deleted successfully:', file.name);
+              deletedFiles.push(file.name);
             }
+          }
+          // Show success toast
+          if (deletedFiles.length > 0) {
+            toast.success(t("delete-toast.success.title"), {
+              description: t("delete-toast.success.description", { files: deletedFiles.join(", ") }),
+              duration: 3000,
+            });
+          }
+          // Show error toast
+          if (deleteErrors.length > 0) {
+            const errorMessages = deleteErrors.map(error => `${error.file}: ${error.message}`).join("\n");
+            toast.error(t("delete-toast.error.title"), {
+              description: errorMessages,
+              duration: 5000,
+            });
           }
         }
       }
 
       // Upload files
+      let successfulUploads: string[] = [];
+      let failedUploads: { file: string; error: string }[] = [];
       for (const file of pendingFiles) {
-        const normalizedFileName = toNonAccentVietnamese(file.name)
+        const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name))
         const { data, error } = await supabase.storage.from(bucketName).upload(`${artworkUUID}/${normalizedFileName}`, file, { upsert: false })
         if (error) {
           console.error('Error uploading file:', error.message)
-          toast.error(t("toast.error.title"), {
-            description: `${file.name}: ${error.message}`,
-            duration: 3000,
-          })
           errors.push({ message: error.message })
           remainingFiles.push(file)
+          failedUploads.push({ file: file.name, error: error.message })
         } else {
-          console.log('Files uploaded successfully:', data)
-          toast.success(t("toast.success.title"), {
-            description: t("toast.success.description", { file: file.name }),
-            duration: 3000,
-          })
+          console.log('File uploaded successfully:', data)
           results.push({ id: data.path, path: data.path, fullPath: data.fullPath })
           uploadedFilesList.push({
             id: data.path,
             path: data.path,
             fullPath: data.fullPath,
-            name: file.name,
+            name: normalizedFileName,
             size: file.size,
-            isThumbnail: file.name === thumbnailFile
+            isThumbnail: normalizedFileName === normalizeFileNameForS3(toNonAccentVietnamese(thumbnailFile || ''))
           })
           successCount++;
+          successfulUploads.push(file.name)
         }
+      }
+      // Show success toast
+      if (successfulUploads.length > 0) {
+        toast.success(t("toast.success.title"), {
+          description: t("toast.success.description", { files: successfulUploads.join(", ") }),
+          duration: 5000,
+        });
+      }
+      // Show error toast
+      if (failedUploads.length > 0) {
+        const errorMessages = failedUploads.map(upload => `${upload.file}: ${upload.error}`).join("\n");
+        toast.error(t("toast.error.title"), {
+          description: errorMessages,
+          duration: 5000,
+        });
       }
       // Update the uploaded files list in the query cache
       queryClient.setQueryData(['uploadedFiles', artworkUUID], (oldData: any) => [...(oldData || []), ...uploadedFilesList]);

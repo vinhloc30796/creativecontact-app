@@ -1,63 +1,36 @@
-"use client";
-
+// File: app/(public)/[eventSlug]/upload-confirmed/page.tsx
+"use server";
+// Actions
+import { getArtwork } from '@/app/actions/artwork/getArtwork';
+import { getUserInfo } from '@/app/actions/user/getUserInfo';
+// Components
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useState } from 'react';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import { useQuery } from '@tanstack/react-query';
-import { useTranslation, Trans } from 'react-i18next';
+// Hooks
+import { useTranslation } from '@/lib/i18n/init-server';
+// Next
+import Link from 'next/link';
 
 interface UploadConfirmedContentProps {
   params: {
     eventSlug: string;
   };
+  searchParams: {
+    email?: string;
+    userId?: string;
+    artworkId?: string;
+    emailSent?: string;
+    lang?: string;
+  };
 }
 
-function UploadConfirmedContent({ params }: UploadConfirmedContentProps) {
-  const hostUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  // Params
-  const { eventSlug } = params;
-  const searchParams = useSearchParams();
-  // Auth
-  const { user, isLoading } = useAuth();
-  // State
-  const [uploadInfo, setUploadInfo] = useState({
-    email: '',
-    userId: '',
-    artworkId: ''
-  });
-  const [emailStatus, setEmailStatus] = useState<'sent' | 'error'>('sent');
-  // I18n
-  const { t } = useTranslation(["upload-confirmed"], { keyPrefix: "UploadConfirmed" });
-
-  useEffect(() => {
-    const info = {
-      email: searchParams.get('email') || '',
-      userId: searchParams.get('userId') || '',
-      artworkId: searchParams.get('artworkId') || ''
-    };
-    setUploadInfo(info);
-
-    const emailSent = searchParams.get('emailSent') === 'true';
-    setEmailStatus(emailSent ? 'sent' : 'error');
-  }, [searchParams]);
-
-  const { data: artwork, isLoading: isArtworkLoading, error: artworkError } = useQuery({
-    queryKey: ['artwork', uploadInfo.artworkId],
-    queryFn: async () => {
-      if (!uploadInfo.artworkId) return null;
-      const response = await fetch(`/api/artworks/${uploadInfo.artworkId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch artwork');
-      }
-      return response.json();
-    },
-    enabled: !!uploadInfo.artworkId,
-  });
+async function UploadConfirmedContent({ params, searchParams }: UploadConfirmedContentProps) {
+  const { eventSlug } = params; 
+  const { email, userId, artworkId, emailSent, lang } = searchParams;
+  const artwork = artworkId ? await getArtwork(artworkId) : null;
+  const user = userId ? await getUserInfo(userId) : null;
+  const { t } = await useTranslation(lang || 'en', ['upload-confirmed', 'common']);
 
   return (
     <BackgroundDiv eventSlug={eventSlug}>
@@ -70,58 +43,49 @@ function UploadConfirmedContent({ params }: UploadConfirmedContentProps) {
         />
         <CardContent className='p-6 flex flex-col gap-4'>
           <div
-            className='flex flex-col space-y-2 p-4 bg-slate-400 bg-opacity-10 rounded-md border border-primary-foreground border-opacity-20'
-            style={{ backgroundColor: '#F6EBE4' }}
+            className='flex flex-col space-y-2 p-4 bg-primary/10 rounded-md border border-primary-foreground border-opacity-20'
           >
-            <h2 className="text-2xl font-semibold text-primary">{t("title")}</h2>
-            <p>{t("description")}</p>
-            {emailStatus === 'sent' && <p>{t("email.sent")}</p>}
-            {emailStatus === 'error' && <p>
-              <Trans
-                i18nKey="email.error"
-                values={{ email: "creative.contact.vn@gmail.com" }}
-                components={{ a: <a href="mailto:creative.contact.vn@gmail.com" className='underline' /> }}
-              />
-            </p>}
-            <div>
-              <p className="text-muted-foreground text-sm">
-                {isLoading ? t("user.loading") : (user?.email ? t("user.loggedIn", { email: user.email }) : t("user.guest"))}
-              </p>
-            </div>
+            <h2 className="text-2xl font-semibold text-primary">{t('UploadConfirmed.title')}</h2>
+            <p>{t('UploadConfirmed.description')}</p>
+            {emailSent === 'true' ? (
+              <p>{t('UploadConfirmed.email.sent')}</p>
+            ) : (
+              <p>{t('UploadConfirmed.email.error', { email })}</p>
+            )}
+            <p className="text-muted-foreground text-sm">
+              {user ? t('UploadConfirmed.user.loggedIn', { email: user.email }) : t('UploadConfirmed.user.guest')}
+            </p>
           </div>
 
           <div className="space-y-2">
-            <p>{t("details.title")}</p>
+            <p>{t('UploadConfirmed.details.title')}</p>
             <ul className="list-disc list-inside">
-              <li>{t("details.points.submission")}</li>
-              <li>{t("details.points.artwork")}</li>
-              <li>{t("details.points.review")}</li>
-              <li>{t("details.points.contact")}</li>
+              {Object.values(t('UploadConfirmed.details.points', { returnObjects: true })).map((point, index) => (
+                <li key={index}>{point}</li>
+              ))}
             </ul>
           </div>
 
-          <div className="bg-gray-100 p-4 rounded-md space-y-4">
-            {isArtworkLoading ? (
-              <p>{t("artwork.loading")}</p>
-            ) : artworkError ? (
-              <p>{t("artwork.error")}</p>
-            ) : artwork ? (
-              <>
-                <p><strong>{t("artwork.id")}:</strong> {artwork.id}</p>
-                <ul className='list-disc list-inside'>
-                  <li><strong>{t("artwork.title")}:</strong> {artwork.title}</li>
-                  <li><strong>{t("artwork.description")}:</strong> {artwork.description}</li>
-                </ul>
-                {/* Add more artwork details as needed */}
-              </>
-            ) : (
-              <p>{t("artwork.notFound")}</p>
-            )}
+          {artwork && (
+            <div className="bg-gray-100 p-4 rounded-md space-y-2">
+              <p><strong>{t('UploadConfirmed.artwork.title')}:</strong> {artwork.title}</p>
+              <p><strong>{t('UploadConfirmed.artwork.description')}:</strong> {artwork.description}</p>
+              <p className="text-muted-foreground text-sm"><strong>{t('UploadConfirmed.artwork.id')}:</strong> {artwork.id}</p>
+            </div>
+          )}
+
+          <div className="flex flex-col space-y-2">
+            <Button asChild>
+              <Link href={`/${eventSlug}`}>{t('common:viewGallery')}</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/">{t('common:backToHome')}</Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
-    </BackgroundDiv >
-  )
+    </BackgroundDiv>
+  );
 }
 
 export default UploadConfirmedContent;
