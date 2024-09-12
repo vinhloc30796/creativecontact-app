@@ -197,8 +197,18 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
         {/* Footer section */}
         <footer className="fixed bottom-0 left-0 right-0 bg-primary-200/10 z-30 shadow-md">
-          <div className="container mx-auto px-4 py-4 text-center text-muted-foreground">
-            © 2023 Creative Contact. All rights reserved.
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center text-muted-foreground">
+            <div className="text-left">
+              {/* Left section content */}
+            </div>
+            <div className="text-center">
+              © 2024 Creative Contact
+            </div>
+            <div className="text-right">
+              {/* Right section content */}
+              <Link href="https://www.facebook.com/creativecontact.vn" className="mr-4 hover:text-primary-foreground transition-colors duration-300">FB</Link>
+              <Link href="https://instagram.com/creativecontact_vn" className="hover:text-primary-foreground transition-colors duration-300">IG</Link>
+            </div>
           </div>
         </footer>
       </div>
