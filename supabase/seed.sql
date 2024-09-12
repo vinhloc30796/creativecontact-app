@@ -229,6 +229,18 @@ INSERT INTO artworks (
     'An abstract representation of the universe''s interconnectedness'
 );
 
+INSERT INTO artworks (
+    id,
+    created_at,
+    title,
+    description
+) VALUES (
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    CURRENT_TIMESTAMP,
+    'The Starry Night',
+    'A depiction of the night sky with a village and a cypress tree'
+);
+
 -- Seed artwork_credits table
 INSERT INTO artwork_credits (
     id,
@@ -236,7 +248,7 @@ INSERT INTO artwork_credits (
     user_id,
     title
 ) VALUES (
-    'c7e9a123-3d45-4b8a-9f67-1e8d2f3a4b5c',
+    '92d3899c-5d10-4bb0-be0c-d2f059839b82',
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
     '13f60da9-8dd4-42f9-8a57-c0569a158857',
     'Uploader'
@@ -251,4 +263,51 @@ INSERT INTO artwork_events (
     '72ac8c15-c9f2-4faa-b9f9-397e0b35fb92',
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
     '9419ee07-81ed-4114-8143-1fff084d019a'
+), (
+    '2bca5406-bab2-4f02-88c9-3153b1b9b6cd',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    '9419ee07-81ed-4114-8143-1fff084d019a'
+);
+
+-- Seed artwork_assets table
+INSERT INTO artwork_assets (
+    id,
+    artwork_id,
+    file_path,
+    asset_type,
+    created_at,
+    bucket_id,
+    is_thumbnail
+) VALUES (
+    '8690f354-c948-4335-b0ba-82bdc2e9ccad',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c/lukewarm._cosmic_harmony_d3c493e9-306e-46a2-86cb-c36a234763da.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    true
+), (
+    'ca6e7d44-d402-4cc6-9d36-691e1cfb8d87',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c/lukewarm._cosmic_harmony_d9ed4a30-7a99-44b8-ab97-84b3fcfb099f.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    false
+), (
+    '0e950002-4574-405b-9dff-df8fe7a3894d',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a/lukewarm._the_starry_night_3f67cc86-d07f-4e37-8f4a-c60b4405832c.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    true
+), (
+    '07c90874-d851-46cf-9f8b-562e74ff3111',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a/lukewarm._the_starry_night_18ab7709-6645-4df4-9234-63567bec9fd0.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    false
 );
