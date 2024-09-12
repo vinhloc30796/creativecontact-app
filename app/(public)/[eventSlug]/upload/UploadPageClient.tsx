@@ -2,39 +2,47 @@
 
 "use client";
 
-import { EventNotFound } from "@/app/(public)/[eventSlug]/EventNotFound";
+// Actions
 import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
 import { sendArtworkCreditRequestEmail } from "@/app/actions/email/creditRequest";
 import { checkUserIsAnonymous } from "@/app/actions/user/auth";
 import { signUpUser } from "@/app/actions/user/signUp";
 import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
+import { createArtwork, insertArtworkAssets, insertArtworkCredit, insertArtworkEvents } from "./actions";
+// Types & Form schemas
 import { ArtworkCreditInfoData, artworkCreditInfoSchema } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
 import { ContactInfoData, contactInfoSchema } from "@/app/form-schemas/contact-info";
 import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas/professional-info";
+import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile";
+// Custom
+import { EventNotFound } from "@/app/(public)/[eventSlug]/EventNotFound";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
+import { ProfessionalInfoStep } from "@/components/user/ProfessionalInfoStep";
+// Components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ContactInfoStep } from "@/components/user/ContactInfoStep";
-import { ProfessionalInfoStep } from "@/components/user/ProfessionalInfoStep";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
+import { toast } from "sonner";
+// Hooks, contexts, i18n
 import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useFormUserId } from "@/hooks/useFormUserId";
-import { createEmailLink } from "@/lib/links";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
-import { toast } from "sonner";
+// Utils
+import { createEmailLink } from "@/lib/links";
+import { normalizeFileNameForS3 } from '@/lib/s3_convention';
+import { toNonAccentVietnamese } from '@/lib/vietnamese';
 import { v4 as uuidv4 } from "uuid";
-import { createArtwork, insertArtworkAssets, insertArtworkCredit, insertArtworkEvents } from "./actions";
-import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile";
 
 
 interface UploadPageClientProps {
@@ -159,7 +167,11 @@ export default function UploadPageClient({ eventSlug, eventData, recentEvents }:
     if (errors.length > 0) {
       console.error("errors", errors);
     }
-    setArtworkAssets(results);
+    setArtworkAssets(results.map(asset => ({
+      ...asset,
+      name: normalizeFileNameForS3(toNonAccentVietnamese(asset.name)),
+      isThumbnail: normalizeFileNameForS3(toNonAccentVietnamese(asset.name)) === normalizeFileNameForS3(toNonAccentVietnamese(results[0].name))
+    })));
   };
 
   const handleValidation = async () => {
