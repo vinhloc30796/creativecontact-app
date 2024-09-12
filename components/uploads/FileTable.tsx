@@ -1,11 +1,11 @@
-
-import { Trash2 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-
+// Components
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-import { SupabaseFile, ThumbnailSupabaseFile } from '@/app/types/SupabaseFile'
+import { Trash2 } from 'lucide-react'
+// I18n
+import { useTranslation } from 'react-i18next'
+// Types
+import { ThumbnailSupabaseFile } from '@/app/types/SupabaseFile'
 
 interface FileTableProps {
   files: ThumbnailSupabaseFile[];
