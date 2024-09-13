@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import EventLogo from "@/components/branding/EventLogo";
 
 interface UploadStatisticsProps {
   eventSlug: string;
@@ -44,21 +42,20 @@ export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdow
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-center text-accent">{eventTitle}</h2>
-      <div className="mb-4 flex flex-col items-center">
-          <h3 className="text-8xl font-bold text-primary">{artworkCount}</h3>
-          <p className="text-sm text-muted-foreground">
-            {t("description")}
-          </p>
-        </div>
-        {countdown !== undefined && (
-          <>
-            <div className="text-center text-sm text-muted-foreground mb-2">
-              {t("redirecting", { countdown: timeLeft })}
-            </div>
-            <Progress value={progress} className="w-full" />
-          </>
-        )}
+      <EventLogo eventSlug={eventSlug} eventTitle={eventTitle} className="w-[15vw] h-auto" />
+      <div className="my-4 flex flex-col items-center">
+        <p className="text-md font-semibold text-accent">
+          [{artworkCount} {t("description")}]
+        </p>
+      </div>
+      {countdown !== undefined && (
+        <>
+          <div className="text-center text-sm text-muted-foreground mb-2">
+            {t("redirecting", { countdown: timeLeft })}
+          </div>
+          <Progress value={progress} className="w-full" />
+        </>
+      )}
     </div>
   );
 }
