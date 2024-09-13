@@ -2,22 +2,20 @@
 "use server";
 
 // Import necessary components and utilities
-import { Button } from '@/components/ui/button';
+import { ArtworkCard } from '@/components/artwork/ArtworkCard';
 import { Loading } from '@/components/Loading';
-import { artworkEvents, artworks, artworkAssets } from '@/drizzle/schema/artwork';
+import { Button } from '@/components/ui/button';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import { artworkAssets, artworkEvents, artworks } from '@/drizzle/schema/artwork';
 import { events } from '@/drizzle/schema/event';
 import { db } from '@/lib/db';
-import { desc, eq, and } from 'drizzle-orm';
+import { useTranslation } from '@/lib/i18n/init-server';
+import { createClient } from '@supabase/supabase-js';
+import { desc, eq } from 'drizzle-orm';
+import Link from 'next/link';
 import { Suspense } from 'react';
 import { EventNotFound } from './EventNotFound';
 import { UploadStatistics } from './UploadStatistics';
-import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import { useTranslation } from '@/lib/i18n/init-server';
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import Image from 'next/image';
-import { createClient } from '@supabase/supabase-js';
-import Link from 'next/link';
 
 // Define the props interface for the EventPage component
 interface EventPageProps {
@@ -29,13 +27,22 @@ interface EventPageProps {
   };
 }
 
-// Helper function to generate random sizes for artwork cards
-function getRandomSize() {
-  return Math.floor(Math.random() * (33 - 25 + 1) + 25);
+// Helper function to shuffle an array
+function shuffleArray<T>(array: T[]): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
 // Initialize Supabase client
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+// Helper function to generate random sizes for artwork cards
+function getRandomSize() {
+  return Math.floor(Math.random() * (33 - 25 + 1) + 25);
+}
 
 // Main EventPage component
 export default async function EventPage({ params, searchParams }: EventPageProps) {
@@ -91,42 +98,45 @@ export default async function EventPage({ params, searchParams }: EventPageProps
   // Calculate the total number of artworks
   const artworkCount = Object.keys(processedArtworks).length;
 
+  // Shuffle the artworks
+  const shuffledArtworks = shuffleArray(Object.values(processedArtworks));
+
   // Render the EventPage component
   return (
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col">
         {/* Header section */}
         <header className="fixed top-0 left-0 right-0 bg-primary-900/90 z-30 shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex-1">
-            {/* Left section content */}
-            <h1 className="text-3xl font-bold text-primary-foreground">Creative Contact</h1>
-          </div>
-          <div className="flex-1 text-center">
-          <div className="space-x-4">
-            <Button variant="secondary" disabled>
-              {t("about", { ns: "EventPage" })}
-            </Button>
-            <Button variant="secondary" asChild>
-              <a href={`/${eventSlug}`}>{t("gallery", { ns: "EventPage" })}</a>
-            </Button>
-          </div>
-          </div>
-          <div className="flex-1 text-right">
-            <div className="space-x-4">
-              <Button variant="ghost" className="text-accent" asChild>
-                <a href={`/${eventSlug}/upload`}>{t("upload", { ns: "EventPage" })}</a>
-              </Button>
-              <Button variant="ghost" className="text-accent" asChild>
-                <a href="/signup">{t("signup", { ns: "EventPage" })}</a>
-              </Button>
-              <Button variant="ghost" className="text-accent" asChild>
-                <a href="/login">{t("login", { ns: "EventPage" })}</a>
-              </Button>
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div className="flex-1">
+              {/* Left section content */}
+              <h1 className="text-3xl font-bold text-primary-foreground">Creative Contact</h1>
+            </div>
+            <div className="flex-1 text-center">
+              <div className="space-x-4">
+                <Button variant="secondary" disabled>
+                  {t("about", { ns: "EventPage" })}
+                </Button>
+                <Button variant="secondary" asChild>
+                  <a href={`/${eventSlug}`}>{t("gallery", { ns: "EventPage" })}</a>
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 text-right">
+              <div className="space-x-4">
+                <Button variant="ghost" className="text-accent" asChild>
+                  <a href={`/${eventSlug}/upload`}>{t("upload", { ns: "EventPage" })}</a>
+                </Button>
+                <Button variant="ghost" className="text-accent" asChild>
+                  <a href="/signup">{t("signup", { ns: "EventPage" })}</a>
+                </Button>
+                <Button variant="ghost" className="text-accent" asChild>
+                  <a href="/login">{t("login", { ns: "EventPage" })}</a>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
@@ -144,54 +154,15 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         <main className="flex-grow mt-20 mb-16 relative z-20">
           <div className="container mx-auto px-4">
             {/* Render artwork cards */}
-            {Object.values(processedArtworks).map((artwork, index) => {
-              const size = getRandomSize();
-              return (
-                <div
-                  key={artwork.id}
-                  className={`flex ${
-                    index % 2 === 0 ? 'justify-start' : 'justify-end'
+            {shuffledArtworks.map((artwork, index) => (
+              <div
+                key={artwork.id}
+                className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
                   } my-16`}
-                >
-                  <Link href={`/artwork/${artwork.id}`} passHref>
-                    <Card 
-                      className={`hover:shadow-lg transition-all duration-300 bg-primary cursor-pointer group overflow-hidden relative`}
-                      style={{ width: `${size}vw`, maxWidth: '600px' }}
-                    >
-                      {artwork.thumbnail && (
-                        <div className="relative">
-                          <Image
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${artwork.thumbnail.filePath}`}
-                            alt={artwork.title}
-                            width={300}
-                            height={200}
-                            objectFit="cover"
-                            className="w-full"
-                          />
-                          <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
-                        </div>
-                      )}
-                      <CardContent className="text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute inset-0 flex flex-col justify-center p-4 overflow-y-auto">
-                        <CardTitle className="text-xl sm:text-2xl mb-2 break-words text-primary-foreground">{artwork.title}</CardTitle>
-                        <CardDescription className="text-primary-foreground">
-                          <time dateTime={artwork.createdAt.toISOString()} className="text-sm text-primary-foreground">
-                            {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                          </time>
-                        </CardDescription>
-                        <p className="mt-4 text-primary-foreground text-sm sm:text-base break-words">{artwork.description}</p>
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          {artwork.assets.map((asset, assetIndex) => (
-                            <Badge key={assetIndex} variant="secondary" className="text-xs sm:text-sm">
-                              {asset.assetType}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </div>
-              );
-            })}
+              >
+                <ArtworkCard artwork={artwork} size={getRandomSize()} />
+              </div>
+            ))}
           </div>
         </main>
 
