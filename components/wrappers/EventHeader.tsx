@@ -15,10 +15,9 @@ const EventHeader: React.FC<EventHeaderProps> = async ({ eventSlug, lang, classN
   const { t } = await useTranslation(lang, "EventPage");
   const headerLayoutClassName = stickyOverlay ? "sticky top-0 left-0 right-0 z-30" : "";
 
-
   return (
     <header className={cn("w-full", headerLayoutClassName, className)}> {/* Apply className prop */}
-      <div className="w-full mx-auto py-4 px-4 flex justify-between items-center">
+      <div className="w-full mx-auto py-4 px-16 flex justify-between items-center">
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-primary-foreground">Creative Contact</h1>
         </div>

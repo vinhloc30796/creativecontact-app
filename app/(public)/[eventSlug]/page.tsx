@@ -107,7 +107,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug} lang={lang} />
+        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0"/>
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
@@ -122,8 +122,8 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </div>
 
         {/* Main content area */}
-        <main className="flex-grow mt-20 mb-16 relative z-20">
-          <div className="container mx-auto px-4">
+        <main className="flex-grow my-20 relative z-20 justify-between">
+          <div className="w-full px-16">
             {/* Render artwork cards */}
             {shuffledArtworks.map((artwork, index) => (
               <div
@@ -131,7 +131,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
                 className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
                   } my-16`}
               >
-                <ArtworkCard artwork={artwork} size={getRandomSize()} />
+                <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={getRandomSize()} />
               </div>
             ))}
           </div>

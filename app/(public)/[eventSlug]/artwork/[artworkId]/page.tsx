@@ -15,7 +15,7 @@ import {
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
 import { db } from '@/lib/db';
-import { asc, desc, eq, gte, lte } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt, not } from 'drizzle-orm';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -49,7 +49,12 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     .from(artworks)
     .leftJoin(artworkAssets, eq(artworks.id, artworkAssets.artworkId))
     .leftJoin(artworkEvents, eq(artworks.id, artworkEvents.artworkId))
-    .where(eq(artworks.id, artworkId));
+    .where(eq(artworks.id, artworkId))
+
+  if (!artworkData || artworkData.length === 0) {
+    return <div>Artwork not found</div>;
+  }
+  const currentArtwork = artworkData[0].artwork;
 
   // Fetch next and previous artwork by createdAt
   const nextArtwork = await db
@@ -57,8 +62,13 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
       id: artworks.id,
     })
     .from(artworks)
-    .where(gte(artworks.createdAt, artworkData[0].artwork.createdAt))
-    .orderBy(asc(artworks.createdAt))
+    .where(
+      and(
+        gt(artworks.createdAt, currentArtwork.createdAt),
+        not(eq(artworks.id, currentArtwork.id))
+      )
+    )
+    .orderBy(asc(artworks.createdAt), asc(artworks.id))
     .limit(1);
 
   const prevArtwork = await db
@@ -66,8 +76,13 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
       id: artworks.id,
     })
     .from(artworks)
-    .where(lte(artworks.createdAt, artworkData[0].artwork.createdAt))
-    .orderBy(desc(artworks.createdAt))
+    .where(
+      and(
+        lt(artworks.createdAt, currentArtwork.createdAt),
+        not(eq(artworks.id, currentArtwork.id))
+      )
+    )
+    .orderBy(desc(artworks.createdAt), desc(artworks.id))
     .limit(1);
 
   // Fetch artwork credits
@@ -82,30 +97,26 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     .leftJoin(userInfos, eq(artworkCredits.userId, userInfos.id))
     .where(eq(artworkCredits.artworkId, artworkId));
 
-  if (!artworkData || artworkData.length === 0) {
-    return <div>Artwork not found</div>;
-  }
 
-  const artwork = artworkData[0].artwork;
   const assets = artworkData.map(item => item.assets).filter(asset => asset !== null);
   const nextArtworkId = nextArtwork[0]?.id || null;
   const prevArtworkId = prevArtwork[0]?.id || null;
-  console.log(`Rendering ArtworkPage for ${artwork.title} with eventSlug: ${eventSlug}`);
+  console.log(`Rendering ArtworkPage for ${currentArtwork.title} with eventSlug: ${eventSlug}`);
 
   return (
     <BackgroundDiv eventSlug={eventSlug || undefined} shouldCenter={false}>
       <div className="h-screen mx-auto flex flex-col">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug || ""} lang={lang} stickyOverlay={false} className="px-0" />
+        <EventHeader eventSlug={eventSlug || ""} lang={lang} stickyOverlay={false} className="mb-8" />
         {/* Artwork details */}
-        <div className="mx-4 mb-10 grid grid-cols-12 gap-4 text-primary-foreground h-[20vh]">
-          <div className="col-span-3">
-            <h1 className="text-7xl font-bold mb-4">{artwork.title}</h1>
+        <div className="mx-16 mb-10 grid grid-cols-12 gap-4 text-primary-foreground h-[20vh]">
+          <div className="col-span-4">
+            <h1 className="text-5xl font-bold mb-4">{currentArtwork.title}</h1>
           </div>
-          <div className="col-span-6">
+          <div className="col-span-4">
             <div className="mb-4">
-              <h2 className="text-4xl font-semibold mb-4">{t("description")}</h2>
-              <p>{artwork.description}</p>
+              <h2 className="text-2xl font-semibold mb-4">{t("description")}</h2>
+              <p>{currentArtwork.description}</p>
             </div>
             <div className="flex flex-wrap gap-2 mt-auto">
               {assets.map((asset, index) => (
@@ -115,9 +126,9 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               ))}
             </div>
           </div>
-          <div className="col-span-3">
+          <div className="col-span-4">
             <div className="mb-4">
-              <h2 className="text-4xl font-semibold mb-4">{t("artist")}</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t("artist")}</h2>
               <p>{credits.map(credit => `${credit.name || "Anonymous"} [${credit.title}]`).join(', ')}</p>
             </div>
           </div>
@@ -126,7 +137,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
         {/* Main content */}
         <main className="flex-grow overflow-x-auto">
           <Suspense fallback={<Loading />}>
-            <div className="flex h-full items-center gap-4 px-4">
+            <div className="flex h-full items-center gap-4 px-16">
               {assets.map((asset, index) => (
                 <div
                   key={asset.id}
@@ -134,7 +145,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                 >
                   <img
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
-                    alt={`${artwork.title} - Asset ${index + 1}`}
+                    alt={`${currentArtwork.title} - Asset ${index + 1}`}
                     className="h-full w-auto"
                   />
                 </div>
@@ -143,22 +154,24 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
           </Suspense>
         </main>
 
-        <div className="my-8 mx-4 flex justify-between items-center">
-          <Button variant="outline" disabled={!prevArtworkId} asChild>
-            <Link href={`/artwork/${prevArtworkId}`}>
-              {t("previousArtwork")}
-            </Link>
-          </Button>
-          <Button variant="outline" disabled={!nextArtworkId} asChild>
-            <Link href={`/artwork/${nextArtworkId}`}>
-              {t("nextArtwork")}
-            </Link>
-          </Button>
+        <div className="mx-16 my-8 flex justify-between items-center">
+          <Link
+            href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : '#'}
+            className={`text-sm font-medium text-primary-foreground transition-colors focus-visible:outline-none focus-visible:underline hover:underline ${!prevArtworkId ? 'pointer-events-none opacity-50' : ''}`}
+          >
+            {t("previousArtwork")}
+          </Link>
+          <Link
+            href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : '#'}
+            className={`text-sm font-medium text-primary-foreground transition-colors focus-visible:outline-none focus-visible:underline hover:underline ${!nextArtworkId ? 'pointer-events-none opacity-50' : ''}`}
+          >
+            {t("nextArtwork")}
+          </Link>
         </div>
 
         {/* Footer section */}
         <footer className="bg-primary-200/10 z-30 shadow-md">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center text-muted-foreground">
+          <div className="container mx-auto px-16 py-4 flex justify-between items-center text-muted-foreground">
             <div className="text-left">
               {/* Left section content */}
             </div>

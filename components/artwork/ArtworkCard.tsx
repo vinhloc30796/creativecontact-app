@@ -13,13 +13,15 @@ type ArtworkWithAssetsAndThumbnail = Artwork & {
   } | null
 };
 
+
 interface ArtworkCardProps {
+  eventSlug: string;
   artwork: ArtworkWithAssetsAndThumbnail;
   size: number;
 }
 
 // New ArtworkCard component
-export function ArtworkCard({ artwork, size }: ArtworkCardProps) {
+export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -31,7 +33,7 @@ export function ArtworkCard({ artwork, size }: ArtworkCardProps) {
     >
       {artwork.thumbnail && (
         <>
-          <Link href={`/artwork/${artwork.id}`}>
+          <Link href={`/${eventSlug}/artwork/${artwork.id}`}>
             <Image
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${artwork.thumbnail.filePath}`}
               alt={artwork.title}
