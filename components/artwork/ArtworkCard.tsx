@@ -31,7 +31,7 @@ export function ArtworkCard({ artwork, size }: ArtworkCardProps) {
     >
       {artwork.thumbnail && (
         <>
-          <Link href={`/artworks/${artwork.id}`}>
+          <Link href={`/artwork/${artwork.id}`}>
             <Image
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${artwork.thumbnail.filePath}`}
               alt={artwork.title}

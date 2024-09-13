@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { EventNotFound } from './EventNotFound';
 import { UploadStatistics } from './UploadStatistics';
+import EventHeader from '@/components/wrappers/EventHeader';
 
 // Define the props interface for the EventPage component
 interface EventPageProps {
@@ -106,44 +107,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col">
         {/* Header section */}
-        <header className="fixed top-0 left-0 right-0  z-30 shadow-md">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="flex-1">
-              {/* Left section content */}
-              <h1 className="text-3xl font-bold text-primary-foreground">Creative Contact</h1>
-            </div>
-            <div className="flex-1 text-center">
-              <div className="space-x-4">
-                <Button variant="secondary" disabled>
-                  {t("about", { ns: "EventPage" })}
-                </Button>
-                <Button variant="secondary" asChild>
-                  <a href={`/${eventSlug}`}>{t("gallery", { ns: "EventPage" })}</a>
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 text-right">
-              <div className="flex flex-row justify-end space-x-4">
-                <Button
-                  variant="outline"
-                  className="inset-0 text-accent rounded-full border-accent bg-accent/5 shadow-inner shadow-accent-500/50 hover:shadow-md hover:shadow-accent-500/50 transition-shadow duration-500 relative overflow-hidden"
-                  asChild
-                >
-                  <a href={`/${eventSlug}/upload`}>{t("upload", { ns: "EventPage" })}</a>
-                </Button>
-                <p>
-                  <Button variant="ghost" className="text-primary hover:text-primary-foreground hover:bg-primary/10" asChild>
-                    <a href="/signup">{t("signup", { ns: "EventPage" })}</a>
-                  </Button>
-                  <span className="text-primary">|</span>
-                  <Button variant="ghost" className="text-primary hover:text-primary-foreground hover:bg-primary/10" asChild>
-                    <a href="/login">{t("login", { ns: "EventPage" })}</a>
-                  </Button>
-                </p>
-              </div>
-            </div>
-          </div>
-        </header>
+        <EventHeader eventSlug={eventSlug} lang={lang} />
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
