@@ -135,13 +135,13 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
         </div>
 
         {/* Main content */}
-        <main className="flex-grow overflow-x-auto">
+        <main className="flex-grow overflow-x-auto h-full">
           <Suspense fallback={<Loading />}>
             <div className="flex h-full items-center gap-4 px-16">
               {assets.map((asset, index) => (
                 <div
                   key={asset.id}
-                  className="h-full items-center justify-center bg-red-500"
+                  className="flex-none items-center justify-center h-full"
                 >
                   <img
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
