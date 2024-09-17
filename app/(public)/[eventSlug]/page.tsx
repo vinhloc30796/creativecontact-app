@@ -107,7 +107,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0"/>
+        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0" currentPath={`/${eventSlug}`} />
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">

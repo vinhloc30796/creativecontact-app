@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/i18n/init-server';
 import { cn } from '@/lib/utils'; // Import the cn utility function
 import Link from 'next/link';
 import React from 'react';
+import config from '@/tailwind.config'
 
 interface EventHeaderProps {
   eventSlug: string;
@@ -14,26 +15,53 @@ interface EventHeaderProps {
   stickyOverlay?: boolean;
 }
 
-const EventHeader: React.FC<EventHeaderProps> = async ({ eventSlug, lang, className, stickyOverlay = true }) => {
+
+interface EventHeaderProps {
+  eventSlug: string;
+  lang: string;
+  className?: string;
+  stickyOverlay?: boolean;
+  currentPath: string;
+}
+
+const EventHeader: React.FC<EventHeaderProps> = async ({ 
+  eventSlug, 
+  lang, 
+  className, 
+  stickyOverlay = true,
+}) => {
   const { t } = await useTranslation(lang, "EventPage");
   const headerLayoutClassName = stickyOverlay ? "sticky top-0 left-0 right-0 z-30" : "";
+  const primaryColor = config.theme.extend.colors.primary;
 
   return (
-    <header className={cn("w-full", headerLayoutClassName, className)}> {/* Apply className prop */}
+    <header className={cn("w-full", headerLayoutClassName, className)}>
       <div className="w-full mx-auto py-4 px-16 flex justify-between items-center">
         <div className="flex-1">
           <Link href={`/${eventSlug}`}>
-            <CreativeContactLogo className="fill-primary"/>
+            <CreativeContactLogo className="fill-primary h-16" />
           </Link>
         </div>
         <div className="flex-1 text-center">
           <div className="space-x-4">
-            <Button variant="secondary" disabled>
+            <Link 
+              href={`/${eventSlug}`}
+              className="px-4 py-2 text-primary hover:text-primary-foreground hover:bg-transparent"
+            >
+              <span 
+              style={{
+                textShadow: `hsl(var(--primary-foreground)) 0px 0px 10px`
+              }}
+              >
+                {t("gallery", { ns: "EventPage" })}
+              </span>
+            </Link>
+            <Link 
+              href={`https://creativecontact.vn`}
+              className="px-4 py-2 text-muted hover:text-muted-foreground hover:bg-transparent"
+            >
               {t("about", { ns: "EventPage" })}
-            </Button>
-            <Button variant="secondary" asChild>
-              <Link href={`/${eventSlug}`}>{t("gallery", { ns: "EventPage" })}</Link>
-            </Button>
+            </Link>
           </div>
         </div>
         <div className="flex-1 text-right">
