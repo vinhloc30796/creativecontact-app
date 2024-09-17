@@ -14,7 +14,8 @@ type ArtworkCreditWithUser = ArtworkCredit & {
 export type ArtworkWithAssetsThumbnailCredits = Artwork & {
   assets: ArtworkAsset[];
   thumbnail: {
-    filePath: string
+    filePath: string;
+    assetType: string;
   } | null,
   credits: ArtworkCreditWithUser[];
 };
@@ -25,9 +26,12 @@ interface ArtworkCardProps {
   size: number;
 }
 
-// Updated ArtworkCard component with credits
+// Updated ArtworkCard component with credits and video support
 export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  const isVideo = artwork.thumbnail?.assetType?.startsWith('video');
+  const assetUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${artwork.thumbnail?.filePath}`;
 
   return (
     <div
@@ -38,14 +42,22 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
       {artwork.thumbnail && (
         <>
           <Link href={`/${eventSlug}/artwork/${artwork.id}`}>
-            <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${artwork.thumbnail.filePath}`}
-              alt={artwork.title}
-              width={400}
-              height={300}
-              objectFit="cover"
-              className="w-full h-auto"
-            />
+            {isVideo ? (
+              <video
+                src={assetUrl}
+                controls
+                className="w-full h-auto"
+              />
+            ) : (
+              <Image
+                src={assetUrl}
+                alt={artwork.title}
+                width={400}
+                height={300}
+                objectFit="cover"
+                className="w-full h-auto"
+              />
+            )}
           </Link>
           <div
             className={cn(

@@ -101,7 +101,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     if (assets && !acc[artwork.id].assets.some(a => a.id === assets.id)) {
       acc[artwork.id].assets.push(assets);
       if (assets.isThumbnail) {
-        acc[artwork.id].thumbnail = { filePath: assets.filePath };
+        acc[artwork.id].thumbnail = { filePath: assets.filePath, assetType: assets.assetType || "image" };
       }
     }
     if (credits && !acc[artwork.id].credits.some(c => c.id === credits.id)) {

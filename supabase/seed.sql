@@ -112,9 +112,9 @@ INSERT INTO user_infos (
     '+1234567890',
     'New York',
     'System Administrator',
-    'Experienced system administrator with a passion for maintaining robust and secure systems.',
-    ARRAY['Technology', 'IT']::industry[],
-    'Professional',
+    'Experienced creative technologist with a passion for integrating cutting-edge technology into artistic projects and interactive experiences.',
+    ARRAY['Software and Interactive', 'Other']::industry[],
+    'Senior',
     'admin_insta',
     'admin_fb'
 ), (
@@ -125,35 +125,11 @@ INSERT INTO user_infos (
     '+9876543210',
     'San Francisco',
     'Software Developer',
-    'Enthusiastic software developer eager to learn and grow in the tech industry.',
-    ARRAY['Technology', 'Software']::industry[],
+    'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
+    ARRAY['Software and Interactive']::industry[],
     'Entry',
     'user_insta',
     'user_fb'
-);
-INSERT INTO user_infos (
-    id,
-    created_at,
-    first_name,
-    last_name,
-    display_name,
-    email,
-    phone,
-    experience,
-) VALUES (
-    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
-    CURRENT_TIMESTAMP,
-    'Admin',
-    'admin@example.com',
-    '+1234567890',
-    'Professional'
-), (
-    '13f60da9-8dd4-42f9-8a57-c0569a158857',
-    CURRENT_TIMESTAMP,
-    'User',
-    'user@example.com',
-    '+1234567890',
-    'Entry'
 );
 
 -- Seed data for events table
@@ -269,6 +245,18 @@ INSERT INTO artworks (
     'A depiction of the night sky with a village and a cypress tree'
 );
 
+INSERT INTO artworks (
+    id,
+    created_at,
+    title,
+    description
+) VALUES (
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    CURRENT_TIMESTAMP,
+    'Ethereal Whispers',
+    'A mesmerizing digital artwork that captures the delicate dance of light and shadow, evoking a sense of mystery and wonder'
+);
+
 -- Seed artwork_credits table
 INSERT INTO artwork_credits (
     id,
@@ -295,6 +283,16 @@ INSERT INTO artwork_credits (
     '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
     'Artist'
+), (
+    'f3a9c6b2-7d8e-4a1f-9b0c-5d6e8f3a2c1d',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    '13f60da9-8dd4-42f9-8a57-c0569a158857',
+    'Uploader'
+), (
+    'e2b1d8a7-6c9f-4b5e-8d3a-7f4c9e0b1a2d',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
+    'Artist'
 );
 
 -- Seed artwork_events table
@@ -309,6 +307,10 @@ INSERT INTO artwork_events (
 ), (
     '2bca5406-bab2-4f02-88c9-3153b1b9b6cd',
     '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    '9419ee07-81ed-4114-8143-1fff084d019a'
+), (
+    '2fdbe299-4267-4faa-8170-7bde048062d9',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
     '9419ee07-81ed-4114-8143-1fff084d019a'
 );
 
@@ -353,4 +355,44 @@ INSERT INTO artwork_assets (
     CURRENT_TIMESTAMP,
     'artwork_assets',
     false
+), (
+    '751d51e9-675b-44ba-b2b0-daac08e30ee9',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25/lukewarm._Ethereal_Whispers_A_mesmerizing_digital_artwork_that__1ba69160-20f1-4221-a03a-04917a5ab90e.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    true
+), (
+    'a99eaa31-f672-4194-95b2-d2848b832787',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25/lukewarm._Ethereal_Whispers_A_mesmerizing_digital_artwork_that__3702d92e-7bf6-4b3f-a356-1fd43d7f0437.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    false
+), (
+    'fa869ede-9390-4ad6-82b2-cc4b446d976c',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25/lukewarm._Ethereal_Whispers_A_mesmerizing_digital_artwork_that__51b78df0-75ae-4d99-a71b-a6b865877b3b.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    false
+), (
+    'eacdf935-3090-4b27-8591-8480fff4f91a',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25/lukewarm._Ethereal_Whispers_A_mesmerizing_digital_artwork_that__8afb789f-958d-4011-afda-507c9a86d864.png',
+    'image',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    false
+), (
+    '85699a87-bb54-497a-96dc-e9942dd71ff7',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
+    '3197dbc5-711d-4c84-8db2-6ac20a2ded25/Ethereal_Whispers__A_mesmerizing_digital_artwork_that_captures_the_delicate_dance_of_light_and_shado_seed7848757570724325.mp4',
+    'video',
+    CURRENT_TIMESTAMP,
+    'artwork_assets',
+    true
 );
