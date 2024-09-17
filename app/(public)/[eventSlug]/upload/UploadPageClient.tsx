@@ -3,35 +3,30 @@
 "use client";
 
 // Actions
-import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
-import { sendArtworkCreditRequestEmail } from "@/app/actions/email/creditRequest";
-import { checkUserIsAnonymous } from "@/app/actions/user/auth";
-import { signUpUser } from "@/app/actions/user/signUp";
-import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
-import { createArtwork, insertArtworkAssets, insertArtworkCredit, insertArtworkEvents } from "./actions";
+import { insertArtworkAssets } from "./actions";
+import { handleArtworkCreation, handleCoArtists, handleFileUpload, handleUserInfo, sendConfirmationEmail } from './client-helpers';
 // Types & Form schemas
 import { ArtworkCreditInfoData, artworkCreditInfoSchema } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
 import { ContactInfoData, contactInfoSchema } from "@/app/form-schemas/contact-info";
 import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas/professional-info";
-import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile";
 // Custom
 import { EventNotFound } from "@/app/(public)/[eventSlug]/EventNotFound";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
+import { MediaUpload } from "@/components/uploads/media-upload";
+import { ContactInfoStep } from "@/components/user/ContactInfoStep";
 import { ProfessionalInfoStep } from "@/components/user/ProfessionalInfoStep";
 // Components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { MediaUpload } from "@/components/uploads/media-upload";
-import { ContactInfoStep } from "@/components/user/ContactInfoStep";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { toast } from "sonner";
 // Hooks, contexts, i18n
-import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
 import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
+import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useFormUserId } from "@/hooks/useFormUserId";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,7 +37,6 @@ import { Trans, useTranslation } from "react-i18next";
 // Utils
 import { createEmailLink } from "@/lib/links";
 import { v4 as uuidv4 } from "uuid";
-import { performUpload } from "./client";
 
 
 interface UploadPageClientProps {
@@ -79,7 +73,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   const { resolveFormUserId, userData, isLoading: isUserDataLoading } = useFormUserId();
   // Context
   const { currentArtwork, artworks, setCurrentArtwork, addArtwork } = useArtwork();
-  const { thumbnailFileName } = useThumbnail(); // Use the context here
+  const { thumbnailFileName } = useThumbnail();
   // States
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [artworkUUID, setArtworkUUID] = useState<string | null>(null);
@@ -89,6 +83,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
   // Form setup
   const [formStep, setFormStep] = useState(0);
+
   const contactInfoForm = useForm<ContactInfoData>({
     resolver: zodResolver(contactInfoSchema),
     mode: "onChange",
@@ -97,6 +92,8 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       firstName: "",
       lastName: "",
       phone: "",
+      instagramHandle: undefined,
+      facebookHandle: undefined,
     },
   });
 
@@ -136,6 +133,8 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,
+        instagramHandle: userData.instagramHandle || undefined,
+        facebookHandle: userData.facebookHandle || undefined,
       });
       professionalInfoForm.reset({
         industries: userData.industries || [],
@@ -175,68 +174,36 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
     setPendingFiles(files);
   };
 
-  const handleValidation = async () => {
-    const contactInfoResult = await contactInfoForm.trigger();
-    console.log("contactInfoForm", contactInfoForm.formState.errors);
-    const professionalInfoResult = await professionalInfoForm.trigger();
-    console.log("professionalInfoForm", professionalInfoForm.formState.errors);
-    const artworkResult = await artworkForm.trigger();
-    console.log("artworkForm", artworkForm.formState.errors);
-    const artworkCreditResult = await artworkCreditForm.trigger();
-    console.log("artworkCreditForm", artworkCreditForm.formState.errors);
-    return contactInfoResult && professionalInfoResult && artworkResult && artworkCreditResult;
-  };
+  async function validateForms() {
+    const validationResult = await Promise.all([
+      contactInfoForm.trigger(),
+      professionalInfoForm.trigger(),
+      artworkForm.trigger(),
+      artworkCreditForm.trigger(),
+    ]);
+
+    return validationResult.every(result => result === true);
+  }
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const isValid = await handleValidation();
+      const isValid = await validateForms();
       if (!isValid) return false;
-      // Get form values
+
       const contactInfoData = contactInfoForm.getValues();
       const professionalInfoData = professionalInfoForm.getValues();
       const artworkData = artworkForm.getValues();
       const artworkCreditData = artworkCreditForm.getValues();
-      // Debug
-      console.debug('Submit button clicked')
-      console.debug('Current contact:', contactInfoForm.getValues())
-      console.debug('Current professional info:', professionalInfoForm.getValues())
-      console.debug('Current artwork info:', artworkForm.getValues())
-      console.debug('Current artwork credit info:', artworkCreditForm.getValues())
-      console.debug('isSubmitting:', isSubmitting)
-      // Hook into user ID
-      const formUserId = await resolveFormUserId(contactInfoData.email);
-      // Write user info
-      const writeUserInfoResult = await writeUserInfo(
-        formUserId,
-        {
-          phone: contactInfoData.phone,
-          firstName: contactInfoData.firstName,
-          lastName: contactInfoData.lastName,
-        },
-        {
-          industries: professionalInfoData.industries,
-          experience: professionalInfoData.experience,
-        }
+
+      const { formUserId, writeUserInfoResult } = await handleUserInfo(
+        contactInfoData,
+        professionalInfoData,
+        resolveFormUserId
       );
       console.log("Write user info successful:", writeUserInfoResult);
-      // Create artwork in the database
-      if (isNewArtwork) {
-        const formUserId = await resolveFormUserId(contactInfoForm.getValues().email);
-        const createResult = await createArtwork(
-          formUserId,
-          artworkData
-        );
-        const insertArtworkEventsResult = await insertArtworkEvents(
-          createResult.artwork.id,
-          eventSlug
-        );
-        console.log("Artwork created:", createResult, "and artwork events inserted:", insertArtworkEventsResult);
-      } else {
-        console.log("Using existing artwork:", artworkData.uuid);
-      }
-      // Perform media upload
-      if (pendingFiles.length == 0) {
+
+      if (pendingFiles.length === 0) {
         toast.error("No files to upload");
         return false;
       } else if (!artworkUUID) {
@@ -246,108 +213,38 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
         toast.error("Thumbnail file not set");
         return false;
       }
+
+      // Upload files then record artwork into database
       const files = pendingFiles.map(file => new File([file], file.name, { type: file.type }));
-      const { results: uploadedResults, errors: uploadErrors } = await performUpload(artworkUUID, files, thumbnailFileName);
-      if (uploadErrors.length > 0) {
-        console.error("handleAssetUpload: errors", uploadErrors);
-        toast.error(
-          t("UploadFailure.title"), {
-          description: t("UploadFailure.description", { value: uploadErrors }),
-          duration: 5000,
-        });
-        return false;
-      }
+      const uploadedResults = await handleFileUpload(artworkUUID, files, thumbnailFileName);
+      // const uploadedResults = await handleFileUploadAlwaysFails();
+      const { createResult, insertArtworkEventsResult } = await handleArtworkCreation(artworkData, formUserId, eventSlug);
+      console.log("Artwork created:", createResult, "and artwork events inserted:", insertArtworkEventsResult);
+
       // Insert assets
-      const insertAssetsResult = await insertArtworkAssets(
-        artworkData.uuid,
-        uploadedResults
-      );
+      const insertAssetsResult = await insertArtworkAssets(artworkData.uuid, uploadedResults);
       console.log("Insert assets successful:", insertAssetsResult);
 
-      // Signup anonymously for each co-artist
-      // and write their info to the database
-      // then insert the artwork credits
-      for (const coartist of artworkCreditData.coartists || []) {
-        // sign up the coartist
-        const signupResult = await signUpUser(coartist.email);
-        console.log("Signup anonymous successful:", signupResult);
-        if (!signupResult) {
-          console.error("Signup anonymous failed:", signupResult);
-          return false;
-        }
-        // write the coartist's info to the database
-        const writeUserInfoResult = await writeUserInfo(
-          signupResult.id,
-          {
-            phone: "",
-            firstName: coartist.first_name,
-            lastName: coartist.last_name,
-          },
-          {
-            industries: [],
-            experience: null,
-          },
-          false,
-          false
-        );
-        if (writeUserInfoResult.success) {
-          console.log("Write user info successful:", writeUserInfoResult);
-        } else {
-          console.error("Write user info failed:", writeUserInfoResult);
-        }
-        // insert the artwork credits
-        const insertArtworkCreditResult = await insertArtworkCredit(
-          artworkData.uuid,
-          signupResult.id,
-          coartist.title
-        );
-        console.log("Insert artwork credit successful:", insertArtworkCreditResult);
-        // send the artwork credit request email
-        const emailResult = await sendArtworkCreditRequestEmail(
-          coartist.email,
-          `${coartist.first_name} ${coartist.last_name}`,
-          artworkData.title,
-          eventSlug
-        );
-        console.log("Credit request email sent:", emailResult);
-      }
+      // Signup co-artists and record their info
+      await handleCoArtists(artworkData, artworkCreditData, eventSlug);
 
-      // Prepare params for the confirmation page
+      // Send confirmation email
+      const emailResult = await sendConfirmationEmail(contactInfoData, artworkData, eventSlug);
       const params = new URLSearchParams({
         email: contactInfoData.email,
         userId: formUserId,
         artworkId: artworkData.uuid,
-        emailSent: 'true', // Assuming email was sent successfully,
+        emailSent: emailResult.success ? 'true' : 'false',
         lang: i18n?.language || 'en',
       });
-      // Send artwork details email
-      if (insertAssetsResult) {
-        const contactInfoData = contactInfoForm.getValues();
-        const artworkData = artworkForm.getValues();
-        const shouldConfirmEmail = (await checkUserIsAnonymous(contactInfoData.email)) ?? true;
 
-        // Send confirmation email
-        const emailResult = await sendArtworkUploadConfirmationEmail(
-          contactInfoData.email,
-          `${contactInfoData.firstName} ${contactInfoData.lastName}`,
-          artworkData.title,
-          eventSlug,
-          shouldConfirmEmail
-        );
-
-        // Update the params to include the email sending status
-        params.set('emailSent', emailResult.success ? 'true' : 'false');
-      }
       const confirmedUrl = `/${eventSlug}/upload-confirmed?${params.toString()}`;
-      // Show success toast
       toast.success(t("UploadSuccess.title"), {
         description: t("UploadSuccess.description", { confirmedUrl }),
         action: <a href={confirmedUrl}>{t("UploadSuccess.action")}</a>,
         duration: 5000,
       });
-      // Use window.location for a full page reload and navigation
-      console.debug("Redirecting to confirmation page with params", params.toString());
-      // window.location.href = `/${eventSlug}/upload-confirmed?${params.toString()}`;
+
       return await router.push(confirmedUrl);
     } catch (error) {
       console.error("error", error);
@@ -432,6 +329,21 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
     },
   ];
 
+  const renderCurrentStep = () => {
+    const currentStep = steps[formStep];
+
+    if (!currentStep.form) {
+      // If there's no form (e.g., MediaUpload step), just render the component
+      return currentStep.component;
+    }
+
+    return (
+      <FormProvider {...currentStep.form as any}>
+        {currentStep.component}
+      </FormProvider>
+    );
+  };
+
   // Extract the current step
   const currentStep = steps[formStep];
   // Calculate progress percentage
@@ -455,6 +367,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       }
     }
   };
+
   return (
     <BackgroundDiv eventSlug={eventSlug}>
       <Card className="w-[400px] mx-auto mt-10">
@@ -479,38 +392,38 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
             </div>
             <Progress value={progress} className="w-full" />
           </div>
-          <FormProvider {...currentStep.form as unknown as FormContextType}>
-            {currentStep.component || <div>Loading Media Upload...</div>}
-            <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+          {/* Form */}
+          {renderCurrentStep()}
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+            <Button
+              type="button"
+              onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
+              disabled={formStep === 0 || isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              {t("Button.back")}
+            </Button>
+            {formStep < steps.length - 1 ? (
               <Button
                 type="button"
-                onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
-                disabled={formStep === 0 || isSubmitting}
+                onClick={handleNextStep}
+                disabled={isSubmitting}
                 className="w-full sm:w-auto"
               >
-                {t("Button.back")}
+                {isSubmitting ? t("Button.loading") : t("Button.next")}
               </Button>
-              {formStep < steps.length - 1 ? (
-                <Button
-                  type="button"
-                  onClick={handleNextStep}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto"
-                >
-                  {isSubmitting ? t("Button.loading") : t("Button.next")}
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
-                >
-                  {isSubmitting ? t("Button.submitting") : t("Button.submit")}
-                </Button>
-              )}
-            </div>
-          </FormProvider>
+            ) : (
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
+              >
+                {isSubmitting ? t("Button.submitting") : t("Button.submit")}
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </BackgroundDiv>

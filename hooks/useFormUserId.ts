@@ -15,6 +15,8 @@ export interface UserData extends Omit<UserInfo, 'experience'> {
   firstName: string;
   lastName: string;
   phone: string;
+  instagramHandle: string | null;
+  facebookHandle: string | null;
   industries: Industry[];
   experience: ExperienceLevel | null;
 }

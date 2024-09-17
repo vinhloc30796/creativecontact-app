@@ -113,7 +113,11 @@ export default function SignupPage() {
         {
           industries: professionalInfoData.industries,
           experience: professionalInfoData.experience,
-        }
+        },
+        {
+          instagramHandle: contactInfoData.instagramHandle,
+          facebookHandle: contactInfoData.facebookHandle,
+        },
       )
 
       console.log('Write user info successful:', writeUserInfoResult)

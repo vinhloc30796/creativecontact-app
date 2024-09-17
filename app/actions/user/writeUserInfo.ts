@@ -16,6 +16,10 @@ export async function writeUserInfo(
     industries: IndustryType[];
     experience: ExperienceType | null;
   },
+  socialInfo: {
+    instagramHandle?: string;
+    facebookHandle?: string;
+  },
   validateProfessionalInfo: boolean = true,
   validateUserInfo: boolean = true
 ) {
@@ -43,6 +47,8 @@ export async function writeUserInfo(
       firstName: userInfo.firstName,
       lastName: userInfo.lastName,
       displayName: getDisplayName(userInfo.firstName, userInfo.lastName, true),
+      instagramHandle: socialInfo.instagramHandle,
+      facebookHandle: socialInfo.facebookHandle,
       industries: professionalInfo.industries,
       experience: professionalInfo.experience,
     };
