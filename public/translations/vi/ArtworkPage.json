@@ -2,5 +2,7 @@
   "description": "Mô tả",
   "artist": "Nghệ sĩ",
   "previousArtwork": "Tác phẩm trước",
-  "nextArtwork": "Tác phẩm sau"
+  "nextArtwork": "Tác phẩm sau",
+  "underConstruction": "Đang xây dựng",
+  "developmentMessage": "Trang này đang được phát triển. Vui lòng quay lại sau."
 }
