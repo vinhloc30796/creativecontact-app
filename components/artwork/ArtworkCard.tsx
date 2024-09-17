@@ -61,7 +61,9 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
               </time>
               <p className="text-white text-sm mb-2 line-clamp-3">{artwork.description}</p>
               <div className="flex flex-wrap gap-2 mb-2">
-
+                <Badge className="text-xs text-primary-foreground">
+                  Assets: {artwork.assets.length}
+                </Badge>
               </div>
             </div>
             <div className="w-1/2 text-right pl-2">
@@ -83,9 +85,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                   )
                 })}
               </ul>
-              <Badge variant="secondary" className="text-xs bg-primary text-primary-foreground">
-                Assets: {artwork.assets.length}
-              </Badge>
+
             </div>
           </div>
         </>

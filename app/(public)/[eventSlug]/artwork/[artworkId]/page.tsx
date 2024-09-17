@@ -1,28 +1,16 @@
 "use server";
 
-import { getUserInfo } from '@/app/actions/user/getUserInfo';
 import { Loading } from '@/components/Loading';
 import { Badge } from "@/components/ui/badge";
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import EventHeader from '@/components/wrappers/EventHeader';
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
+import { userInfos } from '@/drizzle/schema/user';
 import { db } from '@/lib/db';
+import { useTranslation } from '@/lib/i18n/init-server';
 import { and, asc, desc, eq, gt, lt, not } from 'drizzle-orm';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { useTranslation } from '@/lib/i18n/init-server';
-import { events } from '@/drizzle/schema/event';
-import EventHeader from '@/components/wrappers/EventHeader';
-import { userInfos } from '@/drizzle/schema/user';
 
 interface ArtworkPageProps {
   params: {
@@ -119,17 +107,25 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               <p>{currentArtwork.description}</p>
             </div>
             <div className="flex flex-wrap gap-2 mt-auto">
-              {assets.map((asset, index) => (
-                <Badge key={index} variant="secondary" className="text-xs sm:text-sm">
-                  {asset.assetType}
-                </Badge>
-              ))}
+              <Badge className="text-xs text-primary-foreground">
+                Assets: {assets.length}
+              </Badge>
             </div>
           </div>
           <div className="col-span-4">
             <div className="mb-4">
               <h2 className="text-2xl font-semibold mb-4">{t("artist")}</h2>
-              <p>{credits.map(credit => `${credit.name || "Anonymous"} [${credit.title}]`).join(', ')}</p>
+              <ul>
+                {credits.map(credit => (
+                  <li key={credit.id}>
+                    {credit.name || "Anonymous"}
+                    &nbsp;
+                    <span className="text-primary-foreground text-xs italic">
+                      ({credit.title})
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
