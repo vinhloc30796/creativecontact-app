@@ -60,7 +60,6 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
               <time dateTime={artwork.createdAt.toISOString()} className="text-sm text-primary-foreground mb-2 block">
                 {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
               </time>
-              <p className="text-white text-sm mb-2 line-clamp-3">{artwork.description}</p>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge className="text-xs text-primary-foreground">
                   Assets: {artwork.assets.length}
