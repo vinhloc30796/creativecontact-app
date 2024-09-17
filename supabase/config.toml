@@ -73,7 +73,7 @@ enabled = true
 [storage.buckets.artwork_assets]
 public = true
 file_size_limit = "50MiB"
-allowed_mime_types = ["image/png", "image/jpeg"]
+allowed_mime_types = ["image/png", "image/jpg", "image/jpeg", "image/gif", "image/svg+xml", "image/x-icon", "video/mp4", "video/quicktime", "video/x-msvideo", "video/x-matroska", "audio/mpeg", "audio/wav", "audio/flac", "audio/aac", "font/ttf", "font/otf", "font/woff", "font/woff2"]
 objects_path = "./seed-storage"
 
 [auth]
