@@ -134,7 +134,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
         <main className="flex-grow overflow-x-auto h-full">
           <Suspense fallback={<Loading />}>
             <div className="flex h-full items-center gap-4 px-16">
-              {assets.map((asset, index) => (
+              {assets.map((asset, index) => asset && (
                 <div
                   key={asset.id}
                   className="flex-none items-center justify-center h-full"
