@@ -1,27 +1,33 @@
 "use client"
 import { Badge } from "@/components/ui/badge";
-import { Artwork, ArtworkAsset } from "@/drizzle/schema/artwork";
+import { Artwork, ArtworkAsset, ArtworkCredit } from "@/drizzle/schema/artwork";
+import { UserInfo } from "@/drizzle/schema/user";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-type ArtworkWithAssetsAndThumbnail = Artwork & {
+type ArtworkCreditWithUser = ArtworkCredit & {
+  user: UserInfo
+}
+
+export type ArtworkWithAssetsThumbnailCredits = Artwork & {
   assets: ArtworkAsset[];
   thumbnail: {
     filePath: string
-  } | null
+  } | null,
+  credits: ArtworkCreditWithUser[];
 };
-
 
 interface ArtworkCardProps {
   eventSlug: string;
-  artwork: ArtworkWithAssetsAndThumbnail;
+  artwork: ArtworkWithAssetsThumbnailCredits;
   size: number;
 }
 
-// New ArtworkCard component
+// Updated ArtworkCard component with credits
 export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
+  console.log(artwork);
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -53,12 +59,26 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
               {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </time>
             <p className="text-white text-sm mb-2 line-clamp-3">{artwork.description}</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-2">
               {artwork.assets.map((asset, assetIndex) => (
                 <Badge key={assetIndex} variant="secondary" className="text-xs bg-primary text-primary-foreground">
                   {asset.assetType}
                 </Badge>
               ))}
+            </div>
+            <div className="text-sm text-primary-foreground">
+              <h4 className="font-semibold mb-1">Credits:</h4>
+              <ul>
+                {artwork.credits.map((credit, index) => (
+                  <li key={index}>
+                    {credit.user.displayName}
+                    &nbsp;
+                    <span className="text-primary-foreground text-xs italic">
+                      ({credit.title})
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </>

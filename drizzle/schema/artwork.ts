@@ -70,6 +70,8 @@ export const artworkCredits = pgTable("artwork_credits", {
   uniqueArtworkUser: unique("unique_artwork_user").on(table.artworkId, table.userId),
 }));
 
+export type ArtworkCredit = InferSelectModel<typeof artworkCredits>;
+
 /* postgres=> \d artwork_events
                 Table "public.artwork_events"
    Column   | Type | Collation | Nullable |      Default      

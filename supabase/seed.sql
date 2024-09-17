@@ -18,43 +18,6 @@ INSERT INTO auth.users (
     '2024-07-31 13:29:02.204237+00',         -- updated_at
     false                                    -- is_anonymous
 );
--- {
---   "instance_id": "00000000-0000-0000-0000-000000000000",
---   "id": "13f60da9-8dd4-42f9-8a57-c0569a158857",
---   "aud": "authenticated",
---   "role": "authenticated",
---   "email": null,
---   "encrypted_password": "",
---   "email_confirmed_at": null,
---   "invited_at": null,
---   "confirmation_token": "",
---   "confirmation_sent_at": null,
---   "recovery_token": "",
---   "recovery_sent_at": null,
---   "email_change_token_new": "",
---   "email_change": "",
---   "email_change_sent_at": null,
---   "last_sign_in_at": "2024-07-31 13:29:02.201874+00",
---   "raw_app_meta_data": {},
---   "raw_user_meta_data": {},
---   "is_super_admin": null,
---   "created_at": "2024-07-31 13:29:02.199319+00",
---   "updated_at": "2024-07-31 13:29:02.204237+00",
---   "phone": null,
---   "phone_confirmed_at": null,
---   "phone_change": "",
---   "phone_change_token": "",
---   "phone_change_sent_at": null,
---   "confirmed_at": null,
---   "email_change_token_current": "",
---   "email_change_confirm_status": 0,
---   "banned_until": null,
---   "reauthentication_token": "",
---   "reauthentication_sent_at": null,
---   "is_sso_user": false,
---   "deleted_at": null,
---   "is_anonymous": true
--- }
 INSERT INTO auth.users (
     instance_id,
     id,
@@ -127,6 +90,71 @@ INSERT INTO auth.users (
     true                                     -- is_anonymous
 );
 
+-- Seed data for user_infos table
+INSERT INTO user_infos (
+    id,
+    first_name,
+    last_name,
+    display_name,
+    phone,
+    location,
+    occupation,
+    about,
+    industries,
+    experience,
+    instagram_handle,
+    facebook_handle
+) VALUES (
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
+    'Admin',
+    'User',
+    'Admin User',
+    '+1234567890',
+    'New York',
+    'System Administrator',
+    'Experienced system administrator with a passion for maintaining robust and secure systems.',
+    ARRAY['Technology', 'IT']::industry[],
+    'Professional',
+    'admin_insta',
+    'admin_fb'
+), (
+    '13f60da9-8dd4-42f9-8a57-c0569a158857',
+    'Regular',
+    'User',
+    'Regular User',
+    '+9876543210',
+    'San Francisco',
+    'Software Developer',
+    'Enthusiastic software developer eager to learn and grow in the tech industry.',
+    ARRAY['Technology', 'Software']::industry[],
+    'Entry',
+    'user_insta',
+    'user_fb'
+);
+INSERT INTO user_infos (
+    id,
+    created_at,
+    first_name,
+    last_name,
+    display_name,
+    email,
+    phone,
+    experience,
+) VALUES (
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
+    CURRENT_TIMESTAMP,
+    'Admin',
+    'admin@example.com',
+    '+1234567890',
+    'Professional'
+), (
+    '13f60da9-8dd4-42f9-8a57-c0569a158857',
+    CURRENT_TIMESTAMP,
+    'User',
+    'user@example.com',
+    '+1234567890',
+    'Entry'
+);
 
 -- Seed data for events table
 INSERT INTO events (id, created_at, name, slug, created_by)
@@ -252,6 +280,21 @@ INSERT INTO artwork_credits (
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
     '13f60da9-8dd4-42f9-8a57-c0569a158857',
     'Uploader'
+), (
+    'bc9d8116-4af5-4006-bc2b-fd9f5ec691be',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
+    'Artist'
+), (
+    '6a856ada-98d5-41dc-801f-230fb76958ad',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    '13f60da9-8dd4-42f9-8a57-c0569a158857',
+    'Uploader'
+), (
+    '8c89a0cc-fa3e-4eca-8e02-0abc39cbf0ff',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
+    'Artist'
 );
 
 -- Seed artwork_events table

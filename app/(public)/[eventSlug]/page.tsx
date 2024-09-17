@@ -2,12 +2,13 @@
 "use server";
 
 // Import necessary components and utilities
-import { ArtworkCard } from '@/components/artwork/ArtworkCard';
+import { ArtworkCard, ArtworkWithAssetsThumbnailCredits } from '@/components/artwork/ArtworkCard';
 import { Loading } from '@/components/Loading';
-import { Button } from '@/components/ui/button';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import { artworkAssets, artworkEvents, artworks } from '@/drizzle/schema/artwork';
+import EventHeader from '@/components/wrappers/EventHeader';
+import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
 import { events } from '@/drizzle/schema/event';
+import { UserInfo, userInfos } from '@/drizzle/schema/user';
 import { db } from '@/lib/db';
 import { useTranslation } from '@/lib/i18n/init-server';
 import { createClient } from '@supabase/supabase-js';
@@ -16,8 +17,6 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { EventNotFound } from './EventNotFound';
 import { UploadStatistics } from './UploadStatistics';
-import EventHeader from '@/components/wrappers/EventHeader';
-
 // Define the props interface for the EventPage component
 interface EventPageProps {
   params: {
@@ -75,26 +74,50 @@ export default async function EventPage({ params, searchParams }: EventPageProps
   const eventArtworks = await db
     .select({
       artwork: artworks,
-      assets: artworkAssets
+      assets: artworkAssets,
+      credits: artworkCredits,
+      user: userInfos
     })
     .from(artworkEvents)
     .innerJoin(artworks, eq(artworkEvents.artworkId, artworks.id))
     .leftJoin(artworkAssets, eq(artworks.id, artworkAssets.artworkId))
+    .leftJoin(artworkCredits, eq(artworks.id, artworkCredits.artworkId))
+    .leftJoin(userInfos, eq(artworkCredits.userId, userInfos.id))
     .where(eq(artworkEvents.eventId, eventData.id));
 
   // Process fetched artworks to group assets with their respective artworks
-  const processedArtworks = eventArtworks.reduce((acc, { artwork, assets }) => {
+  const processedArtworks = eventArtworks.reduce((acc, { artwork, assets, credits, user }) => {
     if (!acc[artwork.id]) {
-      acc[artwork.id] = { ...artwork, assets: [], thumbnail: null };
+      acc[artwork.id] = { ...artwork, assets: [], thumbnail: null, credits: [] };
     }
-    if (assets) {
+    if (assets && !acc[artwork.id].assets.some(a => a.id === assets.id)) {
       acc[artwork.id].assets.push(assets);
       if (assets.isThumbnail) {
-        acc[artwork.id].thumbnail = assets;
+        acc[artwork.id].thumbnail = { filePath: assets.filePath };
       }
     }
+    if (credits && !acc[artwork.id].credits.some(c => c.id === credits.id)) {
+      const userInfo: UserInfo = user ? {
+        ...user,
+        experience: user.experience || 'Entry' // Provide a default value if null
+      } : {
+        id: credits.userId,
+        firstName: null,
+        lastName: null,
+        displayName: 'Anonymous',
+        phone: null,
+        location: null,
+        occupation: null,
+        about: null,
+        industries: null,
+        experience: 'Entry',
+        instagramHandle: null,
+        facebookHandle: null
+      };
+      acc[artwork.id].credits.push({ ...credits, user: userInfo });
+    }
     return acc;
-  }, {} as Record<string, typeof artworks.$inferSelect & { assets: typeof artworkAssets.$inferSelect[], thumbnail: typeof artworkAssets.$inferSelect | null }>);
+  }, {} as Record<string, ArtworkWithAssetsThumbnailCredits>);
 
   // Calculate the total number of artworks
   const artworkCount = Object.keys(processedArtworks).length;

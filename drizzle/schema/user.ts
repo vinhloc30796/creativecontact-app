@@ -1,13 +1,14 @@
-import {
-    boolean,
-    pgEnum,
-    pgSchema,
-    pgTable,
-    text,
-    timestamp,
-    uuid
-} from "drizzle-orm/pg-core";
 import { experienceLevels, industries } from "@/app/types/UserInfo";
+import { InferSelectModel } from "drizzle-orm";
+import {
+  boolean,
+  pgEnum,
+  pgSchema,
+  pgTable,
+  text,
+  timestamp,
+  uuid
+} from "drizzle-orm/pg-core";
 
 
 // Partial schema for auth.users
@@ -57,3 +58,4 @@ export const userInfos = pgTable('user_infos', {
 // TypeScript types for use in your application
 export type IndustryType = typeof industries[number];
 export type ExperienceType = typeof experienceLevels[number];
+export type UserInfo = InferSelectModel<typeof userInfos>;
