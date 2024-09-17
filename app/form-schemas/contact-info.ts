@@ -9,6 +9,8 @@ export const contactInfoSchema = z.object({
   phone: z.string().refine((value) => /^\d{10}$/.test(value), {
     message: "Phone number must be 10 digits",
   }),
+  instagramHandle: z.string().optional(),
+  facebookHandle: z.string().optional(),
 });
 
 export type ContactInfoData = z.infer<typeof contactInfoSchema>

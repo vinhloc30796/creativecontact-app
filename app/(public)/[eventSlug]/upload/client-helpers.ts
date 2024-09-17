@@ -8,12 +8,16 @@ import { createArtwork, insertArtworkCredit, insertArtworkEvents } from "./actio
 // Types & Form schemas
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
-import { ContactInfoData } from "@/app/form-schemas/contact-info";
 import { ProfessionalInfoData } from "@/app/form-schemas/professional-info";
 // Utils
 import { performUpload } from "./client";
+import { ContactInfoData } from "@/app/form-schemas/contact-info";
 
-export async function handleUserInfo(contactInfoData: ContactInfoData, professionalInfoData: ProfessionalInfoData, resolveFormUserId: (email: string) => Promise<string>) {
+export async function handleUserInfo(
+  contactInfoData: ContactInfoData,
+  professionalInfoData: ProfessionalInfoData,
+  resolveFormUserId: (email: string) => Promise<string>
+) {
   const formUserId = await resolveFormUserId(contactInfoData.email);
   const writeUserInfoResult = await writeUserInfo(
     formUserId,
@@ -25,7 +29,13 @@ export async function handleUserInfo(contactInfoData: ContactInfoData, professio
     {
       industries: professionalInfoData.industries,
       experience: professionalInfoData.experience,
-    }
+    },
+    {
+      instagramHandle: contactInfoData.instagramHandle,
+      facebookHandle: contactInfoData.facebookHandle,
+    },
+    false,
+    false
   );
   return { formUserId, writeUserInfoResult };
 }
@@ -65,6 +75,10 @@ export async function handleCoArtists(artworkData: ArtworkInfoData, artworkCredi
       {
         industries: [],
         experience: null,
+      },
+      {
+        instagramHandle: undefined,
+        facebookHandle: undefined,
       },
       false,
       false

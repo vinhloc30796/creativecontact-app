@@ -4,6 +4,7 @@
 
 // Actions
 import { insertArtworkAssets } from "./actions";
+import { handleArtworkCreation, handleCoArtists, handleFileUpload, handleUserInfo, sendConfirmationEmail } from './client-helpers';
 // Types & Form schemas
 import { ArtworkCreditInfoData, artworkCreditInfoSchema } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
@@ -13,14 +14,14 @@ import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas
 import { EventNotFound } from "@/app/(public)/[eventSlug]/EventNotFound";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
+import { MediaUpload } from "@/components/uploads/media-upload";
+import { ContactInfoStep } from "@/components/user/ContactInfoStep";
 import { ProfessionalInfoStep } from "@/components/user/ProfessionalInfoStep";
 // Components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { MediaUpload } from "@/components/uploads/media-upload";
-import { ContactInfoStep } from "@/components/user/ContactInfoStep";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { toast } from "sonner";
 // Hooks, contexts, i18n
@@ -36,7 +37,6 @@ import { Trans, useTranslation } from "react-i18next";
 // Utils
 import { createEmailLink } from "@/lib/links";
 import { v4 as uuidv4 } from "uuid";
-import { handleArtworkCreation, handleCoArtists, handleFileUpload, handleFileUploadAlwaysFails, handleUserInfo, sendConfirmationEmail } from './client-helpers';
 
 
 interface UploadPageClientProps {
@@ -83,6 +83,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
   // Form setup
   const [formStep, setFormStep] = useState(0);
+
   const contactInfoForm = useForm<ContactInfoData>({
     resolver: zodResolver(contactInfoSchema),
     mode: "onChange",
@@ -91,6 +92,8 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       firstName: "",
       lastName: "",
       phone: "",
+      instagramHandle: undefined,
+      facebookHandle: undefined,
     },
   });
 
@@ -130,6 +133,8 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,
+        instagramHandle: userData.instagramHandle || undefined,
+        facebookHandle: userData.facebookHandle || undefined,
       });
       professionalInfoForm.reset({
         industries: userData.industries || [],
@@ -170,11 +175,14 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   };
 
   async function validateForms() {
-    const contactInfoResult = await contactInfoForm.trigger();
-    const professionalInfoResult = await professionalInfoForm.trigger();
-    const artworkResult = await artworkForm.trigger();
-    const artworkCreditResult = await artworkCreditForm.trigger();
-    return contactInfoResult && professionalInfoResult && artworkResult && artworkCreditResult;
+    const validationResult = await Promise.all([
+      contactInfoForm.trigger(),
+      professionalInfoForm.trigger(),
+      artworkForm.trigger(),
+      artworkCreditForm.trigger(),
+    ]);
+
+    return validationResult.every(result => result === true);
   }
 
   const handleSubmit = async () => {
@@ -188,7 +196,11 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       const artworkData = artworkForm.getValues();
       const artworkCreditData = artworkCreditForm.getValues();
 
-      const { formUserId, writeUserInfoResult } = await handleUserInfo(contactInfoData, professionalInfoData, resolveFormUserId);
+      const { formUserId, writeUserInfoResult } = await handleUserInfo(
+        contactInfoData,
+        professionalInfoData,
+        resolveFormUserId
+      );
       console.log("Write user info successful:", writeUserInfoResult);
 
       if (pendingFiles.length === 0) {
@@ -317,6 +329,21 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
     },
   ];
 
+  const renderCurrentStep = () => {
+    const currentStep = steps[formStep];
+
+    if (!currentStep.form) {
+      // If there's no form (e.g., MediaUpload step), just render the component
+      return currentStep.component;
+    }
+
+    return (
+      <FormProvider {...currentStep.form as any}>
+        {currentStep.component}
+      </FormProvider>
+    );
+  };
+
   // Extract the current step
   const currentStep = steps[formStep];
   // Calculate progress percentage
@@ -340,6 +367,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       }
     }
   };
+
   return (
     <BackgroundDiv eventSlug={eventSlug}>
       <Card className="w-[400px] mx-auto mt-10">
@@ -364,38 +392,38 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
             </div>
             <Progress value={progress} className="w-full" />
           </div>
-          <FormProvider {...currentStep.form as unknown as FormContextType}>
-            {currentStep.component || <div>Loading Media Upload...</div>}
-            <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+          {/* Form */}
+          {renderCurrentStep()}
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+            <Button
+              type="button"
+              onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
+              disabled={formStep === 0 || isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              {t("Button.back")}
+            </Button>
+            {formStep < steps.length - 1 ? (
               <Button
                 type="button"
-                onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
-                disabled={formStep === 0 || isSubmitting}
+                onClick={handleNextStep}
+                disabled={isSubmitting}
                 className="w-full sm:w-auto"
               >
-                {t("Button.back")}
+                {isSubmitting ? t("Button.loading") : t("Button.next")}
               </Button>
-              {formStep < steps.length - 1 ? (
-                <Button
-                  type="button"
-                  onClick={handleNextStep}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto"
-                >
-                  {isSubmitting ? t("Button.loading") : t("Button.next")}
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
-                >
-                  {isSubmitting ? t("Button.submitting") : t("Button.submit")}
-                </Button>
-              )}
-            </div>
-          </FormProvider>
+            ) : (
+              <Button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
+              >
+                {isSubmitting ? t("Button.submitting") : t("Button.submit")}
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </BackgroundDiv>

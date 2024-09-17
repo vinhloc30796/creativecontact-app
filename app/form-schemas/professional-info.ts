@@ -1,8 +1,7 @@
 // File: app/(public)/(event)/register/_sections/formSchema.ts
 
 import { z } from "zod";
-import { experienceLevels } from "@/app/types/UserInfo";
-import { industries } from "@/app/types/UserInfo";
+import { experienceLevels, industries } from "@/app/types/UserInfo";
 
 // Define the schema for ProfessionalInfoStep
 export const professionalInfoSchema = z.object({
