@@ -50,35 +50,42 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
             />
           </Link>
           <div
-            className={cn(`absolute top-full left-0 right-0 py-4 px-0 transition-opacity duration-300`,
+            className={cn(`absolute top-full left-0 right-0 py-4 px-0 transition-opacity duration-300 flex`,
               isHovered ? 'opacity-100' : 'opacity-0'
             )}
           >
-            <h3 className="text-xl font-bold text-primary-foreground mb-2">{artwork.title}</h3>
-            <time dateTime={artwork.createdAt.toISOString()} className="text-sm text-primary-foreground mb-2">
-              {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </time>
-            <p className="text-white text-sm mb-2 line-clamp-3">{artwork.description}</p>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {artwork.assets.map((asset, assetIndex) => (
-                <Badge key={assetIndex} variant="secondary" className="text-xs bg-primary text-primary-foreground">
-                  {asset.assetType}
-                </Badge>
-              ))}
+            <div className="w-1/2 text-left pr-2">
+              <h3 className="text-xl font-bold text-primary-foreground mb-2">{artwork.title}</h3>
+              <time dateTime={artwork.createdAt.toISOString()} className="text-sm text-primary-foreground mb-2 block">
+                {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </time>
+              <p className="text-white text-sm mb-2 line-clamp-3">{artwork.description}</p>
+              <div className="flex flex-wrap gap-2 mb-2">
+
+              </div>
             </div>
-            <div className="text-sm text-primary-foreground">
-              <h4 className="font-semibold mb-1">Credits:</h4>
-              <ul>
-                {artwork.credits.map((credit, index) => (
-                  <li key={index}>
-                    {credit.user.displayName}
-                    &nbsp;
-                    <span className="text-primary-foreground text-xs italic">
-                      ({credit.title})
-                    </span>
-                  </li>
-                ))}
+            <div className="w-1/2 text-right pl-2">
+              <ul className="text-primary-foreground">
+                {artwork.credits.map((credit, index) => {
+                  // Build credit name from first name, last name, and display name
+                  let creditName = credit.user.displayName;
+                  if ((!creditName || creditName === '') && (credit.user.firstName || credit.user.lastName)) {
+                    creditName = `${credit.user.firstName} ${credit.user.lastName}`;
+                  }
+                  return (
+                    <li key={index}>
+                      {creditName || 'Anonymous'}
+                      &nbsp;
+                      <span className="text-primary-foreground text-xs italic">
+                        ({credit.title})
+                      </span>
+                    </li>
+                  )
+                })}
               </ul>
+              <Badge variant="secondary" className="text-xs bg-primary text-primary-foreground">
+                Assets: {artwork.assets.length}
+              </Badge>
             </div>
           </div>
         </>

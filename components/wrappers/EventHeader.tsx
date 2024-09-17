@@ -21,7 +21,6 @@ interface EventHeaderProps {
   lang: string;
   className?: string;
   stickyOverlay?: boolean;
-  currentPath: string;
 }
 
 const EventHeader: React.FC<EventHeaderProps> = async ({ 

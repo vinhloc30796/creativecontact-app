@@ -130,7 +130,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0" currentPath={`/${eventSlug}`} />
+        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0" />
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
@@ -158,6 +158,8 @@ export default async function EventPage({ params, searchParams }: EventPageProps
               </div>
             ))}
           </div>
+          {/* Add spacing */}
+          <div className="h-20"></div>
         </main>
 
         {/* Footer section */}
