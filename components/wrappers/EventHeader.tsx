@@ -32,14 +32,13 @@ const EventHeader: React.FC<EventHeaderProps> = async ({
 }) => {
   const { t } = await useTranslation(lang, "EventPage");
   const headerLayoutClassName = stickyOverlay ? "sticky top-0 left-0 right-0 z-30" : "";
-  const primaryColor = config.theme.extend.colors.primary;
 
   return (
     <header className={cn("w-full", headerLayoutClassName, className)}>
       <div className="w-full mx-auto py-4 px-16 flex justify-between items-center">
         <div className="flex-1">
           <Link href={`/${eventSlug}`}>
-            <CreativeContactLogo className="fill-primary h-16" />
+            <CreativeContactLogo className="fill-muted h-16" />
           </Link>
         </div>
         <div className="flex-1 text-center">

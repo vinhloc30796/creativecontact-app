@@ -42,7 +42,7 @@ export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdow
 
   return (
     <div>
-      <EventLogo eventSlug={eventSlug} eventTitle={eventTitle} className="w-[15vw] h-auto" />
+      <EventLogo eventSlug={eventSlug} eventTitle={eventTitle} className="w-[15vw] h-auto fill-muted" />
       <div className="my-4 flex flex-col items-center">
         <p className="text-md font-semibold text-accent">
           [{artworkCount} {t("description")}]
