@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss"
+import plugin from "tailwindcss/plugin"
 
 const config = {
   darkMode: [
@@ -36,10 +37,32 @@ const config = {
         primary: {
           DEFAULT: "hsl(var(--primary) / <alpha-value>)",
           foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
+          50: "hsl(var(--primary-50) / <alpha-value>)",
+          100: "hsl(var(--primary-100) / <alpha-value>)",
+          200: "hsl(var(--primary-200) / <alpha-value>)",
+          300: "hsl(var(--primary-300) / <alpha-value>)",
+          400: "hsl(var(--primary-400) / <alpha-value>)",
+          500: "hsl(var(--primary-500) / <alpha-value>)",
+          600: "hsl(var(--primary-600) / <alpha-value>)",
+          700: "hsl(var(--primary-700) / <alpha-value>)",
+          800: "hsl(var(--primary-800) / <alpha-value>)",
+          900: "hsl(var(--primary-900) / <alpha-value>)",
+          1000: "hsl(var(--primary-1000) / <alpha-value>)",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
           foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
+          50: "hsl(var(--secondary-50) / <alpha-value>)",
+          100: "hsl(var(--secondary-100) / <alpha-value>)",
+          200: "hsl(var(--secondary-200) / <alpha-value>)",
+          300: "hsl(var(--secondary-300) / <alpha-value>)",
+          400: "hsl(var(--secondary-400) / <alpha-value>)",
+          500: "hsl(var(--secondary-500) / <alpha-value>)",
+          600: "hsl(var(--secondary-600) / <alpha-value>)",
+          700: "hsl(var(--secondary-700) / <alpha-value>)",
+          800: "hsl(var(--secondary-800) / <alpha-value>)",
+          900: "hsl(var(--secondary-900) / <alpha-value>)",
+          1000: "hsl(var(--secondary-1000) / <alpha-value>)",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
@@ -52,6 +75,17 @@ const config = {
         accent: {
           DEFAULT: "hsl(var(--accent) / <alpha-value>)",
           foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
+          50: "hsl(var(--accent-50) / <alpha-value>)",
+          100: "hsl(var(--accent-100) / <alpha-value>)",
+          200: "hsl(var(--accent-200) / <alpha-value>)",
+          300: "hsl(var(--accent-300) / <alpha-value>)",
+          400: "hsl(var(--accent-400) / <alpha-value>)",
+          500: "hsl(var(--accent-500) / <alpha-value>)",
+          600: "hsl(var(--accent-600) / <alpha-value>)",
+          700: "hsl(var(--accent-700) / <alpha-value>)",
+          800: "hsl(var(--accent-800) / <alpha-value>)",
+          900: "hsl(var(--accent-900) / <alpha-value>)",
+          1000: "hsl(var(--accent-1000) / <alpha-value>)",
         },
         popover: {
           DEFAULT: "hsl(var(--popover) / <alpha-value>)",
@@ -155,7 +189,10 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@designbycode/tailwindcss-text-shadow"),
+  ],
 } satisfies Config
 
 export default config

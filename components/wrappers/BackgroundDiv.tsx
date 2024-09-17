@@ -5,15 +5,16 @@ interface BackgroundDivProps {
   children: React.ReactNode;
   className?: string;
   eventSlug?: string;
+  shouldCenter?: boolean;
 }
 
-export function BackgroundDiv({ children, className, eventSlug = 'hoantat-2024' }: BackgroundDivProps) {
+export function BackgroundDiv({ children, className, eventSlug = 'hoantat-2024', shouldCenter = true }: BackgroundDivProps) {
   const backgroundImage = `/${eventSlug}-background-blur.png`;
   const fallbackImage = '/bg.jpg';
-
+  const centerClass = shouldCenter ? 'flex items-center justify-center' : '';
   return (
     <div 
-      className={cn("min-h-screen flex items-center justify-center", className)}
+      className={cn("min-h-screen", centerClass, className)}
       style={{
         backgroundImage: `url(${backgroundImage}), url(${fallbackImage})`,
         backgroundSize: 'cover',

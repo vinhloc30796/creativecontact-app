@@ -1,6 +1,6 @@
 // File: drizzle/schema/artwork.ts
 
-import { sql } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 import {
     integer,
     pgEnum,
@@ -40,6 +40,9 @@ export const artworks = pgTable("artworks", {
   description: text("description"),
 });
 
+export type Artwork = InferSelectModel<typeof artworks>;
+export type NewArtwork = InferInsertModel<typeof artworks>;
+
 /* postgres=> \d artwork_credits
                 Table "public.artwork_credits"
    Column   | Type | Collation | Nullable |      Default      
@@ -66,6 +69,8 @@ export const artworkCredits = pgTable("artwork_credits", {
 }, (table) => ({
   uniqueArtworkUser: unique("unique_artwork_user").on(table.artworkId, table.userId),
 }));
+
+export type ArtworkCredit = InferSelectModel<typeof artworkCredits>;
 
 /* postgres=> \d artwork_events
                 Table "public.artwork_events"
@@ -135,3 +140,5 @@ export const artworkAssets = pgTable("artwork_assets", {
   bucketId: text("bucket_id").notNull().default("artwork_assets"),
   isThumbnail: boolean("is_thumbnail").notNull().default(false),
 });
+
+export type ArtworkAsset = InferSelectModel<typeof artworkAssets>;
