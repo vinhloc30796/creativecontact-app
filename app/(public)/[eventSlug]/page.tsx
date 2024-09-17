@@ -145,25 +145,23 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </div>
 
         {/* Main content area */}
-        <main className="flex-grow my-20 relative z-20 justify-between w-full">
+        <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
           <div className="w-full px-4 sm:px-8 md:px-16">
             {/* Render artwork cards */}
             {shuffledArtworks.map((artwork, index) => (
               <div
                 key={artwork.id}
                 className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
-                  } my-16`}
+                  } mt-2 pb-[40vh] sm:pb-[25vh]`}
               >
                 <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={100} />
               </div>
             ))}
           </div>
-          {/* Add spacing */}
-          <div className="h-20"></div>
         </main>
 
         {/* Footer section */}
-        <footer className="fixed bottom-0 left-0 right-0 bg-primary-200/10 z-30 shadow-md w-full">
+        <footer className="fixed bottom-0 left-0 right-0 bg-primary-1000/80 z-30 shadow-md w-full">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center text-muted-foreground w-full">
             <div className="text-left">
               {/* Left section content */}
