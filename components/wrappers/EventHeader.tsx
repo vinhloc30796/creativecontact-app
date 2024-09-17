@@ -1,8 +1,11 @@
-import React from 'react';
+// Custom
+import CreativeContactLogo from '@/components/branding/CreativeContactLogo';
+// Components
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n/init-server';
 import { cn } from '@/lib/utils'; // Import the cn utility function
+import Link from 'next/link';
+import React from 'react';
 
 interface EventHeaderProps {
   eventSlug: string;
@@ -19,7 +22,9 @@ const EventHeader: React.FC<EventHeaderProps> = async ({ eventSlug, lang, classN
     <header className={cn("w-full", headerLayoutClassName, className)}> {/* Apply className prop */}
       <div className="w-full mx-auto py-4 px-16 flex justify-between items-center">
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-primary-foreground">Creative Contact</h1>
+          <Link href={`/${eventSlug}`}>
+            <CreativeContactLogo className="fill-primary"/>
+          </Link>
         </div>
         <div className="flex-1 text-center">
           <div className="space-x-4">
