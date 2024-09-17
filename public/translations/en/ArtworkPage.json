@@ -2,5 +2,7 @@
   "description": "Description",
   "artist": "Artist",
   "previousArtwork": "Previous Artwork",
-  "nextArtwork": "Next Artwork"
+  "nextArtwork": "Next Artwork",
+  "underConstruction": "Under Construction",
+  "developmentMessage": "This page is currently being developed. Please check back later."
 }
