@@ -15,6 +15,14 @@
     "phone": {
       "label": "Số điện thoại",
       "placeholder": "1234567890"
+    },
+    "instagramHandle": {
+      "label": "Instagram (tùy chọn)",
+      "placeholder": "john_doe"
+    },
+    "facebookHandle": {
+      "label": "Facebook (tùy chọn)",
+      "placeholder": "john_doe"
     }
   }
 }

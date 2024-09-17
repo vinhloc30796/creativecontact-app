@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { UseFormReturn } from 'react-hook-form'
 import { ContactInfoData } from "@/app/form-schemas/contact-info"
 import { useTranslation } from 'react-i18next'
+import { Separator } from '@/components/ui/separator'
 
 interface ContactInfoStepProps {
   form: UseFormReturn<ContactInfoData>
@@ -64,6 +65,39 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
             <FormLabel>{t('ContactInfoStep.phone.label')}</FormLabel>
             <FormControl>
               <Input placeholder={t('ContactInfoStep.phone.placeholder')} {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <Separator className="my-4" />
+      <FormField
+        control={form.control}
+        name="instagramHandle"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t('ContactInfoStep.instagramHandle.label')}</FormLabel>
+            <FormControl>
+              <div className="flex items-center">
+                <span className="mr-2 text-sm text-gray-500">https://instagram.com/</span>
+                <Input placeholder={t('ContactInfoStep.instagramHandle.placeholder')} {...field} />
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="facebookHandle"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t('ContactInfoStep.facebookHandle.label')}</FormLabel>
+            <FormControl>
+              <div className="flex items-center">
+                <span className="mr-2 text-sm text-gray-500">https://facebook.com/</span>
+                <Input placeholder={t('ContactInfoStep.facebookHandle.placeholder')} {...field} />
+              </div>
             </FormControl>
             <FormMessage />
           </FormItem>

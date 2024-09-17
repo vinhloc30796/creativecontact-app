@@ -50,6 +50,8 @@ export const userInfos = pgTable('user_infos', {
   about: text('about'),
   industries: industryEnum('industries').array(),
   experience: experienceEnum('experience'),
+  instagramHandle: text('instagram_handle'),
+  facebookHandle: text('facebook_handle'),
 });
 
 // TypeScript types for use in your application

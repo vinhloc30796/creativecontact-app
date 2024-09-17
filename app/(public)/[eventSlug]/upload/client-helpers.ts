@@ -8,24 +8,34 @@ import { createArtwork, insertArtworkCredit, insertArtworkEvents } from "./actio
 // Types & Form schemas
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
-import { ContactInfoData } from "@/app/form-schemas/contact-info";
+import { ContactSocialInfoData } from "@/app/form-schemas/contact-social-info";
 import { ProfessionalInfoData } from "@/app/form-schemas/professional-info";
 // Utils
 import { performUpload } from "./client";
 
-export async function handleUserInfo(contactInfoData: ContactInfoData, professionalInfoData: ProfessionalInfoData, resolveFormUserId: (email: string) => Promise<string>) {
-  const formUserId = await resolveFormUserId(contactInfoData.email);
+export async function handleUserInfo(
+  contactSocialInfoData: ContactSocialInfoData,
+  professionalInfoData: ProfessionalInfoData,
+  resolveFormUserId: (email: string) => Promise<string>
+) {
+  const formUserId = await resolveFormUserId(contactSocialInfoData.email);
   const writeUserInfoResult = await writeUserInfo(
     formUserId,
     {
-      phone: contactInfoData.phone,
-      firstName: contactInfoData.firstName,
-      lastName: contactInfoData.lastName,
+      phone: contactSocialInfoData.phone,
+      firstName: contactSocialInfoData.firstName,
+      lastName: contactSocialInfoData.lastName,
     },
     {
       industries: professionalInfoData.industries,
       experience: professionalInfoData.experience,
-    }
+    },
+    {
+      instagramHandle: contactSocialInfoData.instagramHandle,
+      facebookHandle: contactSocialInfoData.facebookHandle,
+    },
+    false,
+    false
   );
   return { formUserId, writeUserInfoResult };
 }
@@ -65,6 +75,10 @@ export async function handleCoArtists(artworkData: ArtworkInfoData, artworkCredi
       {
         industries: [],
         experience: null,
+      },
+      {
+        instagramHandle: undefined,
+        facebookHandle: undefined,
       },
       false,
       false
