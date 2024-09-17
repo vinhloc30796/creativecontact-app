@@ -1,22 +1,30 @@
 // File: app/(public)/[eventSlug]/page.tsx
 "use server";
 
-// Import necessary components and utilities
+// React and Next.js imports
+import { Suspense } from 'react';
+import Link from 'next/link';
+
+// Database and ORM imports
+import { createClient } from '@supabase/supabase-js';
+import { desc, eq } from 'drizzle-orm';
+import { db } from '@/lib/db';
+
+// Schema imports
+import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
+import { events } from '@/drizzle/schema/event';
+import { UserInfo, userInfos } from '@/drizzle/schema/user';
+
+// Component imports
 import { ArtworkCard, ArtworkWithAssetsThumbnailCredits } from '@/components/artwork/ArtworkCard';
 import { Loading } from '@/components/Loading';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 import { EventHeader } from '@/components/wrappers/EventHeader';
-import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
-import { events } from '@/drizzle/schema/event';
-import { UserInfo, userInfos } from '@/drizzle/schema/user';
-import { db } from '@/lib/db';
-import { useTranslation } from '@/lib/i18n/init-server';
-import { createClient } from '@supabase/supabase-js';
-import { desc, eq } from 'drizzle-orm';
-import Link from 'next/link';
-import { Suspense } from 'react';
 import { EventNotFound } from './EventNotFound';
 import { UploadStatistics } from './UploadStatistics';
+
+// Utility imports
+import { useTranslation } from '@/lib/i18n/init-server';
 // Define the props interface for the EventPage component
 interface EventPageProps {
   params: {
