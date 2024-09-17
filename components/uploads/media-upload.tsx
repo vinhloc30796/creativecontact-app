@@ -113,7 +113,7 @@ export function MediaUpload({
           {isOverLimit && (
             <div className="flex items-center text-destructive mt-2">
               <AlertCircle className="h-4 w-4 mr-1" />
-              <span className="text-xs">{t("alert.overLimit", { limit: maxSize })}</span>
+              <span className="text-xs">{t("alert.overLimit", { limit: "25MB" })}</span>
             </div>
           )}
           <div className="mt-2 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
