@@ -317,7 +317,12 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
             {
               industries: combinedData.industries,
               experience: combinedData.experience,
-            })
+            },
+            {
+              instagramHandle: combinedData.instagramHandle,
+              facebookHandle: combinedData.facebookHandle,
+            }
+          )
           : Promise.resolve(null),
       ])
 
