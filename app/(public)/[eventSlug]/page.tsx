@@ -5,7 +5,7 @@
 import { ArtworkCard, ArtworkWithAssetsThumbnailCredits } from '@/components/artwork/ArtworkCard';
 import { Loading } from '@/components/Loading';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import EventHeader from '@/components/wrappers/EventHeader';
+import { EventHeader } from '@/components/wrappers/EventHeader';
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
 import { events } from '@/drizzle/schema/event';
 import { UserInfo, userInfos } from '@/drizzle/schema/user';
@@ -128,7 +128,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
   // Render the EventPage component
   return (
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col w-full">
         {/* Header section */}
         <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0" />
 
@@ -145,8 +145,8 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </div>
 
         {/* Main content area */}
-        <main className="flex-grow my-20 relative z-20 justify-between">
-          <div className="w-full px-16">
+        <main className="flex-grow my-20 relative z-20 justify-between w-full">
+          <div className="w-full px-4 sm:px-8 md:px-16">
             {/* Render artwork cards */}
             {shuffledArtworks.map((artwork, index) => (
               <div
@@ -154,7 +154,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
                 className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
                   } my-16`}
               >
-                <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={getRandomSize()} />
+                <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={100} />
               </div>
             ))}
           </div>
@@ -163,8 +163,8 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </main>
 
         {/* Footer section */}
-        <footer className="fixed bottom-0 left-0 right-0 bg-primary-200/10 z-30 shadow-md">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center text-muted-foreground">
+        <footer className="fixed bottom-0 left-0 right-0 bg-primary-200/10 z-30 shadow-md w-full">
+          <div className="container mx-auto px-4 py-4 flex justify-between items-center text-muted-foreground w-full">
             <div className="text-left">
               {/* Left section content */}
             </div>

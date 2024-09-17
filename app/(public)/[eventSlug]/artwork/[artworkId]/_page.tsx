@@ -3,7 +3,7 @@
 import { Loading } from '@/components/Loading';
 import { Badge } from "@/components/ui/badge";
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import EventHeader from '@/components/wrappers/EventHeader';
+import { EventHeader } from '@/components/wrappers/EventHeader';
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
 import { userInfos } from '@/drizzle/schema/user';
 import { db } from '@/lib/db';

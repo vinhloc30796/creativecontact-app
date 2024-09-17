@@ -1,20 +1,12 @@
-// Custom
-import CreativeContactLogo from '@/components/branding/CreativeContactLogo';
-// Components
+"use server";
+
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/lib/i18n/init-server';
-import { cn } from '@/lib/utils'; // Import the cn utility function
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import React from 'react';
-import config from '@/tailwind.config'
-
-interface EventHeaderProps {
-  eventSlug: string;
-  lang: string;
-  className?: string; // Add className prop
-  stickyOverlay?: boolean;
-}
-
+import CreativeContactLogo from '@/components/branding/CreativeContactLogo';
+import BurgerMenu from '@/components/BurgerMenu';
 
 interface EventHeaderProps {
   eventSlug: string;
@@ -23,7 +15,7 @@ interface EventHeaderProps {
   stickyOverlay?: boolean;
 }
 
-const EventHeader: React.FC<EventHeaderProps> = async ({ 
+export const EventHeader: React.FC<EventHeaderProps> = async ({ 
   eventSlug, 
   lang, 
   className, 
@@ -34,23 +26,20 @@ const EventHeader: React.FC<EventHeaderProps> = async ({
 
   return (
     <header className={cn("w-full", headerLayoutClassName, className)}>
-      <div className="w-full mx-auto py-4 px-16 flex justify-between items-center">
+      <div className="w-full mx-auto py-4 px-4 md:px-16 flex justify-between items-center">
         <div className="flex-1">
           <Link href={`/${eventSlug}`}>
             <CreativeContactLogo className="fill-muted h-16" />
           </Link>
         </div>
-        <div className="flex-1 text-center">
+        <div className="hidden md:flex flex-1 justify-center">
+          {/* Desktop menu */}
           <div className="space-x-4">
             <Link 
               href={`/${eventSlug}`}
               className="px-4 py-2 text-primary hover:text-primary-foreground hover:bg-transparent"
             >
-              <span 
-              style={{
-                textShadow: `hsl(var(--primary-foreground)) 0px 0px 10px`
-              }}
-              >
+              <span style={{ textShadow: `hsl(var(--primary-foreground)) 0px 0px 10px` }}>
                 {t("gallery", { ns: "EventPage" })}
               </span>
             </Link>
@@ -62,8 +51,9 @@ const EventHeader: React.FC<EventHeaderProps> = async ({
             </Link>
           </div>
         </div>
-        <div className="flex-1 text-right">
-          <div className="flex flex-row justify-end space-x-4">
+        <div className="hidden md:flex flex-1 justify-end">
+          {/* Desktop buttons */}
+          <div className="flex flex-row space-x-4">
             <Button
               variant="outline"
               className="inset-0 text-accent rounded-full border-accent bg-accent/5 shadow-inner shadow-accent-500/50 hover:shadow-md hover:shadow-accent-500/50 transition-shadow duration-500 relative overflow-hidden"
@@ -82,9 +72,10 @@ const EventHeader: React.FC<EventHeaderProps> = async ({
             </p>
           </div>
         </div>
+        <div className="md:hidden">
+          <BurgerMenu lang={lang} eventSlug={eventSlug} />
+        </div>
       </div>
     </header>
   );
 };
-
-export default EventHeader;
