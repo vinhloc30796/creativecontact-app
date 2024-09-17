@@ -27,13 +27,11 @@ interface ArtworkCardProps {
 
 // Updated ArtworkCard component with credits
 export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
-  console.log(artwork);
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className="relative"
-      style={{ width: `${size}vw`, maxWidth: '600px' }}
+      className="relative w-full max-w-[40vw]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -50,11 +48,14 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
             />
           </Link>
           <div
-            className={cn(`absolute top-full left-0 right-0 py-4 px-0 transition-opacity duration-300 flex`,
-              isHovered ? 'opacity-100' : 'opacity-0'
+            className={cn(
+              `absolute top-full left-0 right-0 py-4 px-0 transition-opacity duration-300`,
+              'flex flex-col sm:flex-row', // One column by default, two columns on md and above
+              'opacity-100', // Always visible, 
+              isHovered ? 'xl:opacity-100' : 'xl:opacity-0' // hover effect on xl
             )}
           >
-            <div className="w-1/2 text-left pr-2">
+            <div className="w-full sm:w-1/2 text-left pr-0 sm:pr-2 mb-4 sm:mb-0">
               <h3 className="text-xl font-bold text-primary-foreground mb-2">{artwork.title}</h3>
               <time dateTime={artwork.createdAt.toISOString()} className="text-sm text-primary-foreground mb-2 block">
                 {artwork.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -66,7 +67,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                 </Badge>
               </div>
             </div>
-            <div className="w-1/2 text-right pl-2">
+            <div className="w-full sm:w-1/2 text-left sm:text-right pl-0 sm:pl-2">
               <ul className="text-primary-foreground">
                 {artwork.credits.map((credit, index) => {
                   // Build credit name from first name, last name, and display name
@@ -85,7 +86,6 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                   )
                 })}
               </ul>
-
             </div>
           </div>
         </>
