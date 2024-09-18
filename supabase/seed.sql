@@ -230,9 +230,7 @@ INSERT INTO artworks (
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
     CURRENT_TIMESTAMP,
     'Cosmic Harmony',
-    'An abstract representation of the universe''s interconnectedness, showcasing the delicate balance between chaos and order. The artwork explores the intricate web of relationships that bind celestial bodies, from the tiniest particles to the grandest galaxies. Through a mesmerizing blend of colors and forms, it invites viewers to contemplate their place in the vast cosmic tapestry.
-
-    The piece draws inspiration from cutting-edge scientific theories, including string theory and quantum entanglement, translating complex concepts into visually stunning imagery. It challenges observers to reconsider their perception of reality, suggesting that everything in the universe is fundamentally connected on a deep, often imperceptible level. By merging art and science, the work aims to spark curiosity and wonder about the nature of existence and our collective journey through the cosmos.'
+    E'An abstract representation of the universe''s interconnectedness, showcasing the delicate balance between chaos and order. The artwork explores the intricate web of relationships that bind celestial bodies, from the tiniest particles to the grandest galaxies. Through a mesmerizing blend of colors and forms, it invites viewers to contemplate their place in the vast cosmic tapestry.\r\nThe piece draws inspiration from cutting-edge scientific theories, including string theory and quantum entanglement, translating complex concepts into visually stunning imagery. It challenges observers to reconsider their perception of reality, suggesting that everything in the universe is fundamentally connected on a deep, often imperceptible level. By merging art and science, the work aims to spark curiosity and wonder about the nature of existence and our collective journey through the cosmos.'
 );
 
 INSERT INTO artworks (

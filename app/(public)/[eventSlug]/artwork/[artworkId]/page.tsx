@@ -98,7 +98,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     });
   const nextArtworkId = nextArtwork[0]?.id || null;
   const prevArtworkId = prevArtwork[0]?.id || null;
-  console.log(`Rendering ArtworkPage for ${currentArtwork.title} with eventSlug: ${eventSlug}`);
+  console.log(`Rendering ArtworkPage for ${currentArtwork.title} (description: ${currentArtwork.description}) with eventSlug: ${eventSlug}`);
 
   return (
     <BackgroundDiv eventSlug={eventSlug || undefined} shouldCenter={false}>
@@ -138,7 +138,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               </div>
               <div className="mt-12 mb-4">
                 <h2 className="text-xl md:text-2xl text-accent font-semibold mb-2">{t("description")}</h2>
-                <p>{currentArtwork.description}</p>
+                <p style={{whiteSpace: 'pre-line'}}>{currentArtwork.description}</p>
               </div>
               <div className="flex flex-wrap gap-2 mt-4">
                 <Badge className="text-xs text-primary-foreground">
