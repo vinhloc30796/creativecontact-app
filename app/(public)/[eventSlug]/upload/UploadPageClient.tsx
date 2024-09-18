@@ -242,10 +242,28 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       toast.success(t("UploadSuccess.title"), {
         description: t("UploadSuccess.description", { confirmedUrl }),
         action: <a href={confirmedUrl}>{t("UploadSuccess.action")}</a>,
+        onAutoClose: (t) => {
+          console.debug(`Toast with id ${t.id} has been closed automatically`)
+          // Redirect to the confirmation page
+          window.location.href = confirmedUrl
+        },
         duration: 5000,
       });
 
-      return await router.push(confirmedUrl);
+      // Redirect to the confirmation page
+      const navigationTimeout = 5000; // 5 seconds
+      const navigationPromise = router.push(confirmedUrl);
+      const timeoutPromise = new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('Navigation timeout')), navigationTimeout)
+      );
+      // Try to navigate to the confirmation page, if it fails, redirect to the confirmation page
+      try {
+        await Promise.race([navigationPromise, timeoutPromise]);
+        console.log('Navigation completed');
+      } catch (err) {
+        console.error('Navigation failed or timed out', err);
+        window.location.href = confirmedUrl;
+      }
     } catch (error) {
       console.error("error", error);
       toast.error(t("UploadFailure.title"), {
