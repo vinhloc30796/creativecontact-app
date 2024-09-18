@@ -181,29 +181,24 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                     key={asset.id}
                     className="flex w-full relative items-center justify-center"
                   >
-                      {asset.isThumbnail && (
-                        <Badge className="absolute top-2 right-2 z-10">
-                          Thumbnail
-                        </Badge>
-                      )}
-                      {asset.assetType === 'video' ? (
-                        <video
-                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
-                          controls
-                          className="max-w-full h-auto"
-                        >
-                          Your browser does not support the video tag.
-                        </video>
-                      ) : (
-                        <Image
-                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
-                          alt={`${currentArtwork.title} - Asset ${index + 1}`}
-                          sizes="(min-width: 1024px) 66vw, 100vw"
-                          width={1024}
-                          height={1024}
-                          style={{ objectFit: 'contain' }}
-                        />
-                      )}
+                    {asset.assetType === 'video' ? (
+                      <video
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
+                        controls
+                        className="max-w-full h-auto"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
+                        alt={`${currentArtwork.title} - Asset ${index + 1}`}
+                        sizes="(min-width: 1024px) 66vw, 100vw"
+                        width={1024}
+                        height={1024}
+                        style={{ objectFit: 'contain' }}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
