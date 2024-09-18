@@ -1,16 +1,26 @@
 "use server";
 
+// React and Next.js imports
+import Image from 'next/image';
+import Link from 'next/link';
+import { Suspense } from 'react';
+
+// Database ORM imports
+import { and, asc, desc, eq, gt, lt, not } from 'drizzle-orm';
+
+// UI component imports
 import { Loading } from '@/components/Loading';
 import { Badge } from "@/components/ui/badge";
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 import { EventHeader } from '@/components/wrappers/EventHeader';
+
+// Database schema imports
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
 import { userInfos } from '@/drizzle/schema/user';
+
+// Utility imports
 import { db } from '@/lib/db';
 import { useTranslation } from '@/lib/i18n/init-server';
-import { and, asc, desc, eq, gt, lt, not } from 'drizzle-orm';
-import Link from 'next/link';
-import { Suspense } from 'react';
 
 interface ArtworkPageProps {
   params: {
@@ -138,7 +148,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               </div>
               <div className="mt-12 mb-4">
                 <h2 className="text-xl md:text-2xl text-accent font-semibold mb-2">{t("description")}</h2>
-                <p style={{whiteSpace: 'pre-line'}}>{currentArtwork.description}</p>
+                <p style={{ whiteSpace: 'pre-line' }}>{currentArtwork.description}</p>
               </div>
               <div className="flex flex-wrap gap-2 mt-4">
                 <Badge className="text-xs text-primary-foreground">
@@ -169,9 +179,8 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                 {assets.map((asset, index) => asset && (
                   <div
                     key={asset.id}
-                    className="w-full flex items-center justify-center"
+                    className="flex w-full relative items-center justify-center"
                   >
-                    <div className="relative inline-block">
                       {asset.isThumbnail && (
                         <Badge className="absolute top-2 right-2 z-10">
                           Thumbnail
@@ -186,13 +195,15 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                           Your browser does not support the video tag.
                         </video>
                       ) : (
-                        <img
+                        <Image
                           src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
                           alt={`${currentArtwork.title} - Asset ${index + 1}`}
-                          className="max-w-full h-auto"
+                          sizes="(min-width: 1024px) 66vw, 100vw"
+                          width={1024}
+                          height={1024}
+                          style={{ objectFit: 'contain' }}
                         />
                       )}
-                    </div>
                   </div>
                 ))}
               </div>
