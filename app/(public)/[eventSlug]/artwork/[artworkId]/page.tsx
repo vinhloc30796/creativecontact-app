@@ -183,7 +183,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                   >
                     {asset.assetType === 'video' ? (
                       <video
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}#t=0.05`}
                         controls
                         className="max-w-full h-auto"
                       >
