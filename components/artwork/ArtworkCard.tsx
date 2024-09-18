@@ -44,7 +44,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
           <Link href={`/${eventSlug}/artwork/${artwork.id}`}>
             {isVideo ? (
               <video
-                src={assetUrl}
+                src={`${assetUrl}#t=0.05`}
                 preload="metadata"
                 controls
                 className="w-full h-auto"
