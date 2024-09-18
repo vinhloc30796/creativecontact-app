@@ -169,28 +169,30 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                 {assets.map((asset, index) => asset && (
                   <div
                     key={asset.id}
-                    className="w-full flex items-center justify-center relative"
+                    className="w-full flex items-center justify-center"
                   >
-                    {asset.isThumbnail && (
-                      <Badge className="absolute top-2 right-2 z-10">
-                        Thumbnail
-                      </Badge>
-                    )}
-                    {asset.assetType === 'video' ? (
-                      <video
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
-                        controls
-                        className="max-w-full h-auto"
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
-                        alt={`${currentArtwork.title} - Asset ${index + 1}`}
-                        className="max-w-full h-auto"
-                      />
-                    )}
+                    <div className="relative inline-block">
+                      {asset.isThumbnail && (
+                        <Badge className="absolute top-2 right-2 z-10">
+                          Thumbnail
+                        </Badge>
+                      )}
+                      {asset.assetType === 'video' ? (
+                        <video
+                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
+                          controls
+                          className="max-w-full h-auto"
+                        >
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : (
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
+                          alt={`${currentArtwork.title} - Asset ${index + 1}`}
+                          className="max-w-full h-auto"
+                        />
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
