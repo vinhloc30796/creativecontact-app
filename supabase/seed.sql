@@ -242,7 +242,7 @@ INSERT INTO artworks (
     '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
     CURRENT_TIMESTAMP,
     'The Starry Night',
-    'A depiction of the night sky with a village and a cypress tree'
+    E'A depiction of the night sky with a village and a cypress tree.\r\n\r\nThe Starry Night is an iconic painting by the Dutch post-impressionist painter Vincent van Gogh. Created in 1889, it is one of his most famous and recognizable works. The painting depicts a nocturnal landscape with a vivid depiction of the night sky, filled with swirling stars and a bright crescent moon. The central focus of the composition is a small village with a thatched-roof church and a cypress tree, which stands prominently in the foreground. The use of impasto brushstrokes and contrasting colors creates a sense of movement and depth, giving the impression of a dynamic and ever-changing sky. Van Gogh''s expressive and emotional style is evident in the swirling, almost frenzied quality of the stars and the serene, tranquil atmosphere of the village below. The Starry Night is celebrated for its ability to evoke a sense of awe and wonder, capturing the essence of the night sky and the human experience.'
 );
 
 INSERT INTO artworks (
