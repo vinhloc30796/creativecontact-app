@@ -32,7 +32,7 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
             <CreativeContactLogo className="fill-muted h-16" />
           </Link>
         </div>
-        <div className="hidden md:flex flex-1 justify-center">
+        <div className="hidden lg:flex flex-1 justify-center">
           {/* Desktop menu */}
           <div className="space-x-4">
             <Link 
@@ -51,7 +51,7 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
             </Link>
           </div>
         </div>
-        <div className="hidden md:flex flex-1 justify-end">
+        <div className="hidden lg:flex flex-1 justify-end">
           {/* Desktop buttons */}
           <div className="flex flex-row space-x-4">
             <Button
@@ -72,7 +72,7 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
             </p>
           </div>
         </div>
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <BurgerMenu lang={lang} eventSlug={eventSlug} />
         </div>
       </div>
