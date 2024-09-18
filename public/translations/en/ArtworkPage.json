@@ -1,5 +1,6 @@
 {
   "description": "Description",
+  "artwork": "Artwork",
   "artist": "Artist",
   "previousArtwork": "Previous Artwork",
   "nextArtwork": "Next Artwork",
