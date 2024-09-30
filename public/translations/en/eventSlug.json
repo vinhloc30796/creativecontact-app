@@ -24,5 +24,10 @@
   "UploadFailure": {
     "title": "Upload Failure",
     "description": "There was an error uploading your artwork: {{value}}. Please try again."
+  },
+  "UploadProgress": {
+    "title": "Uploading",
+    "description": "Uploading {{progress}}%",
+    "fileCount": "{{current}} / {{total}} files uploaded"
   }
 }

@@ -12,7 +12,8 @@ export const bucketName = 'artwork_assets'
 export const performUpload = async (
   artworkUUID: string,
   files: File[],
-  thumbnailFileName: string
+  thumbnailFileName: string,
+  onProgress: (progress: number, uploadedCount: number, totalCount: number) => void
 ) => {
   console.log("performUpload: artworkUUID", artworkUUID, "thumbnailFileName", thumbnailFileName);
   const supabase = createClient();
@@ -45,34 +46,46 @@ export const performUpload = async (
   }
 
   // Upload files
-  const uploadPromises = files.map(async (file) => {
+  let completedUploads = 0;
+  const totalFiles = files.length;
+
+  const uploadPromises = files.map(async (file, index) => {
     const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name));
-    return supabase.storage
+    const { data, error } = await supabase.storage
       .from('artwork_assets')
-      .upload(`${artworkUUID}/${normalizedFileName}`, file, { upsert: false });
+      .upload(`${artworkUUID}/${normalizedFileName}`, file, {
+        upsert: false
+      });
+
+    // Update progress after each file upload
+    completedUploads++;
+    const progress = (completedUploads / totalFiles) * 100;
+    onProgress(progress, completedUploads, totalFiles);
+
+    return { data, error, file };
   });
 
   const uploadResults = await Promise.all(uploadPromises);
 
   const { results: uploadedResults, errors: uploadErrors } = uploadResults.reduce<{ results: ThumbnailSupabaseFile[], errors: { message: string }[] }>(
-    (acc, result, index) => {
-      if (result.error) {
-        console.error('Error uploading file:', result.error.message);
-        acc.errors.push({ message: result.error.message });
-      } else if (result.data) {
-        console.log('File uploaded successfully:', result.data);
+    (acc, { data, error, file }) => {
+      if (error) {
+        console.error('Error uploading file:', error.message);
+        acc.errors.push({ message: error.message });
+      } else if (data) {
+        console.log('File uploaded successfully:', data);
         const normalizedThumbnailFileName = normalizeFileNameForS3(toNonAccentVietnamese(thumbnailFileName));
-        const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(files[index].name));
+        const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name));
         const matched = normalizedFileName === normalizedThumbnailFileName;
         if (matched) {
-          console.log("matched", matched, "for file", files[index].name);
+          console.log("matched", matched, "for file", file.name);
         }
         acc.results.push({
-          id: result.data.path,
-          path: result.data.path,
-          fullPath: result.data.fullPath,
-          name: result.data.path,
-          size: files[index].size,
+          id: data.path,
+          path: data.path,
+          fullPath: `${bucketName}/${data.path}`,
+          name: data.path,
+          size: file.size,
           isThumbnail: matched
         });
       } else {
