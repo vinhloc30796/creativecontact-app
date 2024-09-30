@@ -136,7 +136,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
           <div className="lg:w-1/3 lg:h-full lg:overflow-y-auto flex flex-col gap-4 text-primary-foreground">
             <div>
               <div>
-                <h2 className="text-xl md:text-2xl text-accent font-semibold mb-2">{t("artwork")}</h2>
+                <h2 className="text-md md:text-lg text-accent text-transform: uppercase font-semibold mb-2">{t("artwork")}</h2>
                 <h1 className="text-4xl md:text-5xl text-primary font-bold mb-4">{currentArtwork.title}</h1>
                 <p className="text-sm text-muted-foreground mb-2">
                   {new Date(currentArtwork.createdAt).toLocaleDateString(lang, {
@@ -147,7 +147,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
                 </p>
               </div>
               <div className="mt-12 mb-4">
-                <h2 className="text-xl md:text-2xl text-accent font-semibold mb-2">{t("description")}</h2>
+                <h2 className="text-md md:text-lg text-accent text-transform: uppercase font-semibold mb-2">{t("description")}</h2>
                 <p style={{ whiteSpace: 'pre-line' }}>{currentArtwork.description}</p>
               </div>
               <div className="flex flex-wrap gap-2 mt-4">
@@ -157,7 +157,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
               </div>
             </div>
             <div className="mt-12 mb-4">
-              <h2 className="text-xl md:text-2xl text-accent font-semibold mb-2">{t("artist")}</h2>
+              <h2 className="text-md md:text-lg text-accent text-transform: uppercase font-semibold mb-2">{t("artist")}</h2>
               <ul>
                 {credits.map(credit => (
                   <li key={credit.id}>
