@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react"; // Import chevron icons
 
 // Database ORM imports
 import { and, asc, desc, eq, gt, lt, not } from "drizzle-orm";
@@ -14,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { EventHeader } from "@/components/wrappers/EventHeader";
 import { EventFooter } from "@/components/wrappers/EventFooter";
+import { Button } from "@/components/ui/button"; // Import Button component
 
 // Database schema imports
 import {
@@ -131,22 +133,28 @@ export default async function ArtworkPage({
           className="mb-8"
         />
         <div className="mx-16 my-8 flex items-center justify-between">
-          <Link
-            href={
-              prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"
-            }
-            className={`text-sm font-medium text-primary-foreground transition-colors hover:underline focus-visible:underline focus-visible:outline-none ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
+          <Button
+            asChild
+            variant="outline"
+            size="icon"
+            className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
           >
-            {t("previousArtwork")}
-          </Link>
-          <Link
-            href={
-              nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"
-            }
-            className={`text-sm font-medium text-primary-foreground transition-colors hover:underline focus-visible:underline focus-visible:outline-none ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
+            <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+              <ChevronLeft className="h-4 w-4 text-primary" />
+              <span className="sr-only">{t("previousArtwork")}</span>
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="icon"
+            className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
           >
-            {t("nextArtwork")}
-          </Link>
+            <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+              <ChevronRight className="h-4 w-4 text-primary" />
+              <span className="sr-only">{t("nextArtwork")}</span>
+            </Link>
+          </Button>
         </div>
 
         {/* Artwork details and Main content */}
