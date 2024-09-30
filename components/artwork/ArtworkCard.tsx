@@ -41,7 +41,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
     >
       {artwork.thumbnail && (
         <>
-          <Link href={`/${eventSlug}/artwork/${artwork.id}`}>
+          <Link href={`/${eventSlug}/artwork/${artwork.id}`} className="relative block">
             {isVideo ? (
               <video
                 src={`${assetUrl}#t=0.05`}
@@ -58,6 +58,11 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                 objectFit="cover"
                 className="h-auto w-full"
               />
+            )}
+            {isHovered && (
+              <Badge className="absolute bottom-2 right-2 rounded-[8px] text-xs text-primary-foreground transition-opacity duration-300 bg-primary-1000/80">
+                {artwork.assets.length}
+              </Badge>
             )}
           </Link>
           <div
@@ -82,11 +87,6 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                   day: "numeric",
                 })}
               </time>
-              <div className="mb-2 flex flex-wrap gap-2">
-                <Badge className="text-xs text-primary-foreground">
-                  Assets: {artwork.assets.length}
-                </Badge>
-              </div>
             </div>
             <div className="w-full pl-0 text-left sm:w-1/2 sm:pl-2 sm:text-right">
               <ul className="text-primary-foreground">
