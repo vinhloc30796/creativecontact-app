@@ -242,7 +242,7 @@ export default async function ArtworkPage({
         </div>
 
         {/* Footer section */}
-        <EventFooter />
+        <EventFooter lang={lang} />
       </div>
     </BackgroundDiv>
   );
