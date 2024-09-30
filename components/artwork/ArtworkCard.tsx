@@ -102,10 +102,6 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                   return (
                     <li key={index}>
                       {creditName || "Anonymous"}
-                      &nbsp;
-                      <span className="text-xs italic text-primary-foreground">
-                        ({credit.title})
-                      </span>
                     </li>
                   );
                 })}
