@@ -12,7 +12,8 @@ export const bucketName = 'artwork_assets'
 export const performUpload = async (
   artworkUUID: string,
   files: File[],
-  thumbnailFileName: string
+  thumbnailFileName: string,
+  onProgress: (progress: number, uploadedCount: number, totalCount: number) => void
 ) => {
   console.log("performUpload: artworkUUID", artworkUUID, "thumbnailFileName", thumbnailFileName);
   const supabase = createClient();
@@ -45,32 +46,56 @@ export const performUpload = async (
   }
 
   // Upload files
-  for (const file of files) {
+  let completedUploads = 0;
+  const totalFiles = files.length;
+
+  const uploadPromises = files.map(async (file, index) => {
     const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name));
     const { data, error } = await supabase.storage
       .from('artwork_assets')
-      .upload(`${artworkUUID}/${normalizedFileName}`, file, { upsert: false });
-
-    if (error) {
-      console.error('Error uploading file:', error.message);
-      errors.push({ message: error.message });
-    } else {
-      console.log('File uploaded successfully:', data);
-      const normalizedThumbnailFileName = normalizeFileNameForS3(toNonAccentVietnamese(thumbnailFileName));
-      const matched = normalizedFileName === normalizedThumbnailFileName;
-      if (matched) {
-        console.log("matched", matched, "for file", file.name);
-      }
-      results.push({
-        id: data.path,
-        path: data.path,
-        fullPath: data.fullPath,
-        name: normalizedFileName,
-        size: file.size,
-        isThumbnail: matched
+      .upload(`${artworkUUID}/${normalizedFileName}`, file, {
+        upsert: false
       });
-    }
-  }
 
-  return { results, errors };
+    // Update progress after each file upload
+    completedUploads++;
+    const progress = (completedUploads / totalFiles) * 100;
+    onProgress(progress, completedUploads, totalFiles);
+
+    return { data, error, file };
+  });
+
+  const uploadResults = await Promise.all(uploadPromises);
+
+  const { results: uploadedResults, errors: uploadErrors } = uploadResults.reduce<{ results: ThumbnailSupabaseFile[], errors: { message: string }[] }>(
+    (acc, { data, error, file }) => {
+      if (error) {
+        console.error('Error uploading file:', error.message);
+        acc.errors.push({ message: error.message });
+      } else if (data) {
+        console.log('File uploaded successfully:', data);
+        const normalizedThumbnailFileName = normalizeFileNameForS3(toNonAccentVietnamese(thumbnailFileName));
+        const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name));
+        const matched = normalizedFileName === normalizedThumbnailFileName;
+        if (matched) {
+          console.log("matched", matched, "for file", file.name);
+        }
+        acc.results.push({
+          id: data.path,
+          path: data.path,
+          fullPath: `${bucketName}/${data.path}`,
+          name: data.path,
+          size: file.size,
+          isThumbnail: matched
+        });
+      } else {
+        // This should never happen, but we handle it for completeness
+        acc.errors.push({ message: "Unexpected error occurred" });
+      }
+      return acc;
+    },
+    { results: [], errors: [] }
+  );
+
+  return { results: uploadedResults, errors: uploadErrors };
 };

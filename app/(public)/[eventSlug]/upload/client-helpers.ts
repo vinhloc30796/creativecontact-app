@@ -40,8 +40,21 @@ export async function handleUserInfo(
   return { formUserId, writeUserInfoResult };
 }
 
-export async function handleFileUpload(artworkUUID: string, files: File[], thumbnailFileName: string) {
-  const { results: uploadedResults, errors: uploadErrors } = await performUpload(artworkUUID, files, thumbnailFileName);
+export async function handleFileUpload(
+  artworkUUID: string, 
+  files: File[], 
+  thumbnailFileName: string,
+  setUploadProgress: (progress: number, uploadedCount: number, totalCount: number) => void
+) {
+  const totalFileCount = files.length;
+  const { results: uploadedResults, errors: uploadErrors } = await performUpload(
+    artworkUUID, 
+    files, 
+    thumbnailFileName,
+    (progress, uploadedCount) => {
+      setUploadProgress(progress, uploadedCount, totalFileCount);
+    }
+  );
   if (uploadErrors.length > 0) {
     throw new Error(uploadErrors.join(", "));
   }

@@ -23,5 +23,10 @@
   "UploadFailure": {
     "title": "Tải thất bại",
     "description": "Có lỗi khi tải tác phẩm của bạn: {{value}}. Vui lòng thử lại."
+  },
+  "UploadProgress": {
+    "title": "Đang tải",
+    "description": "Đang tải {{progress}}%",
+    "fileCount": "{{current}} / {{total}} tệp đã tải"
   }
 }

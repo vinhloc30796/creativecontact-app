@@ -24,6 +24,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 // Hooks, contexts, i18n
 import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
 import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
@@ -34,6 +35,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
+import { useUploadStore } from "@/stores/uploadStore";
 // Utils
 import { createEmailLink } from "@/lib/links";
 import { v4 as uuidv4 } from "uuid";
@@ -83,6 +85,8 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   const { t, i18n } = useTranslation(["eventSlug", "formSteps"]);
   // Form setup
   const [formStep, setFormStep] = useState(0);
+  // Upload progress
+  const { uploadProgress, uploadedFileCount, totalFileCount, setUploadProgress, resetUploadProgress } = useUploadStore();
 
   const contactInfoForm = useForm<ContactInfoData>({
     resolver: zodResolver(contactInfoSchema),
@@ -187,6 +191,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    resetUploadProgress();
     try {
       const isValid = await validateForms();
       if (!isValid) return false;
@@ -216,7 +221,12 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
 
       // Upload files then record artwork into database
       const files = pendingFiles.map(file => new File([file], file.name, { type: file.type }));
-      const uploadedResults = await handleFileUpload(artworkUUID, files, thumbnailFileName);
+      const uploadedResults = await handleFileUpload(
+        artworkUUID, 
+        files, 
+        thumbnailFileName, 
+        setUploadProgress
+      );
       // const uploadedResults = await handleFileUploadAlwaysFails();
       const { createResult, insertArtworkEventsResult } = await handleArtworkCreation(artworkData, formUserId, eventSlug);
       console.log("Artwork created:", createResult, "and artwork events inserted:", insertArtworkEventsResult);
@@ -273,6 +283,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       return false;
     } finally {
       setIsSubmitting(false);
+      resetUploadProgress();
     }
   };
 
@@ -444,6 +455,21 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
           </div>
         </CardContent>
       </Card>
+      {/* Upload Progress Dialog */}
+      {isSubmitting && uploadProgress > 0 && (
+        <Dialog open={true} onOpenChange={() => {}}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold mb-2">{t("UploadProgress.title")}</DialogTitle>
+              <DialogDescription className="text-sm text-gray-600">{t("UploadProgress.description")}</DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-3">
+              <p className="text-sm text-gray-700">{t("UploadProgress.fileCount", { current: uploadedFileCount, total: totalFileCount })}</p>
+              <Progress value={uploadProgress} className="w-full mt-2" />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </BackgroundDiv>
   );
 }
