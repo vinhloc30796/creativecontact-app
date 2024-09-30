@@ -79,7 +79,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
               </h3>
               <time
                 dateTime={artwork.createdAt.toISOString()}
-                className="mb-2 block text-sm text-primary-foreground"
+                className="hidden"
               >
                 {artwork.createdAt.toLocaleDateString("en-US", {
                   year: "numeric",
