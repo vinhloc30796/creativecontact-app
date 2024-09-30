@@ -39,11 +39,11 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
           <div className="space-x-4">
             <Link
               href={`/${eventSlug}`}
-              className="px-4 py-2 font-bold text-primary hover:bg-transparent hover:text-primary-foreground"
+              className="px-4 py-2 font-bold text-primary hover:bg-transparent hover:text-primary-500"
             >
               <span
                 style={{
-                  textShadow: `hsl(var(--primary-foreground)) 0px 0px 10px`,
+                  textShadow: `hsl(var(--primary)) 0px 0px 10px`,
                 }}
               >
                 {t("gallery", { ns: "EventPage" })}

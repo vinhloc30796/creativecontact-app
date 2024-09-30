@@ -1,27 +1,32 @@
 "use server";
 
 // React and Next.js imports
-import Image from 'next/image';
-import Link from 'next/link';
-import { Suspense } from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
 
 // Database ORM imports
-import { and, asc, desc, eq, gt, lt, not } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, lt, not } from "drizzle-orm";
 
 // UI component imports
-import { Loading } from '@/components/Loading';
+import { Loading } from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
-import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import { EventHeader } from '@/components/wrappers/EventHeader';
-import { EventFooter } from '@/components/wrappers/EventFooter';
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
+import { EventHeader } from "@/components/wrappers/EventHeader";
+import { EventFooter } from "@/components/wrappers/EventFooter";
 
 // Database schema imports
-import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
-import { userInfos } from '@/drizzle/schema/user';
+import {
+  artworkAssets,
+  artworkCredits,
+  artworkEvents,
+  artworks,
+} from "@/drizzle/schema/artwork";
+import { userInfos } from "@/drizzle/schema/user";
 
 // Utility imports
-import { db } from '@/lib/db';
-import { useTranslation } from '@/lib/i18n/init-server';
+import { db } from "@/lib/db";
+import { useTranslation } from "@/lib/i18n/init-server";
 
 interface ArtworkPageProps {
   params: {
@@ -33,7 +38,10 @@ interface ArtworkPageProps {
   };
 }
 
-export default async function ArtworkPage({ params, searchParams }: ArtworkPageProps) {
+export default async function ArtworkPage({
+  params,
+  searchParams,
+}: ArtworkPageProps) {
   const { eventSlug, artworkId } = params;
   const lang = searchParams.lang || "en";
   const { t } = await useTranslation(lang, ["ArtworkPage", "common"]);
@@ -49,7 +57,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     .leftJoin(artworkAssets, eq(artworks.id, artworkAssets.artworkId))
     .leftJoin(artworkEvents, eq(artworks.id, artworkEvents.artworkId))
     .where(eq(artworks.id, artworkId))
-    .orderBy(desc(artworkAssets.isThumbnail)) // Sort thumbnail to the top
+    .orderBy(desc(artworkAssets.isThumbnail)); // Sort thumbnail to the top
 
   if (!artworkData || artworkData.length === 0) {
     return <div>Artwork not found</div>;
@@ -65,8 +73,8 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     .where(
       and(
         gt(artworks.createdAt, currentArtwork.createdAt),
-        not(eq(artworks.id, currentArtwork.id))
-      )
+        not(eq(artworks.id, currentArtwork.id)),
+      ),
     )
     .orderBy(asc(artworks.createdAt), asc(artworks.id))
     .limit(1);
@@ -79,8 +87,8 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     .where(
       and(
         lt(artworks.createdAt, currentArtwork.createdAt),
-        not(eq(artworks.id, currentArtwork.id))
-      )
+        not(eq(artworks.id, currentArtwork.id)),
+      ),
     )
     .orderBy(desc(artworks.createdAt), desc(artworks.id))
     .limit(1);
@@ -97,10 +105,9 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     .leftJoin(userInfos, eq(artworkCredits.userId, userInfos.id))
     .where(eq(artworkCredits.artworkId, artworkId));
 
-
   // Process and sort assets
   const assets = artworkData
-    .map(item => item.assets)
+    .map((item) => item.assets)
     .filter((asset): asset is NonNullable<typeof asset> => asset !== null)
     .sort((a, b) => {
       if (a.isThumbnail && !b.isThumbnail) return -1;
@@ -109,62 +116,86 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
     });
   const nextArtworkId = nextArtwork[0]?.id || null;
   const prevArtworkId = prevArtwork[0]?.id || null;
-  console.log(`Rendering ArtworkPage for ${currentArtwork.title} (description: ${currentArtwork.description}) with eventSlug: ${eventSlug}`);
+  console.log(
+    `Rendering ArtworkPage for ${currentArtwork.title} (description: ${currentArtwork.description}) with eventSlug: ${eventSlug}`,
+  );
 
   return (
     <BackgroundDiv eventSlug={eventSlug || undefined} shouldCenter={false}>
-      <div className="h-screen mx-auto flex flex-col">
+      <div className="mx-auto flex h-screen flex-col">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug || ""} lang={lang} stickyOverlay={false} className="mb-8" />
-        <div className="mx-16 my-8 flex justify-between items-center">
+        <EventHeader
+          eventSlug={eventSlug || ""}
+          lang={lang}
+          stickyOverlay={false}
+          className="mb-8"
+        />
+        <div className="mx-16 my-8 flex items-center justify-between">
           <Link
-            href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : '#'}
-            className={`text-sm font-medium text-primary-foreground transition-colors focus-visible:outline-none focus-visible:underline hover:underline ${!prevArtworkId ? 'pointer-events-none opacity-50' : ''}`}
+            href={
+              prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"
+            }
+            className={`text-sm font-medium text-primary-foreground transition-colors hover:underline focus-visible:underline focus-visible:outline-none ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
           >
             {t("previousArtwork")}
           </Link>
           <Link
-            href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : '#'}
-            className={`text-sm font-medium text-primary-foreground transition-colors focus-visible:outline-none focus-visible:underline hover:underline ${!nextArtworkId ? 'pointer-events-none opacity-50' : ''}`}
+            href={
+              nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"
+            }
+            className={`text-sm font-medium text-primary-foreground transition-colors hover:underline focus-visible:underline focus-visible:outline-none ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
           >
             {t("nextArtwork")}
           </Link>
         </div>
 
         {/* Artwork details and Main content */}
-        <div className="flex flex-col lg:flex-row mx-4 md:mx-8 lg:mx-16 mb-10 gap-8 overflow-y-auto h-[calc(100vh-16rem)]">
+        <div className="mx-4 mb-10 flex h-[calc(100vh-16rem)] flex-col gap-8 overflow-y-auto md:mx-8 lg:mx-16 lg:flex-row">
           {/* Artwork details */}
-          <div className="lg:w-1/3 lg:h-full lg:overflow-y-auto flex flex-col gap-4 text-primary-foreground">
+          <div className="flex flex-col gap-4 text-primary-foreground lg:h-full lg:w-1/3 lg:overflow-y-auto">
             <div>
               <div>
-                <h2 className="text-md md:text-lg text-accent text-transform: uppercase font-semibold mb-2">{t("artwork")}</h2>
-                <h1 className="text-4xl md:text-5xl text-primary font-bold mb-4">{currentArtwork.title}</h1>
-                <p className="text-sm text-muted-foreground mb-2">
+                <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
+                  {t("artwork")}
+                </h2>
+                <h1 className="mb-4 text-4xl font-bold text-primary md:text-5xl">
+                  {currentArtwork.title}
+                </h1>
+                <time
+                  className="mb-2 text-sm text-muted-foreground"
+                  dateTime={currentArtwork.createdAt.toISOString()}
+                >
                   {new Date(currentArtwork.createdAt).toLocaleDateString(lang, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
+                </time>
+              </div>
+              <div className="mb-4 mt-12">
+                <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
+                  {t("description")}
+                </h2>
+                <p style={{ whiteSpace: "pre-line" }}>
+                  {currentArtwork.description}
                 </p>
               </div>
-              <div className="mt-12 mb-4">
-                <h2 className="text-md md:text-lg text-accent text-transform: uppercase font-semibold mb-2">{t("description")}</h2>
-                <p style={{ whiteSpace: 'pre-line' }}>{currentArtwork.description}</p>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-4">
-                <Badge className="text-xs text-primary-foreground">
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Badge className="rounded-[8px] bg-primary-1000/80 text-xs text-primary-foreground">
                   Assets: {assets.length}
                 </Badge>
               </div>
             </div>
-            <div className="mt-12 mb-4">
-              <h2 className="text-md md:text-lg text-accent text-transform: uppercase font-semibold mb-2">{t("artist")}</h2>
+            <div className="mb-4 mt-12">
+              <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
+                {t("artist")}
+              </h2>
               <ul>
-                {credits.map(credit => (
+                {credits.map((credit) => (
                   <li key={credit.id}>
                     {credit.name || "Anonymous"}
                     &nbsp;
-                    <span className="text-primary-foreground text-xs italic">
+                    <span className="text-xs italic text-primary-foreground">
                       ({credit.title})
                     </span>
                   </li>
@@ -174,43 +205,45 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
           </div>
 
           {/* Main content */}
-          <main className="lg:w-2/3 flex-grow lg:overflow-y-auto">
+          <main className="flex-grow lg:w-2/3 lg:overflow-y-auto">
             <Suspense fallback={<Loading />}>
               <div className="flex flex-col items-center gap-8 pb-8">
-                {assets.map((asset, index) => asset && (
-                  <div
-                    key={asset.id}
-                    className="flex w-full relative items-center justify-center"
-                  >
-                    {asset.assetType === 'video' ? (
-                      <video
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}#t=0.05`}
-                        controls
-                        className="max-w-full h-auto"
+                {assets.map(
+                  (asset, index) =>
+                    asset && (
+                      <div
+                        key={asset.id}
+                        className="relative flex w-full items-center justify-center"
                       >
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <Image
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
-                        alt={`${currentArtwork.title} - Asset ${index + 1}`}
-                        sizes="(min-width: 1024px) 66vw, 100vw"
-                        width={1024}
-                        height={1024}
-                        style={{ objectFit: 'contain' }}
-                      />
-                    )}
-                  </div>
-                ))}
+                        {asset.assetType === "video" ? (
+                          <video
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}#t=0.05`}
+                            controls
+                            className="h-auto max-w-full"
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : (
+                          <Image
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${asset.filePath}`}
+                            alt={`${currentArtwork.title} - Asset ${index + 1}`}
+                            sizes="(min-width: 1024px) 66vw, 100vw"
+                            width={1024}
+                            height={1024}
+                            style={{ objectFit: "contain" }}
+                          />
+                        )}
+                      </div>
+                    ),
+                )}
               </div>
             </Suspense>
           </main>
         </div>
 
-
         {/* Footer section */}
         <EventFooter />
       </div>
-    </BackgroundDiv >
+    </BackgroundDiv>
   );
 }

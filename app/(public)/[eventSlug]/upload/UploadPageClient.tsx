@@ -4,12 +4,30 @@
 
 // Actions
 import { insertArtworkAssets } from "./actions";
-import { handleArtworkCreation, handleCoArtists, handleFileUpload, handleUserInfo, sendConfirmationEmail } from './client-helpers';
+import {
+  handleArtworkCreation,
+  handleCoArtists,
+  handleFileUpload,
+  handleUserInfo,
+  sendConfirmationEmail,
+} from "./client-helpers";
 // Types & Form schemas
-import { ArtworkCreditInfoData, artworkCreditInfoSchema } from "@/app/form-schemas/artwork-credit-info";
-import { ArtworkInfoData, artworkInfoSchema } from "@/app/form-schemas/artwork-info";
-import { ContactInfoData, contactInfoSchema } from "@/app/form-schemas/contact-info";
-import { ProfessionalInfoData, professionalInfoSchema } from "@/app/form-schemas/professional-info";
+import {
+  ArtworkCreditInfoData,
+  artworkCreditInfoSchema,
+} from "@/app/form-schemas/artwork-credit-info";
+import {
+  ArtworkInfoData,
+  artworkInfoSchema,
+} from "@/app/form-schemas/artwork-info";
+import {
+  ContactInfoData,
+  contactInfoSchema,
+} from "@/app/form-schemas/contact-info";
+import {
+  ProfessionalInfoData,
+  professionalInfoSchema,
+} from "@/app/form-schemas/professional-info";
 // Custom
 import { EventNotFound } from "@/app/(public)/[eventSlug]/EventNotFound";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
@@ -24,7 +42,13 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 // Hooks, contexts, i18n
 import { ArtworkProvider, useArtwork } from "@/contexts/ArtworkContext";
 import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
@@ -39,7 +63,6 @@ import { useUploadStore } from "@/stores/uploadStore";
 // Utils
 import { createEmailLink } from "@/lib/links";
 import { v4 as uuidv4 } from "uuid";
-
 
 interface UploadPageClientProps {
   eventSlug: string;
@@ -57,24 +80,41 @@ interface UploadPageClientProps {
 
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>;
 
-export default function UploadPageClient({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
+export default function UploadPageClient({
+  eventSlug,
+  eventData,
+  recentEvents,
+}: UploadPageClientProps) {
   return (
     <ArtworkProvider>
       <ThumbnailProvider>
-        <UploadPageContent eventSlug={eventSlug} eventData={eventData} recentEvents={recentEvents} />
+        <UploadPageContent
+          eventSlug={eventSlug}
+          eventData={eventData}
+          recentEvents={recentEvents}
+        />
       </ThumbnailProvider>
     </ArtworkProvider>
   );
 }
 
-function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageClientProps) {
+function UploadPageContent({
+  eventSlug,
+  eventData,
+  recentEvents,
+}: UploadPageClientProps) {
   // Router
   const router = useRouter();
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
-  const { resolveFormUserId, userData, isLoading: isUserDataLoading } = useFormUserId();
+  const {
+    resolveFormUserId,
+    userData,
+    isLoading: isUserDataLoading,
+  } = useFormUserId();
   // Context
-  const { currentArtwork, artworks, setCurrentArtwork, addArtwork } = useArtwork();
+  const { currentArtwork, artworks, setCurrentArtwork, addArtwork } =
+    useArtwork();
   const { thumbnailFileName } = useThumbnail();
   // States
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,7 +126,13 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   // Form setup
   const [formStep, setFormStep] = useState(0);
   // Upload progress
-  const { uploadProgress, uploadedFileCount, totalFileCount, setUploadProgress, resetUploadProgress } = useUploadStore();
+  const {
+    uploadProgress,
+    uploadedFileCount,
+    totalFileCount,
+    setUploadProgress,
+    resetUploadProgress,
+  } = useUploadStore();
 
   const contactInfoForm = useForm<ContactInfoData>({
     resolver: zodResolver(contactInfoSchema),
@@ -148,9 +194,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   }, [userData, isLoading, professionalInfoForm, contactInfoForm]);
 
   if (!eventData) {
-    return (
-      <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />
-    );
+    return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
   }
   const emailLink = createEmailLink(eventData);
 
@@ -171,7 +215,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
     artworkForm.setValue("description", processedData?.description || "");
     setArtworkUUID(processedData.uuid); // Update artworkUUID state
     console.log("artworkUUID set to:", processedData.uuid);
-  }
+  };
 
   // Callback function to update pending files
   const handlePendingFilesUpdate = (files: File[]) => {
@@ -186,7 +230,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       artworkCreditForm.trigger(),
     ]);
 
-    return validationResult.every(result => result === true);
+    return validationResult.every((result) => result === true);
   }
 
   const handleSubmit = async () => {
@@ -204,7 +248,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       const { formUserId, writeUserInfoResult } = await handleUserInfo(
         contactInfoData,
         professionalInfoData,
-        resolveFormUserId
+        resolveFormUserId,
       );
       console.log("Write user info successful:", writeUserInfoResult);
 
@@ -220,32 +264,47 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       }
 
       // Upload files then record artwork into database
-      const files = pendingFiles.map(file => new File([file], file.name, { type: file.type }));
+      const files = pendingFiles.map(
+        (file) => new File([file], file.name, { type: file.type }),
+      );
       const uploadedResults = await handleFileUpload(
-        artworkUUID, 
-        files, 
-        thumbnailFileName, 
-        setUploadProgress
+        artworkUUID,
+        files,
+        thumbnailFileName,
+        setUploadProgress,
       );
       // const uploadedResults = await handleFileUploadAlwaysFails();
-      const { createResult, insertArtworkEventsResult } = await handleArtworkCreation(artworkData, formUserId, eventSlug);
-      console.log("Artwork created:", createResult, "and artwork events inserted:", insertArtworkEventsResult);
+      const { createResult, insertArtworkEventsResult } =
+        await handleArtworkCreation(artworkData, formUserId, eventSlug);
+      console.log(
+        "Artwork created:",
+        createResult,
+        "and artwork events inserted:",
+        insertArtworkEventsResult,
+      );
 
       // Insert assets
-      const insertAssetsResult = await insertArtworkAssets(artworkData.uuid, uploadedResults);
+      const insertAssetsResult = await insertArtworkAssets(
+        artworkData.uuid,
+        uploadedResults,
+      );
       console.log("Insert assets successful:", insertAssetsResult);
 
       // Signup co-artists and record their info
       await handleCoArtists(artworkData, artworkCreditData, eventSlug);
 
       // Send confirmation email
-      const emailResult = await sendConfirmationEmail(contactInfoData, artworkData, eventSlug);
+      const emailResult = await sendConfirmationEmail(
+        contactInfoData,
+        artworkData,
+        eventSlug,
+      );
       const params = new URLSearchParams({
         email: contactInfoData.email,
         userId: formUserId,
         artworkId: artworkData.uuid,
-        emailSent: emailResult.success ? 'true' : 'false',
-        lang: i18n?.language || 'en',
+        emailSent: emailResult.success ? "true" : "false",
+        lang: i18n?.language || "en",
       });
 
       const confirmedUrl = `/${eventSlug}/upload-confirmed?${params.toString()}`;
@@ -253,9 +312,9 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
         description: t("UploadSuccess.description", { confirmedUrl }),
         action: <a href={confirmedUrl}>{t("UploadSuccess.action")}</a>,
         onAutoClose: (t) => {
-          console.debug(`Toast with id ${t.id} has been closed automatically`)
+          console.debug(`Toast with id ${t.id} has been closed automatically`);
           // Redirect to the confirmation page
-          window.location.href = confirmedUrl
+          window.location.href = confirmedUrl;
         },
         duration: 5000,
       });
@@ -264,14 +323,17 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       const navigationTimeout = 5000; // 5 seconds
       const navigationPromise = router.push(confirmedUrl);
       const timeoutPromise = new Promise<void>((_, reject) =>
-        setTimeout(() => reject(new Error('Navigation timeout')), navigationTimeout)
+        setTimeout(
+          () => reject(new Error("Navigation timeout")),
+          navigationTimeout,
+        ),
       );
       // Try to navigate to the confirmation page, if it fails, redirect to the confirmation page
       try {
         await Promise.race([navigationPromise, timeoutPromise]);
-        console.log('Navigation completed');
+        console.log("Navigation completed");
       } catch (err) {
-        console.error('Navigation failed or timed out', err);
+        console.error("Navigation failed or timed out", err);
         window.location.href = confirmedUrl;
       }
     } catch (error) {
@@ -313,10 +375,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
       description: t("formSteps:ArtworkInfoStep.description"),
       component: (
         <>
-          <ArtworkInfoStep
-            form={artworkForm}
-            artworks={artworks}
-          />
+          <ArtworkInfoStep form={artworkForm} artworks={artworks} />
           <Separator className="my-2" />
           <ArtworkCreditInfoStep form={artworkCreditForm} />
         </>
@@ -334,11 +393,16 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
     },
     {
       title: t("formSteps:MediaUpload.title"),
-      description: <Trans
-        i18nKey="formSteps:MediaUpload.description"
-        values={{ artworkTitle: currentArtwork?.title ?? t("formSteps:MediaUpload.fallback") }}
-        components={{ strong: <strong /> }}
-      />,
+      description: (
+        <Trans
+          i18nKey="formSteps:MediaUpload.description"
+          values={{
+            artworkTitle:
+              currentArtwork?.title ?? t("formSteps:MediaUpload.fallback"),
+          }}
+          components={{ strong: <strong /> }}
+        />
+      ),
       component: (
         <>
           <MediaUpload
@@ -367,7 +431,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
     }
 
     return (
-      <FormProvider {...currentStep.form as any}>
+      <FormProvider {...(currentStep.form as any)}>
         {currentStep.component}
       </FormProvider>
     );
@@ -376,7 +440,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
   // Extract the current step
   const currentStep = steps[formStep];
   // Calculate progress percentage
-  const progress = ((formStep + 1) / steps.length) * 100
+  const progress = ((formStep + 1) / steps.length) * 100;
 
   const handleNextStep = async () => {
     console.log("Current formStep:", formStep);
@@ -384,7 +448,8 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
     const form = currentStepData.form;
     if (form) {
       const formData = form.getValues();
-      currentStepData.handlePreSubmit && await currentStepData.handlePreSubmit(formData as any);
+      currentStepData.handlePreSubmit &&
+        (await currentStepData.handlePreSubmit(formData as any));
       const isValid = await form.trigger();
       if (isValid) {
         setFormStep((prev) => {
@@ -399,24 +464,27 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
 
   return (
     <BackgroundDiv eventSlug={eventSlug}>
-      <Card className="w-[400px] mx-auto mt-10">
+      <Card className="mx-auto mt-10 w-[400px]">
         <CardHeader
-          className="border-b aspect-video bg-accent-foreground text-accent-foreground"
+          className="aspect-video border-b bg-accent-foreground text-accent-foreground"
           style={{
             backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
             backgroundSize: "cover",
           }}
-        >
-        </CardHeader>
-        <CardContent className="p-6 flex flex-col gap-2">
-          <div
-            className="flex flex-col space-y-2 p-4 bg-primary bg-opacity-10 rounded-md"
-          >
-            <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
+        ></CardHeader>
+        <CardContent className="flex flex-col gap-2 p-6">
+          <div className="flex flex-col space-y-2 rounded-md bg-primary bg-opacity-10 p-4">
+            <h2 className="text-2xl font-semibold text-primary">
+              {currentStep.title}
+            </h2>
             <p>{currentStep.description}</p>
             <div>
-              <p className="text-muted-foreground text-sm">
-                {isLoading ? t("state.loading") : (user?.email ? t("state.loggedIn", { email: user.email }) : t("state.loggedOut"))}
+              <p className="text-sm text-muted-foreground">
+                {isLoading
+                  ? t("state.loading")
+                  : user?.email
+                    ? t("state.loggedIn", { email: user.email })
+                    : t("state.loggedOut")}
               </p>
             </div>
             <Progress value={progress} className="w-full" />
@@ -424,7 +492,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
           {/* Form */}
           {renderCurrentStep()}
           {/* Buttons */}
-          <div className="flex flex-col sm:flex-row justify-between mt-2 gap-2">
+          <div className="mt-2 flex flex-col justify-between gap-2 sm:flex-row">
             <Button
               type="button"
               onClick={() => setFormStep((prev) => Math.max(0, prev - 1))}
@@ -447,7 +515,7 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90"
+                className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
               >
                 {isSubmitting ? t("Button.submitting") : t("Button.submit")}
               </Button>
@@ -460,12 +528,21 @@ function UploadPageContent({ eventSlug, eventData, recentEvents }: UploadPageCli
         <Dialog open={true} onOpenChange={() => {}}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold mb-2">{t("UploadProgress.title")}</DialogTitle>
-              <DialogDescription className="text-sm text-gray-600">{t("UploadProgress.description")}</DialogDescription>
+              <DialogTitle className="mb-2 text-2xl font-bold">
+                {t("UploadProgress.title")}
+              </DialogTitle>
+              <DialogDescription className="text-sm text-gray-600">
+                {t("UploadProgress.description")}
+              </DialogDescription>
             </DialogHeader>
-            <div className="py-4 space-y-3">
-              <p className="text-sm text-gray-700">{t("UploadProgress.fileCount", { current: uploadedFileCount, total: totalFileCount })}</p>
-              <Progress value={uploadProgress} className="w-full mt-2" />
+            <div className="space-y-3 py-4">
+              <p className="text-sm text-gray-700">
+                {t("UploadProgress.fileCount", {
+                  current: uploadedFileCount,
+                  total: totalFileCount,
+                })}
+              </p>
+              <Progress value={uploadProgress} className="mt-2 w-full" />
             </div>
           </DialogContent>
         </Dialog>
