@@ -29,7 +29,7 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
       <div className="w-full mx-auto py-4 px-4 md:px-16 flex justify-between items-center">
         <div className="flex-1">
           <Link href={`/${eventSlug}`}>
-            <CreativeContactLogo className="fill-muted h-16" />
+            <CreativeContactLogo className="fill-muted h-8 sm:h-12 md:h-16 w-auto" />
           </Link>
         </div>
         <div className="hidden lg:flex flex-1 justify-center">
