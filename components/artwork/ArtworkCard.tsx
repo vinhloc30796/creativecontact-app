@@ -89,7 +89,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
               </time>
             </div>
             <div className="w-full pl-0 text-left sm:w-1/2 sm:pl-2 sm:text-right">
-              <ul className="text-primary-foreground">
+              <ul className="text-primary-foreground text-xs sm:text-sm md:text-base">
                 {artwork.credits.map((credit, index) => {
                   // Build credit name from first name, last name, and display name
                   let creditName = credit.user.displayName;
@@ -100,7 +100,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                     creditName = `${credit.user.firstName} ${credit.user.lastName}`;
                   }
                   return (
-                    <li key={index}>
+                    <li key={index} className="text-xs sm:text-sm md:text-base">
                       {creditName || "Anonymous"}
                     </li>
                   );
