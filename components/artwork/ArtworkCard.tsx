@@ -41,7 +41,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
     >
       {artwork.thumbnail && (
         <>
-          <Link href={`/${eventSlug}/artwork/${artwork.id}`}>
+          <Link href={`/${eventSlug}/artwork/${artwork.id}`} className="relative block">
             {isVideo ? (
               <video
                 src={`${assetUrl}#t=0.05`}
@@ -59,6 +59,11 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                 className="h-auto w-full"
               />
             )}
+            {isHovered && (
+              <Badge className="absolute bottom-2 right-2 rounded-[8px] text-xs text-primary-foreground transition-opacity duration-300 bg-primary-1000/80">
+                {artwork.assets.length}
+              </Badge>
+            )}
           </Link>
           <div
             className={cn(
@@ -74,7 +79,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
               </h3>
               <time
                 dateTime={artwork.createdAt.toISOString()}
-                className="mb-2 block text-sm text-primary-foreground"
+                className="hidden"
               >
                 {artwork.createdAt.toLocaleDateString("en-US", {
                   year: "numeric",
@@ -82,14 +87,9 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                   day: "numeric",
                 })}
               </time>
-              <div className="mb-2 flex flex-wrap gap-2">
-                <Badge className="text-xs text-primary-foreground">
-                  Assets: {artwork.assets.length}
-                </Badge>
-              </div>
             </div>
             <div className="w-full pl-0 text-left sm:w-1/2 sm:pl-2 sm:text-right">
-              <ul className="text-primary-foreground">
+              <ul className="text-primary-foreground text-xs sm:text-sm md:text-base">
                 {artwork.credits.map((credit, index) => {
                   // Build credit name from first name, last name, and display name
                   let creditName = credit.user.displayName;
@@ -100,12 +100,8 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
                     creditName = `${credit.user.firstName} ${credit.user.lastName}`;
                   }
                   return (
-                    <li key={index}>
+                    <li key={index} className="text-xs sm:text-sm md:text-base">
                       {creditName || "Anonymous"}
-                      &nbsp;
-                      <span className="text-xs italic text-primary-foreground">
-                        ({credit.title})
-                      </span>
                     </li>
                   );
                 })}
