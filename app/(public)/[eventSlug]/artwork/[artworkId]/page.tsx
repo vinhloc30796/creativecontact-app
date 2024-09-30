@@ -13,6 +13,7 @@ import { Loading } from '@/components/Loading';
 import { Badge } from "@/components/ui/badge";
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 import { EventHeader } from '@/components/wrappers/EventHeader';
+import { EventFooter } from '@/components/wrappers/EventFooter';
 
 // Database schema imports
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
@@ -208,21 +209,7 @@ export default async function ArtworkPage({ params, searchParams }: ArtworkPageP
 
 
         {/* Footer section */}
-        <footer className="fixed bottom-0 left-0 right-0 bg-primary-1000/80 z-30 shadow-md w-full">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center text-muted-foreground w-full">
-            <div className="text-left">
-              {/* Left section content */}
-            </div>
-            <div className="text-center">
-              © 2024 Creative Contact
-            </div>
-            <div className="text-right">
-              {/* Right section content */}
-              <Link href="https://www.facebook.com/creativecontact.vn" className="mr-4 hover:text-primary-foreground transition-colors duration-300">FB</Link>
-              <Link href="https://instagram.com/creativecontact_vn" className="hover:text-primary-foreground transition-colors duration-300">IG</Link>
-            </div>
-          </div>
-        </footer>
+        <EventFooter />
       </div>
     </BackgroundDiv >
   );
