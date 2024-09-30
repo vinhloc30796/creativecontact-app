@@ -169,7 +169,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </main>
 
         {/* Footer section */}
-        <EventFooter />
+        <EventFooter lang={lang}/>
       </div>
     </BackgroundDiv>
   );

@@ -3,14 +3,20 @@
 import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "@/lib/i18n/init-server";
 
 interface EventFooterProps {
   className?: string;
+  lang: string;
 }
 
 export const EventFooter: React.FC<EventFooterProps> = async ({
   className,
+  lang = 'en',
 }) => {
+  const { t } = await useTranslation(lang, "common");
+
   return (
     <footer
       className={cn(
@@ -19,7 +25,21 @@ export const EventFooter: React.FC<EventFooterProps> = async ({
       )}
     >
       <div className="container mx-auto flex w-full items-center justify-between px-4 py-4 text-muted-foreground">
-        <div className="text-left">{/* Left section content */}</div>
+        <div className="text-left flex items-center">
+          <Link
+            href={`?lang=en`}
+            className={`transition-colors duration-300 hover:text-primary-foreground ${lang === 'en' ? 'text-primary font-black' : 'font-bold'}`}
+          >
+            EN
+          </Link>
+          <Separator orientation="vertical" className="mx-2 h-4" />
+          <Link
+            href={`?lang=vi`}
+            className={`transition-colors duration-300 hover:text-primary-foreground ${lang === 'vi' ? 'text-primary font-black' : 'font-bold'}`}
+          >
+            VI
+          </Link>
+        </div>
         <div className="text-center">
           © {new Date().getFullYear()} Creative Contact
         </div>
