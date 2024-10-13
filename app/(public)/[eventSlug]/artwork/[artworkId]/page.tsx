@@ -133,35 +133,46 @@ export default async function ArtworkPage({
           className="mb-8"
         />
         <div className="mx-16 my-8 flex items-center justify-between">
-          <Button
-            asChild
-            variant="outline"
-            size="icon"
-            className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
-          >
-            <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
-              <ChevronLeft className="h-4 w-4 text-primary" />
-              <span className="sr-only">{t("previousArtwork")}</span>
+          <div className="flex justify-end gap-4">
+            <Link
+              href={`/${eventSlug}`}
+              className="flex items-center text-muted hover:underline"
+            >
+              {t("backToEvent")}
             </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="icon"
-            className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
-          >
-            <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
-              <ChevronRight className="h-4 w-4 text-primary" />
-              <span className="sr-only">{t("nextArtwork")}</span>
-            </Link>
-          </Button>
+          </div>
+          {/* Defaulting the button to here; awaiting decision before adding lg:hidden */}
+          <div className="flex justify-end gap-4">
+            <Button
+              asChild
+              variant="outline"
+              size="icon"
+              className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
+            >
+              <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+                <ChevronLeft className="h-4 w-4 text-primary" />
+                <span className="sr-only">{t("previousArtwork")}</span>
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="icon"
+              className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
+            >
+              <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+                <ChevronRight className="h-4 w-4 text-primary" />
+                <span className="sr-only">{t("nextArtwork")}</span>
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Artwork details and Main content */}
         <div className="mx-4 mb-10 flex h-[calc(100vh-16rem)] flex-col gap-8 overflow-y-auto md:mx-8 lg:mx-16 lg:flex-row">
           {/* Artwork details */}
-          <div className="flex flex-col gap-4 text-primary-foreground lg:h-full lg:w-1/3 lg:overflow-y-auto">
-            <div>
+          <div className="flex flex-col gap-4 text-primary-foreground lg:h-full lg:w-1/3 lg:overflow-y-auto relative">
+            <div className="overflow-y-auto pb-16">
               <div>
                 <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
                   {t("artwork")}
@@ -193,22 +204,49 @@ export default async function ArtworkPage({
                   Assets: {assets.length}
                 </Badge>
               </div>
+              <div className="mb-4 mt-12">
+                <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
+                  {t("artist")}
+                </h2>
+                <ul>
+                  {credits.map((credit) => (
+                    <li key={credit.id}>
+                      {credit.name || "Anonymous"}
+                      &nbsp;
+                      <span className="text-xs italic text-primary-foreground">
+                        ({credit.title})
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <div className="mb-4 mt-12">
-              <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
-                {t("artist")}
-              </h2>
-              <ul>
-                {credits.map((credit) => (
-                  <li key={credit.id}>
-                    {credit.name || "Anonymous"}
-                    &nbsp;
-                    <span className="text-xs italic text-primary-foreground">
-                      ({credit.title})
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            {/* Scaffold here, awaiting decision */}
+            <div className="absolute bottom-0 left-0 right-0 py-8 hidden">
+              <div className="flex items-center justify-start gap-4">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="icon"
+                  className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+                    <ChevronLeft className="h-4 w-4 text-primary" />
+                    <span className="sr-only">{t("previousArtwork")}</span>
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="icon"
+                  className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+                    <ChevronRight className="h-4 w-4 text-primary" />
+                    <span className="sr-only">{t("nextArtwork")}</span>
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
 

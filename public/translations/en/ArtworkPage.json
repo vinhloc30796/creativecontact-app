@@ -2,6 +2,7 @@
   "description": "Description",
   "artwork": "Artwork",
   "artist": "Artist",
+  "backToEvent": "Back to Event",
   "previousArtwork": "Previous Artwork",
   "nextArtwork": "Next Artwork",
   "underConstruction": "Under Construction",

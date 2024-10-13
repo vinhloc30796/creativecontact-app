@@ -2,6 +2,7 @@
   "description": "Mô tả",
   "artwork": "Tác phẩm",
   "artist": "Nghệ sĩ",
+  "backToEvent": "Quay lại Sự kiện",
   "previousArtwork": "Tác phẩm trước",
   "nextArtwork": "Tác phẩm sau",
   "underConstruction": "Đang xây dựng",
