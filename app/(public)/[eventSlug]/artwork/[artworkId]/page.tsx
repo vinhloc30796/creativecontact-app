@@ -132,48 +132,70 @@ export default async function ArtworkPage({
           stickyOverlay={false}
           className="mb-8"
         />
-        <div className="mx-16 my-8 flex items-center justify-between">
-          <div className="flex justify-end gap-4">
-            <Link
-              href={`/${eventSlug}`}
-              className="flex items-center text-muted hover:underline"
-            >
-              {t("backToEvent")}
-            </Link>
+        <div className="flex flex-col">
+          <div className="mx-16 my-8 flex items-center justify-between">
+            <div className="flex justify-center gap-4">
+              <Link
+                href={`/${eventSlug}`}
+                className="flex items-center text-muted hover:underline"
+              >
+                {t("backToEvent")}
+              </Link>
+            </div>
+            {/* Don't show nav buttons on desktop (because it's on the mobile footer) */}
+            <div className="flex justify-end gap-4 lg:hidden">
+              <Button
+                asChild
+                variant="outline"
+                size="icon"
+                className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
+              >
+                <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+                  <ChevronLeft className="h-4 w-4 text-primary" />
+                  <span className="sr-only">{t("previousArtwork")}</span>
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="icon"
+                className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
+              >
+                <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+                  <ChevronRight className="h-4 w-4 text-primary" />
+                  <span className="sr-only">{t("nextArtwork")}</span>
+                </Link>
+              </Button>
+            </div>
           </div>
-          {/* Defaulting the button to here; awaiting decision before adding lg:hidden */}
-          <div className="flex justify-end gap-4">
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
+          {/* Don't show artwork header on desktop (because it's on the content section) */}
+          <div className="mx-4 sticky top-0 z-10 pb-4 lg:hidden">
+            <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
+              {t("artwork")}
+            </h2>
+            <h1 className="mb-4 text-4xl font-bold text-primary md:text-5xl">
+              {currentArtwork.title}
+            </h1>
+            <time
+              className="mb-2 text-sm text-muted-foreground"
+              dateTime={currentArtwork.createdAt.toISOString()}
             >
-              <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
-                <ChevronLeft className="h-4 w-4 text-primary" />
-                <span className="sr-only">{t("previousArtwork")}</span>
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
-            >
-              <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
-                <ChevronRight className="h-4 w-4 text-primary" />
-                <span className="sr-only">{t("nextArtwork")}</span>
-              </Link>
-            </Button>
+              {new Date(currentArtwork.createdAt).toLocaleDateString(lang, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </time>
           </div>
         </div>
 
         {/* Artwork details and Main content */}
-        <div className="mx-4 mb-10 flex h-[calc(100vh-16rem)] flex-col gap-8 overflow-y-auto md:mx-8 lg:mx-16 lg:flex-row">
+        <div className="mx-4 mb-14 flex h-[calc(100vh-16rem)] overflow-y-auto flex-col gap-8 md:mx-8 lg:mx-16 lg:flex-row">
           {/* Artwork details */}
-          <div className="flex flex-col gap-4 text-primary-foreground lg:h-full lg:w-1/3 lg:overflow-y-auto relative">
-            <div className="overflow-y-auto pb-16">
-              <div>
+          <div className="flex flex-col gap-4 text-primary-foreground lg:h-full lg:w-1/3 relative">
+            <div className="pb-16">
+              {/* Artwork header: frozen on desktop, hidden on mobile */}
+              <div className="hidden sticky top-0 z-10 pb-4 lg:block">
                 <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
                   {t("artwork")}
                 </h2>
@@ -191,38 +213,41 @@ export default async function ArtworkPage({
                   })}
                 </time>
               </div>
-              <div className="mb-4 mt-12">
-                <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
-                  {t("description")}
-                </h2>
-                <p style={{ whiteSpace: "pre-line" }}>
-                  {currentArtwork.description}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Badge className="rounded-[8px] bg-primary-1000/80 text-xs text-primary-foreground">
-                  Assets: {assets.length}
-                </Badge>
-              </div>
-              <div className="mb-4 mt-12">
-                <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
-                  {t("artist")}
-                </h2>
-                <ul>
-                  {credits.map((credit) => (
-                    <li key={credit.id}>
-                      {credit.name || "Anonymous"}
-                      &nbsp;
-                      <span className="text-xs italic text-primary-foreground">
-                        ({credit.title})
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+              {/* Artwork description: scrollable separately on its own on desktop */}
+              <div className="block lg:h-[calc(100vh-32rem)] lg:overflow-y-auto">
+                <div className="mb-4 mt-12">
+                  <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
+                    {t("description")}
+                  </h2>
+                  <p style={{ whiteSpace: "pre-line" }}>
+                    {currentArtwork.description}
+                  </p>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Badge className="rounded-[8px] bg-primary-1000/80 text-xs text-primary-foreground">
+                    Assets: {assets.length}
+                  </Badge>
+                </div>
+                <div className="mb-4 mt-12">
+                  <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
+                    {t("artist")}
+                  </h2>
+                  <ul>
+                    {credits.map((credit) => (
+                      <li key={credit.id}>
+                        {credit.name || "Anonymous"}
+                        &nbsp;
+                        <span className="text-xs italic text-primary-foreground">
+                          ({credit.title})
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
-            {/* Scaffold here, awaiting decision */}
-            <div className="absolute bottom-0 left-0 right-0 py-8 hidden">
+            {/* Nav buttons: only show in footer on desktop (otherwise in the header already) */}
+            <div className="absolute bottom-0 left-0 right-0 py-4 hidden lg:block">
               <div className="flex items-center justify-start gap-4">
                 <Button
                   asChild
@@ -250,7 +275,7 @@ export default async function ArtworkPage({
             </div>
           </div>
 
-          {/* Main content */}
+          {/* Main content: scrollable always, but separate or together with artwork details depending on screen size */}
           <main className="flex-grow lg:w-2/3 lg:overflow-y-auto">
             <Suspense fallback={<Loading />}>
               <div className="flex flex-col items-center gap-8 pb-8">

@@ -20,11 +20,11 @@ export const EventFooter: React.FC<EventFooterProps> = async ({
   return (
     <footer
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-30 w-full bg-primary-1000/80 shadow-md",
+        "fixed bottom-0 left-0 right-0 z-30 w-full shadow-md",
         className,
       )}
     >
-      <div className="container mx-auto flex w-full items-center justify-between px-4 py-4 text-muted-foreground">
+      <div className="container mx-auto flex w-full h-full items-center justify-between px-4 py-4 text-muted-foreground">
         <div className="text-left flex items-center">
           <Link
             href={`?lang=en`}
@@ -40,10 +40,10 @@ export const EventFooter: React.FC<EventFooterProps> = async ({
             VI
           </Link>
         </div>
-        <div className="text-center">
+        <div className="text-center flex items-center">
           © {new Date().getFullYear()} Creative Contact
         </div>
-        <div className="text-right">
+        <div className="text-right flex items-center">
           <Link
             href="https://www.facebook.com/creativecontact.vn"
             className="mr-4 font-bold transition-colors duration-300 hover:text-primary-foreground"
