@@ -6,12 +6,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
-interface BurgerMenuProps {
+interface EventBurgerMenuProps {
   lang: string;
   eventSlug: string;
 }
 
-const BurgerMenu: React.FC<BurgerMenuProps> = ({ lang, eventSlug }) => {
+const EventBurgerMenu: React.FC<EventBurgerMenuProps> = ({ lang, eventSlug }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation(lang, "EventPage");
 
@@ -57,4 +57,4 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ lang, eventSlug }) => {
   );
 };
 
-export default BurgerMenu;
+export default EventBurgerMenu;
