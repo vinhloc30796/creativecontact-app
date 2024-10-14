@@ -25,6 +25,8 @@ export async function GET(
         about: userInfos.about,
         industries: userInfos.industries,
         experience: userInfos.experience,
+        instagramHandle: userInfos.instagramHandle,
+        facebookHandle: userInfos.facebookHandle,
       })
       .from(authUsers)
       .leftJoin(userInfos, eq(authUsers.id, userInfos.id))
@@ -41,14 +43,18 @@ export async function GET(
     const transformedData = {
       id: userData.id,
       email: userData.email || '',
-      isAnonymous: userData.isAnonymous,
-      emailConfirmedAt: userData.emailConfirmedAt,
       firstName: userData.firstName || '',
       lastName: userData.lastName || '',
       phone: userData.phone || '',
+      isAnonymous: userData.isAnonymous,
+      emailConfirmedAt: userData.emailConfirmedAt,
+      location: userData.location || '',
+      occupation: userData.occupation || '',
+      about: userData.about || '',
       industries: userData.industries || [],
-      experience: userData.experience,
-      // Add other fields as needed
+      experience: userData.experience || '',
+      instagramHandle: userData.instagramHandle,
+      facebookHandle: userData.facebookHandle,
     };
 
     return NextResponse.json(transformedData);

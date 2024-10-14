@@ -3,10 +3,9 @@
 
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-// import { IntlProvider } from "react-intl";
+import React, { useState } from "react";
 import { I18nProvider } from "@/lib/i18n/i18nProvider";
 import { languages } from "@/lib/i18n/settings";
 import { Suspense } from "react";
@@ -27,8 +26,29 @@ export async function SearchParamsProvider({ children }: { children: React.React
   )
 }
 
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000,
+      },
+    },
+  })
+}
+
+let browserQueryClient: QueryClient | undefined = undefined
+
+function getQueryClient() {
+  if (isServer) {
+    return makeQueryClient()
+  } else {
+    if (!browserQueryClient) browserQueryClient = makeQueryClient()
+    return browserQueryClient
+  }
+}
+
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = React.useState(() => new QueryClient())
+  const queryClient = getQueryClient()
 
   return (
     <ThemeProvider>
@@ -40,6 +60,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           </SearchParamsProvider>
         </Suspense>
       </QueryClientProvider>
-    </ThemeProvider >
+    </ThemeProvider>
   )
 }

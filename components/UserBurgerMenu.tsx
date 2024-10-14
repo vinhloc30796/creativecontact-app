@@ -11,7 +11,7 @@ interface UserBurgerMenuProps {
   isLoggedIn: boolean;
 }
 
-const UserBurgerMenu: React.FC<UserBurgerMenuProps> = ({ lang, isLoggedIn }) => {
+export const UserBurgerMenu: React.FC<UserBurgerMenuProps> = ({ lang, isLoggedIn }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation(lang, "UserPage");
 
@@ -51,5 +51,3 @@ const UserBurgerMenu: React.FC<UserBurgerMenuProps> = ({ lang, isLoggedIn }) => 
     </div>
   );
 };
-
-export default UserBurgerMenu;

@@ -1,33 +1,9 @@
 import { getUserId } from '@/app/actions/user/auth';
 import { signUpUser } from "@/app/actions/user/signUp";
-import { authUsers, userInfos } from '@/drizzle/schema/user';
+import { fetchUserData } from '@/app/api/user/helper';
 import { useAuth } from '@/hooks/useAuth';
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ExperienceLevel, Industry, UserInfo } from '@/app/types/UserInfo';
-
-export interface UserData extends Omit<UserInfo, 'experience'> {
-  email: string;
-  isAnonymous: boolean;
-  emailConfirmedAt: Date | null;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  instagramHandle: string | null;
-  facebookHandle: string | null;
-  industries: Industry[];
-  experience: ExperienceLevel | null;
-}
-
-async function fetchUserData(userId: string): Promise<UserData | null> {
-  const response = await fetch(`/api/user/${userId}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch user data');
-  }
-  return response.json();
-}
+import { useCallback } from 'react';
 
 // Either:
 // - formData.email is a confirmed email address (getUserId is not null)

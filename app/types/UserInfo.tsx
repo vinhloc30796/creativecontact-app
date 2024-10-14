@@ -37,3 +37,23 @@ export interface UserInfo {
   industries: Industry[] | null;
   experience: ExperienceLevel;
 }
+
+export interface UserData extends Omit<UserInfo, 'experience'> {
+  // UserInfo fields
+  id: string;
+  displayName: string | null;
+  location: string | null;
+  occupation: string | null;
+  about: string | null;
+  // new fields
+  email: string;
+  isAnonymous: boolean;
+  emailConfirmedAt: Date | null;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  instagramHandle: string | null;
+  facebookHandle: string | null;
+  industries: Industry[];
+  experience: ExperienceLevel | null;
+}

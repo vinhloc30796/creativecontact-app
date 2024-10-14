@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
-import UserBurgerMenu from "@/components/UserBurgerMenu";
+import { UserBurgerMenu } from "@/components/UserBurgerMenu";
 
 interface UserHeaderProps {
   lang: string;

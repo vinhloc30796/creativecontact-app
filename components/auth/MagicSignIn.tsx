@@ -1,14 +1,12 @@
 // File: app/(public)/(event)/checkin/_sections/MagicSignIn.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { handleMagicLinkRequest } from '../../app/(public)/(event)/checkin/_utils/apiHelpers';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { handleMagicLinkRequest } from '@/app/(public)/(event)/checkin/_utils/apiHelpers';
 
 interface MagicSignInProps {
   purpose: 'login' | 'checkin';
