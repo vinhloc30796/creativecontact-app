@@ -1,12 +1,13 @@
 "use server";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from "@/lib/i18n/init-server";
 import { SiGithub, SiLinkedin, SiX } from "@icons-pack/react-simple-icons";
+import { useServerAuth } from '@/hooks/useServerAuth';
 
 
 interface ProfilePageProps {
@@ -29,13 +30,15 @@ async function getUserSkills(userId?: string) {
 
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
+  // User
   const lang = params.lang || "en";
   const { t } = await useTranslation(lang, "ProfilePage");
+  const { user, isLoggedIn, isAnonymous } = await useServerAuth();
 
   return (
     <BackgroundDiv>
       <div className="min-h-screen flex flex-col w-full">
-        <UserHeader lang={lang} className="bg-background/80 backdrop-blur-sm" />
+        <UserHeader lang={lang} isLoggedIn={isLoggedIn} className="bg-background/80 backdrop-blur-sm" />
         <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
           <div className="w-full px-4 sm:px-8 md:px-16">
             <div className="flex flex-col lg:flex-row">
