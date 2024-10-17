@@ -89,6 +89,77 @@ INSERT INTO auth.users (
     NULL,                                    -- deleted_at
     true                                     -- is_anonymous
 );
+INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    invited_at,
+    confirmation_token,
+    confirmation_sent_at,
+    recovery_token,
+    recovery_sent_at,
+    email_change_token_new,
+    email_change,
+    email_change_sent_at,
+    last_sign_in_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    is_super_admin,
+    created_at,
+    updated_at,
+    phone,
+    phone_confirmed_at,
+    phone_change,
+    phone_change_token,
+    phone_change_sent_at,
+    email_change_token_current,
+    email_change_confirm_status,
+    banned_until,
+    reauthentication_token,
+    reauthentication_sent_at,
+    is_sso_user,
+    deleted_at,
+    is_anonymous
+) VALUES (
+    '00000000-0000-0000-0000-000000000000',                             -- instance_id
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',                             -- id
+    'authenticated',                                                    -- aud
+    'authenticated',                                                    -- role
+    'vinhloc30796@gmail.com',                                           -- email
+    '',                                                                 -- encrypted_password
+    '2024-07-31 13:29:02.204237+00',                                    -- email_confirmed_at
+    NULL,                                                               -- invited_at
+    '',                                                                 -- confirmation_token
+    '2024-07-31 13:29:02.201874+00',                                    -- confirmation_sent_at
+    '',                                                                 -- recovery_token
+    NULL,                                                               -- recovery_sent_at
+    '',                                                                 -- email_change_token_new
+    '',                                                                 -- email_change
+    NULL,                                                               -- email_change_sent_at
+    '2024-07-31 13:29:02.201874+00',                                    -- last_sign_in_at
+    '{"provider": ["email"], "providers": ["email", "github"]}'::jsonb, -- raw_app_meta_data
+    '{"type": "user", "email": "vinhloc30796@gmail.com"}'::jsonb,       -- raw_user_meta_data
+    NULL,                                                               -- is_super_admin
+    '2024-07-31 13:29:02.199319+00',                                    -- created_at
+    '2024-07-31 13:29:02.204237+00',                                    -- updated_at
+    NULL,                                                               -- phone
+    NULL,                                                               -- phone_confirmed_at
+    '',                                                                 -- phone_change
+    '',                                                                 -- phone_change_token
+    NULL,                                                               -- phone_change_sent_at
+    '',                                                                 -- email_change_token_current
+    0,                                                                  -- email_change_confirm_status
+    NULL,                                                               -- banned_until
+    '',                                                                 -- reauthentication_token
+    NULL,                                                               -- reauthentication_sent_at
+    false,                                                              -- is_sso_user
+    NULL,                                                               -- deleted_at
+    false                                                               -- is_anonymous
+);
 
 -- Seed data for user_infos table
 INSERT INTO user_infos (
@@ -130,6 +201,19 @@ INSERT INTO user_infos (
     'Entry',
     'user_insta',
     'user_fb'
+), (
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',
+    'Hoang Vinh Loc',
+    'Nguyen',
+    'Vinh Loc Nguyen',
+    '+1234567890',
+    'Lam Dong, Vietnam',
+    'Software Developer',
+    'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
+    ARRAY['Software and Interactive']::industry[],
+    'Senior',
+    'vl307',
+    'vl307'
 );
 
 -- Seed data for events table
