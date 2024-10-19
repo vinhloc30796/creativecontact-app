@@ -19,7 +19,7 @@ export const UserHeader: React.FC<UserHeaderProps> = async ({
   lang,
   className,
   stickyOverlay = true,
-  isLoggedIn, // Add the new prop to the component parameters
+  isLoggedIn,
 }) => {
   const { t } = await useTranslation(lang, "UserPage");
   const headerLayoutClassName = stickyOverlay
@@ -83,7 +83,7 @@ export const UserHeader: React.FC<UserHeaderProps> = async ({
               )}
             </div>
           </div>
-          <div className="lg:hidden">
+          <div className="lg:hidden ml-auto">
             <UserBurgerMenu lang={lang} isLoggedIn={isLoggedIn} />
           </div>
         </div>
