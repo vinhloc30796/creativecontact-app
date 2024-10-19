@@ -1,16 +1,18 @@
 "use server";
 
+import { fetchUserData } from "@/app/api/user/helper";
+import { ExperienceLevel, Industry, UserData } from "@/app/types/UserInfo";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
-import { useTranslation } from "@/lib/i18n/init-server";
-import { SiGithub, SiLinkedin, SiX, SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
 import { useServerAuth } from "@/hooks/useServerAuth";
-import { UserData } from "@/app/types/UserInfo";
-import { fetchUserData } from "@/app/api/user/helper";
+import { useTranslation } from "@/lib/i18n/init-server";
+import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
 import { TFunction } from "i18next";
-import { Mail, Phone, MapPin, UserCircle, CheckCircle, MessageSquare, UserPlus, Share2 } from 'lucide-react'
+import { Separator } from "@/components/ui/separator";
+import { Briefcase, CheckCircle, Mail, MapPin, MessageSquare, Phone, Share2, TrendingUp, UserCircle, UserPlus, Users } from 'lucide-react';
 import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
@@ -24,6 +26,14 @@ interface UserSkills {
   name: string;
 }
 
+interface UserContacts {
+  id: number;
+  name: string;
+  industries: Industry[];
+  experience: ExperienceLevel;
+  location?: string;
+}
+
 async function getUserSkills(userId?: string): Promise<UserSkills[]> {
   // TODO: Implement actual skill fetching logic
   // This is a placeholder implementation
@@ -33,6 +43,16 @@ async function getUserSkills(userId?: string): Promise<UserSkills[]> {
     { id: 3, name: "Node.js" },
     { id: 4, name: "TypeScript" },
     { id: 5, name: "GraphQL" },
+  ];
+}
+
+async function getUserContacts(userId?: string): Promise<UserContacts[]> {
+  // TODO: Implement actual contact fetching logic
+  // This is a placeholder implementation
+  return [
+    { id: 1, name: "John Doe", industries: ["Software and Interactive", "Design"], experience: "Mid-level", location: "San Francisco, CA" },
+    { id: 2, name: "Jane Doe", industries: ["Publishing", "Arts and Crafts"], experience: "Senior", location: "New York, NY" },
+    { id: 3, name: "John Smith", industries: ["Film, Video, and Photography", "Music"], experience: "Manager", location: "Los Angeles, CA" },
   ];
 }
 
@@ -66,26 +86,36 @@ function ProfileCard({
   t,
   userData,
   userSkills,
+  imageUrl,
   showButtons = false
 }: {
   t: TFunction;
   userData: UserData;
   userSkills: UserSkills[];
+  imageUrl: string;
   showButtons?: boolean;
 }) {
+  const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
   return (
     <div className="mt-6 w-full overflow-y-auto lg:mt-0 lg:w-1/3 lg:pl-6">
-      <Card className="p-6">
+      <Card className="flex flex-col h-full">
         <CardHeader className="flex flex-col items-center">
+          <div className="mb-4 w-24 h-24 overflow-hidden rounded-lg">
+            <img
+              src={imageUrl}
+              alt={`${name}'s profile`}
+              className="w-full h-full object-cover"
+            />
+          </div>
           <CardTitle className="mb-2 text-2xl font-bold flex items-center">
             <UserCircle className="mr-2 h-6 w-6" />
-            {userData.firstName} {userData.lastName}
+            {name}
           </CardTitle>
           <div className="mb-2 flex items-center">
-            <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-800 flex items-center">
+            <Badge variant="success" className="flex items-center">
               <CheckCircle className="mr-1 h-3 w-3" />
               {t("openToCollab")}
-            </span>
+            </Badge>
           </div>
           <p className="mb-4 text-sm text-gray-500 flex items-center">
             <MapPin className="mr-1 h-4 w-4" />
@@ -93,10 +123,6 @@ function ProfileCard({
           </p>
           {showButtons && (
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <MessageSquare className="mr-1 h-4 w-4" />
-                {t("message")}
-              </Button>
               <Button variant="outline" size="sm">
                 <UserPlus className="mr-1 h-4 w-4" />
                 {t("connect")}
@@ -107,26 +133,28 @@ function ProfileCard({
               </Button>
             </div>
           )}
+          {userData.about && (
+            <section data-section="about" className="pt-4">
+              <h3 className="mb-2 text-lg font-semibold">{t("about")}</h3>
+              <p>{userData.about}</p>
+            </section>
+          )}
         </CardHeader>
-        <CardContent>
+        <Separator className="my-4" />
+        <CardContent className="mt-4">
           <div className="space-y-6">
-            {userData.about && (
-              <section data-section="about">
-                <h3 className="mb-2 text-lg font-semibold">{t("about")}</h3>
-                <p>{userData.about}</p>
-              </section>
-            )}
             {userData.industries && userData.industries.length > 0 && (
               <section data-section="industry">
                 <h3 className="mb-2 text-lg font-semibold">{t("industry")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {userData.industries.map((industry) => (
-                    <span
+                    <Badge
                       key={industry}
-                      className="rounded-full bg-primary-100 px-2 py-1 text-xs text-primary-800"
+                      variant="default"
+                      className="text-xs"
                     >
                       {industry}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </section>
@@ -141,17 +169,19 @@ function ProfileCard({
               <section data-section="skills">
                 <h3 className="mb-2 text-lg font-semibold">{t("skills")}</h3>
                 <div className="flex flex-wrap gap-2">
-                {userSkills.map((skill) => (
-                  <span
-                    key={skill.id}
-                    className="rounded-full bg-primary-100 px-2 py-1 text-xs text-primary-800"
-                  >
-                    {skill.name}
-                  </span>
-                ))}
-              </div>
+                  {userSkills.map((skill) => (
+                    <Badge
+                      key={skill.id}
+                      variant="secondary"
+                      className="text-xs"
+                    >
+                      {skill.name}
+                    </Badge>
+                  ))}
+                </div>
               </section>
             )}
+            <Separator className="my-4" />
             <section data-section="contact">
               <h3 className="mb-2 text-lg font-semibold">{t("contact")}</h3>
               <ul className="space-y-2">
@@ -179,6 +209,7 @@ function ProfileCard({
                 )}
               </ul>
             </section>
+            <Separator className="my-4" />
             {userData && (
               <section data-section="social-links">
                 <h3 className="mb-2 text-lg font-semibold">{t("socialLinks")}</h3>
@@ -202,7 +233,84 @@ function ProfileCard({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
+  );
+}
+
+function ContactCard({
+  t,
+  userData,
+  imageUrl,
+  showButtons = false
+}: {
+  t: TFunction;
+  userData: UserData;
+  imageUrl?: string;
+  showButtons?: boolean;
+}) {
+  const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+  const contactImage = imageUrl || placeholderImage;
+
+  return (
+    <Card className="flex flex-col h-full">
+      <CardHeader className="p-0 overflow-hidden">
+        <div className="relative w-full h-48">
+          <img
+            src={contactImage}
+            alt={`${userData.displayName}'s profile`}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
+          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+            <CardTitle className="text-2xl font-bold flex items-center mb-2">
+              <UserCircle className="mr-2 h-6 w-6" />
+              {userData.displayName}
+            </CardTitle>
+            <div className="mb-2 flex items-center">
+              <Badge variant="success" className="flex items-center">
+                <CheckCircle className="mr-1 h-3 w-3" />
+                {t("openToCollab")}
+              </Badge>
+            </div>
+          </div>
+
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex-grow p-4">
+        <ul className="space-y-3">
+          {userData.industries && userData.industries.length > 0 && (
+            <li className="flex items-center">
+              <Briefcase className="mr-2 h-4 w-4 flex-shrink-0" />
+              <div className="flex flex-wrap gap-2">
+                {userData.industries.map((industry, index) => (
+                  <Badge key={index} variant="secondary">{industry}</Badge>
+                ))}
+              </div>
+            </li>
+          )}
+          {userData.experience && (
+            <li className="flex items-center">
+              <TrendingUp className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span>{userData.experience}</span>
+            </li>
+          )}
+          {userData.location && (
+            <li className="flex items-center">
+              <MapPin className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span>{userData.location}</span>
+            </li>
+          )}
+        </ul>
+      </CardContent>
+
+      <CardFooter className="mt-auto p-4 pt-2 border-t">
+        <a href="#" className="text-primary hover:underline">
+          {t("seeMore")}
+        </a>
+      </CardFooter>
+    </Card>
   );
 }
 
@@ -229,6 +337,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
   // Fetch user skills
   const userSkills = await getUserSkills(userData?.id);
+
+  // Image
+  const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+  const contactImage = placeholderImage; // TODO: Implement actual image fetching logic
 
   return (
     <BackgroundDiv>
@@ -264,31 +376,29 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     </a>
                   </nav>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{t("card1Title")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{t("card1Content")}</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{t("card2Title")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{t("card2Content")}</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{t("card3Title")}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{t("card3Content")}</p>
-                    </CardContent>
-                  </Card>
+                <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+                  {userData && (
+                    <>
+                      {getUserContacts(userData.id).then((contacts) =>
+                        contacts.map((contact) => (
+                          <ContactCard
+                            key={contact.id}
+                            t={t}
+                            userData={{
+                              ...userData,
+                              firstName: contact.name.split(' ')[0],
+                              lastName: contact.name.split(' ')[1] || '',
+                              displayName: contact.name, // Add displayName
+                              industries: contact.industries,
+                              experience: contact.experience,
+                              location: contact.location || null
+                            }}
+                            showButtons={false}
+                          />
+                        ))
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
               {userData && (
@@ -296,6 +406,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   t={t}
                   userData={userData}
                   userSkills={userSkills}
+                  imageUrl={contactImage}
                 />
               )}
             </div>
