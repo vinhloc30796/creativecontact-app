@@ -4,6 +4,7 @@ INSERT INTO auth.users (
     id,
     aud,
     role,
+    email,
     last_sign_in_at,
     created_at,
     updated_at,
@@ -13,6 +14,7 @@ INSERT INTO auth.users (
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',  -- id
     'authenticated',                         -- aud
     'authenticated',                         -- role
+    'admin@lukewarm.io',                     -- email
     '2024-07-31 13:29:02.201874+00',         -- last_sign_in_at
     '2024-07-31 13:29:02.199319+00',         -- created_at
     '2024-07-31 13:29:02.204237+00',         -- updated_at
@@ -479,4 +481,15 @@ INSERT INTO artwork_assets (
     CURRENT_TIMESTAMP,
     'artwork_assets',
     true
+);
+
+-- Seed contacts table
+INSERT INTO contacts (
+    id,
+    user_id,
+    contact_id
+) VALUES (
+    '12912ab4-4e74-42d5-8977-cb387fba64b6',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8', -- vinhloc30796@gmail.com
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- admin@lukewarm.io
 );
