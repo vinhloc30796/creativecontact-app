@@ -1,6 +1,4 @@
 import { z } from "zod";
-import { experienceLevels } from "@/app/types/UserInfo";
-import { industries } from "@/app/types/UserInfo";
 
 export const contactInfoSchema = z.object({
   email: z.string().email("Invalid email address"),

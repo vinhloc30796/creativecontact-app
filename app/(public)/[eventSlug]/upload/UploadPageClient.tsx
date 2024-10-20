@@ -180,9 +180,9 @@ function UploadPageContent({
       // Auto-fill form fields
       contactInfoForm.reset({
         email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        phone: userData.phone,
+        firstName: userData.firstName ?? '',
+        lastName: userData.lastName ?? '',
+        phone: userData.phone ?? '',
         instagramHandle: userData.instagramHandle || undefined,
         facebookHandle: userData.facebookHandle || undefined,
       });

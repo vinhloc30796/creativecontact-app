@@ -12,6 +12,7 @@ import { ProfessionalInfoData } from "@/app/form-schemas/professional-info";
 // Utils
 import { performUpload } from "./client";
 import { ContactInfoData } from "@/app/form-schemas/contact-info";
+import { Industry, ExperienceLevel } from "@/app/types/UserInfo";
 
 export async function handleUserInfo(
   contactInfoData: ContactInfoData,
@@ -27,8 +28,8 @@ export async function handleUserInfo(
       lastName: contactInfoData.lastName,
     },
     {
-      industries: professionalInfoData.industries,
-      experience: professionalInfoData.experience,
+      industries: professionalInfoData.industries as Industry[],
+      experience: professionalInfoData.experience as ExperienceLevel | null,
     },
     {
       instagramHandle: contactInfoData.instagramHandle,

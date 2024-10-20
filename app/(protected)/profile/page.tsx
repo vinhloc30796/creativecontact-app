@@ -1,6 +1,6 @@
 "use server";
 
-import { fetchUserContacts } from "@/app/api/user/[id]/contacts/route";
+import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
