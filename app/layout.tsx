@@ -6,11 +6,17 @@ import React from 'react'
 import { plusJakartaSans } from './fonts'
 import './globals.css'
 import Providers from './providers'
+import dynamic from 'next/dynamic'
 
 export const metadata: Metadata = {
   title: 'Creative Contact',
   description: 'Vietnamese Creative Network',
 }
+
+const PostHogPageView = dynamic(() => import('@/components/analytics/PostHogPageView'), {
+  ssr: false,
+})
+
 
 interface RootLayoutProps {
   children: React.ReactNode
@@ -27,6 +33,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
         <Providers>
           {children}
+          <PostHogPageView />
         </Providers>
       </body>
     </html>
