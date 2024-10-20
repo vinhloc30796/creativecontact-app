@@ -1,18 +1,20 @@
 "use server";
 
+import { fetchUserContacts } from "@/app/api/user/[id]/contacts/route";
 import { fetchUserData } from "@/app/api/user/helper";
-import { ExperienceLevel, Industry, UserData } from "@/app/types/UserInfo";
+import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
+import { UserInfo } from "@/drizzle/schema/user";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
 import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
 import { TFunction } from "i18next";
-import { Separator } from "@/components/ui/separator";
-import { Briefcase, CheckCircle, Mail, MapPin, MessageSquare, Phone, Share2, TrendingUp, UserCircle, UserPlus, Users } from 'lucide-react';
+import { Briefcase, CheckCircle, Mail, MapPin, Phone, Share2, TrendingUp, UserCircle, UserPlus } from 'lucide-react';
 import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
@@ -24,14 +26,6 @@ interface ProfilePageProps {
 interface UserSkills {
   id: number;
   name: string;
-}
-
-interface UserContacts {
-  id: number;
-  name: string;
-  industries: Industry[];
-  experience: ExperienceLevel;
-  location?: string;
 }
 
 async function getUserSkills(userId?: string): Promise<UserSkills[]> {
@@ -46,14 +40,20 @@ async function getUserSkills(userId?: string): Promise<UserSkills[]> {
   ];
 }
 
-async function getUserContacts(userId?: string): Promise<UserContacts[]> {
-  // TODO: Implement actual contact fetching logic
-  // This is a placeholder implementation
-  return [
-    { id: 1, name: "John Doe", industries: ["Software and Interactive", "Design"], experience: "Mid-level", location: "San Francisco, CA" },
-    { id: 2, name: "Jane Doe", industries: ["Publishing", "Arts and Crafts"], experience: "Senior", location: "New York, NY" },
-    { id: 3, name: "John Smith", industries: ["Film, Video, and Photography", "Music"], experience: "Manager", location: "Los Angeles, CA" },
-  ];
+async function getUserContacts(userId?: string): Promise<UserData[]> {
+  if (!userId) {
+    return [];
+  }
+
+  const contacts = await fetchUserContacts(userId);
+
+  // Map UserInfo to UserData
+  return contacts.map(contact => ({
+    ...contact,
+    email: '', // Add a default empty string or fetch the actual email
+    isAnonymous: false, // Set a default value
+    emailConfirmedAt: null, // Set a default value
+  }));
 }
 
 const socialMediaMapper = {
@@ -384,15 +384,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                           <ContactCard
                             key={contact.id}
                             t={t}
-                            userData={{
-                              ...userData,
-                              firstName: contact.name.split(' ')[0],
-                              lastName: contact.name.split(' ')[1] || '',
-                              displayName: contact.name, // Add displayName
-                              industries: contact.industries,
-                              experience: contact.experience,
-                              location: contact.location || null
-                            }}
+                            userData={contact}
                             showButtons={false}
                           />
                         ))
