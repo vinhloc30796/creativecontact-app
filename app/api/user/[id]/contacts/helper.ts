@@ -24,6 +24,7 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
       phone: userInfos.phone,
       instagramHandle: userInfos.instagramHandle,
       facebookHandle: userInfos.facebookHandle,
+      profilePicture: userInfos.profilePicture,
     })
     .from(userInfos)
     .innerJoin(authUsers, eq(authUsers.id, userInfos.id))
