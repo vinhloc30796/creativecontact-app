@@ -175,6 +175,7 @@ INSERT INTO user_infos (
     about,
     industries,
     experience,
+    profile_picture,
     instagram_handle,
     facebook_handle
 ) VALUES (
@@ -188,6 +189,7 @@ INSERT INTO user_infos (
     'Experienced creative technologist with a passion for integrating cutting-edge technology into artistic projects and interactive experiences.',
     ARRAY['Software and Interactive', 'Other']::industry[],
     'Senior',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d/lukewarm._Abstract_expressionism_emerald-powered_river-dwelling_9c99d61d-cd4b-4534-8a4e-ee60d1862ed2.png',
     'admin_insta',
     'admin_fb'
 ), (
@@ -201,6 +203,7 @@ INSERT INTO user_infos (
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
     ARRAY['Software and Interactive']::industry[],
     'Entry',
+    NULL,
     'user_insta',
     'user_fb'
 ), (
@@ -214,6 +217,7 @@ INSERT INTO user_infos (
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
     ARRAY['Software and Interactive']::industry[],
     'Senior',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8/lukewarm._a_river_water-elemental_lion_drawing_power_from_emera_cd875218-db8a-4ab4-afdd-a00a1a6deb49.png',
     'vl307',
     'vl307'
 );
