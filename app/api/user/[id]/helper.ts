@@ -20,6 +20,7 @@ export async function fetchUserData(userId: string) {
         experience: userInfos.experience,
         instagramHandle: userInfos.instagramHandle,
         facebookHandle: userInfos.facebookHandle,
+        profilePicture: userInfos.profilePicture,
       })
       .from(authUsers)
       .leftJoin(userInfos, eq(authUsers.id, userInfos.id))
@@ -48,5 +49,6 @@ export async function fetchUserData(userId: string) {
       experience: userData.experience || '',
       instagramHandle: userData.instagramHandle,
       facebookHandle: userData.facebookHandle,
+      profilePicture: userData.profilePicture,
     };
   }

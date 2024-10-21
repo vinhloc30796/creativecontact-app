@@ -86,23 +86,23 @@ function ProfileCard({
   t,
   userData,
   userSkills,
-  imageUrl,
   showButtons = false
 }: {
   t: TFunction;
   userData: UserData;
   userSkills: UserSkills[];
-  imageUrl: string;
   showButtons?: boolean;
 }) {
   const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
+  const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
+
   return (
     <div className="mt-6 w-full overflow-y-auto lg:mt-0 lg:w-1/3 lg:pl-6">
       <Card className="flex flex-col h-full">
         <CardHeader className="flex flex-col items-center">
           <div className="mb-4 w-24 h-24 overflow-hidden rounded-lg">
             <img
-              src={imageUrl}
+              src={profilePictureUrl}
               alt={`${name}'s profile`}
               className="w-full h-full object-cover"
             />
@@ -398,7 +398,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   t={t}
                   userData={userData}
                   userSkills={userSkills}
-                  imageUrl={contactImage}
                 />
               )}
             </div>

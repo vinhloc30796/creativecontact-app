@@ -73,6 +73,7 @@ export const userInfos = pgTable('user_infos', {
   about: text('about'),
   industries: industryEnum('industries').array(),
   experience: experienceEnum('experience'),
+  profilePicture: text('profile_picture'),
   instagramHandle: text('instagram_handle'),
   facebookHandle: text('facebook_handle'),
 });
