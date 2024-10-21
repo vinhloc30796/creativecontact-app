@@ -19,6 +19,8 @@ import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
   params: {
+  };
+  searchParams: {
     lang: string;
   };
 }
@@ -312,9 +314,9 @@ function ContactCard({
   );
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
+export default async function ProfilePage({ params, searchParams }: ProfilePageProps) {
   // User
-  const lang = params.lang || "en";
+  const lang = searchParams.lang || "en";
   const { t } = await useTranslation(lang, "ProfilePage");
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
 
