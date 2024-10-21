@@ -119,6 +119,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         about: null,
         industries: null,
         experience: 'Entry',
+        profilePicture: null,
         instagramHandle: null,
         facebookHandle: null
       };
