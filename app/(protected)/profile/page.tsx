@@ -379,16 +379,29 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                 <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                   {userData && (
                     <>
-                      {getUserContacts(userData.id).then((contacts) =>
-                        contacts.map((contact) => (
+                      {getUserContacts(userData.id).then((contacts) => {
+                        if (contacts.length === 0) {
+                          return (
+                            <div className="col-span-full">
+                              <Card>
+                                <CardContent className="pt-6">
+                                  <div className="text-center">
+                                    <p className="text-gray-500">Please connect with other users to see their profiles here.</p>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </div>
+                          );
+                        }
+                        return contacts.map((contact) => (
                           <ContactCard
                             key={contact.id}
                             t={t}
                             userData={contact}
                             showButtons={false}
                           />
-                        ))
-                      )}
+                        ));
+                      })}
                     </>
                   )}
                 </div>
