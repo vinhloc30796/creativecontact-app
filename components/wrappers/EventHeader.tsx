@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
-import BurgerMenu from "@/components/BurgerMenu";
+import BurgerMenu from "@/components/EventBurgerMenu";
 
 interface EventHeaderProps {
   eventSlug: string;

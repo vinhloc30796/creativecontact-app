@@ -26,6 +26,7 @@ import { writeUserInfo } from "@/app/actions/user/writeUserInfo"
 import { signUpUser } from "@/app/actions/user/signUp"
 import { formSchema, FormData } from './formSchema'
 import { useFormUserId } from '@/hooks/useFormUserId'
+import { ExperienceLevel, Industry } from '@/app/types/UserInfo'
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[]
@@ -100,9 +101,9 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       // Auto-fill form fields
       contactInfoForm.reset({
         email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        phone: userData.phone,
+        firstName: userData.firstName ?? '',
+        lastName: userData.lastName ?? '',
+        phone: userData.phone ?? '',
       });
       professionalInfoForm.reset({
         industries: userData.industries || [],
@@ -315,8 +316,8 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
               lastName: combinedData.lastName,
             },
             {
-              industries: combinedData.industries,
-              experience: combinedData.experience,
+              industries: combinedData.industries as Industry[],
+              experience: combinedData.experience as ExperienceLevel | null,
             },
             {
               instagramHandle: combinedData.instagramHandle,

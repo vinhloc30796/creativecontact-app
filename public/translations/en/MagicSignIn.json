@@ -7,7 +7,7 @@
         "description": "Please check-in with your email"
     },
     "success": "Magic link sent! Please check your email to continue.",
-    "countdown": "You can request a new link in {countdown} seconds.",
+    "countdown": "You can request a new link in {{countdown}} seconds.",
     "sending": "Sending...",
     "send": "Send Magic Link"
 }

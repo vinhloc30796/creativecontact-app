@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation'
 import { contactInfoSchema, ContactInfoData } from '@/app/form-schemas/contact-info'
 import { professionalInfoSchema, ProfessionalInfoData } from '@/app/form-schemas/professional-info'
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
+import { Industry, ExperienceLevel } from '@/app/types/UserInfo'
 
 const signupSchema = z.object({
   ...contactInfoSchema.shape,
@@ -56,9 +57,9 @@ export default function SignupPage() {
     if (userData && !isLoading) {
       contactInfoForm.reset({
         email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        phone: userData.phone,
+        firstName: userData.firstName ?? '',
+        lastName: userData.lastName ?? '',
+        phone: userData.phone ?? '',
       })
       professionalInfoForm.reset({
         industries: userData.industries || [],
@@ -111,8 +112,8 @@ export default function SignupPage() {
           lastName: contactInfoData.lastName,
         },
         {
-          industries: professionalInfoData.industries,
-          experience: professionalInfoData.experience,
+          industries: professionalInfoData.industries as Industry[],
+          experience: professionalInfoData.experience as ExperienceLevel | null,
         },
         {
           instagramHandle: contactInfoData.instagramHandle,

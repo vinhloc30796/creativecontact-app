@@ -1,4 +1,3 @@
-import { experienceLevels, industries } from "@/app/types/UserInfo";
 import { InferSelectModel } from "drizzle-orm";
 import {
   boolean,
@@ -38,6 +37,29 @@ Foreign-key constraints:
     "user_infos_id_fkey" FOREIGN KEY (id) REFERENCES auth.users(id)
 Policies (row security enabled): (none)
 */
+export const industries = [
+  'Advertising',
+  'Architecture',
+  'Arts and Crafts',
+  'Design',
+  'Fashion',
+  'Film, Video, and Photography',
+  'Music',
+  'Performing Arts',
+  'Publishing',
+  'Software and Interactive',
+  'Television and Radio',
+  'Visual Arts',
+  'Other'
+] as const;
+export const experienceLevels = [
+  'Entry',
+  'Junior',
+  'Mid-level',
+  'Senior',
+  'Manager',
+  'C-level'
+] as const;
 export const industryEnum = pgEnum('industry', industries);
 export const experienceEnum = pgEnum('experience_level', experienceLevels);
 export const userInfos = pgTable('user_infos', {
@@ -51,6 +73,7 @@ export const userInfos = pgTable('user_infos', {
   about: text('about'),
   industries: industryEnum('industries').array(),
   experience: experienceEnum('experience'),
+  profilePicture: text('profile_picture'),
   instagramHandle: text('instagram_handle'),
   facebookHandle: text('facebook_handle'),
 });

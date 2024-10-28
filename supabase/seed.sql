@@ -4,6 +4,7 @@ INSERT INTO auth.users (
     id,
     aud,
     role,
+    email,
     last_sign_in_at,
     created_at,
     updated_at,
@@ -13,6 +14,7 @@ INSERT INTO auth.users (
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',  -- id
     'authenticated',                         -- aud
     'authenticated',                         -- role
+    'admin@lukewarm.io',                     -- email
     '2024-07-31 13:29:02.201874+00',         -- last_sign_in_at
     '2024-07-31 13:29:02.199319+00',         -- created_at
     '2024-07-31 13:29:02.204237+00',         -- updated_at
@@ -89,6 +91,77 @@ INSERT INTO auth.users (
     NULL,                                    -- deleted_at
     true                                     -- is_anonymous
 );
+INSERT INTO auth.users (
+    instance_id,
+    id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    invited_at,
+    confirmation_token,
+    confirmation_sent_at,
+    recovery_token,
+    recovery_sent_at,
+    email_change_token_new,
+    email_change,
+    email_change_sent_at,
+    last_sign_in_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    is_super_admin,
+    created_at,
+    updated_at,
+    phone,
+    phone_confirmed_at,
+    phone_change,
+    phone_change_token,
+    phone_change_sent_at,
+    email_change_token_current,
+    email_change_confirm_status,
+    banned_until,
+    reauthentication_token,
+    reauthentication_sent_at,
+    is_sso_user,
+    deleted_at,
+    is_anonymous
+) VALUES (
+    '00000000-0000-0000-0000-000000000000',                             -- instance_id
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',                             -- id
+    'authenticated',                                                    -- aud
+    'authenticated',                                                    -- role
+    'vinhloc30796@gmail.com',                                           -- email
+    '',                                                                 -- encrypted_password
+    '2024-07-31 13:29:02.204237+00',                                    -- email_confirmed_at
+    NULL,                                                               -- invited_at
+    '',                                                                 -- confirmation_token
+    '2024-07-31 13:29:02.201874+00',                                    -- confirmation_sent_at
+    '',                                                                 -- recovery_token
+    NULL,                                                               -- recovery_sent_at
+    '',                                                                 -- email_change_token_new
+    '',                                                                 -- email_change
+    NULL,                                                               -- email_change_sent_at
+    '2024-07-31 13:29:02.201874+00',                                    -- last_sign_in_at
+    '{"provider": ["email"], "providers": ["email", "github"]}'::jsonb, -- raw_app_meta_data
+    '{"type": "user", "email": "vinhloc30796@gmail.com"}'::jsonb,       -- raw_user_meta_data
+    NULL,                                                               -- is_super_admin
+    '2024-07-31 13:29:02.199319+00',                                    -- created_at
+    '2024-07-31 13:29:02.204237+00',                                    -- updated_at
+    NULL,                                                               -- phone
+    NULL,                                                               -- phone_confirmed_at
+    '',                                                                 -- phone_change
+    '',                                                                 -- phone_change_token
+    NULL,                                                               -- phone_change_sent_at
+    '',                                                                 -- email_change_token_current
+    0,                                                                  -- email_change_confirm_status
+    NULL,                                                               -- banned_until
+    '',                                                                 -- reauthentication_token
+    NULL,                                                               -- reauthentication_sent_at
+    false,                                                              -- is_sso_user
+    NULL,                                                               -- deleted_at
+    false                                                               -- is_anonymous
+);
 
 -- Seed data for user_infos table
 INSERT INTO user_infos (
@@ -102,6 +175,7 @@ INSERT INTO user_infos (
     about,
     industries,
     experience,
+    profile_picture,
     instagram_handle,
     facebook_handle
 ) VALUES (
@@ -115,6 +189,7 @@ INSERT INTO user_infos (
     'Experienced creative technologist with a passion for integrating cutting-edge technology into artistic projects and interactive experiences.',
     ARRAY['Software and Interactive', 'Other']::industry[],
     'Senior',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d/lukewarm._Abstract_expressionism_emerald-powered_river-dwelling_9c99d61d-cd4b-4534-8a4e-ee60d1862ed2.png',
     'admin_insta',
     'admin_fb'
 ), (
@@ -128,8 +203,23 @@ INSERT INTO user_infos (
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
     ARRAY['Software and Interactive']::industry[],
     'Entry',
+    NULL,
     'user_insta',
     'user_fb'
+), (
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',
+    'Hoang Vinh Loc',
+    'Nguyen',
+    'Vinh Loc Nguyen',
+    '+1234567890',
+    'Lam Dong, Vietnam',
+    'Software Developer',
+    'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
+    ARRAY['Software and Interactive']::industry[],
+    'Senior',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8/lukewarm._a_river_water-elemental_lion_drawing_power_from_emera_cd875218-db8a-4ab4-afdd-a00a1a6deb49.png',
+    'vl307',
+    'vl307'
 );
 
 -- Seed data for events table
@@ -395,4 +485,15 @@ INSERT INTO artwork_assets (
     CURRENT_TIMESTAMP,
     'artwork_assets',
     true
+);
+
+-- Seed contacts table
+INSERT INTO contacts (
+    id,
+    user_id,
+    contact_id
+) VALUES (
+    '12912ab4-4e74-42d5-8977-cb387fba64b6',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8', -- vinhloc30796@gmail.com
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- admin@lukewarm.io
 );
