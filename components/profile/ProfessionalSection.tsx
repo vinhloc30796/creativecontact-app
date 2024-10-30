@@ -10,7 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { experienceLevelsMapper, industriesMapper } from "@/drizzle/schema/user";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useFormState } from "@/app/(protected)/profile/edit/FormStateNav";
 
 interface Translations {
   professional: string;
@@ -29,6 +30,13 @@ interface IndustrySectionProps {
 export function ProfessionalSection({ userData, translations }: IndustrySectionProps) {
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>(userData.industries || []);
   const [selectedExperience, setSelectedExperience] = useState<string>(userData.experience || '');
+  const { setFieldDirty } = useFormState();
+
+  useEffect(() => {
+    const industriesChanged = JSON.stringify(selectedIndustries) !== JSON.stringify(userData.industries || []);
+    const experienceChanged = selectedExperience !== (userData.experience || '');
+    setFieldDirty('professional', industriesChanged || experienceChanged);
+  }, [selectedIndustries, selectedExperience, userData.industries, userData.experience, setFieldDirty]);
 
   const toggleIndustry = (value: string) => {
     setSelectedIndustries(current => {

@@ -1,13 +1,31 @@
 {
-    "openToCollab": "Open to Collab",
-    "notOpenToCollab": "Not Open to Collab", 
-    "connect": "Connect",
-    "share": "Share",
-    "seeMore": "See More",
-    "overview": "Overview",
-    "activity": "Activity", 
-    "settings": "Settings",
-    "editProfile": "Edit Profile",
+    "navigation": {
+        "editProfile": "Edit Profile",
+        "basicInfo": "Basic Info",
+        "about": "About",
+        "professional": "Professional",
+        "contact": "Contact",
+        "saveChanges": "Save Changes"
+    },
+    "BasicInfoSection": {
+        "basicInfo": "Basic Info",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "displayName": "Display Name",
+        "location": "Location"
+    },
+    "AboutSection": {
+        "about": "About",
+        "placeholder": "Tell us about yourself..."
+    },
+    "ContactSection": {
+        "contact": "Contact",
+        "email": "Email",
+        "phone": "Phone",
+        "socialLinks": "Social Links",
+        "instagram": "Instagram",
+        "facebook": "Facebook"
+    },
     "ProfessionalSection": {
         "professional": "Professional",
         "currentIndustries": "Current Industries",
@@ -15,13 +33,5 @@
         "select": "Select Industry",
         "search": "Search Industries",
         "noExperienceFound": "No Experience Found"
-    },
-    "location": "Location",
-    "basicInfo": "Basic Info",
-    "about": "About",
-    "skills": "Skills",
-    "contact": "Contact",
-    "socialLinks": "Social Links",
-    "saveChanges": "Save Changes",
-    "cancel": "Cancel"
+    }
 }
