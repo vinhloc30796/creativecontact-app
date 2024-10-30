@@ -136,12 +136,12 @@ export default async function ProfileEditPage({ params, searchParams }: ProfileE
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
 
   const professionalTranslations = {
-    professional: t("professional"),
-    currentIndustries: t("currentIndustries"),
-    experience: t("experience"),
-    select: t("select"),
-    search: t("search"),
-    noExperienceFound: t("noExperienceFound")
+    professional: t("ProfessionalSection.professional"),
+    currentIndustries: t("ProfessionalSection.currentIndustries"),
+    experience: t("ProfessionalSection.experience"),
+    select: t("ProfessionalSection.select"),
+    search: t("ProfessionalSection.search"),
+    noExperienceFound: t("ProfessionalSection.noExperienceFound")
   }
 
   if (!isLoggedIn || isAnonymous) {

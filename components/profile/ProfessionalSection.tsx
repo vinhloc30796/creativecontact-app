@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { experienceLevelsMapper, industriesMapper } from "@/drizzle/schema/user";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from 'lucide-react';
+import { useState } from "react";
 
 interface Translations {
   professional: string;
@@ -26,6 +27,18 @@ interface IndustrySectionProps {
 }
 
 export function ProfessionalSection({ userData, translations }: IndustrySectionProps) {
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>(userData.industries || []);
+
+  const toggleIndustry = (value: string) => {
+    setSelectedIndustries(current => {
+      if (current.includes(value)) {
+        return current.filter(i => i !== value);
+      } else {
+        return [...current, value];
+      }
+    });
+  };
+
   return (
     <Card id="professional">
       <CardHeader>
@@ -36,7 +49,7 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
           <div className="space-y-2">
             <Label>{translations.currentIndustries}</Label>
             <div className="flex flex-wrap gap-2 mt-2">
-              {userData.industries?.map((industry) => (
+              {selectedIndustries.map((industry) => (
                 <Badge key={industry}>{industry}</Badge>
               ))}
             </div>
@@ -48,11 +61,11 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
                     role="combobox"
                     className={cn(
                       "w-full justify-between",
-                      !userData.industries?.length && "text-muted-foreground"
+                      !selectedIndustries.length && "text-muted-foreground"
                     )}
                   >
-                    {userData.industries?.length
-                      ? `${userData.industries.length} selected`
+                    {selectedIndustries.length
+                      ? `${selectedIndustries.length} selected`
                       : translations.select}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -67,14 +80,12 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
                           <CommandItem
                             key={industry.value}
                             value={industry.value}
-                            onSelect={(currentValue) => {
-                              // TODO: Handle selection
-                            }}
+                            onSelect={toggleIndustry}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                userData.industries?.includes(industry.value) ? "opacity-100" : "opacity-0"
+                                selectedIndustries.includes(industry.value) ? "opacity-100" : "opacity-0"
                               )}
                             />
                             {industry.label}
