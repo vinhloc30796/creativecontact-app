@@ -35,14 +35,14 @@ export function IndustrySection({ userData, translations }: IndustrySectionProps
         <div className="grid grid-cols-1 gap-6">
           <div className="space-y-2">
             <Label>{translations.currentIndustries}</Label>
-            <div>
+            <div className="max-w-md">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
                     className={cn(
-                      "w-full max-w-md justify-between",
+                      "w-full justify-between",
                       !userData.industries?.length && "text-muted-foreground"
                     )}
                   >
@@ -52,7 +52,7 @@ export function IndustrySection({ userData, translations }: IndustrySectionProps
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
                     <CommandInput placeholder={translations.search} />
                     <CommandEmpty>No industry found</CommandEmpty>
@@ -80,7 +80,7 @@ export function IndustrySection({ userData, translations }: IndustrySectionProps
                   </Command>
                 </PopoverContent>
               </Popover>
-              <div className="flex flex-wrap gap-2 mt-2 max-w-md">
+              <div className="flex flex-wrap gap-2 mt-2">
                 {userData.industries?.map((industry) => (
                   <Badge key={industry} variant="secondary">
                     {industry}
@@ -91,14 +91,14 @@ export function IndustrySection({ userData, translations }: IndustrySectionProps
           </div>
           <div className="space-y-2">
             <Label htmlFor="experience">{translations.experience}</Label>
-            <div>
+            <div className="max-w-md">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
                     className={cn(
-                      "w-full max-w-md justify-between",
+                      "w-full justify-between",
                       !userData.experience && "text-muted-foreground"
                     )}
                   >
@@ -108,7 +108,7 @@ export function IndustrySection({ userData, translations }: IndustrySectionProps
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
                     <CommandInput placeholder={translations.search} />
                     <CommandEmpty>{translations.noExperienceFound}</CommandEmpty>
