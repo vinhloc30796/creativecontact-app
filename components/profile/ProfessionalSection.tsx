@@ -28,6 +28,7 @@ interface IndustrySectionProps {
 
 export function ProfessionalSection({ userData, translations }: IndustrySectionProps) {
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>(userData.industries || []);
+  const [selectedExperience, setSelectedExperience] = useState<string>(userData.experience || '');
 
   const toggleIndustry = (value: string) => {
     setSelectedIndustries(current => {
@@ -108,11 +109,11 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
                     role="combobox"
                     className={cn(
                       "w-full justify-between",
-                      !userData.experience && "text-muted-foreground"
+                      !selectedExperience && "text-muted-foreground"
                     )}
                   >
-                    {userData.experience
-                      ? experienceLevelsMapper.find((level: any) => level.value === userData.experience)?.label
+                    {selectedExperience
+                      ? experienceLevelsMapper.find((level: any) => level.value === selectedExperience)?.label
                       : translations.select}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -127,14 +128,12 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
                           <CommandItem
                             key={level.value}
                             value={level.value}
-                            onSelect={(value) => {
-                              // TODO: Handle selection
-                            }}
+                            onSelect={(value) => setSelectedExperience(value)}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                userData.experience === level.value ? "opacity-100" : "opacity-0"
+                                selectedExperience === level.value ? "opacity-100" : "opacity-0"
                               )}
                             />
                             {level.label}
