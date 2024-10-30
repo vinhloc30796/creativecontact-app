@@ -5,21 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
-import { useFormState } from "../FormStateNav";
+import { useFormState } from "../../app/(protected)/profile/edit/FormStateNav";
 import { useEffect, useState } from "react";
+import { useTranslation } from '@/lib/i18n/init-client'
 
 interface BasicInfoSectionProps {
   userData: UserData;
-  translations: {
-    basicInfo: string;
-    firstName: string;
-    lastName: string;
-    displayName: string;
-    location: string;
-  };
+  lang?: string;
 }
 
-export function BasicInfoSection({ userData, translations }: BasicInfoSectionProps) {
+export function BasicInfoSection({ userData, lang = "en" }: BasicInfoSectionProps) {
+  const { t } = useTranslation(lang, "ProfilePage");
   const [firstName, setFirstName] = useState(userData.firstName || '');
   const [lastName, setLastName] = useState(userData.lastName || '');
   const [displayName, setDisplayName] = useState(userData.displayName || '');
@@ -43,12 +39,12 @@ export function BasicInfoSection({ userData, translations }: BasicInfoSectionPro
   return (
     <Card id="basic">
       <CardHeader>
-        <CardTitle>{translations.basicInfo}</CardTitle>
+        <CardTitle>{t('BasicInfoSection.basicInfo')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="firstName">{translations.firstName}</Label>
+            <Label htmlFor="firstName">{t('BasicInfoSection.firstName')}</Label>
             <Input 
               id="firstName" 
               value={firstName}
@@ -57,7 +53,7 @@ export function BasicInfoSection({ userData, translations }: BasicInfoSectionPro
             />
           </div>
           <div>
-            <Label htmlFor="lastName">{translations.lastName}</Label>
+            <Label htmlFor="lastName">{t('BasicInfoSection.lastName')}</Label>
             <Input 
               id="lastName" 
               value={lastName}
@@ -67,7 +63,7 @@ export function BasicInfoSection({ userData, translations }: BasicInfoSectionPro
           </div>
         </div>
         <div>
-          <Label htmlFor="displayName">{translations.displayName}</Label>
+          <Label htmlFor="displayName">{t('BasicInfoSection.displayName')}</Label>
           <Input 
             id="displayName" 
             value={displayName}
@@ -76,7 +72,7 @@ export function BasicInfoSection({ userData, translations }: BasicInfoSectionPro
           />
         </div>
         <div>
-          <Label htmlFor="location">{translations.location}</Label>
+          <Label htmlFor="location">{t('BasicInfoSection.location')}</Label>
           <div className="relative max-w-md">
             <Input
               id="location"

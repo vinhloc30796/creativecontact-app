@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { ContactInfoStep } from '@/components/user/ContactInfoStep'
 import { ProfessionalInfoStep } from '@/components/user/ProfessionalInfoStep'
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/lib/i18n/init-client'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { useFormUserId } from '@/hooks/useFormUserId'
@@ -26,9 +26,16 @@ const signupSchema = z.object({
 type SignupData = z.infer<typeof signupSchema>
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>
 
-export default function SignupPage() {
+export default function SignupPage({
+  searchParams,
+}: {
+  searchParams: {
+    lang: string;
+  };
+}) {
+  const lang = searchParams.lang || "en";
   const [step, setStep] = useState(0)
-  const { t } = useTranslation(['formSteps'])
+  const { t } = useTranslation(lang, ['formSteps'])
   const router = useRouter()
   const { resolveFormUserId, userData, isLoading } = useFormUserId()
   const [isSubmitting, setIsSubmitting] = useState(false)

@@ -2,22 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "@/lib/i18n/init-client";
+import { Briefcase, Mail, User, UserCircle } from "lucide-react";
 import { createContext, useContext, useState } from "react";
-import { Briefcase, Mail, User, UserCircle } from 'lucide-react';
 
 export interface Section {
   id: string;
   label: string;
   iconName: string;
-}
-
-interface Translations {
-  editProfile: string;
-  basicInfo: string;
-  about: string;
-  professional: string;
-  contact: string;
-  saveChanges: string;
 }
 
 interface FormStateContextType {
@@ -29,32 +21,34 @@ interface FormStateContextType {
 
 const FormStateContext = createContext<FormStateContextType>({
   dirtyFields: {},
-  setFieldDirty: () => { },
+  setFieldDirty: () => {},
   formData: {},
-  setFormData: () => { },
+  setFormData: () => {},
 });
 
 const IconMap: Record<string, React.ElementType> = {
-  'user': User,
-  'userCircle': UserCircle,
-  'briefcase': Briefcase,
-  'mail': Mail,
+  user: User,
+  userCircle: UserCircle,
+  briefcase: Briefcase,
+  mail: Mail,
 };
 
 export function FormStateNav({
   sections,
-  translations,
   onSubmit,
+  lang = "en",
 }: {
   sections: Section[];
-  translations: Translations;
   onSubmit: (data: Record<string, any>) => Promise<void>;
+  lang?: string;
 }) {
+  const { t } = useTranslation(lang, "ProfilePage");
   const [dirtyFields, setDirtyFields] = useState<Record<string, boolean>>({});
   const [formData, setFormDataState] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const setFieldDirty = (id: string, isDirty: boolean) => {
+    console.debug("setFieldDirty", id, isDirty);
     setDirtyFields((prev) => ({ ...prev, [id]: isDirty }));
   };
 
@@ -66,26 +60,28 @@ export function FormStateNav({
 
   const handleSubmit = async () => {
     if (!isDirty || isSubmitting) return;
-    
+
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
       // Reset dirty state after successful submission
       setDirtyFields({});
     } catch (error) {
-      console.error('Form submission failed:', error);
+      console.error("Form submission failed:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <FormStateContext.Provider value={{ dirtyFields, setFieldDirty, formData, setFormData }}>
+    <FormStateContext.Provider
+      value={{ dirtyFields, setFieldDirty, formData, setFormData }}
+    >
       <div className="lg:w-1/3">
         <div className="fixed lg:w-[calc(33.333%-2rem)]">
           <Card>
             <CardHeader>
-              <CardTitle>{translations.editProfile}</CardTitle>
+              <CardTitle>{t('navigation.editProfile')}</CardTitle>
             </CardHeader>
             <CardContent>
               <nav className="space-y-2">
@@ -95,7 +91,7 @@ export function FormStateNav({
                     <a
                       key={section.id}
                       href={`#${section.id}`}
-                      className="flex items-center p-2 hover:bg-accent rounded-lg transition-colors"
+                      className="flex items-center rounded-lg p-2 transition-colors hover:bg-accent"
                     >
                       <Icon className="mr-2 h-4 w-4" />
                       {section.label}
@@ -106,11 +102,8 @@ export function FormStateNav({
             </CardContent>
           </Card>
           <div className="my-5 flex justify-end space-x-4 pb-8">
-            <Button 
-              disabled={!isDirty || isSubmitting} 
-              onClick={handleSubmit}
-            >
-              {isSubmitting ? 'Saving...' : translations.saveChanges}
+            <Button disabled={!isDirty || isSubmitting} onClick={handleSubmit}>
+              {isSubmitting ? t('navigation.saving') : t('navigation.saveChanges')}
             </Button>
           </div>
         </div>

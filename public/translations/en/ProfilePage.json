@@ -5,7 +5,8 @@
         "about": "About",
         "professional": "Professional",
         "contact": "Contact",
-        "saveChanges": "Save Changes"
+        "saveChanges": "Save Changes",
+        "saving": "Saving..."
     },
     "BasicInfoSection": {
         "basicInfo": "Basic Info",

@@ -11,6 +11,7 @@ export async function writeUserInfo(
     phone: string;
     firstName: string;
     lastName: string;
+    displayName?: string;
   },
   professionalInfo: {
     industries: IndustryType[];

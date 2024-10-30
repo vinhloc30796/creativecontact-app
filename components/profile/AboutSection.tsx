@@ -3,25 +3,24 @@
 import { UserData } from "@/app/types/UserInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useFormState } from "../FormStateNav";
+import { useFormState } from "../../app/(protected)/profile/edit/FormStateNav";
 import { useEffect, useState } from "react";
+import { useTranslation } from '@/lib/i18n/init-client'
 
 interface AboutSectionProps {
   userData: UserData;
-  translations: {
-    about: string;
-    placeholder: string;
-  };
+  lang?: string;
 }
 
-export function AboutSection({ userData, translations }: AboutSectionProps) {
+export function AboutSection({ userData, lang = "en" }: AboutSectionProps) {
+  const { t } = useTranslation(lang, "ProfilePage");
   const [about, setAbout] = useState(userData.about || '');
   const { setFieldDirty, setFormData } = useFormState();
 
   useEffect(() => {
     const isDirty = about !== (userData.about || '');
     setFieldDirty('about', isDirty);
-    
+
     if (isDirty) {
       setFormData('about', { about });
     }
@@ -30,16 +29,16 @@ export function AboutSection({ userData, translations }: AboutSectionProps) {
   return (
     <Card id="about">
       <CardHeader>
-        <CardTitle>{translations.about}</CardTitle>
+        <CardTitle>{t('AboutSection.about')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Textarea 
-          id="about" 
+        <Textarea
+          id="about"
           value={about}
           onChange={(e) => setAbout(e.target.value)}
-          rows={4} 
+          rows={4}
           className="max-w-2xl"
-          placeholder={translations.placeholder}
+          placeholder={t('AboutSection.aboutPlaceholder')}
         />
       </CardContent>
     </Card>

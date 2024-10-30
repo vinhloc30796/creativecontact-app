@@ -12,22 +12,15 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { useFormState } from "@/app/(protected)/profile/edit/FormStateNav";
+import { useTranslation } from '@/lib/i18n/init-client'
 
-interface Translations {
-  professional: string;
-  currentIndustries: string;
-  experience: string;
-  select: string;
-  search: string;
-  noExperienceFound: string;
-}
-
-interface IndustrySectionProps {
+interface ProfessionalSectionProps {
   userData: UserData;
-  translations: Translations;
+  lang?: string;
 }
 
-export function ProfessionalSection({ userData, translations }: IndustrySectionProps) {
+export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSectionProps) {
+  const { t } = useTranslation(lang, "ProfilePage");
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>(userData.industries || []);
   const [selectedExperience, setSelectedExperience] = useState<string>(userData.experience || '');
   const { setFieldDirty } = useFormState();
@@ -51,12 +44,12 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
   return (
     <Card id="professional">
       <CardHeader>
-        <CardTitle>{translations.professional}</CardTitle>
+        <CardTitle>{t('ProfessionalSection.professional')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-6">
           <div className="space-y-2">
-            <Label>{translations.currentIndustries}</Label>
+            <Label>{t('ProfessionalSection.currentIndustries')}</Label>
             <div className="flex flex-wrap gap-2 mt-2">
               {selectedIndustries.map((industry) => (
                 <Badge key={industry}>{industry}</Badge>
@@ -75,13 +68,13 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
                   >
                     {selectedIndustries.length
                       ? `${selectedIndustries.length} selected`
-                      : translations.select}
+                      : t('ProfessionalSection.select')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-                    <CommandInput placeholder={translations.search} />
+                    <CommandInput placeholder={t('ProfessionalSection.search')} />
                     <CommandEmpty>No industry found</CommandEmpty>
                     <CommandGroup>
                       <CommandList>
@@ -108,7 +101,7 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="experience">{translations.experience}</Label>
+            <Label htmlFor="experience">{t('ProfessionalSection.experience')}</Label>
             <div className="max-w-md">
               <Popover>
                 <PopoverTrigger asChild>
@@ -122,14 +115,14 @@ export function ProfessionalSection({ userData, translations }: IndustrySectionP
                   >
                     {selectedExperience
                       ? experienceLevelsMapper.find((level: any) => level.value === selectedExperience)?.label
-                      : translations.select}
+                      : t('ProfessionalSection.select')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-                    <CommandInput placeholder={translations.search} />
-                    <CommandEmpty>{translations.noExperienceFound}</CommandEmpty>
+                    <CommandInput placeholder={t('ProfessionalSection.search')} />
+                    <CommandEmpty>{t('ProfessionalSection.noExperienceFound')}</CommandEmpty>
                     <CommandGroup>
                       <CommandList>
                         {experienceLevelsMapper.map((level: any) => (

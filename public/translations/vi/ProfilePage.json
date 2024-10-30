@@ -5,7 +5,8 @@
         "about": "Giới thiệu",
         "professional": "Chuyên môn",
         "contact": "Liên hệ",
-        "saveChanges": "Lưu Thay đổi"
+        "saveChanges": "Lưu Thay đổi",
+        "saving": "Đang Lưu..."
     },
     "BasicInfoSection": {
         "basicInfo": "Thông tin Cơ bản",

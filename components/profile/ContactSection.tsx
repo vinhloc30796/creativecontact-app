@@ -6,22 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Phone } from "lucide-react";
-import { useFormState } from "../FormStateNav";
+import { useFormState } from "../../app/(protected)/profile/edit/FormStateNav";
 import { useEffect, useState } from "react";
+import { useTranslation } from '@/lib/i18n/init-client'
 
 interface ContactSectionProps {
   userData: UserData;
-  translations: {
-    contact: string;
-    email: string;
-    phone: string;
-    socialLinks: string;
-    instagram: string;
-    facebook: string;
-  };
+  lang?: string;
 }
 
-export function ContactSection({ userData, translations }: ContactSectionProps) {
+export function ContactSection({ userData, lang = "en" }: ContactSectionProps) {
+  const { t } = useTranslation(lang, "ProfilePage");
   const [email, setEmail] = useState(userData.email || '');
   const [phone, setPhone] = useState(userData.phone || '');
   const [instagram, setInstagram] = useState(userData.instagramHandle || '');
@@ -29,14 +24,14 @@ export function ContactSection({ userData, translations }: ContactSectionProps) 
   const { setFieldDirty, setFormData } = useFormState();
 
   useEffect(() => {
-    const isDirty = 
+    const isDirty =
       email !== (userData.email || '') ||
       phone !== (userData.phone || '') ||
       instagram !== (userData.instagramHandle || '') ||
       facebook !== (userData.facebookHandle || '');
 
     setFieldDirty('contact', isDirty);
-    
+
     if (isDirty) {
       setFormData('contact', { email, phone, instagramHandle: instagram, facebookHandle: facebook });
     }
@@ -45,11 +40,11 @@ export function ContactSection({ userData, translations }: ContactSectionProps) 
   return (
     <Card id="contact">
       <CardHeader>
-        <CardTitle>{translations.contact}</CardTitle>
+        <CardTitle>{t('ContactSection.contact')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="email">{translations.email}</Label>
+          <Label htmlFor="email">{t('ContactSection.email')}</Label>
           <div className="relative max-w-md">
             <Input
               id="email"
@@ -61,7 +56,7 @@ export function ContactSection({ userData, translations }: ContactSectionProps) 
           </div>
         </div>
         <div>
-          <Label htmlFor="phone">{translations.phone}</Label>
+          <Label htmlFor="phone">{t('ContactSection.phone')}</Label>
           <div className="relative max-w-md">
             <Input
               id="phone"
@@ -74,10 +69,10 @@ export function ContactSection({ userData, translations }: ContactSectionProps) 
         </div>
         <Separator />
         <div>
-          <Label>{translations.socialLinks}</Label>
+          <Label>{t('ContactSection.socialLinks')}</Label>
           <div className="grid grid-cols-2 gap-4 mt-2 max-w-2xl">
             <div>
-              <Label htmlFor="instagram">{translations.instagram}</Label>
+              <Label htmlFor="instagram">{t('ContactSection.instagram')}</Label>
               <Input
                 id="instagram"
                 value={instagram}
@@ -86,7 +81,7 @@ export function ContactSection({ userData, translations }: ContactSectionProps) 
               />
             </div>
             <div>
-              <Label htmlFor="facebook">{translations.facebook}</Label>
+              <Label htmlFor="facebook">{t('ContactSection.facebook')}</Label>
               <Input
                 id="facebook"
                 value={facebook}
