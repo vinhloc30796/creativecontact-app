@@ -35,6 +35,11 @@ export function IndustrySection({ userData, translations }: IndustrySectionProps
         <div className="grid grid-cols-1 gap-6">
           <div className="space-y-2">
             <Label>{translations.currentIndustries}</Label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {userData.industries?.map((industry) => (
+                <Badge key={industry}>{industry}</Badge>
+              ))}
+            </div>
             <div className="max-w-md">
               <Popover>
                 <PopoverTrigger asChild>
@@ -80,13 +85,6 @@ export function IndustrySection({ userData, translations }: IndustrySectionProps
                   </Command>
                 </PopoverContent>
               </Popover>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {userData.industries?.map((industry) => (
-                  <Badge key={industry} variant="secondary">
-                    {industry}
-                  </Badge>
-                ))}
-              </div>
             </div>
           </div>
           <div className="space-y-2">
