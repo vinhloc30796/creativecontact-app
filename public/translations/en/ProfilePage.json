@@ -7,11 +7,16 @@
     "overview": "Overview",
     "activity": "Activity",
     "settings": "Settings",
+    "editProfile": "Edit Profile",
     "industry": "Industry",
+    "currentIndustries": "Current Industries",
     "location": "Location",
+    "basicInfo": "Basic Info",
     "about": "About",
     "experience": "Experience",
     "skills": "Skills",
     "contact": "Contact",
-    "socialLinks": "Social Links"
+    "socialLinks": "Social Links",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel"
 }

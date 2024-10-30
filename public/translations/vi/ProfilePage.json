@@ -7,11 +7,16 @@
     "overview": "Tổng quan",
     "activity": "Hoạt động",
     "settings": "Cài đặt",
+    "editProfile": "Chỉnh sửa Hồ sơ",
     "industry": "Ngành nghề",
+    "currentIndustries": "Ngành nghề Hiện tại",
     "location": "Địa điểm",
+    "basicInfo": "Thông tin Cơ bản",
     "about": "Giới thiệu",
     "experience": "Kinh nghiệm",
     "skills": "Kỹ năng",
     "contact": "Liên hệ",
-    "socialLinks": "Liên kết xã hội"
+    "socialLinks": "Liên kết xã hội",
+    "saveChanges": "Lưu Thay đổi",
+    "cancel": "Hủy"
 }

@@ -387,6 +387,9 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                                 <CardContent className="pt-6">
                                   <div className="text-center">
                                     <p className="text-gray-500">Please connect with other users to see their profiles here.</p>
+                                    <Button className="mt-4">
+                                      Find Contacts
+                                    </Button>
                                   </div>
                                 </CardContent>
                               </Card>
