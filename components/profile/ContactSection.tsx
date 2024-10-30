@@ -31,9 +31,14 @@ export function ContactSection({ userData, lang = "en" }: ContactSectionProps) {
       facebook !== (userData.facebookHandle || '');
 
     setFieldDirty('contact', isDirty);
-
+    
     if (isDirty) {
-      setFormData('contact', { email, phone, instagramHandle: instagram, facebookHandle: facebook });
+      setFormData('contact', {
+        email,
+        phone,
+        instagramHandle: instagram,
+        facebookHandle: facebook
+      });
     }
   }, [email, phone, instagram, facebook, userData, setFieldDirty, setFormData]);
 

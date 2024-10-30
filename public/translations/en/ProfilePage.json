@@ -6,6 +6,7 @@
         "professional": "Professional",
         "contact": "Contact",
         "saveChanges": "Save Changes",
+        "saveChangesWithCount": "Save Changes ({{count}} changes)",
         "saving": "Saving..."
     },
     "BasicInfoSection": {

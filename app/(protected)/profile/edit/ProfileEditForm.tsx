@@ -46,18 +46,16 @@ export function ProfileEditForm({
   ];
 
   return (
-    <FormStateProvider>
-      <div className="flex flex-col lg:flex-row gap-8 h-full">
-        <div className="lg:w-1/3 lg:overflow-y-auto">
-          <FormStateNav sections={sections} onSubmit={handleSubmit} />
-        </div>
-        <div className="space-y-8 lg:w-2/3 lg:overflow-y-auto pb-8">
-          <BasicInfoSection userData={userData} lang={lang} />
-          <AboutSection userData={userData} lang={lang} />
-          <ProfessionalSection userData={userData} lang={lang} />
-          <ContactSection userData={userData} lang={lang} />
-        </div>
+    <div className="flex flex-col lg:flex-row gap-8 h-full">
+      <div className="lg:w-1/3 lg:overflow-y-auto">
+        <FormStateNav sections={sections} onSubmit={handleSubmit} />
       </div>
-    </FormStateProvider>
+      <div className="space-y-8 lg:w-2/3 lg:overflow-y-auto pb-8">
+        <BasicInfoSection userData={userData} lang={lang} />
+        <AboutSection userData={userData} lang={lang} />
+        <ProfessionalSection userData={userData} lang={lang} />
+        <ContactSection userData={userData} lang={lang} />
+      </div>
+    </div>
   );
 }

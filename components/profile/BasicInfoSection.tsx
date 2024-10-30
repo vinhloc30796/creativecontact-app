@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
-import { useFormState } from "../../app/(protected)/profile/edit/FormStateNav";
+import { useFormState } from "@/app/(protected)/profile/edit/FormStateNav";
 import { useEffect, useState } from "react";
 import { useTranslation } from '@/lib/i18n/init-client'
 
@@ -32,7 +32,12 @@ export function BasicInfoSection({ userData, lang = "en" }: BasicInfoSectionProp
     setFieldDirty('basic', isDirty);
     
     if (isDirty) {
-      setFormData('basic', { firstName, lastName, displayName, location });
+      setFormData('basic', {
+        firstName,
+        lastName,
+        displayName,
+        location
+      });
     }
   }, [firstName, lastName, displayName, location, userData, setFieldDirty, setFormData]);
 

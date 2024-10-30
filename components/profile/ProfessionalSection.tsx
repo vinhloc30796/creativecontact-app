@@ -23,13 +23,22 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
   const { t } = useTranslation(lang, "ProfilePage");
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>(userData.industries || []);
   const [selectedExperience, setSelectedExperience] = useState<string>(userData.experience || '');
-  const { setFieldDirty } = useFormState();
+  const { setFieldDirty, setFormData } = useFormState();
 
   useEffect(() => {
     const industriesChanged = JSON.stringify(selectedIndustries) !== JSON.stringify(userData.industries || []);
     const experienceChanged = selectedExperience !== (userData.experience || '');
-    setFieldDirty('professional', industriesChanged || experienceChanged);
-  }, [selectedIndustries, selectedExperience, userData.industries, userData.experience, setFieldDirty]);
+    const isDirty = industriesChanged || experienceChanged;
+    
+    setFieldDirty('professional', isDirty);
+    
+    if (isDirty) {
+      setFormData('professional', {
+        industries: selectedIndustries,
+        experience: selectedExperience
+      });
+    }
+  }, [selectedIndustries, selectedExperience, userData.industries, userData.experience, setFieldDirty, setFormData]);
 
   const toggleIndustry = (value: string) => {
     setSelectedIndustries(current => {

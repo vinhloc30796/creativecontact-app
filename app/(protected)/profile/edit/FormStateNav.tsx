@@ -3,28 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/lib/i18n/init-client";
+import { useProfileFormStore, isFormDirty } from "@/lib/stores/profile-form-store";
 import { Briefcase, Mail, User, UserCircle } from "lucide-react";
-import { createContext, useContext, useState } from "react";
+import { useState } from "react";
 
 export interface Section {
   id: string;
   label: string;
   iconName: string;
 }
-
-interface FormStateContextType {
-  dirtyFields: Record<string, boolean>;
-  setFieldDirty: (id: string, isDirty: boolean) => void;
-  formData: Record<string, any>;
-  setFormData: (id: string, data: any) => void;
-}
-
-const FormStateContext = createContext<FormStateContextType>({
-  dirtyFields: {},
-  setFieldDirty: () => {},
-  formData: {},
-  setFormData: () => {},
-});
 
 const IconMap: Record<string, React.ElementType> = {
   user: User,
@@ -43,20 +30,11 @@ export function FormStateNav({
   lang?: string;
 }) {
   const { t } = useTranslation(lang, "ProfilePage");
-  const [dirtyFields, setDirtyFields] = useState<Record<string, boolean>>({});
-  const [formData, setFormDataState] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const setFieldDirty = (id: string, isDirty: boolean) => {
-    console.debug("setFieldDirty", id, isDirty);
-    setDirtyFields((prev) => ({ ...prev, [id]: isDirty }));
-  };
-
-  const setFormData = (id: string, data: any) => {
-    setFormDataState((prev) => ({ ...prev, [id]: data }));
-  };
-
-  const isDirty = Object.values(dirtyFields).some(Boolean);
+  
+  const { formData, dirtyFields, resetForm } = useProfileFormStore();
+  const isDirty = isFormDirty({ dirtyFields, formData } as any);
+  const dirtyFieldCount = Object.values(dirtyFields).filter(Boolean).length;
 
   const handleSubmit = async () => {
     if (!isDirty || isSubmitting) return;
@@ -64,8 +42,8 @@ export function FormStateNav({
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
-      // Reset dirty state after successful submission
-      setDirtyFields({});
+      // Reset form state after successful submission
+      resetForm();
     } catch (error) {
       console.error("Form submission failed:", error);
     } finally {
@@ -74,42 +52,44 @@ export function FormStateNav({
   };
 
   return (
-    <FormStateContext.Provider
-      value={{ dirtyFields, setFieldDirty, formData, setFormData }}
-    >
-      <div className="lg:w-1/3">
-        <div className="fixed lg:w-[calc(33.333%-2rem)]">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('navigation.editProfile')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <nav className="space-y-2">
-                {sections.map((section) => {
-                  const Icon = IconMap[section.iconName];
-                  return (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      className="flex items-center rounded-lg p-2 transition-colors hover:bg-accent"
-                    >
-                      <Icon className="mr-2 h-4 w-4" />
-                      {section.label}
-                    </a>
-                  );
-                })}
-              </nav>
-            </CardContent>
-          </Card>
-          <div className="my-5 flex justify-end space-x-4 pb-8">
-            <Button disabled={!isDirty || isSubmitting} onClick={handleSubmit}>
-              {isSubmitting ? t('navigation.saving') : t('navigation.saveChanges')}
-            </Button>
-          </div>
+    <div className="lg:w-1/3">
+      <div className="fixed lg:w-[calc(33.333%-2rem)]">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('navigation.editProfile')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <nav className="space-y-2">
+              {sections.map((section) => {
+                const Icon = IconMap[section.iconName];
+                return (
+                  <a
+                    key={section.id}
+                    href={`#${section.id}`}
+                    className="flex items-center rounded-lg p-2 transition-colors hover:bg-accent"
+                  >
+                    <Icon className="mr-2 h-4 w-4" />
+                    {section.label}
+                  </a>
+                );
+              })}
+            </nav>
+          </CardContent>
+        </Card>
+        <div className="my-5 flex justify-end space-x-4 pb-8">
+          <Button disabled={!isDirty || isSubmitting} onClick={handleSubmit}>
+            {isSubmitting 
+              ? t('navigation.saving') 
+              : dirtyFieldCount > 0 
+                ? t('navigation.saveChangesWithCount', { count: dirtyFieldCount })
+                : t('navigation.saveChanges')
+            }
+          </Button>
         </div>
       </div>
-    </FormStateContext.Provider>
+    </div>
   );
 }
 
-export const useFormState = () => useContext(FormStateContext);
+// Export the hook for components to use
+export const useFormState = useProfileFormStore;

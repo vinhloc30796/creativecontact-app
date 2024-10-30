@@ -3,7 +3,7 @@
 import { UserData } from "@/app/types/UserInfo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useFormState } from "../../app/(protected)/profile/edit/FormStateNav";
+import { useFormState } from "@/app/(protected)/profile/edit/FormStateNav";
 import { useEffect, useState } from "react";
 import { useTranslation } from '@/lib/i18n/init-client'
 
@@ -20,7 +20,7 @@ export function AboutSection({ userData, lang = "en" }: AboutSectionProps) {
   useEffect(() => {
     const isDirty = about !== (userData.about || '');
     setFieldDirty('about', isDirty);
-
+    
     if (isDirty) {
       setFormData('about', { about });
     }

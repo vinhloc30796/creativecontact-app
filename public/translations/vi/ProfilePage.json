@@ -6,6 +6,7 @@
         "professional": "Chuyên môn",
         "contact": "Liên hệ",
         "saveChanges": "Lưu Thay đổi",
+        "saveChangesWithCount": "Lưu Thay đổi ({{count}} thay đổi)",
         "saving": "Đang Lưu..."
     },
     "BasicInfoSection": {
