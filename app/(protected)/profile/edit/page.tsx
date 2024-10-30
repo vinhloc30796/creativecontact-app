@@ -2,7 +2,7 @@
 
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
-import { IndustrySection } from "@/components/profile/IndustrySection";
+import { ProfessionalSection } from "@/components/profile/ProfessionalSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -135,8 +135,8 @@ export default async function ProfileEditPage({ params, searchParams }: ProfileE
   const { t } = await useTranslation(lang, "ProfilePage");
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
 
-  const industryTranslations = {
-    industry: t("industry"),
+  const professionalTranslations = {
+    professional: t("professional"),
     currentIndustries: t("currentIndustries"),
     experience: t("experience"),
     select: t("select"),
@@ -164,8 +164,8 @@ export default async function ProfileEditPage({ params, searchParams }: ProfileE
   const sections = [
     { id: "basic", label: t("basicInfo"), icon: User },
     { id: "about", label: t("about"), icon: UserCircle },
+    { id: "professional", label: t("professional"), icon: Briefcase },
     { id: "contact", label: t("contact"), icon: Mail },
-    { id: "industry", label: t("industry"), icon: Briefcase },
   ];
 
   return (
@@ -179,49 +179,50 @@ export default async function ProfileEditPage({ params, searchParams }: ProfileE
 
         <main className="relative z-20 mt-10 w-full flex-grow lg:mt-20">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col lg:flex-row gap-8 overflow-y-hidden">
 
               {/* Left Navigation */}
-              <div className="lg:w-1/3">
-                <Card className="sticky top-24">
-                  <CardHeader>
-                    <CardTitle>{t("editProfile")}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <nav className="space-y-2">
-                      {sections.map((section) => (
-                        <a
-                          key={section.id}
-                          href={`#${section.id}`}
-                          className="flex items-center p-2 hover:bg-accent rounded-lg transition-colors"
-                        >
-                          <section.icon className="mr-2 h-4 w-4" />
-                          {section.label}
-                        </a>
-                      ))}
-                    </nav>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="flex justify-end space-x-4 pb-8">
-                      <Button variant="outline">{t("cancel")}</Button>
-                      <Button>{t("saveChanges")}</Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-
+              <div id="left-nav" className="lg:w-1/3 flex flex-col">
+                <div className="fixed lg:w-[calc(33.333%-2rem)]">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>{t("editProfile")}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <nav className="space-y-2">
+                        {sections.map((section) => (
+                          <a
+                            key={section.id}
+                            href={`#${section.id}`}
+                            className="flex items-center p-2 hover:bg-accent rounded-lg transition-colors"
+                          >
+                            <section.icon className="mr-2 h-4 w-4" />
+                            {section.label}
+                          </a>
+                        ))}
+                      </nav>
+                    </CardContent>
+                  </Card>
+                  <div id="left-nav-button" className="flex justify-end align-bottom space-x-4 pb-8 my-5">
+                    <Button>{t("saveChanges")}</Button>
+                  </div>
+                </div>
               </div>
 
               {/* Right Content */}
-              <div className="lg:w-2/3 space-y-8">
-                <BasicInfoSection userData={userData} t={t} />
-                <AboutSection userData={userData} t={t} />
-                <IndustrySection userData={userData} translations={industryTranslations} />
-                <ContactSection userData={userData} t={t} />
+              <div className="lg:w-2/3 overflow-y-clip">
+                <div className="space-y-8 overflow-y-scroll">
+                  <BasicInfoSection userData={userData} t={t} />
+                  <AboutSection userData={userData} t={t} />
+                  <ProfessionalSection userData={userData} translations={professionalTranslations} />
+                  <ContactSection userData={userData} t={t} />
+                  <div className="h-20"></div> {/* Padding at the end */}
+                </div>
               </div>
             </div>
           </div>
         </main>
-      </div>
+      </div >
     </BackgroundDiv >
   );
 }

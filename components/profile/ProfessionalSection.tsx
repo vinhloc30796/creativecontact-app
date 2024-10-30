@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 interface Translations {
-  industry: string;
+  professional: string;
   currentIndustries: string;
   experience: string;
   select: string;
@@ -25,11 +25,11 @@ interface IndustrySectionProps {
   translations: Translations;
 }
 
-export function IndustrySection({ userData, translations }: IndustrySectionProps) {
+export function ProfessionalSection({ userData, translations }: IndustrySectionProps) {
   return (
-    <Card id="industry">
+    <Card id="professional">
       <CardHeader>
-        <CardTitle>{translations.industry}</CardTitle>
+        <CardTitle>{translations.professional}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-6">
