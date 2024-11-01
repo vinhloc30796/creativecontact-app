@@ -14,7 +14,7 @@ import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
 import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
 import { TFunction } from "i18next";
-import { Briefcase, CheckCircle, Mail, MapPin, Phone, Share2, TrendingUp, UserCircle, UserPlus } from 'lucide-react';
+import { Briefcase, CheckCircle, Mail, MapPin, Pencil, Phone, Share2, TrendingUp, UserCircle, UserPlus } from 'lucide-react';
 import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
@@ -129,18 +129,14 @@ function ProfileCard({
             <MapPin className="mr-1 h-4 w-4" />
             {userData.location}
           </p>
-          {showButtons && (
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <UserPlus className="mr-1 h-4 w-4" />
-                {t("connect")}
-              </Button>
-              <Button variant="outline" size="sm">
-                <Share2 className="mr-1 h-4 w-4" />
-                {t("share")}
-              </Button>
-            </div>
-          )}
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/edit">
+                <Pencil className="mr-1 h-4 w-4" />
+                {t("edit")}
+              </a>
+            </Button>
+          </div>
           {userData.about && (
             <section data-section="about" className="pt-4">
               <h3 className="mb-2 text-lg font-semibold">{t("about")}</h3>
