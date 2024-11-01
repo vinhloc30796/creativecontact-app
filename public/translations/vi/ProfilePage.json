@@ -2,7 +2,7 @@
     "navigation": {
         "editProfile": "Chỉnh sửa Hồ sơ",
         "basicInfo": "Thông tin Cơ bản",
-        "about": "Giới thiệu",
+        "about": "Giới thiệu", 
         "professional": "Chuyên môn",
         "contact": "Liên hệ",
         "saveChanges": "Lưu Thay đổi",
@@ -22,7 +22,7 @@
     },
     "ContactSection": {
         "contact": "Liên hệ",
-        "email": "Email",
+        "email": "Email", 
         "phone": "Số điện thoại",
         "socialLinks": "Mạng xã hội",
         "instagram": "Instagram",
@@ -35,5 +35,17 @@
         "select": "Chọn Ngành nghề",
         "search": "Tìm kiếm Ngành nghề",
         "noExperienceFound": "Không tìm thấy Ngành nghề"
-    }
+    },
+    "overview": "Tổng quan",
+    "activity": "Hoạt động",
+    "settings": "Cài đặt",
+    "openToCollab": "Sẵn sàng Hợp tác",
+    "edit": "Chỉnh sửa",
+    "about": "Giới thiệu",
+    "industry": "Ngành nghề",
+    "experience": "Kinh nghiệm", 
+    "skills": "Kỹ năng",
+    "contact": "Liên hệ",
+    "socialLinks": "Mạng xã hội",
+    "seeMore": "Xem thêm"
 }

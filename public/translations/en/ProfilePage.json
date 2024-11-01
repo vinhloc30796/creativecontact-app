@@ -1,7 +1,7 @@
 {
     "navigation": {
         "editProfile": "Edit Profile",
-        "basicInfo": "Basic Info",
+        "basicInfo": "Basic Info", 
         "about": "About",
         "professional": "Professional",
         "contact": "Contact",
@@ -12,7 +12,7 @@
     "BasicInfoSection": {
         "basicInfo": "Basic Info",
         "firstName": "First Name",
-        "lastName": "Last Name",
+        "lastName": "Last Name", 
         "displayName": "Display Name",
         "location": "Location"
     },
@@ -35,5 +35,17 @@
         "select": "Select Industry",
         "search": "Search Industries",
         "noExperienceFound": "No Experience Found"
-    }
+    },
+    "overview": "Overview",
+    "activity": "Activity", 
+    "settings": "Settings",
+    "openToCollab": "Open to Collaborations",
+    "edit": "Edit",
+    "about": "About",
+    "industry": "Industry",
+    "experience": "Experience",
+    "skills": "Skills",
+    "contact": "Contact",
+    "socialLinks": "Social Links",
+    "seeMore": "See More"
 }
