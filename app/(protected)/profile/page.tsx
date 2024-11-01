@@ -9,12 +9,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
-import { UserInfo } from "@/drizzle/schema/user";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
-import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
+import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
-import { Briefcase, CheckCircle, Mail, MapPin, Pencil, Phone, Share2, TrendingUp, UserCircle, UserPlus } from 'lucide-react';
+import { Briefcase, CheckCircle, Mail, MapPin, Pencil, Phone, TrendingUp, UserCircle } from 'lucide-react';
 import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
@@ -58,29 +57,7 @@ async function getUserContacts(userId?: string): Promise<UserData[]> {
   }));
 }
 
-const socialMediaMapper = {
-  instagramHandle: {
-    icon: SiInstagram,
-    baseUrl: "https://instagram.com/",
-  },
-  facebookHandle: {
-    icon: SiFacebook,
-    baseUrl: "https://facebook.com/",
-  },
-};
 
-function getSocialMediaLinks(userData: UserData) {
-  return Object.entries(socialMediaMapper).reduce((acc, [key, value]) => {
-    const handle = userData[key as keyof Pick<UserData, 'instagramHandle' | 'facebookHandle'>];
-    if (handle) {
-      acc.push({
-        icon: value.icon,
-        url: `${value.baseUrl}${handle}`,
-      });
-    }
-    return acc;
-  }, [] as Array<{ icon: typeof SiInstagram | typeof SiFacebook; url: string }>);
-}
 
 function getFormattedPhoneNumber(userData: UserData) {
   if (userData.phoneNumber && userData.phoneCountryCode) {

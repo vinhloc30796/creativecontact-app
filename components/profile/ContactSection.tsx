@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Phone } from "lucide-react";
+import { socialMediaMapper } from "@/utils/social_media";
 // React
 import { useFormState } from "@/app/(protected)/profile/edit/FormStateNav";
 import { UserData } from "@/app/types/UserInfo";
@@ -93,25 +94,21 @@ export function ContactSection({ userData, lang = "en" }: ContactSectionProps) {
         <Separator />
         <div>
           <Label>{t('ContactSection.socialLinks')}</Label>
-          <div className="grid grid-cols-2 gap-4 mt-2 max-w-2xl">
-            <div>
-              <Label htmlFor="instagram">{t('ContactSection.instagram')}</Label>
-              <Input
-                id="instagram"
-                value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
-                placeholder="@username"
-              />
-            </div>
-            <div>
-              <Label htmlFor="facebook">{t('ContactSection.facebook')}</Label>
-              <Input
-                id="facebook"
-                value={facebook}
-                onChange={(e) => setFacebook(e.target.value)}
-                placeholder="username"
-              />
-            </div>
+          <div className="space-y-4 mt-2 max-w-md">
+            {Object.entries(socialMediaMapper).map(([key, value]) => (
+              <div key={key} className="relative flex items-center gap-4">
+                <value.icon className="h-6 w-6 text-muted-foreground" />
+                <div className="flex-1">
+                  <Label htmlFor={key}>{t(`ContactSection.${key.replace('Handle', '')}`)}</Label>
+                  <Input
+                    id={key}
+                    value={key === 'instagramHandle' ? instagram : facebook}
+                    onChange={(e) => key === 'instagramHandle' ? setInstagram(e.target.value) : setFacebook(e.target.value)}
+                    placeholder={key === 'instagramHandle' ? '@username' : 'username'}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </CardContent>
