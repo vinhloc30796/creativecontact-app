@@ -82,7 +82,12 @@ function getSocialMediaLinks(userData: UserData) {
   }, [] as Array<{ icon: typeof SiInstagram | typeof SiFacebook; url: string }>);
 }
 
-
+function getFormattedPhoneNumber(userData: UserData) {
+  if (userData.phoneNumber && userData.phoneCountryCode) {
+    return `+${userData.phoneCountryCode} ${userData.phoneNumber}`;
+  }
+  return null;
+}
 
 function ProfileCard({
   t,
@@ -97,6 +102,7 @@ function ProfileCard({
 }) {
   const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
   const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
+  const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
     <div className="mt-6 w-full overflow-y-auto lg:mt-0 lg:w-1/3 lg:pl-6">
@@ -198,14 +204,14 @@ function ProfileCard({
                     </a>
                   </li>
                 )}
-                {userData.phone && (
+                {phoneNumber && (
                   <li className="flex items-center">
                     <Phone className="mr-2 h-4 w-4" />
                     <a
-                      href={`tel:${userData.phone}`}
+                      href={`tel:${phoneNumber}`}
                       className="text-primary hover:underline"
                     >
-                      {userData.phone}
+                      {phoneNumber}
                     </a>
                   </li>
                 )}

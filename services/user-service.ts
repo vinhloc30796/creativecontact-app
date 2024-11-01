@@ -11,8 +11,8 @@ export class UserService {
     data: Partial<ContactInfoData & ProfessionalInfoData & AboutInfoData>
   ) {
     const {
-      firstName, lastName, displayName, location,
-      email, phone, instagramHandle, facebookHandle,
+      firstName, lastName, location,
+      email, phoneCountryCode, phoneNumber, phoneCountryAlpha3, instagramHandle, facebookHandle,
       industries, experience,
       about
     } = data
@@ -22,8 +22,9 @@ export class UserService {
       {
         firstName: firstName || '',
         lastName: lastName || '',
-        displayName,
-        phone: phone || '',
+        phoneCountryCode: phoneCountryCode || '84',
+        phoneNumber: phoneNumber || '',
+        phoneCountryAlpha3: phoneCountryAlpha3 || 'VNM',
       },
       {
         industries: industries || [] as ("Advertising" | "Architecture" | "Arts and Crafts" | "Design" | "Fashion" | "Film, Video, and Photography" | "Music" | "Performing Arts" | "Publishing" | "Software and Interactive" | "Television and Radio" | "Visual Arts" | "Other")[],

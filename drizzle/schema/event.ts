@@ -70,7 +70,9 @@ export const eventRegistrations = pgTable("event_registrations", {
   slot: uuid("slot").references(() => eventSlots.id).notNull(),
   name: text("name").notNull(),
   email: text("email").notNull(),
-  phone: text("phone").notNull(),
+  phone_country_code: text("phone_country_code").notNull().default("84"),
+  phone_number: text("phone_number").notNull(),
+  phone_country_alpha3: text("phone_country_alpha3").notNull().default("VNM"),
 }, (table) => ({
   uniqueUserSlotRegistration: unique("unique_user_slot_registration").on(
     table.created_by,

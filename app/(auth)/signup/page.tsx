@@ -47,7 +47,9 @@ export default function SignupPage({
       email: '',
       firstName: '',
       lastName: '',
-      phone: '',
+      phoneCountryCode: '84',
+      phoneNumber: '',
+      phoneCountryAlpha3: 'VNM',
     },
   })
 
@@ -66,7 +68,9 @@ export default function SignupPage({
         email: userData.email,
         firstName: userData.firstName ?? '',
         lastName: userData.lastName ?? '',
-        phone: userData.phone ?? '',
+        phoneCountryCode: userData.phoneCountryCode ?? '84',
+        phoneNumber: userData.phoneNumber ?? '',
+        phoneCountryAlpha3: userData.phoneCountryAlpha3 ?? 'VNM',
       })
       professionalInfoForm.reset({
         industries: userData.industries || [],
@@ -114,7 +118,9 @@ export default function SignupPage({
       const writeUserInfoResult = await writeUserInfo(
         formUserId,
         {
-          phone: contactInfoData.phone,
+          phoneCountryCode: contactInfoData.phoneCountryCode,
+          phoneNumber: contactInfoData.phoneNumber,
+          phoneCountryAlpha3: contactInfoData.phoneCountryAlpha3,
           firstName: contactInfoData.firstName,
           lastName: contactInfoData.lastName,
         },
@@ -181,4 +187,3 @@ export default function SignupPage({
     </BackgroundDiv>
   )
 }
-

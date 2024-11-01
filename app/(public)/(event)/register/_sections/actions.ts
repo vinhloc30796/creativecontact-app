@@ -223,7 +223,9 @@ export async function createRegistration(
             slot: formData.slot,
             email: formData.email,
             name: `${formData.lastName} ${formData.firstName}`,
-            phone: formData.phone,
+            phone_country_code: formData.phoneCountryCode,
+            phone_number: formData.phoneNumber,
+            phone_country_alpha3: formData.phoneCountryAlpha3,
             status: status,
           })
           .where(
@@ -247,7 +249,9 @@ export async function createRegistration(
             slot: slot,
             email: formData.email,
             name: name,
-            phone: formData.phone,
+            phone_country_code: formData.phoneCountryCode,
+            phone_number: formData.phoneNumber, 
+            phone_country_alpha3: formData.phoneCountryAlpha3,
             created_by: formData.created_by,
             status: status,
           })
