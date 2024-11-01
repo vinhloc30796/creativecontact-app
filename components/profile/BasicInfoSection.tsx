@@ -30,15 +30,13 @@ export function BasicInfoSection({ userData, lang = "en" }: BasicInfoSectionProp
       location !== (userData.location || '');
 
     setFieldDirty('basic', isDirty);
-    
-    if (isDirty) {
-      setFormData('basic', {
-        firstName,
-        lastName,
-        displayName,
-        location
-      });
-    }
+    // Always set form data, not just when dirty
+    setFormData('basic', {
+      firstName,
+      lastName,
+      displayName,
+      location
+    });
   }, [firstName, lastName, displayName, location, userData, setFieldDirty, setFormData]);
 
   return (
@@ -82,6 +80,7 @@ export function BasicInfoSection({ userData, lang = "en" }: BasicInfoSectionProp
             <Input
               id="location"
               value={location}
+              disabled
               onChange={(e) => setLocation(e.target.value)}
             />
             <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -20,10 +20,8 @@ export function AboutSection({ userData, lang = "en" }: AboutSectionProps) {
   useEffect(() => {
     const isDirty = about !== (userData.about || '');
     setFieldDirty('about', isDirty);
-    
-    if (isDirty) {
-      setFormData('about', { about });
-    }
+    // Always set form data, not just when dirty
+    setFormData('about', { about });
   }, [about, userData.about, setFieldDirty, setFormData]);
 
   return (

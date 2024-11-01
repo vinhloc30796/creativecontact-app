@@ -55,6 +55,7 @@ export function ContactSection({ userData, lang = "en" }: ContactSectionProps) {
               id="email"
               type="email"
               value={email}
+              disabled
               onChange={(e) => setEmail(e.target.value)}
             />
             <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -1,10 +1,14 @@
+import { z } from 'zod'
+
 import { writeUserInfo } from '@/app/actions/user/writeUserInfo'
-import { BasicInfoData, ContactInfoData, ProfessionalInfoData, AboutData } from '@/app/form-schemas/about-info'
+import { type AboutInfoData } from '@/app/form-schemas/about-info'
+import { contactInfoSchema, type ContactInfoData } from '@/app/form-schemas/contact-info'
+import { professionalInfoSchema, type ProfessionalInfoData } from '@/app/form-schemas/professional-info'
 
 export class UserService {
   static async updateUserInfo(
     userId: string,
-    data: Partial<BasicInfoData & ContactInfoData & ProfessionalInfoData & AboutData>
+    data: Partial<ContactInfoData & ProfessionalInfoData & AboutInfoData>
   ) {
     const {
       firstName, lastName, displayName, location,

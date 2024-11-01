@@ -31,13 +31,11 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
     const isDirty = industriesChanged || experienceChanged;
     
     setFieldDirty('professional', isDirty);
-    
-    if (isDirty) {
-      setFormData('professional', {
+    // Always set form data, not just when dirty
+    setFormData('professional', {
         industries: selectedIndustries,
         experience: selectedExperience
-      });
-    }
+    });
   }, [selectedIndustries, selectedExperience, userData.industries, userData.experience, setFieldDirty, setFormData]);
 
   const toggleIndustry = (value: string) => {
