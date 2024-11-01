@@ -7,7 +7,11 @@
         "contact": "Liên hệ",
         "saveChanges": "Lưu Thay đổi",
         "saveChangesWithCount": "Lưu Thay đổi ({{count}} thay đổi)",
-        "saving": "Đang Lưu..."
+        "saving": "Đang Lưu...",
+        "backToProfile": "Quay lại Hồ sơ",
+        "discardChanges": "Hủy bỏ Thay đổi?",
+        "discardChangesDescription": "Bạn có muốn hủy bỏ {{count}} thay đổi? Nếu đồng ý, các chỉnh sửa của bạn sẽ không được lưu.",
+        "cancel": "Hủy"
     },
     "BasicInfoSection": {
         "basicInfo": "Thông tin Cơ bản",

@@ -15,14 +15,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/lib/i18n/init-client";
 
 interface BackButtonProps {
   className?: string;
+  lang?: string;
 }
 
-export function BackButton({ className }: BackButtonProps) {
+export function BackButton({ className, lang = "en" }: BackButtonProps) {
   const [showDialog, setShowDialog] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation(lang, "ProfilePage");
   const { formData, dirtyFields } = useProfileFormStore();
   const isDirty = isFormDirty({ dirtyFields, formData } as any);
   const dirtyFieldCount = Object.values(dirtyFields).filter(Boolean).length;
@@ -48,20 +51,20 @@ export function BackButton({ className }: BackButtonProps) {
         onClick={handleBack}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Profile
+        {t('navigation.backToProfile', 'Back to Profile')}
       </Button>
 
       <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Discard Changes?</AlertDialogTitle>
+            <AlertDialogTitle>{t('navigation.discardChanges', 'Discard Changes?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Do you want to discard {dirtyFieldCount} changes? If yes, your edits won&apos;t be effective.
+              {t('navigation.discardChangesDescription', 'Do you want to discard {{count}} changes? If yes, your edits won\'t be effective.', { count: dirtyFieldCount })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>Discard Changes</AlertDialogAction>
+            <AlertDialogCancel>{t('navigation.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm}>{t('navigation.discardChanges', 'Discard Changes')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -7,7 +7,11 @@
         "contact": "Contact",
         "saveChanges": "Save Changes",
         "saveChangesWithCount": "Save Changes ({{count}} changes)",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "backToProfile": "Back to Profile",
+        "discardChanges": "Discard Changes",
+        "discardChangesDescription": "Do you want to discard {{count}} changes? If yes, your edits won't be effective.",
+        "cancel": "Cancel"
     },
     "BasicInfoSection": {
         "basicInfo": "Basic Info",
