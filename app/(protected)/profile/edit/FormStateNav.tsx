@@ -31,7 +31,7 @@ export function FormStateNav({
 }) {
   const { t } = useTranslation(lang, "ProfilePage");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { formData, dirtyFields, resetForm } = useProfileFormStore();
   const isDirty = isFormDirty({ dirtyFields, formData } as any);
   const dirtyFieldCount = Object.values(dirtyFields).filter(Boolean).length;
@@ -52,40 +52,38 @@ export function FormStateNav({
   };
 
   return (
-    <div className="lg:w-1/3">
-      <div className="fixed lg:w-[calc(33.333%-2rem)]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('navigation.editProfile')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <nav className="space-y-2">
-              {sections.map((section) => {
-                const Icon = IconMap[section.iconName];
-                return (
-                  <a
-                    key={section.id}
-                    href={`#${section.id}`}
-                    className="flex items-center rounded-lg p-2 transition-colors hover:bg-accent"
-                  >
-                    <Icon className="mr-2 h-4 w-4" />
-                    {section.label}
-                  </a>
-                );
-              })}
-            </nav>
-          </CardContent>
-        </Card>
-        <div className="my-5 flex justify-end space-x-4 pb-8">
-          <Button disabled={!isDirty || isSubmitting} onClick={handleSubmit}>
-            {isSubmitting 
-              ? t('navigation.saving') 
-              : dirtyFieldCount > 0 
-                ? t('navigation.saveChangesWithCount', { count: dirtyFieldCount })
-                : t('navigation.saveChanges')
-            }
-          </Button>
-        </div>
+    <div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('navigation.editProfile')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <nav className="space-y-2">
+            {sections.map((section) => {
+              const Icon = IconMap[section.iconName];
+              return (
+                <a
+                  key={section.id}
+                  href={`#${section.id}`}
+                  className="flex items-center rounded-lg p-2 transition-colors hover:bg-accent"
+                >
+                  <Icon className="mr-2 h-4 w-4" />
+                  {section.label}
+                </a>
+              );
+            })}
+          </nav>
+        </CardContent>
+      </Card>
+      <div className="my-5 flex justify-end space-x-4 pb-8">
+        <Button disabled={!isDirty || isSubmitting} onClick={handleSubmit}>
+          {isSubmitting
+            ? t('navigation.saving')
+            : dirtyFieldCount > 0
+              ? t('navigation.saveChangesWithCount', { count: dirtyFieldCount })
+              : t('navigation.saveChanges')
+          }
+        </Button>
       </div>
     </div>
   );
