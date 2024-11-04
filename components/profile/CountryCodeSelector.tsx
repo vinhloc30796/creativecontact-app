@@ -4,21 +4,15 @@
 
 // Components
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { Check, ChevronsUpDown, Mail, Phone } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 // Utils
 import { cn } from "@/lib/utils";
 import { countryCodes } from "@/utils/countries";
 // React
-import { useFormState } from "@/app/(protected)/profile/edit/FormStateNav";
 import { UserData } from "@/app/types/UserInfo";
-import { useTranslation } from '@/lib/i18n/init-client';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface ContactSectionProps {
   userData: UserData;
@@ -55,8 +49,11 @@ export function CountryCodeSelector({ value, onChange }: { value: string, onChan
               {countryCodes.map((code) => (
                 <CommandItem
                   key={code.a3}
-                  value={code.value}
+                  // this is the value that will be returned by the command
+                  value={code.value} 
                   onSelect={toggleCountryCode}
+                  // helper text to improve search
+                  keywords={[code.label.toLowerCase(), code.a3.toLowerCase()]}
                 >
                   <Check
                     className={cn(
