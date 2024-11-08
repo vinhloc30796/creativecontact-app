@@ -505,3 +505,24 @@ INSERT INTO contacts (
     '314f834c-3ff2-4382-bc92-d37cbe2286a8', -- vinhloc30796@gmail.com
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- admin@lukewarm.io
 );
+
+-- Seed portfolio_artworks table
+INSERT INTO portfolio_artworks (
+    id,
+    user_id,
+    artwork_id,
+    display_order,
+    is_highlighted
+) VALUES (
+    '12912ab4-4e74-42d5-8977-cb387fba64b6',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    0,
+    true
+), (
+    '182f415e-aa64-4153-80d3-515e9e9bb825',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    1,
+    false
+);

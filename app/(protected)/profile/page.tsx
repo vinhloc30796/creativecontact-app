@@ -1,6 +1,7 @@
 "use server";
 
 import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
+import { fetchUserPortfolioArtworks } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +10,12 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
+import { PortfolioArtwork } from "@/drizzle/schema/portfolio";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
 import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
-import { Briefcase, CheckCircle, Mail, MapPin, Pencil, Phone, TrendingUp, UserCircle } from 'lucide-react';
+import { Briefcase, CheckCircle, Image, Mail, MapPin, Pencil, Phone, TrendingUp, UserCircle } from 'lucide-react';
 import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
@@ -70,11 +72,13 @@ function ProfileCard({
   t,
   userData,
   userSkills,
+  portfolioArtworks,
   showButtons = false
 }: {
   t: TFunction;
   userData: UserData;
   userSkills: UserSkills[];
+  portfolioArtworks: PortfolioArtwork[];
   showButtons?: boolean;
 }) {
   const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
@@ -96,10 +100,14 @@ function ProfileCard({
             <UserCircle className="mr-2 h-6 w-6" />
             {name}
           </CardTitle>
-          <div className="mb-2 flex items-center">
+          <div className="mb-2 flex items-center gap-2">
             <Badge variant="success" className="flex items-center">
               <CheckCircle className="mr-1 h-3 w-3" />
               {t("openToCollab")}
+            </Badge>
+            <Badge variant="secondary" className="flex items-center">
+              <Image className="mr-1 h-3 w-3" />
+              {portfolioArtworks.length} {t("artworks")}
             </Badge>
           </div>
           <p className="mb-4 text-sm text-gray-500 flex items-center">
@@ -303,14 +311,26 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
     redirect("/login");
   }
 
-  // Fetch user data
+  // Fetch user data and portfolio artworks in parallel
   let userData: UserData | null = null;
+  let portfolioArtworks: PortfolioArtwork[] = [];
   if (user) {
-    try {
-      userData = await fetchUserData(user.id);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      // Handle the error appropriately, e.g., show an error message to the user
+    const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
+      fetchUserData(user.id),
+      fetchUserPortfolioArtworks(user.id)
+    ]);
+    // Handle user data
+    if (userDataResult.status === 'fulfilled') {
+      userData = userDataResult.value;
+    } else {
+      console.error("Error fetching user data:", userDataResult.reason);
+    }
+
+    // Handle portfolio artworks
+    if (portfolioArtworksResult.status === 'fulfilled') {
+      portfolioArtworks = portfolioArtworksResult.value;
+    } else {
+      console.error("Error fetching portfolio artworks:", portfolioArtworksResult.reason);
     }
   }
 
@@ -393,6 +413,7 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                   t={t}
                   userData={userData}
                   userSkills={userSkills}
+                  portfolioArtworks={portfolioArtworks}
                 />
               )}
             </div>
