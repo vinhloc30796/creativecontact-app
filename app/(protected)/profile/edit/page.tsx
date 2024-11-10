@@ -1,3 +1,5 @@
+// File: app/(protected)/profile/edit/page.tsx
+
 "use server";
 
 import { fetchUserData } from "@/app/api/user/helper";
@@ -9,7 +11,7 @@ import { UserHeader } from "@/components/wrappers/UserHeader";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
 import { ProfileEditForm } from "./ProfileEditForm";
-import { BackButton } from "./BackButton";
+import { BackButton } from "../BackButton";
 
 interface ProfileEditPageProps {
   params: {};

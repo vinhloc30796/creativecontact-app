@@ -121,6 +121,12 @@ function ProfileCard({
                 {t("edit")}
               </a>
             </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/portfolio">
+                <Image className="mr-1 h-4 w-4" />
+                {t("portfolio")}
+              </a>
+            </Button>
           </div>
           {userData.about && (
             <section data-section="about" className="pt-4">
