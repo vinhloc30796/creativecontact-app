@@ -44,14 +44,14 @@ function PortfolioProjectCard({ form, handlePendingFilesUpdate, project }: Portf
   return (
     <Card>
       <CardContent className="space-y-6 p-6">
-        <ArtworkInfoStep
+        {/* <ArtworkInfoStep
           form={form}
           artworks={[]}
         />
 
         <ArtworkCreditInfoStep
           form={form}
-        />
+        /> */}
 
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium mb-4">Project Media</h3>
@@ -103,16 +103,25 @@ export default function PortfolioEditForm({
   };
 
   return (
-    <BackgroundDiv>
-      <div className="flex min-h-screen w-full flex-col">
-        <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
-          <div className="w-full px-4 sm:px-8 md:px-16">
-            <div className="flex flex-col lg:flex-row">
-              <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
-                <div className="mb-6">
-                  <h1 className="text-3xl font-bold">Portfolio</h1>
-                </div>
+    <div className="flex min-h-screen w-full flex-col">
+      <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
+        <div className="w-full px-4 sm:px-8 md:px-16">
+          <div className="flex flex-col lg:flex-row">
+            <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
+              <div className="mb-6">
+                <h1 className="text-3xl font-bold">Portfolio</h1>
+              </div>
 
+              {projects.length === 0 ? (
+                <div className="text-center py-12">
+                  <h3 className="text-lg font-medium text-gray-600 mb-4">No projects yet</h3>
+                  <p className="text-gray-500 mb-6">Get started by adding your first project</p>
+                  <Button onClick={handleAddProject} variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Project
+                  </Button>
+                </div>
+              ) : (
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <div className="flex items-center justify-between mb-4">
                     <TabsList>
@@ -139,11 +148,11 @@ export default function PortfolioEditForm({
                     </TabsContent>
                   ))}
                 </Tabs>
-              </div>
+              )}
             </div>
           </div>
-        </main>
-      </div>
-    </BackgroundDiv>
+        </div>
+      </main>
+    </div>
   );
 }
