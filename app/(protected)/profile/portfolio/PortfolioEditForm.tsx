@@ -76,7 +76,7 @@ export default function PortfolioEditForm({
   const { user, isLoggedIn } = useAuth();
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
   const [activeTab, setActiveTab] = useState<string>("new");
-
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const form = useForm<ProjectFormValues>({
     defaultValues: {
       title: "",
@@ -95,6 +95,7 @@ export default function PortfolioEditForm({
     };
     setProjects([...projects, newProject]);
     setActiveTab(newProject.id);
+    setIsEditing(true);
   };
 
   const handlePendingFilesUpdate = (projectId: string, files: File[]) => {
@@ -133,10 +134,12 @@ export default function PortfolioEditForm({
                       ))}
                     </TabsList>
 
-                    <Button onClick={handleAddProject} variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Project
-                    </Button>
+                    {!isEditing && (
+                      <Button onClick={handleAddProject} variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Project
+                      </Button>
+                    )}
                   </div>
 
                   {projects.map((project) => (
