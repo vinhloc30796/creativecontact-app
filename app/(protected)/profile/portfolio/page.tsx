@@ -7,6 +7,7 @@ import { UserData } from "@/app/types/UserInfo";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
 // React
+import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
 import { BackButton } from "../BackButton";
@@ -43,6 +44,10 @@ export default async function PortfolioEditPage({
     return null;
   }
 
+  const existingPortfolioArtworks = await fetchUserPortfolioArtworksWithDetails(
+    userData.id,
+  );
+
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
@@ -57,7 +62,11 @@ export default async function PortfolioEditPage({
             <BackButton />
           </div>
           <div className="container mx-auto px-4">
-            <PortfolioEditForm userData={userData} lang={lang} />
+            <PortfolioEditForm
+              userData={userData}
+              lang={lang}
+              existingPortfolioArtworks={existingPortfolioArtworks}
+            />
           </div>
         </main>
       </div>

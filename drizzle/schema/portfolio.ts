@@ -6,7 +6,7 @@ import {
   boolean,
   integer,
 } from "drizzle-orm/pg-core";
-import { artworks } from "./artwork";
+import { Artwork, artworks } from "./artwork";
 import { authUsers } from "./user";
 
 export const portfolioArtworks = pgTable("portfolio_artworks", {
@@ -24,3 +24,7 @@ export const portfolioArtworks = pgTable("portfolio_artworks", {
 });
 
 export type PortfolioArtwork = typeof portfolioArtworks.$inferSelect;
+export type PortfolioArtworkWithDetails = {
+  portfolio_artworks: typeof portfolioArtworks.$inferSelect;
+  artworks: typeof artworks.$inferSelect | null;
+};

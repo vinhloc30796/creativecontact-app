@@ -1,7 +1,9 @@
 // File: app/api/user/[id]/portfolio-artworks/helper.ts
 
+import { artworks } from "@/drizzle/schema/artwork";
 import {
   PortfolioArtwork,
+  PortfolioArtworkWithDetails,
   portfolioArtworks,
 } from "@/drizzle/schema/portfolio";
 import { db } from "@/lib/db";
@@ -10,9 +12,20 @@ import { eq } from "drizzle-orm";
 export async function fetchUserPortfolioArtworks(
   userId: string,
 ): Promise<PortfolioArtwork[]> {
-  const artworks: PortfolioArtwork[] = await db
+  const results: PortfolioArtwork[] = await db
     .select()
     .from(portfolioArtworks)
     .where(eq(portfolioArtworks.userId, userId));
-  return artworks;
+  return results;
+}
+
+export async function fetchUserPortfolioArtworksWithDetails(
+  userId: string,
+): Promise<PortfolioArtworkWithDetails[]> {
+  const results: PortfolioArtworkWithDetails[] = await db
+    .select()
+    .from(portfolioArtworks)
+    .where(eq(portfolioArtworks.userId, userId))
+    .innerJoin(artworks, eq(portfolioArtworks.artworkId, artworks.id));
+  return results;
 }

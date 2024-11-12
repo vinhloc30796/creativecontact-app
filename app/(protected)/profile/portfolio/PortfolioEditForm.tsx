@@ -6,7 +6,13 @@ import { UserData } from "@/app/types/UserInfo";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
@@ -16,13 +22,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormStateNav, Section } from "../edit/FormStateNav";
-
-interface PortfolioProject {
-  id: string;
-  title: string;
-  description: string;
-  files: File[];
-}
+import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 
 interface ProjectFormValues {
   title: string;
@@ -33,25 +33,30 @@ interface ProjectFormValues {
 
 interface PortfolioEditFormProps {
   userData: UserData;
+  existingPortfolioArtworks: PortfolioArtworkWithDetails[];
   lang?: string;
 }
 
 interface PortfolioProjectCardProps {
   form: ReturnType<typeof useForm<ProjectFormValues>>;
   handlePendingFilesUpdate: (projectId: string, files: File[]) => void;
-  project: PortfolioProject;
+  project: PortfolioArtworkWithDetails;
 }
 
-function PortfolioProjectCard({ form, handlePendingFilesUpdate, project }: PortfolioProjectCardProps) {
+function PortfolioProjectCard({
+  form,
+  handlePendingFilesUpdate,
+  project,
+}: PortfolioProjectCardProps) {
   return (
     <>
       <FormProvider {...form}>
         <CardHeader>
-          <h3 className="text-lg font-medium mb-4">Project Info</h3>
+          <h3 className="mb-4 text-lg font-medium">Project Info</h3>
           <ArtworkInfoStep form={form} artworks={[]} />
         </CardHeader>
         <CardContent className="space-y-6 p-6">
-          <h3 className="text-lg font-medium mb-4">Project Media</h3>
+          <h3 className="mb-4 text-lg font-medium">Project Media</h3>
           <ThumbnailProvider>
             <MediaUpload
               isNewArtwork={true}
@@ -62,8 +67,8 @@ function PortfolioProjectCard({ form, handlePendingFilesUpdate, project }: Portf
             />
           </ThumbnailProvider>
         </CardContent>
-        <CardFooter className="p-6 flex flex-col gap-4 items-start">
-          <h3 className="text-lg font-medium mb-4">Project Credits</h3>
+        <CardFooter className="flex flex-col items-start gap-4 p-6">
+          <h3 className="mb-4 text-lg font-medium">Project Credits</h3>
           <ArtworkCreditInfoStep form={form} />
         </CardFooter>
       </FormProvider>
@@ -71,29 +76,52 @@ function PortfolioProjectCard({ form, handlePendingFilesUpdate, project }: Portf
   );
 }
 
-function PortfolioSection() {
-
+function PortfolioSection({
+  userData,
+  existingPortfolioArtworks,
+}: {
+  userData: UserData;
+  existingPortfolioArtworks: PortfolioArtworkWithDetails[];
+}) {
   // Tabs
   const [activeTab, setActiveTab] = useState<string>("new");
   const [isEditing, setIsEditing] = useState<boolean>(false);
   // Projects
-  const [projects, setProjects] = useState<PortfolioProject[]>([]);
+  const [projects, setProjects] = useState<PortfolioArtworkWithDetails[]>(
+    existingPortfolioArtworks || []
+  );
+  const [newProjectTitle, setNewProjectTitle] = useState<string>("");
   const handleAddProject = () => {
-    const newProject: PortfolioProject = {
-      id: `project-${projects.length + 1}`,
-      title: "New Project",
-      description: "",
-      files: [],
+    const newProject: PortfolioArtworkWithDetails = {
+      portfolio_artworks: {
+        id: "",
+        userId: userData.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        artworkId: "",
+        displayOrder: projects.length,
+        isHighlighted: false,
+      },
+      artworks: {
+        id: "",
+        title: newProjectTitle,
+        description: null,
+        createdAt: new Date(),
+      },
     };
     setProjects([...projects, newProject]);
-    setActiveTab(newProject.id);
+    setActiveTab(newProject.portfolio_artworks.id);
     setIsEditing(true);
   };
   // Files
   const handlePendingFilesUpdate = (projectId: string, files: File[]) => {
-    setProjects(projects.map(p =>
-      p.id === projectId ? { ...p, files } : p
-    ));
+    setProjects(
+      projects.map((p) =>
+        p.portfolio_artworks.id === projectId
+          ? { ...p, files }
+          : p,
+      ),
+    );
   };
   // Form
   const form = useForm<ProjectFormValues>({
@@ -112,46 +140,54 @@ function PortfolioSection() {
         <CardTitle>Portfolio</CardTitle>
       </CardHeader>
       <CardContent>
-        {
-          projects.length === 0 ? (
-            <div className="text-center py-12">
-              <h3 className="text-lg font-medium text-gray-600 mb-4">No projects yet</h3>
-              <p className="text-gray-500 mb-6">Get started by adding your first project</p>
-              <Button onClick={handleAddProject} variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Project
-              </Button>
-            </div>
-          ) : (
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="flex items-center justify-between mb-4">
-                <TabsList>
-                  {projects.map((project) => (
-                    <TabsTrigger key={project.id} value={project.id}>
-                      {project.title}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+        {projects.length === 0 ? (
+          <div className="py-12 text-center">
+            <h3 className="mb-4 text-lg font-medium text-gray-600">
+              No projects yet
+            </h3>
+            <p className="mb-6 text-gray-500">
+              Get started by adding your first project
+            </p>
+            <Button onClick={handleAddProject} variant="outline" size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Project
+            </Button>
+          </div>
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <div className="mb-4 flex items-center justify-between">
+              <TabsList>
+                {projects.map((project) => (
+                  <TabsTrigger
+                    key={project.portfolio_artworks.id}
+                    value={project.portfolio_artworks.id}
+                  >
+                    {project.artworks?.title || "Untitled"}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
-                {!isEditing && (
-                  <Button onClick={handleAddProject} variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Project
-                  </Button>
-                )}
-              </div>
-              {projects.map((project) => (
-                <TabsContent key={project.id} value={project.id}>
-                  <PortfolioProjectCard
-                    form={form}
-                    handlePendingFilesUpdate={handlePendingFilesUpdate}
-                    project={project}
-                  />
-                </TabsContent>
-              ))}
-            </Tabs>
-          )
-        }
+              {!isEditing && (
+                <Button onClick={handleAddProject} variant="outline" size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Project
+                </Button>
+              )}
+            </div>
+            {projects.map((project) => (
+              <TabsContent
+                key={project.portfolio_artworks.id}
+                value={project.portfolio_artworks.id}
+              >
+                <PortfolioProjectCard
+                  form={form}
+                  handlePendingFilesUpdate={handlePendingFilesUpdate}
+                  project={project}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+        )}
       </CardContent>
     </Card>
   );
@@ -159,13 +195,17 @@ function PortfolioSection() {
 
 export default function PortfolioEditForm({
   userData,
+  existingPortfolioArtworks,
   lang = "en",
 }: PortfolioEditFormProps) {
   const { t } = useTranslation(lang, "ProfilePage");
-  const { user, isLoggedIn } = useAuth();
 
   const sections: Section[] = [
-    { id: "portfolio", label: t("navigation.portfolio"), iconName: "briefcase" },
+    {
+      id: "portfolio",
+      label: t("navigation.portfolio"),
+      iconName: "briefcase",
+    },
   ];
 
   const handleSubmit = async (formData: Record<string, any>) => {
@@ -173,12 +213,19 @@ export default function PortfolioEditForm({
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 h-full">
+    <div className="flex h-full flex-col gap-8 lg:flex-row">
       <div className="lg:w-1/3 lg:overflow-y-auto">
-        <FormStateNav sections={sections} onSubmit={handleSubmit} title="navigation.editPortfolio" />
+        <FormStateNav
+          sections={sections}
+          onSubmit={handleSubmit}
+          title="navigation.editPortfolio"
+        />
       </div>
-      <div className="space-y-8 lg:w-2/3 lg:overflow-y-auto pb-8">
-        <PortfolioSection />
+      <div className="space-y-8 pb-8 lg:w-2/3 lg:overflow-y-auto">
+        <PortfolioSection
+          userData={userData}
+          existingPortfolioArtworks={existingPortfolioArtworks}
+        />
       </div>
     </div>
   );
