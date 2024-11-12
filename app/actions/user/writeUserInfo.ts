@@ -4,13 +4,15 @@ import { IndustryType, ExperienceType, userInfos } from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
 import { getDisplayName } from "@/lib/name";
 
-
 export async function writeUserInfo(
   userId: string,
   userInfo: {
-    phone: string;
+    phoneCountryCode: string;
+    phoneNumber: string;
+    phoneCountryAlpha3: string;
     firstName: string;
     lastName: string;
+    displayName?: string;
   },
   professionalInfo: {
     industries: IndustryType[];
@@ -35,7 +37,7 @@ export async function writeUserInfo(
 
   // Validate user info
   if (validateUserInfo) {
-    if (!userInfo.phone || !userInfo.firstName || !userInfo.lastName) {
+    if (!userInfo.phoneNumber || !userInfo.firstName || !userInfo.lastName) {
       console.error("Invalid user info:", userInfo);
       return { success: false, error: "Invalid user info" };
     }
@@ -43,7 +45,9 @@ export async function writeUserInfo(
 
   try {
     const updateSet = {
-      phone: userInfo.phone,
+      phoneCountryCode: userInfo.phoneCountryCode,
+      phoneNumber: userInfo.phoneNumber,
+      phoneCountryAlpha3: userInfo.phoneCountryAlpha3,
       firstName: userInfo.firstName,
       lastName: userInfo.lastName,
       displayName: getDisplayName(userInfo.firstName, userInfo.lastName, true),

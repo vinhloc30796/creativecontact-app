@@ -36,7 +36,9 @@ export async function POST(request: NextRequest) {
         slot: eventRegistrations.slot,
         name: eventRegistrations.name,
         email: eventRegistrations.email,
-        phone: eventRegistrations.phone,
+        phone_country_code: eventRegistrations.phone_country_code,
+        phone_number: eventRegistrations.phone_number,
+        phone_country_alpha3: eventRegistrations.phone_country_alpha3,
       })
       .from(eventRegistrations)
       .where(eq(eventRegistrations.id, id));

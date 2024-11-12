@@ -1,4 +1,5 @@
 import { UserData } from "@/app/types/UserInfo";
+import { PortfolioArtwork } from "@/drizzle/schema/portfolio";
 
 export async function fetchUserData(userId: string): Promise<UserData | null> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||

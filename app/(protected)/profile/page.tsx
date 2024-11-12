@@ -1,6 +1,7 @@
 "use server";
 
 import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
+import { fetchUserPortfolioArtworks } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
@@ -9,12 +10,12 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
-import { UserInfo } from "@/drizzle/schema/user";
+import { PortfolioArtwork } from "@/drizzle/schema/portfolio";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
-import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
+import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
-import { Briefcase, CheckCircle, Mail, MapPin, Phone, Share2, TrendingUp, UserCircle, UserPlus } from 'lucide-react';
+import { Briefcase, CheckCircle, Image, Mail, MapPin, Pencil, Phone, TrendingUp, UserCircle } from 'lucide-react';
 import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
@@ -58,45 +59,31 @@ async function getUserContacts(userId?: string): Promise<UserData[]> {
   }));
 }
 
-const socialMediaMapper = {
-  instagramHandle: {
-    icon: SiInstagram,
-    baseUrl: "https://instagram.com/",
-  },
-  facebookHandle: {
-    icon: SiFacebook,
-    baseUrl: "https://facebook.com/",
-  },
-};
 
-function getSocialMediaLinks(userData: UserData) {
-  return Object.entries(socialMediaMapper).reduce((acc, [key, value]) => {
-    const handle = userData[key as keyof Pick<UserData, 'instagramHandle' | 'facebookHandle'>];
-    if (handle) {
-      acc.push({
-        icon: value.icon,
-        url: `${value.baseUrl}${handle}`,
-      });
-    }
-    return acc;
-  }, [] as Array<{ icon: typeof SiInstagram | typeof SiFacebook; url: string }>);
+
+function getFormattedPhoneNumber(userData: UserData) {
+  if (userData.phoneNumber && userData.phoneCountryCode) {
+    return `+${userData.phoneCountryCode} ${userData.phoneNumber}`;
+  }
+  return null;
 }
-
-
 
 function ProfileCard({
   t,
   userData,
   userSkills,
+  portfolioArtworks,
   showButtons = false
 }: {
   t: TFunction;
   userData: UserData;
   userSkills: UserSkills[];
+  portfolioArtworks: PortfolioArtwork[];
   showButtons?: boolean;
 }) {
   const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
   const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
+  const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
     <div className="mt-6 w-full overflow-y-auto lg:mt-0 lg:w-1/3 lg:pl-6">
@@ -113,28 +100,34 @@ function ProfileCard({
             <UserCircle className="mr-2 h-6 w-6" />
             {name}
           </CardTitle>
-          <div className="mb-2 flex items-center">
+          <div className="mb-2 flex items-center gap-2">
             <Badge variant="success" className="flex items-center">
               <CheckCircle className="mr-1 h-3 w-3" />
               {t("openToCollab")}
+            </Badge>
+            <Badge variant="secondary" className="flex items-center">
+              <Image className="mr-1 h-3 w-3" />
+              {portfolioArtworks.length} {t("artworks")}
             </Badge>
           </div>
           <p className="mb-4 text-sm text-gray-500 flex items-center">
             <MapPin className="mr-1 h-4 w-4" />
             {userData.location}
           </p>
-          {showButtons && (
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <UserPlus className="mr-1 h-4 w-4" />
-                {t("connect")}
-              </Button>
-              <Button variant="outline" size="sm">
-                <Share2 className="mr-1 h-4 w-4" />
-                {t("share")}
-              </Button>
-            </div>
-          )}
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/edit">
+                <Pencil className="mr-1 h-4 w-4" />
+                {t("edit")}
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/portfolio">
+                <Image className="mr-1 h-4 w-4" />
+                {t("portfolio")}
+              </a>
+            </Button>
+          </div>
           {userData.about && (
             <section data-section="about" className="pt-4">
               <h3 className="mb-2 text-lg font-semibold">{t("about")}</h3>
@@ -198,14 +191,14 @@ function ProfileCard({
                     </a>
                   </li>
                 )}
-                {userData.phone && (
+                {phoneNumber && (
                   <li className="flex items-center">
                     <Phone className="mr-2 h-4 w-4" />
                     <a
-                      href={`tel:${userData.phone}`}
+                      href={`tel:${phoneNumber}`}
                       className="text-primary hover:underline"
                     >
-                      {userData.phone}
+                      {phoneNumber}
                     </a>
                   </li>
                 )}
@@ -324,14 +317,26 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
     redirect("/login");
   }
 
-  // Fetch user data
+  // Fetch user data and portfolio artworks in parallel
   let userData: UserData | null = null;
+  let portfolioArtworks: PortfolioArtwork[] = [];
   if (user) {
-    try {
-      userData = await fetchUserData(user.id);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      // Handle the error appropriately, e.g., show an error message to the user
+    const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
+      fetchUserData(user.id),
+      fetchUserPortfolioArtworks(user.id)
+    ]);
+    // Handle user data
+    if (userDataResult.status === 'fulfilled') {
+      userData = userDataResult.value;
+    } else {
+      console.error("Error fetching user data:", userDataResult.reason);
+    }
+
+    // Handle portfolio artworks
+    if (portfolioArtworksResult.status === 'fulfilled') {
+      portfolioArtworks = portfolioArtworksResult.value;
+    } else {
+      console.error("Error fetching portfolio artworks:", portfolioArtworksResult.reason);
     }
   }
 
@@ -387,6 +392,9 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                                 <CardContent className="pt-6">
                                   <div className="text-center">
                                     <p className="text-gray-500">Please connect with other users to see their profiles here.</p>
+                                    <Button className="mt-4">
+                                      Find Contacts
+                                    </Button>
                                   </div>
                                 </CardContent>
                               </Card>
@@ -411,6 +419,7 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                   t={t}
                   userData={userData}
                   userSkills={userSkills}
+                  portfolioArtworks={portfolioArtworks}
                 />
               )}
             </div>

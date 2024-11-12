@@ -3,6 +3,7 @@ import { EventRegistrationData } from "@/app/form-schemas/event-registration";
 import { ProfessionalInfoData } from "@/app/form-schemas/professional-info";
 import { EventSlot } from '@/app/types/EventSlot';
 import { formatInTimeZone } from 'date-fns-tz';
+import { TIMEZONE } from '@/lib/timezones';
 
 interface ConfirmationStepProps {
 	contactInfoData: ContactInfoData
@@ -12,15 +13,13 @@ interface ConfirmationStepProps {
 }
 
 export function ConfirmationStep({ contactInfoData, eventRegistrationData, professionalInfoData, slots }: ConfirmationStepProps) {
-	const timeZone = 'Asia/Bangkok' // UTC+7
-
 	const selectedSlot = slots.find((slot) => slot.id === eventRegistrationData.slot)
 
 	const formatSlotTime = (slot: EventSlot | undefined) => {
 		if (!slot) return 'No slot selected'
 
-		const startTime = formatInTimeZone(new Date(slot.time_start), timeZone, 'dd/MM/yyyy HH:mm')
-		const endTime = formatInTimeZone(new Date(slot.time_end), timeZone, 'HH:mm')
+		const startTime = formatInTimeZone(new Date(slot.time_start), TIMEZONE, 'dd/MM/yyyy HH:mm')
+		const endTime = formatInTimeZone(new Date(slot.time_end), TIMEZONE, 'HH:mm')
 
 		return `${startTime} - ${endTime}`
 	}
@@ -34,7 +33,7 @@ export function ConfirmationStep({ contactInfoData, eventRegistrationData, profe
 				<strong>Email:</strong> {contactInfoData.email}
 			</p>
 			<p>
-				<strong>Phone:</strong> {contactInfoData.phone}
+				<strong>Phone:</strong> {contactInfoData.phoneCountryCode} {contactInfoData.phoneNumber}
 			</p>
 			<p>
 				<strong>Selected Time Slot:</strong> {formatSlotTime(selectedSlot)}

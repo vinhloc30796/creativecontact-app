@@ -43,7 +43,7 @@ export function ConfirmationPage({ contactInfoData, eventRegistrationData, profe
 				<strong>Email:</strong> {contactInfoData.email}
 			</p>
 			<p>
-				<strong>Phone:</strong> {contactInfoData.phone}
+				<strong>Phone:</strong> {contactInfoData.phoneCountryCode} {contactInfoData.phoneNumber}
 			</p>
 			<p>
 				<strong>Selected Time Slot:</strong> {formatSlotTime(selectedSlot)}

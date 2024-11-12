@@ -21,7 +21,9 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
       emailConfirmedAt: authUsers.emailConfirmedAt,
       firstName: userInfos.firstName,
       lastName: userInfos.lastName,
-      phone: userInfos.phone,
+      phoneCountryCode: userInfos.phoneCountryCode,
+      phoneNumber: userInfos.phoneNumber,
+      phoneCountryAlpha3: userInfos.phoneCountryAlpha3,
       instagramHandle: userInfos.instagramHandle,
       facebookHandle: userInfos.facebookHandle,
       profilePicture: userInfos.profilePicture,
@@ -36,11 +38,14 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
     ...contact,
     firstName: contact.firstName ?? '',
     lastName: contact.lastName ?? '',
-    email: contact.email ?? '', // Ensure email is always a string
-    isAnonymous: contact.isAnonymous ?? false, // Provide a default value
-    emailConfirmedAt: contact.emailConfirmedAt ?? null, // Allow null
-    industries: contact.industries ?? [], // Ensure it's always an array
-    experience: contact.experience ?? null, // Allow null as per UserData type
+    email: contact.email ?? '',
+    isAnonymous: contact.isAnonymous ?? false,
+    emailConfirmedAt: contact.emailConfirmedAt ?? null,
+    industries: contact.industries ?? [],
+    experience: contact.experience ?? null,
+    phoneCountryCode: contact.phoneCountryCode ?? '84',
+    phoneNumber: contact.phoneNumber ?? '',
+    phoneCountryAlpha3: contact.phoneCountryAlpha3 ?? 'VNM'
   }));
 
   return typeSafeContacts;
