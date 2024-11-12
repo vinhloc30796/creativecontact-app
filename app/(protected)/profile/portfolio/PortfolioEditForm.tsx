@@ -6,7 +6,7 @@ import { UserData } from "@/app/types/UserInfo";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
@@ -44,7 +44,7 @@ interface PortfolioProjectCardProps {
 
 function PortfolioProjectCard({ form, handlePendingFilesUpdate, project }: PortfolioProjectCardProps) {
   return (
-    <Card>
+    <>
       <FormProvider {...form}>
         <CardHeader>
           <h3 className="text-lg font-medium mb-4">Project Info</h3>
@@ -67,7 +67,7 @@ function PortfolioProjectCard({ form, handlePendingFilesUpdate, project }: Portf
           <ArtworkCreditInfoStep form={form} />
         </CardFooter>
       </FormProvider>
-    </Card>
+    </>
   );
 }
 
@@ -107,51 +107,53 @@ function PortfolioSection() {
 
   // Render
   return (
-    <>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Portfolio</h1>
-      </div>
-      {
-        projects.length === 0 ? (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-600 mb-4">No projects yet</h3>
-            <p className="text-gray-500 mb-6">Get started by adding your first project</p>
-            <Button onClick={handleAddProject} variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Project
-            </Button>
-          </div>
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex items-center justify-between mb-4">
-              <TabsList>
-                {projects.map((project) => (
-                  <TabsTrigger key={project.id} value={project.id}>
-                    {project.title}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
-              {!isEditing && (
-                <Button onClick={handleAddProject} variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Project
-                </Button>
-              )}
+    <Card>
+      <CardHeader>
+        <CardTitle>Portfolio</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {
+          projects.length === 0 ? (
+            <div className="text-center py-12">
+              <h3 className="text-lg font-medium text-gray-600 mb-4">No projects yet</h3>
+              <p className="text-gray-500 mb-6">Get started by adding your first project</p>
+              <Button onClick={handleAddProject} variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Project
+              </Button>
             </div>
-            {projects.map((project) => (
-              <TabsContent key={project.id} value={project.id}>
-                <PortfolioProjectCard
-                  form={form}
-                  handlePendingFilesUpdate={handlePendingFilesUpdate}
-                  project={project}
-                />
-              </TabsContent>
-            ))}
-          </Tabs>
-        )
-      }
-    </>
+          ) : (
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <div className="flex items-center justify-between mb-4">
+                <TabsList>
+                  {projects.map((project) => (
+                    <TabsTrigger key={project.id} value={project.id}>
+                      {project.title}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+
+                {!isEditing && (
+                  <Button onClick={handleAddProject} variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Project
+                  </Button>
+                )}
+              </div>
+              {projects.map((project) => (
+                <TabsContent key={project.id} value={project.id}>
+                  <PortfolioProjectCard
+                    form={form}
+                    handlePendingFilesUpdate={handlePendingFilesUpdate}
+                    project={project}
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
+          )
+        }
+      </CardContent>
+    </Card>
   );
 }
 
