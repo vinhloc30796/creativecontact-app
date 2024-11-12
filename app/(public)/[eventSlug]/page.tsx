@@ -25,6 +25,7 @@ import { EventNotFound } from './EventNotFound';
 import { UploadStatistics } from './UploadStatistics';
 // Utility imports
 import { useTranslation } from '@/lib/i18n/init-server';
+import EventEnded from './EventEnded';
 // Define the props interface for the EventPage component
 interface EventPageProps {
   params: {
@@ -63,11 +64,8 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
   // Fetch event data from the database
   const eventData = await db.query.events.findFirst({
-    where: and(
-      eq(events.slug, eventSlug),
-      gt(events.time_end, new Date()),
-    ),
-    columns: { id: true, name: true, slug: true }
+    where: eq(events.slug, eventSlug),
+    columns: { id: true, name: true, slug: true, time_end: true }
   });
 
   // Fetch recent events for the EventNotFound component
@@ -155,21 +153,23 @@ export default async function EventPage({ params, searchParams }: EventPageProps
             />
           </Suspense>
         </div>
-
         {/* Main content area */}
         <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
-          <div className="w-full px-4 sm:px-8 md:px-16">
-            {/* Render artwork cards */}
-            {shuffledArtworks.map((artwork, index) => (
-              <div
-                key={artwork.id}
-                className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
-                  } mt-2 pb-[40vh] sm:pb-[25vh]`}
-              >
-                <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={100} />
-              </div>
-            ))}
-          </div>
+          {eventData.time_end && eventData.time_end < new Date() ?
+            <EventEnded eventName={eventData.name} /> :
+            <div className="w-full px-4 sm:px-8 md:px-16">
+              {/* Render artwork cards */}
+              {shuffledArtworks.map((artwork, index) => (
+                <div
+                  key={artwork.id}
+                  className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
+                    } mt-2 pb-[40vh] sm:pb-[25vh]`}
+                >
+                  <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={100} />
+                </div>
+              ))}
+            </div>
+          }
         </main>
 
         {/* Footer section */}

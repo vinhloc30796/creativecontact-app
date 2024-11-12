@@ -11,19 +11,6 @@ BEGIN;
   -- Step 2: Add comment to the new column
   COMMENT ON COLUMN public.events.time_end IS 'End time of the event';
 
-  -- Step 3: Add value now for all events
-  UPDATE public.events
-  SET time_end = now();
-  
-  -- Step 3.1: time end of trungthu-archive-2024 is Oct 1st, 20Ã
-  UPDATE public.events
-  SET time_end = '2024-10-01 00:00:00'
-  WHERE id= '9419ee07-81ed-4114-8143-1fff084d019a';
-  
-  -- Step 4: constraints not null
-  ALTER TABLE public.events
-  ALTER COLUMN time_end SET NOT NULL;
-
   -- Note: index to be added later
 
   -- Verification
