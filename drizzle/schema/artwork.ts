@@ -97,6 +97,8 @@ export const artworkEvents = pgTable("artwork_events", {
   uniqueArtworkEvent: unique("unique_artwork_event").on(table.artworkId, table.eventId),
 }));
 
+export type ArtworkEvent = InferSelectModel<typeof artworkEvents>;
+
 /* postgres=> \dT+ asset_type
                                          List of data types
  Schema |    Name    | Internal name | Size | Elements |  Owner   | Access privileges | Description 
