@@ -1,10 +1,12 @@
 {
     "navigation": {
         "editProfile": "Edit Profile",
+        "editPortfolio": "Edit Portfolio",
         "basicInfo": "Basic Info", 
         "about": "About",
         "professional": "Professional",
         "contact": "Contact",
+        "portfolio": "Portfolio",
         "saveChanges": "Save Changes",
         "saveChangesWithCount": "Save Changes ({{count}} changes)",
         "saving": "Saving...",

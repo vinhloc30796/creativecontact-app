@@ -1,10 +1,12 @@
 {
     "navigation": {
         "editProfile": "Chỉnh sửa Hồ sơ",
+        "editPortfolio": "Chỉnh sửa Portfolio",
         "basicInfo": "Thông tin Cơ bản",
         "about": "Giới thiệu", 
         "professional": "Chuyên môn",
         "contact": "Liên hệ",
+        "portfolio": "Portfolio",
         "saveChanges": "Lưu Thay đổi",
         "saveChangesWithCount": "Lưu Thay đổi ({{count}} thay đổi)",
         "saving": "Đang Lưu...",

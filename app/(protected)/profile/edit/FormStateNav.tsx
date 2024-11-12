@@ -23,10 +23,12 @@ const IconMap: Record<string, React.ElementType> = {
 export function FormStateNav({
   sections,
   onSubmit,
+  title = "navigation.editProfile",
   lang = "en",
 }: {
   sections: Section[];
   onSubmit: (data: Record<string, any>) => Promise<void>;
+  title?: string;
   lang?: string;
 }) {
   const { t } = useTranslation(lang, "ProfilePage");
@@ -55,7 +57,7 @@ export function FormStateNav({
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>{t('navigation.editProfile')}</CardTitle>
+          <CardTitle>{t(title)}</CardTitle>
         </CardHeader>
         <CardContent>
           <nav className="space-y-2">
