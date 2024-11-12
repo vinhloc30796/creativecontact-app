@@ -8,7 +8,7 @@ import { Suspense } from 'react';
 // Database and ORM imports
 import { db } from '@/lib/db';
 import { createClient } from '@supabase/supabase-js';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq, gt, lt } from 'drizzle-orm';
 
 // Schema imports
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
@@ -63,7 +63,10 @@ export default async function EventPage({ params, searchParams }: EventPageProps
 
   // Fetch event data from the database
   const eventData = await db.query.events.findFirst({
-    where: eq(events.slug, eventSlug),
+    where: and(
+      eq(events.slug, eventSlug),
+      gt(events.time_end, new Date()),
+    ),
     columns: { id: true, name: true, slug: true }
   });
 
@@ -170,7 +173,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </main>
 
         {/* Footer section */}
-        <EventFooter lang={lang}/>
+        <EventFooter lang={lang} />
       </div>
     </BackgroundDiv>
   );
