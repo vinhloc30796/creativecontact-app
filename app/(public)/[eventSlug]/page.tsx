@@ -68,6 +68,10 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     columns: { id: true, name: true, slug: true, time_end: true }
   });
 
+  if (eventData?.time_end && eventData.time_end < new Date()) {
+    return <EventEnded eventName={eventData.name} eventSlug={eventSlug} lang={lang} />
+  }
+
   // Fetch recent events for the EventNotFound component
   const recentEvents = await db.query.events.findMany({
     orderBy: desc(events.created_at),
@@ -155,8 +159,6 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </div>
         {/* Main content area */}
         <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
-          {eventData.time_end && eventData.time_end < new Date() ?
-            <EventEnded eventName={eventData.name} /> :
             <div className="w-full px-4 sm:px-8 md:px-16">
               {/* Render artwork cards */}
               {shuffledArtworks.map((artwork, index) => (
@@ -169,7 +171,6 @@ export default async function EventPage({ params, searchParams }: EventPageProps
                 </div>
               ))}
             </div>
-          }
         </main>
 
         {/* Footer section */}
