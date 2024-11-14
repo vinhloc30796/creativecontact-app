@@ -36,7 +36,7 @@ export const EventNotFound = ({ recentEvents, eventSlug }: { recentEvents: { id:
           <div className="space-y-2">
             {recentEvents.map((recentEvent) => (
               <Button key={recentEvent.id} asChild variant="outline" className="w-full">
-                <Link href={`/${recentEvent.slug}`}>
+                <Link href={`/event/${recentEvent.slug}`}>
                   {recentEvent.name}
                 </Link>
               </Button>

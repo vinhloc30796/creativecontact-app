@@ -19,6 +19,7 @@ export const events = pgTable("events", {
   name: text("name").notNull(),
   slug: text("slug").notNull(),
   created_by: uuid("created_by").notNull(),
+  time_end: timestamp("time_end", { withTimezone: true }).notNull(),
 });
 
 export const eventSlots = pgTable("event_slots", {

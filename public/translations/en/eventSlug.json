@@ -3,6 +3,10 @@
     "text": "Event Not Found",
     "description": "The event <strong>{{eventSlug}}</strong> does not exist. Perhaps you meant one of the following events?"
   },
+  "eventEnded": {
+    "text": "The event has ended",
+    "description": "The event <strong>{{eventSlug}}</strong> has ended."
+  },
   "state": {
     "loading": "Loading user information...",
     "loggedIn": "You're logged in as {{email}}",
