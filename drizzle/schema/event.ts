@@ -27,7 +27,7 @@ export const eventSlots = pgTable("event_slots", {
   created_at: timestamp("created_at", { withTimezone: true }).notNull(),
   event: uuid("event").references(() => events.id).notNull(),
   time_start: timestamp("time_start", { withTimezone: true }).notNull(),
-  time_end: timestamp("time_end", { withTimezone: true }).notNull(),
+  time_end: timestamp("time_end", { withTimezone: true }),
   capacity: integer("capacity").notNull(),
   special_notes: text("special_notes"),
 });
