@@ -11,7 +11,7 @@ export async function fetchUserData(userId: string) {
       firstName: userInfos.firstName,
       lastName: userInfos.lastName,
       userName: userInfos.userName,
-
+      displayName: userInfos.displayName,
       phoneCountryCode: userInfos.phoneCountryCode,
       phoneNumber: userInfos.phoneNumber,
       phoneCountryAlpha3: userInfos.phoneCountryAlpha3,
@@ -44,7 +44,7 @@ export async function fetchUserData(userId: string) {
     firstName: userData.firstName || "",
     lastName: userData.lastName || "",
     userName: userData.userName || "",
-
+    displayName: userData.displayName || "",
     phoneCountryCode: userData.phoneCountryCode || "84",
     phoneNumber: userData.phoneNumber || "",
     phoneCountryAlpha3: userData.phoneCountryAlpha3 || "VNM",

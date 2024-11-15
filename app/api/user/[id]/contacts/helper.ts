@@ -39,6 +39,7 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
     ...contact,
     firstName: contact.firstName ?? "",
     lastName: contact.lastName ?? "",
+    displayName: contact.displayName ?? "",
     userName: contact.userName ?? "",
     email: contact.email ?? "",
     isAnonymous: contact.isAnonymous ?? false,
