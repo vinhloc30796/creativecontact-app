@@ -1,10 +1,10 @@
 // File: app/api/user/[id]/contacts/helper.ts
 
-import { UserData } from '@/app/types/UserInfo';
-import { contacts } from '@/drizzle/schema/contact';
-import { authUsers, userInfos } from '@/drizzle/schema/user';
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
+import { UserData } from "@/app/types/UserInfo";
+import { contacts } from "@/drizzle/schema/contact";
+import { authUsers, userInfos } from "@/drizzle/schema/user";
+import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
 
 export async function fetchUserContacts(userId: string): Promise<UserData[]> {
   const contactsInfo = await db
@@ -34,18 +34,19 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
     .where(eq(contacts.userId, userId));
 
   // Ensure type safety by mapping the result to UserData
-  const typeSafeContacts: UserData[] = contactsInfo.map(contact => ({
+  const typeSafeContacts: UserData[] = contactsInfo.map((contact) => ({
     ...contact,
-    firstName: contact.firstName ?? '',
-    lastName: contact.lastName ?? '',
-    email: contact.email ?? '',
+    firstName: contact.firstName ?? "",
+    lastName: contact.lastName ?? "",
+    displayName: contact.displayName ?? "",
+    email: contact.email ?? "",
     isAnonymous: contact.isAnonymous ?? false,
     emailConfirmedAt: contact.emailConfirmedAt ?? null,
     industries: contact.industries ?? [],
     experience: contact.experience ?? null,
-    phoneCountryCode: contact.phoneCountryCode ?? '84',
-    phoneNumber: contact.phoneNumber ?? '',
-    phoneCountryAlpha3: contact.phoneCountryAlpha3 ?? 'VNM'
+    phoneCountryCode: contact.phoneCountryCode ?? "84",
+    phoneNumber: contact.phoneNumber ?? "",
+    phoneCountryAlpha3: contact.phoneCountryAlpha3 ?? "VNM",
   }));
 
   return typeSafeContacts;
