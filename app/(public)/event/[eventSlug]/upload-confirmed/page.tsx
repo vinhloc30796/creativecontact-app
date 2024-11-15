@@ -26,7 +26,7 @@ interface UploadConfirmedContentProps {
 }
 
 async function UploadConfirmedContent({ params, searchParams }: UploadConfirmedContentProps) {
-  const { eventSlug } = params; 
+  const { eventSlug } = params;
   const { email, userId, artworkId, emailSent, lang } = searchParams;
   const artwork = artworkId ? await getArtwork(artworkId) : null;
   const user = userId ? await getUserInfo(userId) : null;
@@ -76,7 +76,7 @@ async function UploadConfirmedContent({ params, searchParams }: UploadConfirmedC
 
           <div className="flex flex-col space-y-2">
             <Button asChild>
-              <Link href={`/${eventSlug}`}>{t('common:viewGallery')}</Link>
+              <Link href={`/event/${eventSlug}`}>{t('common:viewGallery')}</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/">{t('common:backToHome')}</Link>
