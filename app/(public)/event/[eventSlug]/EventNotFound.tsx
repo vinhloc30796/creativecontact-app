@@ -16,7 +16,7 @@ export const EventNotFound = ({ recentEvents, eventSlug }: { recentEvents: { id:
         <CardHeader
           className="border-b aspect-video bg-accent-foreground text-accent-foreground"
           style={{
-            backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
+            backgroundImage: `url(${eventSlug}-background.png), url(/banner.jpg)`,
             backgroundSize: "cover",
           }}
         >

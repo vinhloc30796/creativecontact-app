@@ -13,7 +13,7 @@ export function BackgroundDiv({ children, className, eventSlug = 'hoantat-2024',
   const fallbackImage = '/bg.jpg';
   const centerClass = shouldCenter ? 'flex items-center justify-center' : '';
   return (
-    <div 
+    <div
       className={cn(
         "min-h-screen w-full",
         "min-h-[100vh]",

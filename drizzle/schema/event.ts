@@ -17,7 +17,7 @@ export const events = pgTable("events", {
   id: uuid("id").primaryKey(),
   created_at: timestamp("created_at", { withTimezone: true }).notNull(),
   name: text("name").notNull(),
-  slug: text("slug").notNull(),
+  slug: text("slug").notNull().unique(),
   created_by: uuid("created_by").notNull(),
   time_end: timestamp("time_end", { withTimezone: true }).notNull(),
 });

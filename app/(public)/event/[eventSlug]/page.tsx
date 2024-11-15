@@ -68,16 +68,12 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     columns: { id: true, name: true, slug: true, time_end: true }
   });
 
-  if (eventData?.time_end && eventData.time_end < new Date()) {
-    return <EventEnded eventName={eventData.name} eventSlug={eventSlug} lang={lang} />
-  }
-
   // Fetch recent events for the EventNotFound component
   const recentEvents = await db.query.events.findMany({
     orderBy: desc(events.created_at),
     limit: 5
   });
-
+  const eventEnded = eventData?.time_end && new Date() > new Date(eventData.time_end);
   // If event is not found, render the EventNotFound component
   if (!eventData) {
     return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
@@ -144,7 +140,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col w-full">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0" />
+        <EventHeader eventSlug={eventSlug} lang={lang} eventEnded={eventEnded} className="mb-0" />
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
@@ -159,18 +155,18 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </div>
         {/* Main content area */}
         <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
-            <div className="w-full px-4 sm:px-8 md:px-16">
-              {/* Render artwork cards */}
-              {shuffledArtworks.map((artwork, index) => (
-                <div
-                  key={artwork.id}
-                  className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
-                    } mt-2 pb-[40vh] sm:pb-[25vh]`}
-                >
-                  <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={100} />
-                </div>
-              ))}
-            </div>
+          <div className="w-full px-4 sm:px-8 md:px-16">
+            {/* Render artwork cards */}
+            {shuffledArtworks.map((artwork, index) => (
+              <div
+                key={artwork.id}
+                className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
+                  } mt-2 pb-[40vh] sm:pb-[25vh]`}
+              >
+                <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={100} />
+              </div>
+            ))}
+          </div>
         </main>
 
         {/* Footer section */}
