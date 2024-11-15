@@ -131,7 +131,7 @@ INSERT INTO auth.users (
     '314f834c-3ff2-4382-bc92-d37cbe2286a8',                             -- id
     'authenticated',                                                    -- aud
     'authenticated',                                                    -- role
-    'vinhloc30796@gmail.com',                                           -- email
+    'letrunghoahieu@gmail.com',                                           -- email
     '',                                                                 -- encrypted_password
     '2024-07-31 13:29:02.204237+00',                                    -- email_confirmed_at
     NULL,                                                               -- invited_at
@@ -144,7 +144,7 @@ INSERT INTO auth.users (
     NULL,                                                               -- email_change_sent_at
     '2024-07-31 13:29:02.201874+00',                                    -- last_sign_in_at
     '{"provider": ["email"], "providers": ["email", "github"]}'::jsonb, -- raw_app_meta_data
-    '{"type": "user", "email": "vinhloc30796@gmail.com"}'::jsonb,       -- raw_user_meta_data
+    '{"type": "user", "email": "letrunghoahieu@gmail.com"}'::jsonb,       -- raw_user_meta_data
     NULL,                                                               -- is_super_admin
     '2024-07-31 13:29:02.199319+00',                                    -- created_at
     '2024-07-31 13:29:02.204237+00',                                    -- updated_at
@@ -168,8 +168,11 @@ INSERT INTO user_infos (
     id,
     first_name,
     last_name,
+    user_name,
     display_name,
-    phone,
+    phone_country_code,
+    phone_number,
+    phone_country_alpha3,
     location,
     occupation,
     about,
@@ -182,13 +185,16 @@ INSERT INTO user_infos (
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
     'Admin',
     'User',
+    'admin',
     'Admin User',
-    '+1234567890',
+    '1',
+    '2345678901',
+    'USA',
     'New York',
     'System Administrator',
     'Experienced creative technologist with a passion for integrating cutting-edge technology into artistic projects and interactive experiences.',
     ARRAY['Software and Interactive', 'Other']::industry[],
-    'Senior',
+    'Senior'::experience_level,
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d/lukewarm._Abstract_expressionism_emerald-powered_river-dwelling_9c99d61d-cd4b-4534-8a4e-ee60d1862ed2.png',
     'admin_insta',
     'admin_fb'
@@ -196,27 +202,33 @@ INSERT INTO user_infos (
     '13f60da9-8dd4-42f9-8a57-c0569a158857',
     'Regular',
     'User',
+    'regular',
     'Regular User',
-    '+9876543210',
+    '1',
+    '9876543210',
+    'USA',
     'San Francisco',
     'Software Developer',
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
     ARRAY['Software and Interactive']::industry[],
-    'Entry',
+    'Entry'::experience_level,
     NULL,
     'user_insta',
     'user_fb'
 ), (
     '314f834c-3ff2-4382-bc92-d37cbe2286a8',
-    'Hoang Vinh Loc',
-    'Nguyen',
-    'Vinh Loc Nguyen',
-    '+1234567890',
+    'Trung Hoa Hieu',
+    'Le',
+    'lehieu',
+    'Le Hieu',
+    '84',
+    '1234567890',
+    'VNM',
     'Lam Dong, Vietnam',
     'Software Developer',
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
     ARRAY['Software and Interactive']::industry[],
-    'Senior',
+    'Senior'::experience_level,
     '314f834c-3ff2-4382-bc92-d37cbe2286a8/lukewarm._a_river_water-elemental_lion_drawing_power_from_emera_cd875218-db8a-4ab4-afdd-a00a1a6deb49.png',
     'vl307',
     'vl307'
@@ -494,6 +506,27 @@ INSERT INTO contacts (
     contact_id
 ) VALUES (
     '12912ab4-4e74-42d5-8977-cb387fba64b6',
-    '314f834c-3ff2-4382-bc92-d37cbe2286a8', -- vinhloc30796@gmail.com
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8', -- letrunghoahieu@gmail.com
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- admin@lukewarm.io
+);
+
+-- Seed portfolio_artworks table
+INSERT INTO portfolio_artworks (
+    id,
+    user_id,
+    artwork_id,
+    display_order,
+    is_highlighted
+) VALUES (
+    '12912ab4-4e74-42d5-8977-cb387fba64b6',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',
+    'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
+    0,
+    true
+), (
+    '182f415e-aa64-4153-80d3-515e9e9bb825',
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8',
+    '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
+    1,
+    false
 );

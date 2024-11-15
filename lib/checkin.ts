@@ -20,7 +20,9 @@ export type CheckinResult = {
     status: string;
     name: string;
     email: string;
-    phone: string;
+    phone_country_code: string;
+    phone_number: string;
+    phone_country_alpha3: string;
   };
   error?: string;
   errorCode?: string;
@@ -64,7 +66,9 @@ export async function performCheckin(
           status: eventRegistrations.status,
           name: eventRegistrations.name,
           email: eventRegistrations.email,
-          phone: eventRegistrations.phone,
+          phone_country_code: eventRegistrations.phone_country_code,
+          phone_number: eventRegistrations.phone_number,
+          phone_country_alpha3: eventRegistrations.phone_country_alpha3,
         });
 
       // Insert a new record into event_registration_logs

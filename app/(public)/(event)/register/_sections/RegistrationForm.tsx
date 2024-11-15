@@ -27,6 +27,8 @@ import { signUpUser } from "@/app/actions/user/signUp"
 import { formSchema, FormData } from './formSchema'
 import { useFormUserId } from '@/hooks/useFormUserId'
 import { ExperienceLevel, Industry } from '@/app/types/UserInfo'
+import { IndustryType } from '@/drizzle/schema/user'
+import { ExperienceType } from '@/drizzle/schema/user'
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[]
@@ -50,12 +52,14 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
   // Form setup
   const contactInfoForm = useForm<ContactInfoData>({
     resolver: zodResolver(contactInfoSchema),
-    mode: 'onSubmit',
+    mode: 'onSubmit', 
     defaultValues: {
       email: '',
       firstName: '',
       lastName: '',
-      phone: '',
+      phoneCountryCode: '84',
+      phoneNumber: '',
+      phoneCountryAlpha3: 'VNM',
     },
   })
 
@@ -84,7 +88,9 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
       email: '',
       firstName: '',
       lastName: '',
-      phone: '',
+      phoneCountryCode: '84',
+      phoneNumber: '',
+      phoneCountryAlpha3: 'VNM',
 
       // Professional Info
       industries: [],
@@ -103,7 +109,9 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
         email: userData.email,
         firstName: userData.firstName ?? '',
         lastName: userData.lastName ?? '',
-        phone: userData.phone ?? '',
+        phoneCountryCode: userData.phoneCountryCode ?? '84',
+        phoneNumber: userData.phoneNumber ?? '',
+        phoneCountryAlpha3: userData.phoneCountryAlpha3 ?? 'VNM',
       });
       professionalInfoForm.reset({
         industries: userData.industries || [],
@@ -311,13 +319,15 @@ export default function RegistrationForm({ initialEventSlots }: RegistrationForm
           ? writeUserInfo(
             formUserId,
             {
-              phone: combinedData.phone,
-              firstName: combinedData.firstName,
-              lastName: combinedData.lastName,
+              phoneCountryCode: contactInfoData.phoneCountryCode,
+              phoneNumber: contactInfoData.phoneNumber,
+              phoneCountryAlpha3: contactInfoData.phoneCountryAlpha3,
+              firstName: contactInfoData.firstName,
+              lastName: contactInfoData.lastName,
             },
             {
-              industries: combinedData.industries as Industry[],
-              experience: combinedData.experience as ExperienceLevel | null,
+              industries: combinedData.industries as IndustryType[],
+              experience: combinedData.experience as ExperienceType,
             },
             {
               instagramHandle: combinedData.instagramHandle,

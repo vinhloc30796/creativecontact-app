@@ -5,7 +5,10 @@ import { Pool } from "pg";
 import * as schema from "@/drizzle/schema/event";
 
 const dbUrl = process.env.DATABASE_URL!;
-const maskedDbUrl = dbUrl.replace(/(?<=:\/\/)([^:]+):([^@]+)@/, '$1:[REDACTED]@');
+const maskedDbUrl = dbUrl.replace(
+  /(?<=:\/\/)([^:]+):([^@]+)@/,
+  "$1:[REDACTED]@",
+);
 console.log("lib/db.ts drizzle dbUrl", maskedDbUrl);
 
 const pool = new Pool({

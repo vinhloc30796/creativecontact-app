@@ -18,11 +18,24 @@ export interface EventRegistration {
 }
 
 export type FormData = {
+	// Contact Info
 	email: string
 	firstName: string
 	lastName: string
-	phone: string
+	phoneCountryCode: string
+	phoneNumber: string
+	phoneCountryAlpha3: string
+
+	// Professional Info
+	industries: string[]
+	experience: string
+
+	// Event Registration
 	slot: string
+
+	// Social Media
+	instagramHandle?: string
+	facebookHandle?: string
 }
 
 export interface EventRegistrationWithSlot extends EventRegistration {

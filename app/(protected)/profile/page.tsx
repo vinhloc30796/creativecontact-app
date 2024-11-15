@@ -1,25 +1,41 @@
 "use server";
 
 import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
+import { fetchUserPortfolioArtworks } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
-import { UserInfo } from "@/drizzle/schema/user";
+import { PortfolioArtwork } from "@/drizzle/schema/portfolio";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
-import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
+import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
-import { Briefcase, CheckCircle, Mail, MapPin, Phone, Share2, TrendingUp, UserCircle, UserPlus } from 'lucide-react';
+import {
+  Briefcase,
+  CheckCircle,
+  Image,
+  Mail,
+  MapPin,
+  Pencil,
+  Phone,
+  TrendingUp,
+  UserCircle,
+} from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface ProfilePageProps {
-  params: {
-  };
+  params: {};
   searchParams: {
     lang: string;
   };
@@ -50,91 +66,88 @@ async function getUserContacts(userId?: string): Promise<UserData[]> {
   const contacts = await fetchUserContacts(userId);
 
   // Map UserInfo to UserData
-  return contacts.map(contact => ({
+  return contacts.map((contact) => ({
     ...contact,
-    email: '', // Add a default empty string or fetch the actual email
+    email: "", // Add a default empty string or fetch the actual email
     isAnonymous: false, // Set a default value
     emailConfirmedAt: null, // Set a default value
   }));
 }
 
-const socialMediaMapper = {
-  instagramHandle: {
-    icon: SiInstagram,
-    baseUrl: "https://instagram.com/",
-  },
-  facebookHandle: {
-    icon: SiFacebook,
-    baseUrl: "https://facebook.com/",
-  },
-};
-
-function getSocialMediaLinks(userData: UserData) {
-  return Object.entries(socialMediaMapper).reduce((acc, [key, value]) => {
-    const handle = userData[key as keyof Pick<UserData, 'instagramHandle' | 'facebookHandle'>];
-    if (handle) {
-      acc.push({
-        icon: value.icon,
-        url: `${value.baseUrl}${handle}`,
-      });
-    }
-    return acc;
-  }, [] as Array<{ icon: typeof SiInstagram | typeof SiFacebook; url: string }>);
+function getFormattedPhoneNumber(userData: UserData) {
+  if (userData.phoneNumber && userData.phoneCountryCode) {
+    return `+${userData.phoneCountryCode} ${userData.phoneNumber}`;
+  }
+  return null;
 }
-
-
 
 function ProfileCard({
   t,
   userData,
   userSkills,
-  showButtons = false
+  portfolioArtworks,
+  showButtons = false,
 }: {
   t: TFunction;
   userData: UserData;
   userSkills: UserSkills[];
+  portfolioArtworks: PortfolioArtwork[];
   showButtons?: boolean;
 }) {
-  const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
+  const name =
+    userData.displayName || `${userData.firstName} ${userData.lastName}`;
+  const userName = userData.userName || null;
   const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
+  const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
     <div className="mt-6 w-full overflow-y-auto lg:mt-0 lg:w-1/3 lg:pl-6">
-      <Card className="flex flex-col h-full">
+      <Card className="flex h-full flex-col">
         <CardHeader className="flex flex-col items-center">
-          <div className="mb-4 w-24 h-24 overflow-hidden rounded-lg">
+          <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
             <img
               src={profilePictureUrl}
               alt={`${name}'s profile`}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           </div>
-          <CardTitle className="mb-2 text-2xl font-bold flex items-center">
+          <CardTitle className="mb-2 flex items-center text-2xl font-bold">
             <UserCircle className="mr-2 h-6 w-6" />
             {name}
           </CardTitle>
-          <div className="mb-2 flex items-center">
+          {userName && (
+            <p className="mb-2 flex items-center text-sm text-gray-500">
+              {userName}
+            </p>
+          )}
+          <div className="mb-2 flex items-center gap-2">
             <Badge variant="success" className="flex items-center">
               <CheckCircle className="mr-1 h-3 w-3" />
               {t("openToCollab")}
             </Badge>
+            <Badge variant="secondary" className="flex items-center">
+              <Image className="mr-1 h-3 w-3" />
+              {portfolioArtworks.length} {t("artworks")}
+            </Badge>
           </div>
-          <p className="mb-4 text-sm text-gray-500 flex items-center">
+          <p className="mb-4 flex items-center text-sm text-gray-500">
             <MapPin className="mr-1 h-4 w-4" />
             {userData.location}
           </p>
-          {showButtons && (
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <UserPlus className="mr-1 h-4 w-4" />
-                {t("connect")}
-              </Button>
-              <Button variant="outline" size="sm">
-                <Share2 className="mr-1 h-4 w-4" />
-                {t("share")}
-              </Button>
-            </div>
-          )}
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/edit">
+                <Pencil className="mr-1 h-4 w-4" />
+                {t("edit")}
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/portfolio">
+                <Image className="mr-1 h-4 w-4" />
+                {t("portfolio")}
+              </a>
+            </Button>
+          </div>
           {userData.about && (
             <section data-section="about" className="pt-4">
               <h3 className="mb-2 text-lg font-semibold">{t("about")}</h3>
@@ -150,11 +163,7 @@ function ProfileCard({
                 <h3 className="mb-2 text-lg font-semibold">{t("industry")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {userData.industries.map((industry) => (
-                    <Badge
-                      key={industry}
-                      variant="default"
-                      className="text-xs"
-                    >
+                    <Badge key={industry} variant="default" className="text-xs">
                       {industry}
                     </Badge>
                   ))}
@@ -163,7 +172,9 @@ function ProfileCard({
             )}
             {userData.experience && (
               <section data-section="experience">
-                <h3 className="mb-2 text-lg font-semibold">{t("experience")}</h3>
+                <h3 className="mb-2 text-lg font-semibold">
+                  {t("experience")}
+                </h3>
                 <p>{userData.experience}</p>
               </section>
             )}
@@ -198,14 +209,14 @@ function ProfileCard({
                     </a>
                   </li>
                 )}
-                {userData.phone && (
+                {phoneNumber && (
                   <li className="flex items-center">
                     <Phone className="mr-2 h-4 w-4" />
                     <a
-                      href={`tel:${userData.phone}`}
+                      href={`tel:${phoneNumber}`}
                       className="text-primary hover:underline"
                     >
-                      {userData.phone}
+                      {phoneNumber}
                     </a>
                   </li>
                 )}
@@ -214,56 +225,61 @@ function ProfileCard({
             <Separator className="my-4" />
             {userData && (
               <section data-section="social-links">
-                <h3 className="mb-2 text-lg font-semibold">{t("socialLinks")}</h3>
+                <h3 className="mb-2 text-lg font-semibold">
+                  {t("socialLinks")}
+                </h3>
                 <div className="flex space-x-4">
-                  {getSocialMediaLinks(userData).map((link, index) => (
-                    link && link.url && (
-                      <a
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary-600"
-                      >
-                        <link.icon className="h-6 w-6" />
-                      </a>
-                    )
-                  ))}
+                  {getSocialMediaLinks(userData).map(
+                    (link, index) =>
+                      link &&
+                      link.url && (
+                        <a
+                          key={index}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary-600"
+                        >
+                          <link.icon className="h-6 w-6" />
+                        </a>
+                      ),
+                  )}
                 </div>
               </section>
             )}
           </div>
         </CardContent>
       </Card>
-    </div >
+    </div>
   );
 }
 
 function ContactCard({
   t,
   userData,
-  showButtons = false
+  showButtons = false,
 }: {
   t: TFunction;
   userData: UserData;
   showButtons?: boolean;
 }) {
-  const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+  const placeholderImage =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
   const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
   const contactImage = profilePictureUrl || placeholderImage;
 
   return (
-    <Card className="flex flex-col h-full">
-      <CardHeader className="p-0 overflow-hidden">
-        <div className="relative w-full h-48">
+    <Card className="flex h-full flex-col">
+      <CardHeader className="overflow-hidden p-0">
+        <div className="relative h-48 w-full">
           <img
             src={contactImage}
             alt={`${userData.displayName}'s profile`}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
           <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-            <CardTitle className="text-2xl font-bold flex items-center mb-2">
+            <CardTitle className="mb-2 flex items-center text-2xl font-bold">
               <UserCircle className="mr-2 h-6 w-6" />
               {userData.displayName}
             </CardTitle>
@@ -274,7 +290,6 @@ function ContactCard({
               </Badge>
             </div>
           </div>
-
         </div>
       </CardHeader>
 
@@ -285,7 +300,9 @@ function ContactCard({
               <Briefcase className="mr-2 h-4 w-4 flex-shrink-0" />
               <div className="flex flex-wrap gap-2">
                 {userData.industries.map((industry, index) => (
-                  <Badge key={index} variant="secondary">{industry}</Badge>
+                  <Badge key={index} variant="secondary">
+                    {industry}
+                  </Badge>
                 ))}
               </div>
             </li>
@@ -305,7 +322,7 @@ function ContactCard({
         </ul>
       </CardContent>
 
-      <CardFooter className="mt-auto p-4 pt-2 border-t">
+      <CardFooter className="mt-auto border-t p-4 pt-2">
         <a href="#" className="text-primary hover:underline">
           {t("seeMore")}
         </a>
@@ -314,7 +331,10 @@ function ContactCard({
   );
 }
 
-export default async function ProfilePage({ params, searchParams }: ProfilePageProps) {
+export default async function ProfilePage({
+  params,
+  searchParams,
+}: ProfilePageProps) {
   // User
   const lang = searchParams.lang || "en";
   const { t } = await useTranslation(lang, "ProfilePage");
@@ -324,14 +344,29 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
     redirect("/login");
   }
 
-  // Fetch user data
+  // Fetch user data and portfolio artworks in parallel
   let userData: UserData | null = null;
+  let portfolioArtworks: PortfolioArtwork[] = [];
   if (user) {
-    try {
-      userData = await fetchUserData(user.id);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      // Handle the error appropriately, e.g., show an error message to the user
+    const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
+      fetchUserData(user.id),
+      fetchUserPortfolioArtworks(user.id),
+    ]);
+    // Handle user data
+    if (userDataResult.status === "fulfilled") {
+      userData = userDataResult.value;
+    } else {
+      console.error("Error fetching user data:", userDataResult.reason);
+    }
+
+    // Handle portfolio artworks
+    if (portfolioArtworksResult.status === "fulfilled") {
+      portfolioArtworks = portfolioArtworksResult.value;
+    } else {
+      console.error(
+        "Error fetching portfolio artworks:",
+        portfolioArtworksResult.reason,
+      );
     }
   }
 
@@ -339,7 +374,8 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
   const userSkills = await getUserSkills(userData?.id);
 
   // Image
-  const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+  const placeholderImage =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
   const contactImage = placeholderImage; // TODO: Implement actual image fetching logic
 
   return (
@@ -376,7 +412,7 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                     </a>
                   </nav>
                 </div>
-                <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                   {userData && (
                     <>
                       {getUserContacts(userData.id).then((contacts) => {
@@ -386,7 +422,13 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                               <Card>
                                 <CardContent className="pt-6">
                                   <div className="text-center">
-                                    <p className="text-gray-500">Please connect with other users to see their profiles here.</p>
+                                    <p className="text-gray-500">
+                                      Please connect with other users to see
+                                      their profiles here.
+                                    </p>
+                                    <Button className="mt-4">
+                                      Find Contacts
+                                    </Button>
                                   </div>
                                 </CardContent>
                               </Card>
@@ -411,6 +453,7 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                   t={t}
                   userData={userData}
                   userSkills={userSkills}
+                  portfolioArtworks={portfolioArtworks}
                 />
               )}
             </div>

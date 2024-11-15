@@ -10,6 +10,7 @@ const supabase = createClient();
 
 interface AuthState {
     user: User | null;
+    isLoggedIn: boolean;
     isLoading: boolean;
     error: string | null;
     isAnonymous: boolean;
@@ -18,6 +19,7 @@ interface AuthState {
   export function useAuth(): AuthState {
     const [authState, setAuthState] = useState<AuthState>({
       user: null,
+      isLoggedIn: false,
       isLoading: true,
       error: null,
       isAnonymous: true,
@@ -53,6 +55,7 @@ interface AuthState {
         if (isMounted) {
           setAuthState({
             user,
+            isLoggedIn: user ? true : false,
             isLoading: false,
             error: null,
             isAnonymous: isAnonymous,
