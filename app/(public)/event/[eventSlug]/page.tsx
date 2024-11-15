@@ -73,7 +73,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     orderBy: desc(events.created_at),
     limit: 5
   });
-  const eventEnded = eventData?.time_end && new Date() > new Date(eventData.time_end);
+  const eventEnded = (eventData?.time_end && new Date() > new Date(eventData.time_end)) as boolean;
   // If event is not found, render the EventNotFound component
   if (!eventData) {
     return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;

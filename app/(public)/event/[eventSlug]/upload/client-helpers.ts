@@ -70,7 +70,7 @@ export async function handleFileUploadAlwaysFails() {
 
 export async function handleArtworkCreation(artworkData: ArtworkInfoData, formUserId: string, eventSlug: string) {
   const createResult = await createArtwork(formUserId, artworkData);
-  const insertArtworkEventsResult = await insertArtworkEvents(createResult.artwork.id, eventSlug, eventId);
+  const insertArtworkEventsResult = await insertArtworkEvents(createResult.artwork.id, eventSlug);
   return { createResult, insertArtworkEventsResult };
 }
 
