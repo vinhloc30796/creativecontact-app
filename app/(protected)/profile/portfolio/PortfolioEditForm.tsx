@@ -57,21 +57,104 @@ function ExistingPortfolioProjectCard({
   handlePendingFilesUpdate,
   project,
 }: ExistingPortfolioProjectCardProps) {
-  // Error state
-  if (!project.artworks) {
-    return <div>Project not found</div>;
-  }
-
   const [isEditing, setIsEditing] = useState(false);
   const { data: artworkWithAssets, isLoading } = useQuery<ArtworkWithAssets[]>({
-    queryKey: ['artwork', project.artworks?.id],
+    queryKey: ['artwork', project?.artworks?.id],
     queryFn: async () => {
-      const response = await fetch(`/api/artworks/${project.artworks?.id}/assets`);
+      if (!project?.artworks?.id) {
+        return [];
+      }
+      const response = await fetch(`/api/artworks/${project.artworks.id}/assets`);
       if (!response.ok) throw new Error('Failed to fetch artwork assets');
       return response.json();
     },
-    enabled: !!project.artworks?.id
+    enabled: !!project?.artworks?.id
   });
+
+  if (!project?.artworks) {
+    return <div>Project not found</div>;
+  }
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center min-h-[200px]">
+          <Skeleton className="w-[200px] h-[200px] rounded-lg" />
+        </div>
+      );
+    }
+
+    if (isEditing) {
+      return (
+        <>
+          <div className="space-y-4">
+            <h4 className="font-medium">Project Info</h4>
+            <ArtworkInfoStep form={form} artworks={[project.artworks]} />
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="font-medium">Project Media</h4>
+            <ThumbnailProvider>
+              <MediaUpload
+                isNewArtwork={false}
+                emailLink="/contact"
+                onPendingFilesUpdate={(files) =>
+                  handlePendingFilesUpdate(project.portfolio_artworks.id, files)
+                }
+              />
+            </ThumbnailProvider>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="font-medium">Project Credits</h4>
+            <ArtworkCreditInfoStep form={form} />
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h4 className="font-medium mb-2">Description</h4>
+          <p className="text-gray-600">{project.artworks?.description || "No description provided"}</p>
+        </div>
+
+        <div>
+          <h4 className="font-medium mb-2">Media</h4>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {artworkWithAssets?.map((item, index) =>
+              item.assets && (
+                <div
+                  key={item.assets.id}
+                  className="relative flex w-full items-center justify-center"
+                >
+                  {item.assets.assetType === "video" ? (
+                    <video
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
+                      controls
+                      className="h-auto max-w-full"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
+                      alt={`${project.artworks?.title} - Asset ${index + 1}`}
+                      sizes="(min-width: 1024px) 66vw, 100vw"
+                      width={1024}
+                      height={1024}
+                      style={{ objectFit: "contain" }}
+                    />
+                  )}
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Card className="w-full">
@@ -92,76 +175,7 @@ function ExistingPortfolioProjectCard({
         </CardHeader>
 
         <CardContent className="space-y-6 p-6">
-          {isLoading ? (
-            <div className="flex justify-center items-center min-h-[200px]">
-              <Skeleton className="w-[200px] h-[200px] rounded-lg" />
-            </div>
-          ) : isEditing ? (
-            <>
-              <div className="space-y-4">
-                <h4 className="font-medium">Project Info</h4>
-                <ArtworkInfoStep form={form} artworks={[project.artworks]} />
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-medium">Project Media</h4>
-                <ThumbnailProvider>
-                  <MediaUpload
-                    isNewArtwork={false}
-                    emailLink="/contact"
-                    onPendingFilesUpdate={(files) =>
-                      handlePendingFilesUpdate(project.portfolio_artworks.id, files)
-                    }
-                  />
-                </ThumbnailProvider>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-medium">Project Credits</h4>
-                <ArtworkCreditInfoStep form={form} />
-              </div>
-            </>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <h4 className="font-medium mb-2">Description</h4>
-                <p className="text-gray-600">{project.artworks?.description || "No description provided"}</p>
-              </div>
-
-              <div>
-                <h4 className="font-medium mb-2">Media</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {artworkWithAssets?.map((item, index) =>
-                    item.assets && (
-                      <div
-                        key={item.assets.id}
-                        className="relative flex w-full items-center justify-center"
-                      >
-                        {item.assets.assetType === "video" ? (
-                          <video
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
-                            controls
-                            className="h-auto max-w-full"
-                          >
-                            Your browser does not support the video tag.
-                          </video>
-                        ) : (
-                          <Image
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
-                            alt={`${project.artworks?.title} - Asset ${index + 1}: link: ` + `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
-                            sizes="(min-width: 1024px) 66vw, 100vw"
-                            width={1024}
-                            height={1024}
-                            style={{ objectFit: "contain" }}
-                          />
-                        )}
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          {renderContent()}
         </CardContent>
 
         {isEditing && (
