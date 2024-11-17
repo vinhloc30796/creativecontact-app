@@ -7,7 +7,7 @@ import { UserHeader } from "@/components/wrappers/UserHeader";
 import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
-import { BackButton } from "../../BackButton";
+import { BackButton } from "../../profile/BackButton";
 import PortfolioEditForm from "./PortfolioEditForm";
 
 interface PortfolioEditPageProps {

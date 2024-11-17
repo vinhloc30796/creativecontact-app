@@ -1,7 +1,7 @@
 "use server";
 
 import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
-import { fetchUserPortfolioArtworks } from "@/app/api/user/[id]/portfolio-artworks/helper";
+import { fetchUserPortfolioArtworks, fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
@@ -10,13 +10,16 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
-import { PortfolioArtwork } from "@/drizzle/schema/portfolio";
+import { PortfolioArtwork, PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
 import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
 import { Briefcase, CheckCircle, Image, Mail, MapPin, Pencil, Phone, TrendingUp, UserCircle } from 'lucide-react';
 import { redirect } from "next/navigation";
+import PortfolioSection from './PortfolioSection';
+import { Suspense } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProfilePageProps {
   params: {
@@ -59,8 +62,6 @@ async function getUserContacts(userId?: string): Promise<UserData[]> {
   }));
 }
 
-
-
 function getFormattedPhoneNumber(userData: UserData) {
   if (userData.phoneNumber && userData.phoneCountryCode) {
     return `+${userData.phoneCountryCode} ${userData.phoneNumber}`;
@@ -78,7 +79,7 @@ function ProfileCard({
   t: TFunction;
   userData: UserData;
   userSkills: UserSkills[];
-  portfolioArtworks: PortfolioArtwork[];
+  portfolioArtworks: PortfolioArtworkWithDetails[];
   showButtons?: boolean;
 }) {
   const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
@@ -232,6 +233,27 @@ function ProfileCard({
   );
 }
 
+function EmptyContactCard({
+  t
+}: {
+  t: TFunction;
+}) {
+  return (
+    <div className="col-span-full">
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <p className="text-gray-500">Please connect with other users to see their profiles here.</p>
+            <Button className="mt-4">
+              Find Contacts
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 function ContactCard({
   t,
   userData,
@@ -319,11 +341,11 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
 
   // Fetch user data and portfolio artworks in parallel
   let userData: UserData | null = null;
-  let portfolioArtworks: PortfolioArtwork[] = [];
+  let portfolioArtworks: PortfolioArtworkWithDetails[] = [];
   if (user) {
     const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
       fetchUserData(user.id),
-      fetchUserPortfolioArtworks(user.id)
+      fetchUserPortfolioArtworksWithDetails(user.id)
     ]);
     // Handle user data
     if (userDataResult.status === 'fulfilled') {
@@ -360,58 +382,54 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
             <div className="flex flex-col lg:flex-row">
               <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
                 <div className="mb-6">
-                  <nav className="flex space-x-4">
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                    >
-                      {t("overview")}
-                    </a>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                    >
-                      {t("activity")}
-                    </a>
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                    >
-                      {t("settings")}
-                    </a>
-                  </nav>
-                </div>
-                <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-                  {userData && (
-                    <>
-                      {getUserContacts(userData.id).then((contacts) => {
-                        if (contacts.length === 0) {
-                          return (
-                            <div className="col-span-full">
-                              <Card>
-                                <CardContent className="pt-6">
-                                  <div className="text-center">
-                                    <p className="text-gray-500">Please connect with other users to see their profiles here.</p>
-                                    <Button className="mt-4">
-                                      Find Contacts
-                                    </Button>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            </div>
-                          );
-                        }
-                        return contacts.map((contact) => (
-                          <ContactCard
-                            key={contact.id}
-                            t={t}
-                            userData={contact}
-                            showButtons={false}
+                  <Tabs defaultValue="contacts">
+                    <TabsList>
+                      <TabsTrigger value="contacts">{t("contacts")}</TabsTrigger>
+                      <TabsTrigger value="portfolio">{t("portfolio")}</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="overview">
+                      <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+                        {userData && (
+                          <>
+                            {getUserContacts(userData.id).then((contacts) => {
+                              if (contacts.length === 0) {
+                                return <EmptyContactCard t={t} />
+                              }
+                              return contacts.map((contact) => (
+                                <ContactCard
+                                  key={contact.id}
+                                  t={t}
+                                  userData={contact}
+                                  showButtons={false}
+                                />
+                              ));
+                            })}
+                          </>
+                        )}
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="portfolio">
+                      {userData && (
+                        <Suspense fallback={<div>Loading portfolio...</div>}>
+                          <PortfolioSection
+                            userData={userData}
+                            lang={lang}
+                            existingPortfolioArtworks={portfolioArtworks as PortfolioArtworkWithDetails[]}
                           />
-                        ));
-                      })}
-                    </>
-                  )}
+                        </Suspense>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="activity">
+                      <div>Activity content coming soon...</div>
+                    </TabsContent>
+
+                    <TabsContent value="settings">
+                      <div>Settings content coming soon...</div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
               </div>
               {userData && (

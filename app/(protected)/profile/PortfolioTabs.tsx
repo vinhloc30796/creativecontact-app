@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { FormStateNav, Section } from "../edit/FormStateNav";
+import { FormStateNav, Section } from "../profile/edit/FormStateNav";
 
 interface ProjectFormValues {
   title: string;
@@ -157,7 +157,7 @@ function ExistingPortfolioProjectCard({
   );
 }
 
-function PortfolioTabs({
+export function PortfolioTabs({
   userData,
   existingPortfolioArtworks,
 }: {
@@ -258,43 +258,5 @@ function PortfolioTabs({
         )}
       </CardContent>
     </Card>
-  );
-}
-
-export default function PortfolioSection({
-  userData,
-  existingPortfolioArtworks,
-  lang = "en",
-}: PortfolioTabsProps) {
-  const { t } = useTranslation(lang, "ProfilePage");
-
-  const sections: Section[] = [
-    {
-      id: "portfolio",
-      label: t("navigation.portfolio"),
-      iconName: "briefcase",
-    },
-  ];
-
-  const handleSubmit = async (formData: Record<string, any>) => {
-    console.log(formData);
-  };
-
-  return (
-    <div className="flex h-full flex-col gap-8 lg:flex-row">
-      <div className="lg:w-1/3 lg:overflow-y-auto">
-        <FormStateNav
-          sections={sections}
-          onSubmit={handleSubmit}
-          title="navigation.editPortfolio"
-        />
-      </div>
-      <div className="space-y-8 pb-8 lg:w-2/3 lg:overflow-y-auto">
-        <PortfolioTabs
-          userData={userData}
-          existingPortfolioArtworks={existingPortfolioArtworks}
-        />
-      </div>
-    </div>
   );
 }
