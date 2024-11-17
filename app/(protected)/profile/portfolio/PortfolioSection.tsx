@@ -4,27 +4,24 @@
 
 import { ArtworkWithAssets } from "@/app/api/artworks/[id]/assets/helper";
 import { UserData } from "@/app/types/UserInfo";
-import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
-import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MediaUpload } from "@/components/uploads/media-upload";
-import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { FormStateNav, Section } from "../edit/FormStateNav";
 
 interface ProjectFormValues {
@@ -34,16 +31,10 @@ interface ProjectFormValues {
   coartists: any[];
 }
 
-interface PortfolioEditFormProps {
+interface PortfolioTabsProps {
   userData: UserData;
   existingPortfolioArtworks: PortfolioArtworkWithDetails[];
   lang?: string;
-}
-
-interface PortfolioProjectCardProps {
-  form: ReturnType<typeof useForm<ProjectFormValues>>;
-  handlePendingFilesUpdate: (projectId: string, files: File[]) => void;
-  project: PortfolioArtworkWithDetails;
 }
 
 interface ExistingPortfolioProjectCardProps {
@@ -57,6 +48,7 @@ function ExistingPortfolioProjectCard({
   handlePendingFilesUpdate,
   project,
 }: ExistingPortfolioProjectCardProps) {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const { data: artworkWithAssets, isLoading } = useQuery<ArtworkWithAssets[]>({
     queryKey: ['artwork', project?.artworks?.id],
@@ -75,41 +67,24 @@ function ExistingPortfolioProjectCard({
     return <div>Project not found</div>;
   }
 
+  const handleEdit = () => {
+    if (project.artworks) {
+      router.push(`/profile/portfolio/${project.artworks.id}`);
+    }
+    else {
+      toast.error("Failed to edit the portfolio artwork", {
+        description: "The artwork could not be found",
+        duration: 5000
+      });
+    }
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return (
         <div className="flex justify-center items-center min-h-[200px]">
           <Skeleton className="w-[200px] h-[200px] rounded-lg" />
         </div>
-      );
-    }
-
-    if (isEditing) {
-      return (
-        <>
-          <div className="space-y-4">
-            <h4 className="font-medium">Project Info</h4>
-            <ArtworkInfoStep form={form} artworks={[project.artworks]} />
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-medium">Project Media</h4>
-            <ThumbnailProvider>
-              <MediaUpload
-                isNewArtwork={false}
-                emailLink="/contact"
-                onPendingFilesUpdate={(files) =>
-                  handlePendingFilesUpdate(project.portfolio_artworks.id, files)
-                }
-              />
-            </ThumbnailProvider>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-medium">Project Credits</h4>
-            <ArtworkCreditInfoStep form={form} />
-          </div>
-        </>
       );
     }
 
@@ -162,14 +137,14 @@ function ExistingPortfolioProjectCard({
         <CardHeader>
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">
-              {isEditing ? "Edit Project" : project.artworks?.title || "Untitled"}
+              {project.artworks?.title || "Untitled"}
             </h3>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={handleEdit}
             >
-              {isEditing ? "Cancel" : "Edit"}
+              Edit
             </Button>
           </div>
         </CardHeader>
@@ -177,63 +152,20 @@ function ExistingPortfolioProjectCard({
         <CardContent className="space-y-6 p-6">
           {renderContent()}
         </CardContent>
-
-        {isEditing && (
-          <CardFooter className="flex justify-end gap-2 p-6">
-            <Button variant="outline" onClick={() => setIsEditing(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">Save Changes</Button>
-          </CardFooter>
-        )}
       </FormProvider>
     </Card>
   );
 }
 
-function PortfolioProjectCard({
-  form,
-  handlePendingFilesUpdate,
-  project,
-}: PortfolioProjectCardProps) {
-  return (
-    <>
-      <FormProvider {...form}>
-        <CardHeader>
-          <h3 className="mb-4 text-lg font-medium">Project Info</h3>
-          <ArtworkInfoStep form={form} artworks={[]} />
-        </CardHeader>
-        <CardContent className="space-y-6 p-6">
-          <h3 className="mb-4 text-lg font-medium">Project Media</h3>
-          <ThumbnailProvider>
-            <MediaUpload
-              isNewArtwork={true}
-              emailLink="/contact"
-              onPendingFilesUpdate={(files) =>
-                handlePendingFilesUpdate(project.portfolio_artworks.id, files)
-              }
-            />
-          </ThumbnailProvider>
-        </CardContent>
-        <CardFooter className="flex flex-col items-start gap-4 p-6">
-          <h3 className="mb-4 text-lg font-medium">Project Credits</h3>
-          <ArtworkCreditInfoStep form={form} />
-        </CardFooter>
-      </FormProvider>
-    </>
-  );
-}
-
-function PortfolioSection({
+function PortfolioTabs({
   userData,
   existingPortfolioArtworks,
 }: {
   userData: UserData;
   existingPortfolioArtworks: PortfolioArtworkWithDetails[];
 }) {
-  // Track editing state per project
-  const [editingStates, setEditingStates] = useState<Record<string, boolean>>({});
-  
+  const router = useRouter();
+
   // Projects state
   const [projects, setProjects] = useState<PortfolioArtworkWithDetails[]>(
     existingPortfolioArtworks || []
@@ -248,7 +180,7 @@ function PortfolioSection({
   const form = useForm<ProjectFormValues>({
     defaultValues: {
       title: "",
-      description: "", 
+      description: "",
       uuid: "",
       coartists: [],
     },
@@ -256,38 +188,7 @@ function PortfolioSection({
 
   // Handle adding new project
   const handleAddProject = () => {
-    const newProject: PortfolioArtworkWithDetails = {
-      portfolio_artworks: {
-        id: `new-${Date.now()}`, // Unique temp ID
-        userId: userData.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        artworkId: "",
-        displayOrder: projects.length,
-        isHighlighted: false,
-      },
-      artworks: {
-        id: "",
-        title: "New Project",
-        description: null,
-        createdAt: new Date(),
-      },
-    };
-
-    setProjects([...projects, newProject]);
-    setActiveTab(newProject.portfolio_artworks.id);
-    setEditingStates(prev => ({
-      ...prev,
-      [newProject.portfolio_artworks.id]: true
-    }));
-  };
-
-  // Handle editing state changes
-  const toggleEditing = (projectId: string) => {
-    setEditingStates(prev => ({
-      ...prev,
-      [projectId]: !prev[projectId]
-    }));
+    router.push('/profile/portfolio/new');
   };
 
   // Handle pending files
@@ -345,21 +246,11 @@ function PortfolioSection({
                 value={project.portfolio_artworks.id}
               >
                 <Suspense fallback={<div>Loading project...</div>}>
-                  {activeTab === project.portfolio_artworks.id && (
-                    project.portfolio_artworks.id.startsWith('new-') ? (
-                      <PortfolioProjectCard
-                        form={form}
-                        handlePendingFilesUpdate={handlePendingFilesUpdate}
-                        project={project}
-                      />
-                    ) : (
-                      <ExistingPortfolioProjectCard
-                        form={form}
-                        handlePendingFilesUpdate={handlePendingFilesUpdate}
-                        project={project}
-                      />
-                    )
-                  )}
+                  <ExistingPortfolioProjectCard
+                    form={form}
+                    handlePendingFilesUpdate={handlePendingFilesUpdate}
+                    project={project}
+                  />
                 </Suspense>
               </TabsContent>
             ))}
@@ -370,11 +261,11 @@ function PortfolioSection({
   );
 }
 
-export default function PortfolioEditForm({
+export default function PortfolioSection({
   userData,
   existingPortfolioArtworks,
   lang = "en",
-}: PortfolioEditFormProps) {
+}: PortfolioTabsProps) {
   const { t } = useTranslation(lang, "ProfilePage");
 
   const sections: Section[] = [
@@ -399,7 +290,7 @@ export default function PortfolioEditForm({
         />
       </div>
       <div className="space-y-8 pb-8 lg:w-2/3 lg:overflow-y-auto">
-        <PortfolioSection
+        <PortfolioTabs
           userData={userData}
           existingPortfolioArtworks={existingPortfolioArtworks}
         />

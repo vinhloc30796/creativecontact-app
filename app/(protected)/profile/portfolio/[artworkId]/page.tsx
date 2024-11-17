@@ -1,29 +1,28 @@
-// File: app/(protected)/profile/portfolio/page.tsx
 "use server";
 
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
-// Components
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
-// React
 import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
-import { BackButton } from "../BackButton";
-import PortfolioSection from "./PortfolioSection";
+import { BackButton } from "../../BackButton";
+import PortfolioEditForm from "./PortfolioEditForm";
 
-interface PortfolioPageProps {
-  params: {};
+interface PortfolioEditPageProps {
+  params: {
+    artworkId: string;
+  };
   searchParams: {
     lang: string;
   };
 }
 
-export default async function PortfolioPage({
+export default async function PortfolioEditPage({
   params,
   searchParams,
-}: PortfolioPageProps) {
+}: PortfolioEditPageProps) {
   const lang = searchParams.lang || "en";
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
 
@@ -44,9 +43,17 @@ export default async function PortfolioPage({
     return null;
   }
 
-  const existingPortfolioArtworks = await fetchUserPortfolioArtworksWithDetails(
+  const portfolioArtworks = await fetchUserPortfolioArtworksWithDetails(
     userData.id,
   );
+
+  const currentArtwork = portfolioArtworks.find(
+    (artwork) => artwork.portfolio_artworks.id === params.artworkId
+  );
+
+  if (!currentArtwork && params.artworkId !== 'new') {
+    redirect('/profile/portfolio');
+  }
 
   return (
     <BackgroundDiv>
@@ -62,10 +69,11 @@ export default async function PortfolioPage({
             <BackButton />
           </div>
           <div className="container mx-auto px-4">
-            <PortfolioSection
+            <PortfolioEditForm
               userData={userData}
               lang={lang}
-              existingPortfolioArtworks={existingPortfolioArtworks}
+              artwork={currentArtwork}
+              isNew={params.artworkId === 'new'}
             />
           </div>
         </main>
