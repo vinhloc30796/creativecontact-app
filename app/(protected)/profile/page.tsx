@@ -1,25 +1,48 @@
+// File: app/(protected)/profile/page.tsx
+
 "use server";
 
+// API imports
 import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
-import { fetchUserPortfolioArtworks, fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
+import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
+
+// Component imports
+import { ContactCard } from '@/components/contacts/ContactCard';
+import { EmptyContactCard } from '@/components/contacts/EmptyContactCard';
+
+// UI imports
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
-import { PortfolioArtwork, PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
+
+// Schema imports
+import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
+
+// Hook imports
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
+
+// Utility imports
 import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
-import { Briefcase, CheckCircle, Image, Mail, MapPin, Pencil, Phone, TrendingUp, UserCircle } from 'lucide-react';
+
+// Icon imports
+import { CheckCircle, Image, Mail, MapPin, Pencil, Phone, UserCircle } from 'lucide-react';
+
+// Next.js imports
 import { redirect } from "next/navigation";
-import PortfolioSection from './PortfolioSection';
 import { Suspense } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Local component import
+import PortfolioSection from './PortfolioSection';
 
 interface ProfilePageProps {
   params: {
@@ -120,12 +143,6 @@ function ProfileCard({
               <a href="/profile/edit">
                 <Pencil className="mr-1 h-4 w-4" />
                 {t("edit")}
-              </a>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <a href="/profile/portfolio">
-                <Image className="mr-1 h-4 w-4" />
-                {t("portfolio")}
               </a>
             </Button>
           </div>
@@ -233,102 +250,6 @@ function ProfileCard({
   );
 }
 
-function EmptyContactCard({
-  t
-}: {
-  t: TFunction;
-}) {
-  return (
-    <div className="col-span-full">
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center">
-            <p className="text-gray-500">Please connect with other users to see their profiles here.</p>
-            <Button className="mt-4">
-              Find Contacts
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-function ContactCard({
-  t,
-  userData,
-  showButtons = false
-}: {
-  t: TFunction;
-  userData: UserData;
-  showButtons?: boolean;
-}) {
-  const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
-  const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
-  const contactImage = profilePictureUrl || placeholderImage;
-
-  return (
-    <Card className="flex flex-col h-full">
-      <CardHeader className="p-0 overflow-hidden">
-        <div className="relative w-full h-48">
-          <img
-            src={contactImage}
-            alt={`${userData.displayName}'s profile`}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
-          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-            <CardTitle className="text-2xl font-bold flex items-center mb-2">
-              <UserCircle className="mr-2 h-6 w-6" />
-              {userData.displayName}
-            </CardTitle>
-            <div className="mb-2 flex items-center">
-              <Badge variant="success" className="flex items-center">
-                <CheckCircle className="mr-1 h-3 w-3" />
-                {t("openToCollab")}
-              </Badge>
-            </div>
-          </div>
-
-        </div>
-      </CardHeader>
-
-      <CardContent className="flex-grow p-4">
-        <ul className="space-y-3">
-          {userData.industries && userData.industries.length > 0 && (
-            <li className="flex items-center">
-              <Briefcase className="mr-2 h-4 w-4 flex-shrink-0" />
-              <div className="flex flex-wrap gap-2">
-                {userData.industries.map((industry, index) => (
-                  <Badge key={index} variant="secondary">{industry}</Badge>
-                ))}
-              </div>
-            </li>
-          )}
-          {userData.experience && (
-            <li className="flex items-center">
-              <TrendingUp className="mr-2 h-4 w-4 flex-shrink-0" />
-              <span>{userData.experience}</span>
-            </li>
-          )}
-          {userData.location && (
-            <li className="flex items-center">
-              <MapPin className="mr-2 h-4 w-4 flex-shrink-0" />
-              <span>{userData.location}</span>
-            </li>
-          )}
-        </ul>
-      </CardContent>
-
-      <CardFooter className="mt-auto p-4 pt-2 border-t">
-        <a href="#" className="text-primary hover:underline">
-          {t("seeMore")}
-        </a>
-      </CardFooter>
-    </Card>
-  );
-}
-
 export default async function ProfilePage({ params, searchParams }: ProfilePageProps) {
   // User
   const lang = searchParams.lang || "en";
@@ -365,10 +286,6 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
   // Fetch user skills
   const userSkills = await getUserSkills(userData?.id);
 
-  // Image
-  const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
-  const contactImage = placeholderImage; // TODO: Implement actual image fetching logic
-
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
@@ -394,7 +311,7 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                           <>
                             {getUserContacts(userData.id).then((contacts) => {
                               if (contacts.length === 0) {
-                                return <EmptyContactCard t={t} />
+                                return <EmptyContactCard t={t} />;
                               }
                               return contacts.map((contact) => (
                                 <ContactCard
