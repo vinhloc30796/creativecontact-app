@@ -71,7 +71,7 @@ async function getUserSkills(userId?: string): Promise<UserSkills[]> {
 
 async function getUserContacts(userId?: string): Promise<UserData[]> {
   if (!userId) {
-    return [];
+    return [] as UserData[];
   }
 
   const contacts = await fetchUserContacts(userId);
@@ -305,18 +305,18 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                       <TabsTrigger value="portfolio">{t("portfolio")}</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="overview">
+                    <TabsContent value="contacts">
                       <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                         {userData && (
                           <>
                             {getUserContacts(userData.id).then((contacts) => {
                               if (contacts.length === 0) {
-                                return <EmptyContactCard t={t} />;
+                                return <EmptyContactCard lang={lang} />;
                               }
                               return contacts.map((contact) => (
                                 <ContactCard
                                   key={contact.id}
-                                  t={t}
+                                  lang={lang}
                                   userData={contact}
                                   showButtons={false}
                                 />

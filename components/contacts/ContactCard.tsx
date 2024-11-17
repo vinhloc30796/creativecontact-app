@@ -1,20 +1,23 @@
+"use client";
+
 import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { TFunction } from "i18next";
+import { useTranslation } from "@/lib/i18n/init-client";
 import { Briefcase, CheckCircle, MapPin, TrendingUp, UserCircle } from 'lucide-react';
 
 interface ContactCardProps {
-  t: TFunction;
   userData: UserData;
   showButtons?: boolean;
+  lang?: string;
 }
 
 export function ContactCard({
-  t,
   userData,
-  showButtons = false
+  showButtons = false,
+  lang = "en",
 }: ContactCardProps) {
+  const { t } = useTranslation(lang, "ProfilePage");
   const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
   const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
   const contactImage = profilePictureUrl || placeholderImage;

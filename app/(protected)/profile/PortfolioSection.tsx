@@ -1,6 +1,7 @@
+"use server";
+
 import { UserData } from "@/app/types/UserInfo";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
-import { useTranslation } from "@/lib/i18n/init-client";
 import { PortfolioTabs } from "./PortfolioTabs";
 
 interface PortfolioSectionProps {
@@ -9,12 +10,11 @@ interface PortfolioSectionProps {
   lang?: string;
 }
 
-export default function PortfolioSection({
+export default async function PortfolioSection({
   userData,
   existingPortfolioArtworks,
   lang = "en",
 }: PortfolioSectionProps) {
-  const { t } = useTranslation(lang, "ProfilePage");
   return (
     <div className="space-y-8">
       <PortfolioTabs

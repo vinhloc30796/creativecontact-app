@@ -1,6 +1,6 @@
 // File: app/api/user/[id]/portfolio-artworks/helper.ts
 
-import { artworks } from "@/drizzle/schema/artwork";
+import { artworkCredits, artworks } from "@/drizzle/schema/artwork";
 import {
   PortfolioArtwork,
   PortfolioArtworkWithDetails,
@@ -22,10 +22,14 @@ export async function fetchUserPortfolioArtworks(
 export async function fetchUserPortfolioArtworksWithDetails(
   userId: string,
 ): Promise<PortfolioArtworkWithDetails[]> {
-  const results: PortfolioArtworkWithDetails[] = await db
-    .select()
+  const results = await db
+    .select({
+      portfolioArtworks: portfolioArtworks,
+      artworks: artworks,
+    })
     .from(portfolioArtworks)
     .where(eq(portfolioArtworks.userId, userId))
     .innerJoin(artworks, eq(portfolioArtworks.artworkId, artworks.id));
-  return results;
+
+  return results as PortfolioArtworkWithDetails[];
 }

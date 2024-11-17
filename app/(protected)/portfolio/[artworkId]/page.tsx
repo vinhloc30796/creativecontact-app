@@ -48,7 +48,7 @@ export default async function PortfolioEditPage({
   );
 
   const currentArtwork = portfolioArtworks.find(
-    (artwork) => artwork.portfolio_artworks.id === params.artworkId
+    (artwork) => artwork.portfolioArtworks.id === params.artworkId
   );
 
   if (!currentArtwork && params.artworkId !== 'new') {

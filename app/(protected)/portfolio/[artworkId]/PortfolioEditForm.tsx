@@ -112,7 +112,7 @@ export default function PortfolioEditForm({
         method: isNew ? 'POST' : 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: artwork?.portfolio_artworks?.id,
+          id: artwork?.portfolioArtworks?.id,
           userId: userData.id,
           artworkId: savedArtwork.id,
         }),

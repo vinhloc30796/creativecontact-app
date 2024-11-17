@@ -40,7 +40,7 @@ export default function PortfolioCreatePage() {
   };
 
   const project = {
-    portfolio_artworks: {
+    portfolioArtworks: {
       id: "new",
     },
     artworks: null,

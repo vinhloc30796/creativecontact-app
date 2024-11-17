@@ -22,18 +22,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArtworkWithAssets } from "@/app/api/artworks/[id]/assets/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
+import { ArtworkWithCredits } from "@/app/api/artworks/[id]/credits/helper";
 
 interface ProjectFormValues {
   title: string;
   description: string;
   uuid: string;
   coartists: any[];
-}
-
-interface PortfolioTabsProps {
-  userData: UserData;
-  existingPortfolioArtworks: PortfolioArtworkWithDetails[];
-  lang?: string;
 }
 
 interface ExistingPortfolioProjectCardProps {
@@ -70,14 +65,13 @@ function EmptyPortfolioProjectCard({
 
 function ExistingPortfolioProjectCard({
   form,
-  handlePendingFilesUpdate,
   project,
   lang = "en",
 }: ExistingPortfolioProjectCardProps) {
   const router = useRouter();
   const { t } = useTranslation(lang, "ProfilePage");
-  const { data: artworkWithAssets, isLoading } = useQuery<ArtworkWithAssets[]>({
-    queryKey: ["artwork", project?.artworks?.id],
+  const { data: artworkWithAssets, isLoading: isLoadingAssets } = useQuery<ArtworkWithAssets[]>({
+    queryKey: ["artwork-assets", project?.artworks?.id],
     queryFn: async () => {
       if (!project?.artworks?.id) {
         return [];
@@ -90,6 +84,22 @@ function ExistingPortfolioProjectCard({
     },
     enabled: !!project?.artworks?.id,
   });
+
+  const { data: artworkCredits, isLoading: isLoadingCredits } = useQuery<ArtworkWithCredits[]>({
+    queryKey: ["artwork-credits", project?.artworks?.id],
+    queryFn: async () => {
+      if (!project?.artworks?.id) {
+        return [];
+      }
+      const response = await fetch(
+        `/api/artworks/${project.artworks.id}/credits`,
+      );
+      if (!response.ok) throw new Error("Failed to fetch artwork credits");
+      return response.json();
+    },
+    enabled: !!project?.artworks?.id,
+  });
+
 
   if (!project?.artworks) {
     return <div>Project not found</div>;
@@ -106,8 +116,13 @@ function ExistingPortfolioProjectCard({
     }
   };
 
+  const handleDelete = () => {
+    // TODO: Implement delete functionality
+    console.log("Delete");
+  };
+
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoadingAssets) {
       return (
         <div className="flex min-h-[200px] items-center justify-center">
           <Skeleton className="h-[200px] w-[200px] rounded-lg" />
@@ -117,45 +132,59 @@ function ExistingPortfolioProjectCard({
 
     return (
       <div className="space-y-6">
-        <div>
-          <h4 className="mb-2 font-medium">Description</h4>
-          <p className="text-gray-600">
-            {project.artworks?.description || "No description provided"}
-          </p>
-        </div>
-
-        <div>
-          <h4 className="mb-2 font-medium">Media</h4>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {artworkWithAssets?.map(
-              (item, index) =>
-                item.assets && (
-                  <div
-                    key={item.assets.id}
-                    className="relative flex w-full items-center justify-center"
-                  >
-                    {item.assets.assetType === "video" ? (
-                      <video
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
-                        controls
-                        className="h-auto max-w-full"
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <Image
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
-                        alt={`${project.artworks?.title} - Asset ${index + 1}`}
-                        sizes="(min-width: 1024px) 66vw, 100vw"
-                        width={1024}
-                        height={1024}
-                        style={{ objectFit: "contain" }}
-                      />
-                    )}
-                  </div>
-                ),
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-3 flex flex-col">
+            <h4 className="mb-2 font-medium">Description</h4>
+            <p className="text-gray-600">
+              {project.artworks?.description || "No description provided"}
+            </p>
+          </div>
+          <div className="flex flex-col">
+            <h4 className="mb-2 font-medium">Artists</h4>
+            {isLoadingCredits ? (
+              <Skeleton className="h-4" />
+            ) : (
+              <p className="text-gray-600">
+                {artworkCredits && artworkCredits?.length > 0 
+                  ? artworkCredits.map((credit: ArtworkWithCredits) => (
+                      `${credit.displayName || 'Anonymous'} (${credit.title})`
+                    )).join(", ")
+                  : "No artists provided"
+                }
+              </p>
             )}
           </div>
+        </div>
+        <h4 className="mb-2 font-medium">Media</h4>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          {artworkWithAssets?.map(
+            (item, index) =>
+              item.assets && (
+                <div
+                  key={item.assets.id}
+                  className="relative flex w-full items-center justify-center"
+                >
+                  {item.assets.assetType === "video" ? (
+                    <video
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
+                      controls
+                      className="h-auto max-w-full"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
+                      alt={`${project.artworks?.title} - Asset ${index + 1}`}
+                      sizes="(min-width: 1024px) 66vw, 100vw"
+                      width={1024}
+                      height={1024}
+                      style={{ objectFit: "contain" }}
+                    />
+                  )}
+                </div>
+              ),
+          )}
         </div>
       </div>
     );
@@ -164,14 +193,20 @@ function ExistingPortfolioProjectCard({
   return (
     <Card className="w-full">
       <FormProvider {...form}>
-        <CardHeader>
+        <CardHeader className="flex flex-col items-left">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={handleEdit}>
+              Edit
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleDelete}>
+              Delete
+            </Button>
+          </div>
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium">
               {project.artworks?.title || "Untitled"}
             </h3>
-            <Button variant="ghost" size="sm" onClick={handleEdit}>
-              Edit
-            </Button>
+
           </div>
         </CardHeader>
 
@@ -199,7 +234,7 @@ export function PortfolioTabs({
 
   // Active tab state
   const [activeTab, setActiveTab] = useState<string>(
-    projects.length > 0 ? projects[0].portfolio_artworks.id : "new",
+    projects.length > 0 ? projects[0].portfolioArtworks.id : "new",
   );
 
   // Form state
@@ -221,7 +256,7 @@ export function PortfolioTabs({
   const handlePendingFilesUpdate = (projectId: string, files: File[]) => {
     setProjects(
       projects.map((p) =>
-        p.portfolio_artworks.id === projectId ? { ...p, files } : p,
+        p.portfolioArtworks.id === projectId ? { ...p, files } : p,
       ),
     );
   };
@@ -234,8 +269,8 @@ export function PortfolioTabs({
       <CardContent>
         {projects.length === 0 ? (
           <EmptyPortfolioProjectCard
-          handleAddProject={handleAddProject}
-          lang={lang}
+            handleAddProject={handleAddProject}
+            lang={lang}
           />
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -243,8 +278,8 @@ export function PortfolioTabs({
               <TabsList>
                 {projects.map((project) => (
                   <TabsTrigger
-                    key={project.portfolio_artworks.id}
-                    value={project.portfolio_artworks.id}
+                    key={project.portfolioArtworks.id}
+                    value={project.portfolioArtworks.id}
                   >
                     {project.artworks?.title || "Untitled"}
                   </TabsTrigger>
@@ -258,8 +293,8 @@ export function PortfolioTabs({
             </div>
             {projects.map((project) => (
               <TabsContent
-                key={project.portfolio_artworks.id}
-                value={project.portfolio_artworks.id}
+                key={project.portfolioArtworks.id}
+                value={project.portfolioArtworks.id}
               >
                 <Suspense fallback={<div>Loading project...</div>}>
                   <ExistingPortfolioProjectCard
