@@ -27,7 +27,7 @@ function ExistingArtworkSidepane({ artworks, isOpen, setIsOpen }: { artworks: Ar
 
   useEffect(() => {
     if (selectedArtwork) {
-      const artwork = artworks.find(a => a.uuid === selectedArtwork)
+      const artwork = artworks.find(a => a.id === selectedArtwork)
       if (artwork) {
         setIsOpen(false)
       }
@@ -46,10 +46,10 @@ function ExistingArtworkSidepane({ artworks, isOpen, setIsOpen }: { artworks: Ar
             <Table>
               <TableBody>
                 {artworks.map((artwork) => (
-                  <TableRow key={artwork.uuid}>
+                  <TableRow key={artwork.id}>
                     <TableCell className="font-medium">
                       <h2 className="font-semibold">{artwork.title}</h2>
-                      <p className="text-muted-foreground text-xs">{artwork.uuid}</p>
+                      <p className="text-muted-foreground text-xs">{artwork.id}</p>
                     </TableCell>
                     <TableCell>{artwork.description}</TableCell>
                     <TableCell></TableCell>

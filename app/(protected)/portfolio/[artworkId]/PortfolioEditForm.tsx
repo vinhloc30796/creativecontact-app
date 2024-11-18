@@ -108,6 +108,7 @@ export default function PortfolioEditForm({
       }
 
       // Update portfolio artwork
+      // TODO: This endpoint is not implemented yet
       const portfolioResponse = await fetch('/api/portfolio-artworks', {
         method: isNew ? 'POST' : 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -123,7 +124,7 @@ export default function PortfolioEditForm({
       }
 
       // Redirect back to portfolio page
-      router.push('/profile/portfolio');
+      router.push('/profile');
       router.refresh();
     } catch (error) {
       console.error('Error saving portfolio artwork:', error);
@@ -152,7 +153,10 @@ export default function PortfolioEditForm({
               <TabsContent value="info" className="space-y-4">
                 <ArtworkInfoStep 
                   form={form as any} 
-                  artworks={artwork?.artworks ? [artwork.artworks] : []} 
+                  artworks={artwork?.artworks ? [{
+                    ...artwork.artworks,
+                    description: artwork.artworks.description || "",
+                  }] : []} 
                 />
               </TabsContent>
 
@@ -205,7 +209,7 @@ export default function PortfolioEditForm({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push('/profile/portfolio')}
+                onClick={() => router.push('/portfolio')}
               >
                 {t("cancel")}
               </Button>

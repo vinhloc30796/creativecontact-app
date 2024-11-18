@@ -1,4 +1,4 @@
-// File: app/(protected)/profile/portfolio/PortfolioEditForm.tsx
+// File: app/(protected)/portfolio/PortfolioEditForm.tsx
 
 "use client";
 
@@ -11,6 +11,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -107,7 +108,7 @@ function ExistingPortfolioProjectCard({
 
   const handleEdit = () => {
     if (project.artworks) {
-      router.push(`/profile/portfolio/${project.artworks.id}`);
+      router.push(`/portfolio/${project.artworks.id}`);
     } else {
       toast.error("Failed to edit the portfolio artwork", {
         description: "The artwork could not be found",
@@ -195,8 +196,10 @@ function ExistingPortfolioProjectCard({
       <FormProvider {...form}>
         <CardHeader className="flex flex-col items-left">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={handleEdit}>
-              Edit
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={`/portfolio/${project.artworks?.id}`}>
+                Edit
+              </Link>
             </Button>
             <Button variant="ghost" size="sm" onClick={handleDelete}>
               Delete
@@ -249,7 +252,7 @@ export function PortfolioTabs({
 
   // Handle adding new project
   const handleAddProject = () => {
-    router.push("/profile/portfolio/new");
+    router.push("/portfolio/new");
   };
 
   // Handle pending files

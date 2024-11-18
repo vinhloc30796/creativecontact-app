@@ -3,12 +3,13 @@
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { UserHeader, LoadingUserHeader } from "@/components/wrappers/UserHeader";
 import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
 import { BackButton } from "../../profile/BackButton";
 import PortfolioEditForm from "./PortfolioEditForm";
+import { Suspense } from "react";
 
 interface PortfolioEditPageProps {
   params: {
@@ -52,17 +53,19 @@ export default async function PortfolioEditPage({
   );
 
   if (!currentArtwork && params.artworkId !== 'new') {
-    redirect('/profile/portfolio');
+    redirect('/portfolio');
   }
 
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
-        <UserHeader
-          lang={lang}
-          isLoggedIn={isLoggedIn}
-          className="bg-background/80 backdrop-blur-sm"
-        />
+        <Suspense fallback={<LoadingUserHeader />}>
+          <UserHeader
+            lang={lang}
+            isLoggedIn={isLoggedIn}
+            className="bg-background/80 backdrop-blur-sm"
+          />
+        </Suspense>
 
         <main className="relative z-20 mt-10 w-full flex-grow lg:mt-20">
           <div className="container mx-auto mb-4 px-4">

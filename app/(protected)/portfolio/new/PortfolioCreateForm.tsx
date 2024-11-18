@@ -8,53 +8,75 @@ import {
   CardHeader
 } from "@/components/ui/card";
 import { MediaUpload } from "@/components/uploads/media-upload";
+import { ArtworkProvider } from "@/contexts/ArtworkContext";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
-import { FormProvider } from "react-hook-form";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { v4 as uuidv4 } from 'uuid';
 
 interface ProjectFormValues {
   title: string;
   description: string;
   uuid: string;
-  coartists: any[];
+  coartists: Array<{
+    name: string;
+    role: string;
+  }>;
 }
 
 interface PortfolioProjectCardProps {
-  form: ReturnType<typeof useForm<ProjectFormValues>>;
-  handlePendingFilesUpdate: (projectId: string, files: File[]) => void;
   project: PortfolioArtworkWithDetails;
 }
 
 export function PortfolioProjectCard({
-  form,
-  handlePendingFilesUpdate,
   project,
 }: PortfolioProjectCardProps) {
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const handlePendingFilesUpdate = (
+    portfolioArtworkId: string,
+    files: File[]
+  ) => {
+    setPendingFiles(files);
+  };
+
+  const form = useForm<ProjectFormValues>({
+    defaultValues: {
+      title: "",
+      description: "",
+      uuid: uuidv4(),
+      coartists: [],
+    },
+  });
+
   return (
     <>
-      <FormProvider {...form}>
-        <CardHeader>
-          <h3 className="mb-4 text-lg font-medium">Project Info</h3>
-          <ArtworkInfoStep form={form} artworks={[]} />
-        </CardHeader>
-        <CardContent className="space-y-6 p-6">
-          <h3 className="mb-4 text-lg font-medium">Project Media</h3>
-          <ThumbnailProvider>
-            <MediaUpload
-              isNewArtwork={true}
-              emailLink="/contact"
-              onPendingFilesUpdate={(files) =>
-                handlePendingFilesUpdate(project.portfolio_artworks.id, files)
-              }
-            />
-          </ThumbnailProvider>
-        </CardContent>
-        <CardFooter className="flex flex-col items-start gap-4 p-6">
-          <h3 className="mb-4 text-lg font-medium">Project Credits</h3>
-          <ArtworkCreditInfoStep form={form} />
-        </CardFooter>
-      </FormProvider>
+      <ArtworkProvider>
+        <ThumbnailProvider>
+          <FormProvider {...form}>
+            <CardHeader>
+              <h3 className="mb-4 text-lg font-medium">Project Info</h3>
+              <ArtworkInfoStep form={form} artworks={[]} />
+            </CardHeader>
+            <CardContent className="space-y-6 p-6">
+              <h3 className="mb-4 text-lg font-medium">Project Media</h3>
+              <ThumbnailProvider>
+                <MediaUpload
+                  isNewArtwork={true}
+                  emailLink="/contact"
+                  onPendingFilesUpdate={(files) =>
+                    handlePendingFilesUpdate(project.portfolioArtworks.id, files)
+                  }
+                />
+              </ThumbnailProvider>
+            </CardContent>
+            <CardFooter className="flex flex-col items-start gap-4 p-6">
+              <h3 className="mb-4 text-lg font-medium">Project Credits</h3>
+              <ArtworkCreditInfoStep form={form} />
+            </CardFooter>
+          </FormProvider>
+        </ThumbnailProvider>
+      </ArtworkProvider>
     </>
   );
 }
