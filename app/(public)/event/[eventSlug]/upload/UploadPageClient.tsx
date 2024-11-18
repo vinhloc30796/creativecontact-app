@@ -29,7 +29,7 @@ import {
   professionalInfoSchema,
 } from "@/app/form-schemas/professional-info";
 // Custom
-import { EventNotFound } from "@/app/(public)/[eventSlug]/EventNotFound";
+import { EventNotFound } from "@/app/(public)/event/[eventSlug]/EventNotFound";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { MediaUpload } from "@/components/uploads/media-upload";
