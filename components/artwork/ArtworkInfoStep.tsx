@@ -16,7 +16,11 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 interface ArtworkInfoStepProps {
   artworks: ArtworkInfoData[],
-  form: UseFormReturn<ArtworkInfoData>
+  form: UseFormReturn<{
+    id: string;
+    title: string;
+    description: string;
+  }>
 }
 
 function ExistingArtworkSidepane({ artworks, isOpen, setIsOpen }: { artworks: ArtworkInfoData[], isOpen: boolean, setIsOpen: (isOpen: boolean) => void }) {

@@ -16,12 +16,14 @@ import { FormProvider, useForm } from "react-hook-form";
 import { v4 as uuidv4 } from 'uuid';
 
 interface ProjectFormValues {
+  id: string;
   title: string;
   description: string;
-  uuid: string;
-  coartists: Array<{
-    name: string;
-    role: string;
+  coartists?: Array<{
+    first_name: string;
+    last_name: string;
+    email: string;
+    title: string;
   }>;
 }
 
@@ -42,9 +44,9 @@ export function PortfolioProjectCard({
 
   const form = useForm<ProjectFormValues>({
     defaultValues: {
+      id: uuidv4(),
       title: "",
       description: "",
-      uuid: uuidv4(),
       coartists: [],
     },
   });
