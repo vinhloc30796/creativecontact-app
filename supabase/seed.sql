@@ -244,13 +244,14 @@ VALUES (
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
 );
 
-INSERT INTO events (id, created_at, name, slug, created_by)
+INSERT INTO events (id, created_at, name, slug, created_by, time_end)
 VALUES (
     '9419ee07-81ed-4114-8143-1fff084d019a', -- Random UUID
     CURRENT_TIMESTAMP, -- Current timestamp
     'Trung Thu Creative Archive 2024',
     'trungthu-archive-2024',
-    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', -- Assuming this is a valid user UUID
+    '2024-10-01 00:00:00+00' -- Oct 1st, 2024
 );
 
 INSERT INTO events (id, created_at, name, slug, created_by)

@@ -32,6 +32,9 @@ export async function sendSignInWithOtp(email: string, options?: {
       const escapedEmail = encodeURIComponent(email);
       const confirmationURL = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/confirm?token=${linkData.properties.hashed_token}&email=${escapedEmail}&type=magiclink` + redirectToParam;
 
+      // using for debugging
+      console.log("Confirmation URL:", confirmationURL);
+
       const component = React.createElement(SignInEmail, { otp, confirmationURL });
 
       return resend.emails.send({

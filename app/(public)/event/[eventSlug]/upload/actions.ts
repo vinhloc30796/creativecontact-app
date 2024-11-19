@@ -36,14 +36,14 @@ function getAssetType(path: string): "image" | "video" | "audio" | "font" | null
 export async function createArtwork(
   uploaderId: string,
   artworkData: {
-    uuid: string;
+    id: string;
     title: string;
     description: string;
   }
 ) {
   const result = await db.transaction(async (tx) => {
     const [artwork] = await tx.insert(artworksTable).values({
-      id: artworkData.uuid,
+      id: artworkData.id,
       title: artworkData.title,
       description: artworkData.description,
     }).returning();
@@ -107,16 +107,20 @@ export async function insertArtworkCredit(
 
 export async function insertArtworkEvents(
   artworkId: string,
-  eventSlug: string
+  eventSlug: string,
 ) {
   const result = await db.transaction(async (tx) => {
     const event = await tx.query.events.findFirst({
       where: eq(events.slug, eventSlug),
-      columns: { id: true }
+      columns: { id: true , time_end: true}
     });
 
     if (!event) {
       throw new Error(`Event with slug ${eventSlug} not found`);
+    }
+    
+    if (event.time_end && new Date() > new Date(event.time_end)) {
+      throw new Error(`Event with slug ${eventSlug} has ended`);
     }
 
     const artworkEvent = await tx.insert(artworkEvents).values({
