@@ -12,6 +12,8 @@ export const contactInfoSchema = z.object({
   }),
   phoneCountryAlpha3: z.string().default("VNM"),
   location: z.string().optional(),
+  phoneCountryAlpha3: z.string().default("VNM"),
+  location: z.string().optional(),
   instagramHandle: z.string().optional(),
   facebookHandle: z.string().optional(),
 });
