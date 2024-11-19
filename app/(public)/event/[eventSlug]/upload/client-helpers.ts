@@ -23,7 +23,9 @@ export async function handleUserInfo(
   const writeUserInfoResult = await writeUserInfo(
     formUserId,
     {
-      phone: contactInfoData.phone,
+      phoneCountryCode: "84",
+      phoneNumber: contactInfoData.phoneNumber,
+      phoneCountryAlpha3: "VNM",
       firstName: contactInfoData.firstName,
       lastName: contactInfoData.lastName,
     },
@@ -82,7 +84,9 @@ export async function handleCoArtists(artworkData: ArtworkInfoData, artworkCredi
     await writeUserInfo(
       signupResult.id,
       {
-        phone: "",
+        phoneCountryCode: "84",
+        phoneNumber: "",
+        phoneCountryAlpha3: "VNM",
         firstName: coartist.first_name,
         lastName: coartist.last_name,
       },
