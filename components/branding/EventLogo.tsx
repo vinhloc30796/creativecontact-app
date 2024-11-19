@@ -16,8 +16,8 @@ const EventLogo: React.FC<EventLogoProps> = ({ eventSlug, eventTitle, className,
   });
 
   return (
-    <EventLogoSVG 
-      {...props} 
+    <EventLogoSVG
+      {...props}
     />
   );
 };

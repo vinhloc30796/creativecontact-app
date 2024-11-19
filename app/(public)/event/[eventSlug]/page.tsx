@@ -8,7 +8,7 @@ import { Suspense } from 'react';
 // Database and ORM imports
 import { db } from '@/lib/db';
 import { createClient } from '@supabase/supabase-js';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq, gt, lt } from 'drizzle-orm';
 
 // Schema imports
 import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
@@ -25,6 +25,7 @@ import { EventNotFound } from './EventNotFound';
 import { UploadStatistics } from './UploadStatistics';
 // Utility imports
 import { useTranslation } from '@/lib/i18n/init-server';
+import EventEnded from './EventEnded';
 // Define the props interface for the EventPage component
 interface EventPageProps {
   params: {
@@ -64,7 +65,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
   // Fetch event data from the database
   const eventData = await db.query.events.findFirst({
     where: eq(events.slug, eventSlug),
-    columns: { id: true, name: true, slug: true }
+    columns: { id: true, name: true, slug: true, time_end: true }
   });
 
   // Fetch recent events for the EventNotFound component
@@ -72,7 +73,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     orderBy: desc(events.created_at),
     limit: 5
   });
-
+  const eventEnded = (eventData?.time_end && new Date() > new Date(eventData.time_end)) as boolean;
   // If event is not found, render the EventNotFound component
   if (!eventData) {
     return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
@@ -139,7 +140,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col w-full">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0" />
+        <EventHeader eventSlug={eventSlug} lang={lang} eventEnded={eventEnded} className="mb-0" />
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
@@ -152,7 +153,6 @@ export default async function EventPage({ params, searchParams }: EventPageProps
             />
           </Suspense>
         </div>
-
         {/* Main content area */}
         <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
           <div className="w-full px-4 sm:px-8 md:px-16">
@@ -170,7 +170,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
         </main>
 
         {/* Footer section */}
-        <EventFooter lang={lang}/>
+        <EventFooter lang={lang} />
       </div>
     </BackgroundDiv>
   );
