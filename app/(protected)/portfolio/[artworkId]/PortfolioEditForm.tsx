@@ -59,24 +59,26 @@ export default function PortfolioEditForm({
 
   // Fetch artwork assets if editing existing artwork
   const { data: artworkWithAssets, isLoading } = useQuery<ArtworkWithAssets[]>({
-    queryKey: ['artwork', artwork?.artworks?.id],
+    queryKey: ["artwork", artwork?.artworks?.id],
     queryFn: async () => {
       if (!artwork?.artworks?.id) {
         return [];
       }
-      const response = await fetch(`/api/artworks/${artwork.artworks.id}/assets`);
-      if (!response.ok) throw new Error('Failed to fetch artwork assets');
+      const response = await fetch(
+        `/api/artworks/${artwork.artworks.id}/assets`,
+      );
+      if (!response.ok) throw new Error("Failed to fetch artwork assets");
       return response.json();
     },
-    enabled: !!artwork?.artworks?.id
+    enabled: !!artwork?.artworks?.id,
   });
 
   const handleSubmit = async (formData: ArtworkFormValues) => {
     try {
       // Create or update artwork
-      const artworkResponse = await fetch('/api/artworks', {
-        method: isNew ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const artworkResponse = await fetch("/api/artworks", {
+        method: isNew ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           id: artwork?.artworks?.id,
@@ -84,7 +86,7 @@ export default function PortfolioEditForm({
       });
 
       if (!artworkResponse.ok) {
-        throw new Error('Failed to save artwork');
+        throw new Error("Failed to save artwork");
       }
 
       const savedArtwork = await artworkResponse.json();
@@ -92,26 +94,26 @@ export default function PortfolioEditForm({
       // Handle file uploads if any
       if (pendingFiles.length > 0) {
         const formData = new FormData();
-        pendingFiles.forEach(file => {
-          formData.append('files', file);
+        pendingFiles.forEach((file) => {
+          formData.append("files", file);
         });
-        formData.append('artworkId', savedArtwork.id);
+        formData.append("artworkId", savedArtwork.id);
 
-        const uploadResponse = await fetch('/api/uploads', {
-          method: 'POST',
+        const uploadResponse = await fetch("/api/uploads", {
+          method: "POST",
           body: formData,
         });
 
         if (!uploadResponse.ok) {
-          throw new Error('Failed to upload files');
+          throw new Error("Failed to upload files");
         }
       }
 
       // Update portfolio artwork
       // TODO: This endpoint is not implemented yet
-      const portfolioResponse = await fetch('/api/portfolio-artworks', {
-        method: isNew ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const portfolioResponse = await fetch("/api/portfolio-artworks", {
+        method: isNew ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: artwork?.portfolioArtworks?.id,
           userId: userData.id,
@@ -120,14 +122,14 @@ export default function PortfolioEditForm({
       });
 
       if (!portfolioResponse.ok) {
-        throw new Error('Failed to update portfolio');
+        throw new Error("Failed to update portfolio");
       }
 
       // Redirect back to portfolio page
-      router.push('/profile');
+      router.push("/profile");
       router.refresh();
     } catch (error) {
-      console.error('Error saving portfolio artwork:', error);
+      console.error("Error saving portfolio artwork:", error);
       // Handle error (show toast notification, etc.)
     }
   };
@@ -135,14 +137,15 @@ export default function PortfolioEditForm({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>
-          {isNew ? t("newProject") : t("editProject")}
-        </CardTitle>
+        <CardTitle>{isNew ? t("newProject") : t("editProject")}</CardTitle>
       </CardHeader>
 
       <CardContent>
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8"
+          >
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="info">{t("projectInfo")}</TabsTrigger>
@@ -151,12 +154,18 @@ export default function PortfolioEditForm({
               </TabsList>
 
               <TabsContent value="info" className="space-y-4">
-                <ArtworkInfoStep 
-                  form={form as any} 
-                  artworks={artwork?.artworks ? [{
-                    ...artwork.artworks,
-                    description: artwork.artworks.description || "",
-                  }] : []} 
+                <ArtworkInfoStep
+                  form={form as any}
+                  artworks={
+                    artwork?.artworks
+                      ? [
+                          {
+                            ...artwork.artworks,
+                            description: artwork.artworks.description || "",
+                          },
+                        ]
+                      : []
+                  }
                 />
               </TabsContent>
 
@@ -170,32 +179,33 @@ export default function PortfolioEditForm({
                 </ThumbnailProvider>
 
                 {!isNew && !isLoading && artworkWithAssets && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {artworkWithAssets.map((item, index) => (
-                      item.assets && (
-                        <div
-                          key={item.assets.id}
-                          className="relative aspect-square"
-                        >
-                          {item.assets.assetType === "video" ? (
-                            <video
-                              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
-                              controls
-                              className="h-full w-full object-cover"
-                            >
-                              Your browser does not support the video tag.
-                            </video>
-                          ) : (
-                            <Image
-                              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
-                              alt={`${artwork?.artworks?.title || 'Untitled'} - Asset ${index + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          )}
-                        </div>
-                      )
-                    ))}
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                    {artworkWithAssets.map(
+                      (item, index) =>
+                        item.assets && (
+                          <div
+                            key={item.assets.id}
+                            className="relative aspect-square"
+                          >
+                            {item.assets.assetType === "video" ? (
+                              <video
+                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
+                                controls
+                                className="h-full w-full object-cover"
+                              >
+                                Your browser does not support the video tag.
+                              </video>
+                            ) : (
+                              <Image
+                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
+                                alt={`${artwork?.artworks?.title || "Untitled"} - Asset ${index + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            )}
+                          </div>
+                        ),
+                    )}
                   </div>
                 )}
               </TabsContent>
@@ -209,13 +219,11 @@ export default function PortfolioEditForm({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push('/profile')}
+                onClick={() => router.push("/profile")}
               >
                 {t("cancel")}
               </Button>
-              <Button type="submit">
-                {isNew ? t("create") : t("save")}
-              </Button>
+              <Button type="submit">{isNew ? t("create") : t("save")}</Button>
             </div>
           </form>
         </FormProvider>
