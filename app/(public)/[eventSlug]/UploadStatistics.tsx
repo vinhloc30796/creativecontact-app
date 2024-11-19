@@ -28,7 +28,7 @@ export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdow
       setTimeLeft((prevTime) => {
         if (prevTime === undefined || prevTime <= 1) {
           clearInterval(timer);
-          router.push(`/event/${eventSlug}/upload`);
+          router.push(`/${eventSlug}/upload`);
           return 0;
         }
         return prevTime - 1;

@@ -13,14 +13,12 @@ interface EventHeaderProps {
   lang: string;
   className?: string;
   stickyOverlay?: boolean;
-  eventEnded?: boolean;
 }
 
 export const EventHeader: React.FC<EventHeaderProps> = async ({
   eventSlug,
   lang,
   className,
-  eventEnded = false,
   stickyOverlay = true,
 }) => {
   const { t } = await useTranslation(lang, "EventPage");
@@ -32,7 +30,7 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
     <header className={cn("w-full", headerLayoutClassName, className)}>
       <div className="mx-auto flex w-full items-center justify-between px-4 py-4 md:px-16">
         <div className="flex-1">
-          <Link href={`/event/${eventSlug}`}>
+          <Link href={`/${eventSlug}`}>
             <CreativeContactLogo className="h-8 w-auto fill-muted sm:h-12 md:h-16" />
           </Link>
         </div>
@@ -40,7 +38,7 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
           {/* Desktop menu */}
           <div className="space-x-4">
             <Link
-              href={`/event/${eventSlug}`}
+              href={`/${eventSlug}`}
               className="px-4 py-2 font-bold text-primary hover:bg-transparent hover:text-primary-500"
             >
               <span
@@ -64,21 +62,12 @@ export const EventHeader: React.FC<EventHeaderProps> = async ({
           <div className="flex flex-row space-x-4">
             <Button
               variant="outline"
-              className={cn(
-                "relative inset-0 overflow-hidden rounded-full border-accent bg-accent/5 font-bold text-accent shadow-inner shadow-accent-500/50",
-                eventEnded
-                  ? "cursor-not-allowed opacity-50 hover:shadow-none"
-                  : "hover:shadow-md hover:shadow-accent-500/50"
-              )}
+              className="relative inset-0 overflow-hidden rounded-full border-accent bg-accent/5 font-bold text-accent shadow-inner shadow-accent-500/50 transition-shadow duration-500 hover:shadow-md hover:shadow-accent-500/50"
               asChild
             >
-              {eventEnded ? (
-                <span>{t("upload", { ns: "EventPage" })}</span>
-              ) : (
-                <Link href={`/event/${eventSlug}/upload`}>
-                  {t("upload", { ns: "EventPage" })}
-                </Link>
-              )}
+              <Link href={`/${eventSlug}/upload`}>
+                {t("upload", { ns: "EventPage" })}
+              </Link>
             </Button>
             <p>
               <Button

@@ -1,9 +1,0 @@
-{
-    "EmptyContactCard": {
-        "findContacts": "Tìm Kết nối",
-        "description": "Vui lòng kết nối với người dùng khác để xem hồ sơ của họ tại đây."
-    },
-    "ContactCard": {
-        "findContacts": "Tìm Kết nối"
-    }
-}

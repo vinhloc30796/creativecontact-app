@@ -1,9 +1,0 @@
-{
-    "EmptyContactCard": {
-        "findContacts": "Find Contacts",
-        "description": "Please connect with other users to see their profiles here."
-    },
-    "ContactCard": {
-        "findContacts": "Find Contacts"
-    }
-}

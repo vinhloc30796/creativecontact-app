@@ -4,9 +4,9 @@ import { z } from "zod";
 
 // Define the schema for ArtworkInfoStep
 export const artworkInfoSchema = z.object({
-  id: z.string(),
+  uuid: z.string(),
   title: z.string().min(1, "Title is required"),
-  description: z.string(),
+  description: z.string().min(1, "Description is required"),
 });
 
 export type ArtworkInfoData = z.infer<typeof artworkInfoSchema>

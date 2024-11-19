@@ -136,7 +136,7 @@ export default async function ArtworkPage({
           <div className="mx-16 my-8 flex items-center justify-between">
             <div className="flex justify-center gap-4">
               <Link
-                href={`/event/${eventSlug}`}
+                href={`/${eventSlug}`}
                 className="flex items-center text-muted hover:underline"
               >
                 {t("backToEvent")}
@@ -150,7 +150,7 @@ export default async function ArtworkPage({
                 size="icon"
                 className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
               >
-                <Link href={prevArtworkId ? `/event/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+                <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
                   <ChevronLeft className="h-4 w-4 text-primary" />
                   <span className="sr-only">{t("previousArtwork")}</span>
                 </Link>
@@ -161,7 +161,7 @@ export default async function ArtworkPage({
                 size="icon"
                 className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
               >
-                <Link href={nextArtworkId ? `/event/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+                <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
                   <ChevronRight className="h-4 w-4 text-primary" />
                   <span className="sr-only">{t("nextArtwork")}</span>
                 </Link>
@@ -255,7 +255,7 @@ export default async function ArtworkPage({
                   size="icon"
                   className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
                 >
-                  <Link href={prevArtworkId ? `/event/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+                  <Link href={prevArtworkId ? `/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
                     <ChevronLeft className="h-4 w-4 text-primary" />
                     <span className="sr-only">{t("previousArtwork")}</span>
                   </Link>
@@ -266,7 +266,7 @@ export default async function ArtworkPage({
                   size="icon"
                   className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
                 >
-                  <Link href={nextArtworkId ? `/event/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+                  <Link href={nextArtworkId ? `/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
                     <ChevronRight className="h-4 w-4 text-primary" />
                     <span className="sr-only">{t("nextArtwork")}</span>
                   </Link>

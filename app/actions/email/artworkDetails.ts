@@ -15,7 +15,7 @@ export async function sendArtworkUploadConfirmationEmail(
   eventSlug: string,
   shouldConfirmEmail: boolean = true
 ) {
-  const confirmationURL = `${process.env.NEXT_PUBLIC_APP_URL}/event/${eventSlug}`;
+  const confirmationURL = `${process.env.NEXT_PUBLIC_APP_URL}/${eventSlug}`;
 
   try {
     const adminSupabaseClient = await getAdminSupabaseClient();

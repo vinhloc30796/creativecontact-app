@@ -34,7 +34,7 @@ export async function sendEventDetailsEmail(
     const component: React.ReactNode = React.createElement(EventDetailsEmail, {
       name: registration.name,
       email: registration.email,
-      phone: `${registration.phone_country_code}${registration.phone_number}`,
+      phone: registration.phone,
       eventDate: dateStr,
       eventTime: `${timeStartStr} - ${timeEndStr}`,
       qrCodeUrl: qrCodeUrl,

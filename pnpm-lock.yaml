@@ -168,13 +168,13 @@ importers:
         specifier: ^1.5.4
         version: 1.5.4
       react:
-        specifier: ^18.2.0
+        specifier: ^18
         version: 18.2.0
       react-day-picker:
-        specifier: ^8.10.1
+        specifier: ^8.9.1
         version: 8.10.1(date-fns@3.6.0)(react@18.2.0)
       react-dom:
-        specifier: ^18.2.0
+        specifier: ^18
         version: 18.2.0(react@18.2.0)
       react-dropzone:
         specifier: ^14.2.3
@@ -220,7 +220,7 @@ importers:
         specifier: ^5.53.0
         version: 5.53.0(eslint@8.57.0)(typescript@5.3.3)
       '@types/node':
-        specifier: ^22.2.0
+        specifier: ^22
         version: 22.2.0
       '@types/pg':
         specifier: ^8.11.6
@@ -229,10 +229,10 @@ importers:
         specifier: ^1.5.5
         version: 1.5.5
       '@types/react':
-        specifier: ^18.2.48
+        specifier: ^18
         version: 18.2.48
       '@types/react-dom':
-        specifier: ^18.2.18
+        specifier: ^18
         version: 18.2.18
       '@types/uuid':
         specifier: ^10.0.0
@@ -244,7 +244,7 @@ importers:
         specifier: ^0.23.2
         version: 0.23.2
       eslint:
-        specifier: ^8.57.0
+        specifier: ^8
         version: 8.57.0
       eslint-config-next:
         specifier: 14.2.5
@@ -262,7 +262,7 @@ importers:
         specifier: ^3.4.9
         version: 3.4.9
       typescript:
-        specifier: ^5.3.3
+        specifier: ^5
         version: 5.3.3
 
 packages:
@@ -2831,8 +2831,11 @@ packages:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
 
-  caniuse-lite@1.0.30001680:
-    resolution: {integrity: sha512-rPQy70G6AGUMnbwS1z6Xg+RkHYPAi18ihs47GH0jcxIG7wArmPgY3XbS2sRdBbxJljp3thdT8BIqv9ccCypiPA==}
+  caniuse-lite@1.0.30001632:
+    resolution: {integrity: sha512-udx3o7yHJfUxMLkGohMlVHCvFvWmirKh9JAH/d7WOLPetlH+LTL5cocMZ0t7oZx/mdlOWXti97xLZWc8uURRHg==}
+
+  caniuse-lite@1.0.30001651:
+    resolution: {integrity: sha512-9Cf+Xv1jJNe1xPZLGuUXLNkE1BoDkqRqYyFJ9TDYSqhduqA4hu4oR9HluGoWYQC/aj8WHjsGVV+bwkh0+tegRg==}
 
   chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -7551,7 +7554,7 @@ snapshots:
   autoprefixer@10.4.20(postcss@8.4.41):
     dependencies:
       browserslist: 4.23.3
-      caniuse-lite: 1.0.30001680
+      caniuse-lite: 1.0.30001651
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.1
@@ -7623,7 +7626,7 @@ snapshots:
 
   browserslist@4.23.3:
     dependencies:
-      caniuse-lite: 1.0.30001680
+      caniuse-lite: 1.0.30001651
       electron-to-chromium: 1.5.6
       node-releases: 2.0.18
       update-browserslist-db: 1.1.0(browserslist@4.23.3)
@@ -7655,7 +7658,9 @@ snapshots:
 
   camelcase@6.3.0: {}
 
-  caniuse-lite@1.0.30001680: {}
+  caniuse-lite@1.0.30001632: {}
+
+  caniuse-lite@1.0.30001651: {}
 
   chalk@2.4.2:
     dependencies:
@@ -8978,7 +8983,7 @@ snapshots:
       '@next/env': 14.2.3
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001680
+      caniuse-lite: 1.0.30001651
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.2.0
@@ -9004,7 +9009,7 @@ snapshots:
       '@next/env': 14.2.5
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001680
+      caniuse-lite: 1.0.30001632
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.2.0

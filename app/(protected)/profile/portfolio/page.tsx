@@ -1,34 +1,20 @@
+// File: app/(protected)/profile/portfolio/page.tsx
 "use server";
 
-// React imports
-import { Suspense } from "react";
-
-// Next.js imports
-import { redirect } from "next/navigation";
-
-// API imports
 import { fetchUserData } from "@/app/api/user/helper";
-import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
-
-// Type imports
 import { UserData } from "@/app/types/UserInfo";
-
-// Component imports
+// Components
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader, LoadingUserHeader } from "@/components/wrappers/UserHeader";
-import { BackButton } from "@/app/(protected)/profile/BackButton";
+import { UserHeader } from "@/components/wrappers/UserHeader";
+// React
+import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
+import { useServerAuth } from "@/hooks/useServerAuth";
+import { redirect } from "next/navigation";
+import { BackButton } from "../BackButton";
 import PortfolioEditForm from "./PortfolioEditForm";
 
-// Hook imports
-import { useServerAuth } from "@/hooks/useServerAuth";
-
-// Action imports
-import { handleArtworkNotFound } from "./action";
-
 interface PortfolioEditPageProps {
-  params: {
-    artworkId: string;
-  };
+  params: {};
   searchParams: {
     lang: string;
   };
@@ -58,29 +44,18 @@ export default async function PortfolioEditPage({
     return null;
   }
 
-  const portfolioArtworks = await fetchUserPortfolioArtworksWithDetails(
+  const existingPortfolioArtworks = await fetchUserPortfolioArtworksWithDetails(
     userData.id,
   );
-
-  const currentArtwork = portfolioArtworks.find(
-    (artwork) => artwork.artworks?.id === params.artworkId
-  );
-
-  if (!currentArtwork && params.artworkId !== 'new') {
-    console.error("Artwork not found: ", params.artworkId);
-    redirect("/profile");
-  }
 
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
-        <Suspense fallback={<LoadingUserHeader />}>
-          <UserHeader
-            lang={lang}
-            isLoggedIn={isLoggedIn}
-            className="bg-background/80 backdrop-blur-sm"
-          />
-        </Suspense>
+        <UserHeader
+          lang={lang}
+          isLoggedIn={isLoggedIn}
+          className="bg-background/80 backdrop-blur-sm"
+        />
 
         <main className="relative z-20 mt-10 w-full flex-grow lg:mt-20">
           <div className="container mx-auto mb-4 px-4">
@@ -90,8 +65,7 @@ export default async function PortfolioEditPage({
             <PortfolioEditForm
               userData={userData}
               lang={lang}
-              artwork={currentArtwork}
-              isNew={params.artworkId === 'new'}
+              existingPortfolioArtworks={existingPortfolioArtworks}
             />
           </div>
         </main>

@@ -3,10 +3,6 @@
     "text": "Sự kiện Không Tồn tại",
     "description": "Sự kiện <strong>{{eventSlug}}</strong> không tồn tại. Có phải bạn đang tìm một trong các sự kiện sau đây không?"
   },
-  "eventEnded": {
-    "text": "Sự kiện đã kết thúc",
-    "description": "Sự kiện <strong>{{eventSlug}}</strong> đã kết thúc."
-  },
   "state": {
     "loading": "Đang tải thông tin người dùng...",
     "loggedIn": "Bạn đã đăng nhập với email {{email}}",

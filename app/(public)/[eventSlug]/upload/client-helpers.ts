@@ -23,9 +23,7 @@ export async function handleUserInfo(
   const writeUserInfoResult = await writeUserInfo(
     formUserId,
     {
-      phoneCountryCode: "84",
-      phoneNumber: contactInfoData.phoneNumber,
-      phoneCountryAlpha3: "VNM",
+      phone: contactInfoData.phone,
       firstName: contactInfoData.firstName,
       lastName: contactInfoData.lastName,
     },
@@ -84,9 +82,7 @@ export async function handleCoArtists(artworkData: ArtworkInfoData, artworkCredi
     await writeUserInfo(
       signupResult.id,
       {
-        phoneCountryCode: "84",
-        phoneNumber: "",
-        phoneCountryAlpha3: "VNM",
+        phone: "",
         firstName: coartist.first_name,
         lastName: coartist.last_name,
       },
@@ -103,7 +99,7 @@ export async function handleCoArtists(artworkData: ArtworkInfoData, artworkCredi
     );
 
     await insertArtworkCredit(
-      artworkData.id,
+      artworkData.uuid,
       signupResult.id,
       coartist.title
     );

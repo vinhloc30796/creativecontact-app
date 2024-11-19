@@ -7,7 +7,6 @@ import Link from "next/link";
 import React from "react";
 import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
 import { UserBurgerMenu } from "@/components/UserBurgerMenu";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface UserHeaderProps {
   lang: string;
@@ -15,28 +14,6 @@ interface UserHeaderProps {
   stickyOverlay?: boolean;
   isLoggedIn: boolean; // New prop to check if user is logged in
 }
-
-export const LoadingUserHeader = () => {
-  return (
-    <div className="w-full flex">
-      <div className="mx-auto flex w-full px-4 py-4 md:px-16 gap-4">
-        <div className="flex-1">
-          <div className="h-8 w-32 sm:h-12 md:h-16">
-            <Skeleton className="h-full w-full" />
-          </div>
-        </div>
-        <div className="flex w-full items-center justify-between">
-          <div className="hidden flex-1 justify-start lg:flex">
-            <Skeleton className="h-8 w-24" />
-          </div>
-          <div className="hidden flex-1 justify-end lg:flex">
-            <Skeleton className="h-8 w-24" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export const UserHeader: React.FC<UserHeaderProps> = async ({
   lang,

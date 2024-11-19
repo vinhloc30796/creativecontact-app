@@ -25,6 +25,6 @@ export const portfolioArtworks = pgTable("portfolio_artworks", {
 
 export type PortfolioArtwork = typeof portfolioArtworks.$inferSelect;
 export type PortfolioArtworkWithDetails = {
-  portfolioArtworks: PortfolioArtwork;
-  artworks: Artwork | null;
+  portfolio_artworks: typeof portfolioArtworks.$inferSelect;
+  artworks: typeof artworks.$inferSelect | null;
 };

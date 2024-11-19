@@ -41,7 +41,7 @@ export function ArtworkCard({ eventSlug, artwork, size }: ArtworkCardProps) {
     >
       {artwork.thumbnail && (
         <>
-          <Link href={`/event/${eventSlug}/artwork/${artwork.id}`} className="relative block">
+          <Link href={`/${eventSlug}/artwork/${artwork.id}`} className="relative block">
             {isVideo ? (
               <video
                 src={`${assetUrl}#t=0.05`}
