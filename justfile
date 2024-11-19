@@ -13,3 +13,6 @@ diff choice="staged":
         echo "Invalid choice. Use 'staged' or 'main'."
         exit 1
     fi
+
+db:
+    psql postgresql://postgres:postgres@127.0.0.1:54322/postgres

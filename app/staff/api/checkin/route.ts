@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       id: result.data.id,
       name: result.data.name,
       email: result.data.email,
-      phone: result.data.phone,
+      phone: `${result.data.phone_country_code}${result.data.phone_number}`,
     });
 
   } catch (error) {

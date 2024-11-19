@@ -34,11 +34,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       status: result.data.status,
-      message: "Check-in successful",
+      message: "Check-in successful", 
       id: result.data.id,
       name: result.data.name,
       email: result.data.email,
-      phone: result.data.phone,
+      phone_country_code: result.data.phone_country_code,
+      phone_number: result.data.phone_number,
+      phone_country_alpha3: result.data.phone_country_alpha3
     });
 
   } catch (error) {
@@ -48,4 +50,3 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
-

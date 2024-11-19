@@ -141,7 +141,8 @@ function UploadPageContent({
       email: "",
       firstName: "",
       lastName: "",
-      phone: "",
+      phoneCountryCode: "",
+      phoneNumber: "",
       instagramHandle: undefined,
       facebookHandle: undefined,
     },
@@ -160,7 +161,7 @@ function UploadPageContent({
     resolver: zodResolver(artworkInfoSchema),
     mode: "onSubmit",
     defaultValues: {
-      uuid: currentArtwork?.uuid || "",
+      id: currentArtwork?.id || "",
       title: currentArtwork?.title || "",
       description: currentArtwork?.description || "",
     },
@@ -182,7 +183,8 @@ function UploadPageContent({
         email: userData.email,
         firstName: userData.firstName ?? '',
         lastName: userData.lastName ?? '',
-        phone: userData.phone ?? '',
+        phoneCountryCode: userData.phoneCountryCode ?? '',
+        phoneNumber: userData.phoneNumber ?? '',
         instagramHandle: userData.instagramHandle || undefined,
         facebookHandle: userData.facebookHandle || undefined,
       });
@@ -201,20 +203,20 @@ function UploadPageContent({
   // Actions
   const handleArtworkSubmit = async (data: ArtworkInfoData) => {
     let processedData = data;
-    if (!processedData.uuid) {
+    if (!processedData.id) {
       // Create new artwork
-      const uuid = uuidv4();
-      console.debug("Creating new UUID", uuid);
-      processedData.uuid = uuid;
+      const id = uuidv4();
+      console.debug("Creating new UUID", id);
+      processedData.id = id;
       console.debug("Updated current artwork", processedData);
     }
     addArtwork(processedData);
     setCurrentArtwork(processedData);
-    artworkForm.setValue("uuid", processedData?.uuid || "");
+    artworkForm.setValue("id", processedData?.id || "");
     artworkForm.setValue("title", processedData?.title || "");
     artworkForm.setValue("description", processedData?.description || "");
-    setArtworkUUID(processedData.uuid); // Update artworkUUID state
-    console.log("artworkUUID set to:", processedData.uuid);
+    setArtworkUUID(processedData.id); // Update artworkUUID state
+    console.log("artworkUUID set to:", processedData.id);
   };
 
   // Callback function to update pending files
@@ -285,7 +287,7 @@ function UploadPageContent({
 
       // Insert assets
       const insertAssetsResult = await insertArtworkAssets(
-        artworkData.uuid,
+        artworkData.id,
         uploadedResults,
       );
       console.log("Insert assets successful:", insertAssetsResult);
@@ -302,7 +304,7 @@ function UploadPageContent({
       const params = new URLSearchParams({
         email: contactInfoData.email,
         userId: formUserId,
-        artworkId: artworkData.uuid,
+        artworkId: artworkData.id,
         emailSent: emailResult.success ? "true" : "false",
         lang: i18n?.language || "en",
       });

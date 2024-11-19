@@ -7,6 +7,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { ContactInfoData } from "@/app/form-schemas/contact-info"
 import { useTranslation } from 'react-i18next'
 import { Separator } from '@/components/ui/separator'
+import { CountryCodeSelector } from '@/components/profile/CountryCodeSelector'
 
 interface ContactInfoStepProps {
   form: UseFormReturn<ContactInfoData>
@@ -57,19 +58,35 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           )}
         />
       </div>
-      <FormField
-        control={form.control}
-        name="phone"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t('ContactInfoStep.phone.label')}</FormLabel>
-            <FormControl>
-              <Input placeholder={t('ContactInfoStep.phone.placeholder')} {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="space-y-2">
+        <FormLabel>{t('ContactInfoStep.phone.label')}</FormLabel>
+        <div className="flex space-x-2">
+          <FormField
+            control={form.control}
+            name="phoneCountryCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <CountryCodeSelector value={field.value} onChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormControl>
+                  <Input placeholder={t('ContactInfoStep.phone.placeholder')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      </div>
       <Separator className="my-4" />
       <FormField
         control={form.control}

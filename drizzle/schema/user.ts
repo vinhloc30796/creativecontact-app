@@ -67,7 +67,9 @@ export const userInfos = pgTable('user_infos', {
   firstName: text('first_name'),
   lastName: text('last_name'),
   displayName: text('display_name'),
-  phone: text('phone'),
+  phoneCountryCode: text('phone_country_code').default('84'),
+  phoneNumber: text('phone_number'),
+  phoneCountryAlpha3: text('phone_country_alpha3').default('VNM'),
   location: text('location'),
   occupation: text('occupation'),
   about: text('about'),
@@ -82,3 +84,29 @@ export const userInfos = pgTable('user_infos', {
 export type IndustryType = typeof industries[number];
 export type ExperienceType = typeof experienceLevels[number];
 export type UserInfo = InferSelectModel<typeof userInfos>;
+
+// Mappers
+export const industriesMapper = [
+  { value: 'Advertising' as const, label: 'Advertising' },
+  { value: 'Architecture' as const, label: 'Architecture' },
+  { value: 'Arts and Crafts' as const, label: 'Arts and Crafts' },
+  { value: 'Design' as const, label: 'Design' },
+  { value: 'Fashion' as const, label: 'Fashion' },
+  { value: 'Film, Video, and Photography' as const, label: 'Film, Video, and Photography' },
+  { value: 'Music' as const, label: 'Music' },
+  { value: 'Performing Arts' as const, label: 'Performing Arts' },
+  { value: 'Publishing' as const, label: 'Publishing' },
+  { value: 'Software and Interactive' as const, label: 'Software and Interactive' },
+  { value: 'Television and Radio' as const, label: 'Television and Radio' },
+  { value: 'Visual Arts' as const, label: 'Visual Arts' },
+  { value: 'Other' as const, label: 'Other' }
+] as const
+
+export const experienceLevelsMapper = [
+  { value: 'Entry' as const, label: 'Entry' },
+  { value: 'Junior' as const, label: 'Junior' },
+  { value: 'Mid-level' as const, label: 'Mid-level' },
+  { value: 'Senior' as const, label: 'Senior' },
+  { value: 'Manager' as const, label: 'Manager' },
+  { value: 'C-level' as const, label: 'C-level' }
+] as const
