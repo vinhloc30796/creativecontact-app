@@ -209,7 +209,7 @@ export default function PortfolioEditForm({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push('/portfolio')}
+                onClick={() => router.push('/profile')}
               >
                 {t("cancel")}
               </Button>

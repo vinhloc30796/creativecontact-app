@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ErrorMessage } from "@/components/ErrorMessage";
 
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
@@ -43,6 +44,7 @@ import { Suspense } from 'react';
 
 // Local component import
 import PortfolioSection from './PortfolioSection';
+import { cookies } from "next/headers";
 
 interface ProfilePageProps {
   params: {
@@ -255,6 +257,9 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
   const lang = searchParams.lang || "en";
   const { t } = await useTranslation(lang, "ProfilePage");
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
+  // Cookies
+  const cookieStore = cookies();
+  const errorMessage = cookieStore.get('error_message')?.value;
 
   if (!isLoggedIn || isAnonymous) {
     redirect("/login");
@@ -288,6 +293,9 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
 
   return (
     <BackgroundDiv>
+      <Suspense fallback={null}>
+        {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+      </Suspense>
       <div className="flex min-h-screen w-full flex-col">
         <UserHeader
           lang={lang}

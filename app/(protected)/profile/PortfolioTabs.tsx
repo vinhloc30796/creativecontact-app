@@ -197,9 +197,13 @@ function ExistingPortfolioProjectCard({
         <CardHeader className="flex flex-col items-left">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" asChild>
-              <Link href={`/portfolio/${project.artworks?.id}`}>
-                Edit
-              </Link>
+              {project.artworks?.id ? (
+                <Link href={`/portfolio/${project.artworks.id}`}>
+                  Edit
+                </Link>
+              ) : (
+                <span className="text-muted-foreground">Edit</span>
+              )}
             </Button>
             <Button variant="ghost" size="sm" onClick={handleDelete}>
               Delete

@@ -1,15 +1,29 @@
 "use server";
 
+// React imports
+import { Suspense } from "react";
+
+// Next.js imports
+import { redirect } from "next/navigation";
+
+// API imports
 import { fetchUserData } from "@/app/api/user/helper";
+import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
+
+// Type imports
 import { UserData } from "@/app/types/UserInfo";
+
+// Component imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader, LoadingUserHeader } from "@/components/wrappers/UserHeader";
-import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
-import { useServerAuth } from "@/hooks/useServerAuth";
-import { redirect } from "next/navigation";
-import { BackButton } from "../../profile/BackButton";
+import { BackButton } from "@/app/(protected)/profile/BackButton";
 import PortfolioEditForm from "./PortfolioEditForm";
-import { Suspense } from "react";
+
+// Hook imports
+import { useServerAuth } from "@/hooks/useServerAuth";
+
+// Action imports
+import { handleArtworkNotFound } from "./action";
 
 interface PortfolioEditPageProps {
   params: {
@@ -49,11 +63,12 @@ export default async function PortfolioEditPage({
   );
 
   const currentArtwork = portfolioArtworks.find(
-    (artwork) => artwork.portfolioArtworks.id === params.artworkId
+    (artwork) => artwork.artworks?.id === params.artworkId
   );
 
   if (!currentArtwork && params.artworkId !== 'new') {
-    redirect('/portfolio');
+    console.error("Artwork not found: ", params.artworkId);
+    redirect("/profile");
   }
 
   return (
