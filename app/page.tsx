@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { eventSlots } from "@/drizzle/schema/event"
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
-import InConstruct from '@/components/InConstruction'
+import InConstruction from '@/components/InConstruction'
 
 // show the in-construction page
 const inConstructionPage = true
@@ -26,7 +26,7 @@ export default async function Page({ searchParams }: Props) {
 	if (inConstructionPage) {
 		return (
 			<BackgroundDiv >
-				<InConstruct lang={lang} />
+				<InConstruction lang={lang} />
 			</BackgroundDiv>
 		)
 	}
