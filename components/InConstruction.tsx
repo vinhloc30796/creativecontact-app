@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "./ui/card"
 import { useTranslation } from "@/lib/i18n/init-server"
 import Image from "next/image";
 
-export default async function InConstruct({ lang }: { lang: string }) {
+export default async function InConstruction({ lang }: { lang: string }) {
   const { t } = await useTranslation(lang, 'inConstruction');
   return (
     <Card className="max-w-3xl min-w-xl mx-auto mt-10">
