@@ -103,7 +103,7 @@ export async function handleCoArtists(artworkData: ArtworkInfoData, artworkCredi
     );
 
     await insertArtworkCredit(
-      artworkData.uuid,
+      artworkData.id,
       signupResult.id,
       coartist.title
     );
