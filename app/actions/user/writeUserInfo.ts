@@ -13,6 +13,7 @@ export async function writeUserInfo(
     firstName: string;
     lastName: string;
     displayName?: string;
+    userName?: string;
   },
   professionalInfo: {
     industries: IndustryType[];
@@ -23,13 +24,16 @@ export async function writeUserInfo(
     facebookHandle?: string;
   },
   validateProfessionalInfo: boolean = true,
-  validateUserInfo: boolean = true
+  validateUserInfo: boolean = true,
 ) {
   console.log("Received professionalInfo:", professionalInfo);
   // Validate professional info
   if (validateProfessionalInfo) {
-    if (!professionalInfo.industries || professionalInfo.industries.length === 0 ||
-      !professionalInfo.experience) {
+    if (
+      !professionalInfo.industries ||
+      professionalInfo.industries.length === 0 ||
+      !professionalInfo.experience
+    ) {
       console.error("Invalid professional info:", professionalInfo);
       return { success: false, error: "Invalid professional info" };
     }
