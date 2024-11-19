@@ -81,6 +81,15 @@ export function BasicInfoSection({
           </div>
         </div>
         <div>
+          <Label htmlFor="userName">{t("BasicInfoSection.userName")}</Label>
+          <Input
+            id="userName"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            className="max-w-md"
+          />
+        </div>
+        <div>
           <Label htmlFor="displayName">
             {t("BasicInfoSection.displayName")}
           </Label>
