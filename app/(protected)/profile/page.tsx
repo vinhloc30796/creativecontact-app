@@ -135,6 +135,9 @@ function ProfileCard({
             <UserCircle className="mr-2 h-6 w-6" />
             {name}
           </CardTitle>
+          <div className="mb-2 text-sm text-gray-500">
+            {userName && `@${userName}`}
+          </div>
           <div className="mb-2 flex items-center gap-2">
             <Badge variant="success" className="flex items-center">
               <CheckCircle className="mr-1 h-3 w-3" />

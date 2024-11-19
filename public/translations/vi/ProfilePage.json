@@ -19,6 +19,7 @@
     "basicInfo": "Thông tin Cơ bản",
     "firstName": "Tên",
     "lastName": "Họ",
+    "userName": "Tên Người dùng",
     "displayName": "Tên Hiển thị",
     "location": "Địa điểm"
   },
