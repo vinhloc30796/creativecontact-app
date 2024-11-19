@@ -9,8 +9,8 @@ import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 
 // Component imports
-import { ContactCard } from '@/components/contacts/ContactCard';
-import { EmptyContactCard } from '@/components/contacts/EmptyContactCard';
+import { ContactCard } from "@/components/contacts/ContactCard";
+import { EmptyContactCard } from "@/components/contacts/EmptyContactCard";
 
 // UI imports
 import { Badge } from "@/components/ui/badge";
@@ -36,19 +36,26 @@ import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
 
 // Icon imports
-import { CheckCircle, Image, Mail, MapPin, Pencil, Phone, UserCircle } from 'lucide-react';
+import {
+  CheckCircle,
+  Image,
+  Mail,
+  MapPin,
+  Pencil,
+  Phone,
+  UserCircle,
+} from "lucide-react";
 
 // Next.js imports
 import { redirect } from "next/navigation";
-import { Suspense } from 'react';
+import { Suspense } from "react";
 
 // Local component import
-import PortfolioSection from './PortfolioSection';
+import PortfolioSection from "./PortfolioSection";
 import { cookies } from "next/headers";
 
 interface ProfilePageProps {
-  params: {
-  };
+  params: {};
   searchParams: {
     lang: string;
   };
@@ -79,9 +86,9 @@ async function getUserContacts(userId?: string): Promise<UserData[]> {
   const contacts = await fetchUserContacts(userId);
 
   // Map UserInfo to UserData
-  return contacts.map(contact => ({
+  return contacts.map((contact) => ({
     ...contact,
-    email: '', // Add a default empty string or fetch the actual email
+    email: "", // Add a default empty string or fetch the actual email
     isAnonymous: false, // Set a default value
     emailConfirmedAt: null, // Set a default value
   }));
@@ -99,7 +106,7 @@ function ProfileCard({
   userData,
   userSkills,
   portfolioArtworks,
-  showButtons = false
+  showButtons = false,
 }: {
   t: TFunction;
   userData: UserData;
@@ -107,25 +114,32 @@ function ProfileCard({
   portfolioArtworks: PortfolioArtworkWithDetails[];
   showButtons?: boolean;
 }) {
-  const name = userData.displayName || `${userData.firstName} ${userData.lastName}`;
+  const name =
+    userData.displayName || `${userData.firstName} ${userData.lastName}`;
+  const userName = userData.userName || "";
   const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
   const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
     <div className="mt-6 w-full overflow-y-auto lg:mt-0 lg:w-1/3 lg:pl-6">
-      <Card className="flex flex-col h-full">
+      <Card className="flex h-full flex-col">
         <CardHeader className="flex flex-col items-center">
-          <div className="mb-4 w-24 h-24 overflow-hidden rounded-lg">
+          <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
             <img
               src={profilePictureUrl}
               alt={`${name}'s profile`}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           </div>
-          <CardTitle className="mb-2 text-2xl font-bold flex items-center">
+          <CardTitle className="mb-2 flex items-center text-2xl font-bold">
             <UserCircle className="mr-2 h-6 w-6" />
             {name}
           </CardTitle>
+          {userName && (
+            <p className="mb-2 flex items-center text-sm text-gray-500">
+              @{userName}
+            </p>
+          )}
           <div className="mb-2 flex items-center gap-2">
             <Badge variant="success" className="flex items-center">
               <CheckCircle className="mr-1 h-3 w-3" />
@@ -136,7 +150,7 @@ function ProfileCard({
               {portfolioArtworks.length} {t("artworks")}
             </Badge>
           </div>
-          <p className="mb-4 text-sm text-gray-500 flex items-center">
+          <p className="mb-4 flex items-center text-sm text-gray-500">
             <MapPin className="mr-1 h-4 w-4" />
             {userData.location}
           </p>
@@ -163,11 +177,7 @@ function ProfileCard({
                 <h3 className="mb-2 text-lg font-semibold">{t("industry")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {userData.industries.map((industry) => (
-                    <Badge
-                      key={industry}
-                      variant="default"
-                      className="text-xs"
-                    >
+                    <Badge key={industry} variant="default" className="text-xs">
                       {industry}
                     </Badge>
                   ))}
@@ -176,7 +186,9 @@ function ProfileCard({
             )}
             {userData.experience && (
               <section data-section="experience">
-                <h3 className="mb-2 text-lg font-semibold">{t("experience")}</h3>
+                <h3 className="mb-2 text-lg font-semibold">
+                  {t("experience")}
+                </h3>
                 <p>{userData.experience}</p>
               </section>
             )}
@@ -227,39 +239,46 @@ function ProfileCard({
             <Separator className="my-4" />
             {userData && (
               <section data-section="social-links">
-                <h3 className="mb-2 text-lg font-semibold">{t("socialLinks")}</h3>
+                <h3 className="mb-2 text-lg font-semibold">
+                  {t("socialLinks")}
+                </h3>
                 <div className="flex space-x-4">
-                  {getSocialMediaLinks(userData).map((link, index) => (
-                    link && link.url && (
-                      <a
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary-600"
-                      >
-                        <link.icon className="h-6 w-6" />
-                      </a>
-                    )
-                  ))}
+                  {getSocialMediaLinks(userData).map(
+                    (link, index) =>
+                      link &&
+                      link.url && (
+                        <a
+                          key={index}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary-600"
+                        >
+                          <link.icon className="h-6 w-6" />
+                        </a>
+                      ),
+                  )}
                 </div>
               </section>
             )}
           </div>
         </CardContent>
       </Card>
-    </div >
+    </div>
   );
 }
 
-export default async function ProfilePage({ params, searchParams }: ProfilePageProps) {
+export default async function ProfilePage({
+  params,
+  searchParams,
+}: ProfilePageProps) {
   // User
   const lang = searchParams.lang || "en";
   const { t } = await useTranslation(lang, "ProfilePage");
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
   // Cookies
   const cookieStore = cookies();
-  const errorMessage = cookieStore.get('error_message')?.value;
+  const errorMessage = cookieStore.get("error_message")?.value;
 
   if (!isLoggedIn || isAnonymous) {
     redirect("/login");
@@ -271,20 +290,23 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
   if (user) {
     const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
       fetchUserData(user.id),
-      fetchUserPortfolioArtworksWithDetails(user.id)
+      fetchUserPortfolioArtworksWithDetails(user.id),
     ]);
     // Handle user data
-    if (userDataResult.status === 'fulfilled') {
+    if (userDataResult.status === "fulfilled") {
       userData = userDataResult.value;
     } else {
       console.error("Error fetching user data:", userDataResult.reason);
     }
 
     // Handle portfolio artworks
-    if (portfolioArtworksResult.status === 'fulfilled') {
+    if (portfolioArtworksResult.status === "fulfilled") {
       portfolioArtworks = portfolioArtworksResult.value;
     } else {
-      console.error("Error fetching portfolio artworks:", portfolioArtworksResult.reason);
+      console.error(
+        "Error fetching portfolio artworks:",
+        portfolioArtworksResult.reason,
+      );
     }
   }
 
@@ -309,12 +331,16 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                 <div className="mb-6">
                   <Tabs defaultValue="contacts">
                     <TabsList>
-                      <TabsTrigger value="contacts">{t("contacts")}</TabsTrigger>
-                      <TabsTrigger value="portfolio">{t("portfolio")}</TabsTrigger>
+                      <TabsTrigger value="contacts">
+                        {t("contacts")}
+                      </TabsTrigger>
+                      <TabsTrigger value="portfolio">
+                        {t("portfolio")}
+                      </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="contacts">
-                      <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+                      <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                         {userData && (
                           <>
                             {getUserContacts(userData.id).then((contacts) => {
@@ -341,7 +367,9 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
                           <PortfolioSection
                             userData={userData}
                             lang={lang}
-                            existingPortfolioArtworks={portfolioArtworks as PortfolioArtworkWithDetails[]}
+                            existingPortfolioArtworks={
+                              portfolioArtworks as PortfolioArtworkWithDetails[]
+                            }
                           />
                         </Suspense>
                       )}
