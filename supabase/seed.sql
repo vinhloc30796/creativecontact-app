@@ -131,7 +131,7 @@ INSERT INTO auth.users (
     '314f834c-3ff2-4382-bc92-d37cbe2286a8',                             -- id
     'authenticated',                                                    -- aud
     'authenticated',                                                    -- role
-    'letrunghoahieu@gmail.com',                                           -- email
+    'vinhloc30796@gmail.com',                                           -- email
     '',                                                                 -- encrypted_password
     '2024-07-31 13:29:02.204237+00',                                    -- email_confirmed_at
     NULL,                                                               -- invited_at
@@ -144,7 +144,7 @@ INSERT INTO auth.users (
     NULL,                                                               -- email_change_sent_at
     '2024-07-31 13:29:02.201874+00',                                    -- last_sign_in_at
     '{"provider": ["email"], "providers": ["email", "github"]}'::jsonb, -- raw_app_meta_data
-    '{"type": "user", "email": "letrunghoahieu@gmail.com"}'::jsonb,       -- raw_user_meta_data
+    '{"type": "user", "email": "vinhloc30796@gmail.com"}'::jsonb,       -- raw_user_meta_data
     NULL,                                                               -- is_super_admin
     '2024-07-31 13:29:02.199319+00',                                    -- created_at
     '2024-07-31 13:29:02.204237+00',                                    -- updated_at
@@ -228,10 +228,10 @@ INSERT INTO user_infos (
     'user_fb'
 ), (
     '314f834c-3ff2-4382-bc92-d37cbe2286a8',
-    'Trung Hoa Hieu',
-    'Le',
-    'lehieu',
-    'Le Hieu',
+    'Hoang Vinh Loc',
+    'Nguyen',
+    'vl307',
+    'Vinh Loc Nguyen',
     '84',
     '1234567890',
     'VNM',
@@ -518,7 +518,7 @@ INSERT INTO contacts (
     contact_id
 ) VALUES (
     '12912ab4-4e74-42d5-8977-cb387fba64b6',
-    '314f834c-3ff2-4382-bc92-d37cbe2286a8', -- letrunghoahieu@gmail.com
+    '314f834c-3ff2-4382-bc92-d37cbe2286a8', -- vinhloc30796@gmail.com
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- admin@lukewarm.io
 );
 
