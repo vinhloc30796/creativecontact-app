@@ -11,17 +11,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 interface ArtworkCreditInfoStepProps {
-  form: UseFormReturn<{
-    id: string;
-    title: string;
-    description: string;
-    coartists?: Array<{
-      first_name: string;
-      last_name: string;
-      email: string;
-      title: string;
-    }>;
-  }>;
+  form: UseFormReturn<ArtworkCreditInfoData>;
 }
 
 export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {

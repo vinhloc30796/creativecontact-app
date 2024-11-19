@@ -6,7 +6,7 @@ import { z } from "zod";
 export const artworkInfoSchema = z.object({
   id: z.string(),
   title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
+  description: z.string(),
 });
 
 export type ArtworkInfoData = z.infer<typeof artworkInfoSchema>
