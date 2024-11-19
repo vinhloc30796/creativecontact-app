@@ -77,7 +77,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     orderBy: desc(events.created_at),
     limit: 5
   });
-
+  const eventEnded = (eventData?.time_end && new Date() > new Date(eventData.time_end)) as boolean;
   // If event is not found, render the EventNotFound component
   if (!eventData) {
     return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
@@ -144,7 +144,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
       <div className="min-h-screen flex flex-col w-full">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug} lang={lang} className="mb-0" />
+        <EventHeader eventSlug={eventSlug} lang={lang} eventEnded={eventEnded} className="mb-0" />
 
         {/* Background text */}
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">

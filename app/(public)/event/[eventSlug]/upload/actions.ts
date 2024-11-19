@@ -107,16 +107,20 @@ export async function insertArtworkCredit(
 
 export async function insertArtworkEvents(
   artworkId: string,
-  eventSlug: string
+  eventSlug: string,
 ) {
   const result = await db.transaction(async (tx) => {
     const event = await tx.query.events.findFirst({
       where: eq(events.slug, eventSlug),
-      columns: { id: true }
+      columns: { id: true , time_end: true}
     });
 
     if (!event) {
       throw new Error(`Event with slug ${eventSlug} not found`);
+    }
+    
+    if (event.time_end && new Date() > new Date(event.time_end)) {
+      throw new Error(`Event with slug ${eventSlug} has ended`);
     }
 
     const artworkEvent = await tx.insert(artworkEvents).values({

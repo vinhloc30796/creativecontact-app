@@ -27,7 +27,9 @@ BEGIN;
           RAISE EXCEPTION 'Column "time_end" does not exist in table "events"';
       END IF;
   END $$;
-
+  -- Update the time_end for trung thu
+  UPDATE public.events SET time_end = '2024-10-01 00:00:00+00'
+  WHERE id = '9419ee07-81ed-4114-8143-1fff084d019a';
   -- Rollback function (if supported by your migration tool)
   /* DO $$
   BEGIN
