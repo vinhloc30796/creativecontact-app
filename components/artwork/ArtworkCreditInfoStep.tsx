@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next';
 
 interface ArtworkCreditInfoStepProps {
   form: UseFormReturn<{
+    id: string;
+    title: string;
+    description: string;
     coartists?: Array<{
       first_name: string;
       last_name: string;
