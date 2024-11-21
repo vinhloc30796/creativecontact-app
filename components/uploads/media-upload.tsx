@@ -89,16 +89,6 @@ export function MediaUpload({
     setPendingSize(size);
   }, [pendingFiles, setPendingSize]);
 
-  // const pendingSize = useMemo(
-  //   () => pendingFiles.reduce((acc, file) => acc + file.size, 0),
-  //   [pendingFiles],
-  // );
-  const totalSize = pendingSize;
-
-  const isOverLimit = totalSize > maxSize;
-  const pendingPercentage = (pendingSize / maxSize) * 100;
-  const remainingPercentage = 100 - pendingPercentage;
-
   return (
     <div className="mx-auto w-full max-w-md bg-background">
       <form
@@ -118,41 +108,6 @@ export function MediaUpload({
             {t("form.dropzone")}
           </p>
         </div>
-        {/* <div className="flex flex-col">
-          <div className="items-left mt-4 flex flex-col">
-            <p className="flex-grow text-sm font-medium text-muted-foreground">
-              <br />
-              <Trans
-                i18nKey="media-upload:form.size.pending"
-                values={{ count: formatSize(pendingSize) }}
-                components={{ strong: <strong /> }}
-              />{" "}
-              <Trans
-                i18nKey="media-upload:form.size.total"
-                values={{ count: formatSize(pendingSize), limit: "25MB" }}
-                components={{ strong: <strong /> }}
-              />
-            </p>
-          </div>
-          {isOverLimit && (
-            <div className="mt-2 flex items-center text-destructive">
-              <AlertCircle className="mr-1 h-4 w-4" />
-              <span className="text-xs">
-                {t("alert.overLimit", { limit: "25MB" })}
-              </span>
-            </div>
-          )}
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
-            <div
-              className="float-left h-full bg-primary"
-              style={{ width: `${pendingPercentage}%` }}
-            />
-            <div
-              className="float-left h-full bg-muted"
-              style={{ width: `${remainingPercentage}%` }}
-            />
-          </div>
-        </div> */}
         {pendingFiles.length > 0 && (
           <FileTable
             files={pendingFiles.map((file) => ({
