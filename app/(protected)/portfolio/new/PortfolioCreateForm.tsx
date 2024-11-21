@@ -10,7 +10,7 @@ import { ArtworkProvider } from "@/contexts/ArtworkContext";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 interface PortfolioProjectCardProps {
   project: {
@@ -48,15 +48,15 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
   const handleSubmit = async () => {
     const artworkData = artworkForm.getValues();
     const artworkCreditData = artworkCreditForm.getValues();
-    
+
     // Combine data for submission
     const completeData = {
       artwork: artworkData,
       credits: artworkCreditData,
     };
-    
+
     // Handle submission logic
-    console.log('Complete data:', completeData);
+    console.log("Complete data:", completeData);
   };
 
   return (
@@ -65,10 +65,7 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
         <CardHeader>
           <h3 className="mb-4 text-lg font-medium">Project Info</h3>
           <FormProvider {...artworkForm}>
-            <ArtworkInfoStep 
-              form={artworkForm} 
-              artworks={[]}
-            />
+            <ArtworkInfoStep form={artworkForm} artworks={[]} />
           </FormProvider>
         </CardHeader>
 
