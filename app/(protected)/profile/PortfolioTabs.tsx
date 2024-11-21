@@ -71,7 +71,9 @@ function ExistingPortfolioProjectCard({
 }: ExistingPortfolioProjectCardProps) {
   const router = useRouter();
   const { t } = useTranslation(lang, "ProfilePage");
-  const { data: artworkWithAssets, isLoading: isLoadingAssets } = useQuery<ArtworkWithAssets[]>({
+  const { data: artworkWithAssets, isLoading: isLoadingAssets } = useQuery<
+    ArtworkWithAssets[]
+  >({
     queryKey: ["artwork-assets", project?.artworks?.id],
     queryFn: async () => {
       if (!project?.artworks?.id) {
@@ -86,7 +88,9 @@ function ExistingPortfolioProjectCard({
     enabled: !!project?.artworks?.id,
   });
 
-  const { data: artworkCredits, isLoading: isLoadingCredits } = useQuery<ArtworkWithCredits[]>({
+  const { data: artworkCredits, isLoading: isLoadingCredits } = useQuery<
+    ArtworkWithCredits[]
+  >({
     queryKey: ["artwork-credits", project?.artworks?.id],
     queryFn: async () => {
       if (!project?.artworks?.id) {
@@ -100,7 +104,6 @@ function ExistingPortfolioProjectCard({
     },
     enabled: !!project?.artworks?.id,
   });
-
 
   if (!project?.artworks) {
     return <div>Project not found</div>;
@@ -133,8 +136,8 @@ function ExistingPortfolioProjectCard({
 
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-3 flex flex-col">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="flex flex-col md:col-span-3">
             <h4 className="mb-2 font-medium">Description</h4>
             <p className="text-gray-600">
               {project.artworks?.description || "No description provided"}
@@ -146,30 +149,36 @@ function ExistingPortfolioProjectCard({
               <Skeleton className="h-4" />
             ) : (
               <p className="text-gray-600">
-                {artworkCredits && artworkCredits?.length > 0 
-                  ? artworkCredits.map((credit: ArtworkWithCredits) => (
-                      `${credit.displayName || 'Anonymous'} (${credit.title})`
-                    )).join(", ")
-                  : "No artists provided"
-                }
+                {artworkCredits && artworkCredits?.length > 0
+                  ? artworkCredits
+                      .map(
+                        (credit: ArtworkWithCredits) =>
+                          `${credit.displayName || "Anonymous"} (${credit.title})`,
+                      )
+                      .join(", ")
+                  : "No artists provided"}
               </p>
             )}
           </div>
         </div>
         <h4 className="mb-2 font-medium">Media</h4>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        <div
+          className="h-full overflow-auto"
+          style={{ maxHeight: "calc(100vh - 200px)" }}
+        >
           {artworkWithAssets?.map(
             (item, index) =>
               item.assets && (
                 <div
                   key={item.assets.id}
-                  className="relative flex w-full items-center justify-center"
+                  className="relative mb-4 w-full"
+                  style={index < 2 ? { zIndex: 10 } : {}}
                 >
                   {item.assets.assetType === "video" ? (
                     <video
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
                       controls
-                      className="h-auto max-w-full"
+                      className="w-full"
                     >
                       Your browser does not support the video tag.
                     </video>
@@ -177,10 +186,10 @@ function ExistingPortfolioProjectCard({
                     <Image
                       src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
                       alt={`${project.artworks?.title} - Asset ${index + 1}`}
-                      sizes="(min-width: 1024px) 66vw, 100vw"
-                      width={1024}
-                      height={1024}
-                      style={{ objectFit: "contain" }}
+                      layout="responsive"
+                      width={100}
+                      height={100}
+                      className="object-contain"
                     />
                   )}
                 </div>
@@ -194,13 +203,11 @@ function ExistingPortfolioProjectCard({
   return (
     <Card className="w-full">
       <FormProvider {...form}>
-        <CardHeader className="flex flex-col items-left">
+        <CardHeader className="items-left flex flex-col">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" asChild>
               {project.artworks?.id ? (
-                <Link href={`/portfolio/${project.artworks.id}`}>
-                  Edit
-                </Link>
+                <Link href={`/portfolio/${project.artworks.id}`}>Edit</Link>
               ) : (
                 <span className="text-muted-foreground">Edit</span>
               )}
@@ -213,7 +220,6 @@ function ExistingPortfolioProjectCard({
             <h3 className="text-lg font-medium">
               {project.artworks?.title || "Untitled"}
             </h3>
-
           </div>
         </CardHeader>
 

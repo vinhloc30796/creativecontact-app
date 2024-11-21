@@ -20,9 +20,6 @@ const DataUsage: React.FC = () => {
   return (
     <div className="flex flex-col">
       <div className="items-left mt-4 flex flex-col">
-        <p className="my-2 flex-grow text-sm font-bold text-muted-foreground">
-          DATA USAGE:
-        </p>
         <p className="flex-grow text-sm text-muted-foreground">
           {formatSize(pendingSize)} of 25MB used
         </p>

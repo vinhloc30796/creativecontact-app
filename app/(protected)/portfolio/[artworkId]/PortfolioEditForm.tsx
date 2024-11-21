@@ -172,31 +172,38 @@ export default function PortfolioEditForm({
                     MB
                   </p>
                 )}
-
                 {!isNew && !isLoading && artworkWithAssets && (
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  <div
+                    className="overflow-auto"
+                    style={{ maxHeight: "calc(100vh - 200px)" }}
+                  >
                     {artworkWithAssets.map(
                       (item, index) =>
                         item.assets && (
                           <div
                             key={item.assets.id}
-                            className="relative aspect-square"
+                            className="relative mb-4 w-full"
+                            style={index < 2 ? { zIndex: 10 } : {}}
                           >
                             {item.assets.assetType === "video" ? (
                               <video
                                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
                                 controls
-                                className="h-full w-full object-cover"
+                                className="w-full"
                               >
                                 Your browser does not support the video tag.
                               </video>
                             ) : (
-                              <Image
-                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
-                                alt={`${artwork?.artworks?.title || "Untitled"} - Asset ${index + 1}`}
-                                fill
-                                className="object-cover"
-                              />
+                              <div className="relative h-auto w-full">
+                                <Image
+                                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
+                                  alt={`${artwork?.artworks?.title || "Untitled"} - Asset ${index + 1}`}
+                                  layout="responsive"
+                                  width={100}
+                                  height={100}
+                                  className="object-contain"
+                                />
+                              </div>
                             )}
                           </div>
                         ),
@@ -217,7 +224,7 @@ export default function PortfolioEditForm({
         </Card>
 
         <div className="flex w-full flex-col" style={{ flex: 3 }}>
-          <Card className="mb-4 w-full">
+          <Card className="w-full">
             <CardHeader>
               <CardTitle>{t("creditInfo")}</CardTitle>
             </CardHeader>
@@ -228,30 +235,33 @@ export default function PortfolioEditForm({
               </div>
             </CardContent>
           </Card>
+          <div className="flex-grow"></div>{" "}
+          {/* This div will take up the remaining space */}
+          <div className="sticky bottom-0">
+            <Card className="w-full">
+              <CardHeader>
+                <CardTitle>{t("dataUsage")}</CardTitle>
+              </CardHeader>
 
-          <Card className="mt-auto w-full">
-            <CardHeader>
-              <CardTitle>{t("dataUsage")}</CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              <div className="mt-1">
-                <DataUsage />
-              </div>
-            </CardContent>
-          </Card>
-          <div className="mt-4 flex flex-col gap-4">
-            <Button type="submit" className="w-full">
-              {isNew ? t("create") : t("save")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => router.push("/profile")}
-            >
-              {t("cancel")}
-            </Button>
+              <CardContent>
+                <div className="mt-1">
+                  <DataUsage />
+                </div>
+              </CardContent>
+            </Card>
+            <div className="mt-4 flex flex-col gap-4">
+              <Button type="submit" className="w-full">
+                {isNew ? t("create") : t("save")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => router.push("/profile")}
+              >
+                {t("cancel")}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
