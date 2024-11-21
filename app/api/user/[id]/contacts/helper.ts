@@ -1,16 +1,17 @@
 // File: app/api/user/[id]/contacts/helper.ts
 
-import { UserData } from '@/app/types/UserInfo';
-import { contacts } from '@/drizzle/schema/contact';
-import { authUsers, userInfos } from '@/drizzle/schema/user';
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
+import { UserData } from "@/app/types/UserInfo";
+import { contacts } from "@/drizzle/schema/contact";
+import { authUsers, userInfos } from "@/drizzle/schema/user";
+import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
 
 export async function fetchUserContacts(userId: string): Promise<UserData[]> {
   const contactsInfo = await db
     .select({
       id: userInfos.id,
       displayName: userInfos.displayName,
+      userName: userInfos.userName,
       location: userInfos.location,
       occupation: userInfos.occupation,
       about: userInfos.about,
@@ -21,7 +22,9 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
       emailConfirmedAt: authUsers.emailConfirmedAt,
       firstName: userInfos.firstName,
       lastName: userInfos.lastName,
-      phone: userInfos.phone,
+      phoneCountryCode: userInfos.phoneCountryCode,
+      phoneNumber: userInfos.phoneNumber,
+      phoneCountryAlpha3: userInfos.phoneCountryAlpha3,
       instagramHandle: userInfos.instagramHandle,
       facebookHandle: userInfos.facebookHandle,
       profilePicture: userInfos.profilePicture,
@@ -32,15 +35,20 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
     .where(eq(contacts.userId, userId));
 
   // Ensure type safety by mapping the result to UserData
-  const typeSafeContacts: UserData[] = contactsInfo.map(contact => ({
+  const typeSafeContacts: UserData[] = contactsInfo.map((contact) => ({
     ...contact,
-    firstName: contact.firstName ?? '',
-    lastName: contact.lastName ?? '',
-    email: contact.email ?? '', // Ensure email is always a string
-    isAnonymous: contact.isAnonymous ?? false, // Provide a default value
-    emailConfirmedAt: contact.emailConfirmedAt ?? null, // Allow null
-    industries: contact.industries ?? [], // Ensure it's always an array
-    experience: contact.experience ?? null, // Allow null as per UserData type
+    firstName: contact.firstName ?? "",
+    lastName: contact.lastName ?? "",
+    userName: contact.userName ?? "",
+    displayName: contact.displayName ?? "",
+    email: contact.email ?? "",
+    isAnonymous: contact.isAnonymous ?? false,
+    emailConfirmedAt: contact.emailConfirmedAt ?? null,
+    industries: contact.industries ?? [],
+    experience: contact.experience ?? null,
+    phoneCountryCode: contact.phoneCountryCode ?? "84",
+    phoneNumber: contact.phoneNumber ?? "",
+    phoneCountryAlpha3: contact.phoneCountryAlpha3 ?? "VNM",
   }));
 
   return typeSafeContacts;

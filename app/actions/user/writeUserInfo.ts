@@ -4,13 +4,16 @@ import { IndustryType, ExperienceType, userInfos } from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
 import { getDisplayName } from "@/lib/name";
 
-
 export async function writeUserInfo(
   userId: string,
   userInfo: {
-    phone: string;
+    phoneCountryCode: string;
+    phoneNumber: string;
+    phoneCountryAlpha3: string;
     firstName: string;
     lastName: string;
+    displayName?: string;
+    userName?: string;
   },
   professionalInfo: {
     industries: IndustryType[];
@@ -21,13 +24,16 @@ export async function writeUserInfo(
     facebookHandle?: string;
   },
   validateProfessionalInfo: boolean = true,
-  validateUserInfo: boolean = true
+  validateUserInfo: boolean = true,
 ) {
   console.log("Received professionalInfo:", professionalInfo);
   // Validate professional info
   if (validateProfessionalInfo) {
-    if (!professionalInfo.industries || professionalInfo.industries.length === 0 ||
-      !professionalInfo.experience) {
+    if (
+      !professionalInfo.industries ||
+      professionalInfo.industries.length === 0 ||
+      !professionalInfo.experience
+    ) {
       console.error("Invalid professional info:", professionalInfo);
       return { success: false, error: "Invalid professional info" };
     }
@@ -35,7 +41,7 @@ export async function writeUserInfo(
 
   // Validate user info
   if (validateUserInfo) {
-    if (!userInfo.phone || !userInfo.firstName || !userInfo.lastName) {
+    if (!userInfo.phoneNumber || !userInfo.firstName || !userInfo.lastName) {
       console.error("Invalid user info:", userInfo);
       return { success: false, error: "Invalid user info" };
     }
@@ -43,7 +49,9 @@ export async function writeUserInfo(
 
   try {
     const updateSet = {
-      phone: userInfo.phone,
+      phoneCountryCode: userInfo.phoneCountryCode,
+      phoneNumber: userInfo.phoneNumber,
+      phoneCountryAlpha3: userInfo.phoneCountryAlpha3,
       firstName: userInfo.firstName,
       lastName: userInfo.lastName,
       displayName: getDisplayName(userInfo.firstName, userInfo.lastName, true),

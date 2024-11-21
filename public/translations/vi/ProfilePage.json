@@ -1,17 +1,59 @@
 {
-    "openToCollab": "Mở để hợp tác",
-    "notOpenToCollab": "Không mở để hợp tác",
-    "connect": "Kết nối",
-    "share": "Chia sẻ",
-    "seeMore": "Xem thêm",
-    "overview": "Tổng quan",
-    "activity": "Hoạt động",
-    "settings": "Cài đặt",
-    "industry": "Ngành nghề",
-    "location": "Địa điểm",
+  "navigation": {
+    "editProfile": "Chỉnh sửa Hồ sơ",
+    "editPortfolio": "Chỉnh sửa Portfolio",
+    "basicInfo": "Thông tin Cơ bản",
     "about": "Giới thiệu",
-    "experience": "Kinh nghiệm",
-    "skills": "Kỹ năng",
+    "professional": "Chuyên môn",
     "contact": "Liên hệ",
-    "socialLinks": "Liên kết xã hội"
+    "portfolio": "Portfolio",
+    "saveChanges": "Lưu Thay đổi",
+    "saveChangesWithCount": "Lưu Thay đổi ({{count}} thay đổi)",
+    "saving": "Đang Lưu...",
+    "backToProfile": "Quay lại Hồ sơ",
+    "discardChanges": "Hủy bỏ Thay đổi?",
+    "discardChangesDescription": "Bạn có muốn hủy bỏ {{count}} thay đổi? Nếu đồng ý, các chỉnh sửa của bạn sẽ không được lưu.",
+    "cancel": "Hủy"
+  },
+  "BasicInfoSection": {
+    "basicInfo": "Thông tin Cơ bản",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "userName": "Tên Người dùng",
+    "displayName": "Tên Hiển thị",
+    "location": "Địa điểm"
+  },
+  "AboutSection": {
+    "about": "Giới thiệu",
+    "placeholder": "Hãy kể về bản thân bạn..."
+  },
+  "ContactSection": {
+    "contact": "Liên hệ",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "socialLinks": "Mạng xã hội",
+    "instagram": "Instagram",
+    "facebook": "Facebook"
+  },
+  "ProfessionalSection": {
+    "professional": "Chuyên môn",
+    "currentIndustries": "Ngành nghề Hiện tại",
+    "experience": "Kinh nghiệm",
+    "select": "Chọn Ngành nghề",
+    "search": "Tìm kiếm Ngành nghề",
+    "noExperienceFound": "Không tìm thấy Ngành nghề"
+  },
+  "contacts": "Danh bạ",
+  "activity": "Hoạt động",
+  "settings": "Cài đặt",
+  "openToCollab": "Sẵn sàng Hợp tác",
+  "edit": "Chỉnh sửa",
+  "portfolio": "Portfolio",
+  "about": "Giới thiệu",
+  "industry": "Ngành nghề",
+  "experience": "Kinh nghiệm",
+  "skills": "Kỹ năng",
+  "contact": "Liên hệ",
+  "socialLinks": "Mạng xã hội",
+  "seeMore": "Xem thêm"
 }

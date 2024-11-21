@@ -36,14 +36,14 @@ function getAssetType(path: string): "image" | "video" | "audio" | "font" | null
 export async function createArtwork(
   uploaderId: string,
   artworkData: {
-    uuid: string;
+    id: string;
     title: string;
     description: string;
   }
 ) {
   const result = await db.transaction(async (tx) => {
     const [artwork] = await tx.insert(artworksTable).values({
-      id: artworkData.uuid,
+      id: artworkData.id,
       title: artworkData.title,
       description: artworkData.description,
     }).returning();

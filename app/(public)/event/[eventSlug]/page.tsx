@@ -2,30 +2,38 @@
 "use server";
 
 // React and Next.js imports
-import Link from 'next/link';
-import { Suspense } from 'react';
+import Link from "next/link";
+import { Suspense } from "react";
 
 // Database and ORM imports
-import { db } from '@/lib/db';
-import { createClient } from '@supabase/supabase-js';
-import { and, desc, eq, gt, lt } from 'drizzle-orm';
+import { db } from "@/lib/db";
+import { createClient } from "@supabase/supabase-js";
+import { and, desc, eq, gt, lt } from "drizzle-orm";
 
 // Schema imports
-import { artworkAssets, artworkCredits, artworkEvents, artworks } from '@/drizzle/schema/artwork';
-import { events } from '@/drizzle/schema/event';
-import { UserInfo, userInfos } from '@/drizzle/schema/user';
+import {
+  artworkAssets,
+  artworkCredits,
+  artworkEvents,
+  artworks,
+} from "@/drizzle/schema/artwork";
+import { events } from "@/drizzle/schema/event";
+import { UserInfo, userInfos } from "@/drizzle/schema/user";
 
 // Component imports
-import { ArtworkCard, ArtworkWithAssetsThumbnailCredits } from '@/components/artwork/ArtworkCard';
-import { Loading } from '@/components/Loading';
-import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import { EventHeader } from '@/components/wrappers/EventHeader';
-import { EventFooter } from '@/components/wrappers/EventFooter';
-import { EventNotFound } from './EventNotFound';
-import { UploadStatistics } from './UploadStatistics';
+import {
+  ArtworkCard,
+  ArtworkWithAssetsThumbnailCredits,
+} from "@/components/artwork/ArtworkCard";
+import { Loading } from "@/components/Loading";
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
+import { EventHeader } from "@/components/wrappers/EventHeader";
+import { EventFooter } from "@/components/wrappers/EventFooter";
+import { EventNotFound } from "./EventNotFound";
+import { UploadStatistics } from "./UploadStatistics";
 // Utility imports
-import { useTranslation } from '@/lib/i18n/init-server';
-import EventEnded from './EventEnded';
+import { useTranslation } from "@/lib/i18n/init-server";
+import EventEnded from "./EventEnded";
 // Define the props interface for the EventPage component
 interface EventPageProps {
   params: {
@@ -46,7 +54,10 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 // Initialize Supabase client
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
 
 // Helper function to generate random sizes for artwork cards
 function getRandomSize() {
@@ -54,7 +65,10 @@ function getRandomSize() {
 }
 
 // Main EventPage component
-export default async function EventPage({ params, searchParams }: EventPageProps) {
+export default async function EventPage({
+  params,
+  searchParams,
+}: EventPageProps) {
   // Initialize language and translation
   const lang = searchParams.lang || "en";
   const { t } = await useTranslation(lang, "EventPage");
@@ -85,7 +99,7 @@ export default async function EventPage({ params, searchParams }: EventPageProps
       artwork: artworks,
       assets: artworkAssets,
       credits: artworkCredits,
-      user: userInfos
+      user: userInfos,
     })
     .from(artworkEvents)
     .innerJoin(artworks, eq(artworkEvents.artworkId, artworks.id))
@@ -95,39 +109,58 @@ export default async function EventPage({ params, searchParams }: EventPageProps
     .where(eq(artworkEvents.eventId, eventData.id));
 
   // Process fetched artworks to group assets with their respective artworks
-  const processedArtworks = eventArtworks.reduce((acc, { artwork, assets, credits, user }) => {
-    if (!acc[artwork.id]) {
-      acc[artwork.id] = { ...artwork, assets: [], thumbnail: null, credits: [] };
-    }
-    if (assets && !acc[artwork.id].assets.some(a => a.id === assets.id)) {
-      acc[artwork.id].assets.push(assets);
-      if (assets.isThumbnail) {
-        acc[artwork.id].thumbnail = { filePath: assets.filePath, assetType: assets.assetType || "image" };
+  const processedArtworks = eventArtworks.reduce(
+    (acc, { artwork, assets, credits, user }) => {
+      if (!acc[artwork.id]) {
+        acc[artwork.id] = {
+          ...artwork,
+          assets: [],
+          thumbnail: null,
+          credits: [],
+        };
       }
-    }
-    if (credits && !acc[artwork.id].credits.some(c => c.id === credits.id)) {
-      const userInfo: UserInfo = user ? {
-        ...user,
-        experience: user.experience || 'Entry' // Provide a default value if null
-      } : {
-        id: credits.userId,
-        firstName: null,
-        lastName: null,
-        displayName: 'Anonymous',
-        phone: null,
-        location: null,
-        occupation: null,
-        about: null,
-        industries: null,
-        experience: 'Entry',
-        profilePicture: null,
-        instagramHandle: null,
-        facebookHandle: null
-      };
-      acc[artwork.id].credits.push({ ...credits, user: userInfo });
-    }
-    return acc;
-  }, {} as Record<string, ArtworkWithAssetsThumbnailCredits>);
+      if (assets && !acc[artwork.id].assets.some((a) => a.id === assets.id)) {
+        acc[artwork.id].assets.push(assets);
+        if (assets.isThumbnail) {
+          acc[artwork.id].thumbnail = {
+            filePath: assets.filePath,
+            assetType: assets.assetType || "image",
+          };
+        }
+      }
+      if (
+        credits &&
+        !acc[artwork.id].credits.some((c) => c.id === credits.id)
+      ) {
+        const userInfo: UserInfo = user
+          ? {
+            ...user,
+            experience: user.experience || "Entry", // Provide a default value if null
+          }
+          : {
+            id: credits.userId,
+            firstName: null,
+            lastName: null,
+            userName: null,
+            displayName: "Anonymous",
+            phoneCountryCode: null,
+            phoneNumber: null,
+            phoneCountryAlpha3: null,
+            location: null,
+            occupation: null,
+            about: null,
+            industries: null,
+            experience: "Entry",
+            profilePicture: null,
+            instagramHandle: null,
+            facebookHandle: null,
+          };
+        acc[artwork.id].credits.push({ ...credits, user: userInfo });
+      }
+      return acc;
+    },
+    {} as Record<string, ArtworkWithAssetsThumbnailCredits>,
+  );
 
   // Calculate the total number of artworks
   const artworkCount = Object.keys(processedArtworks).length;
@@ -160,10 +193,14 @@ export default async function EventPage({ params, searchParams }: EventPageProps
             {shuffledArtworks.map((artwork, index) => (
               <div
                 key={artwork.id}
-                className={`flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'
+                className={`flex ${index % 2 === 0 ? "justify-start" : "justify-end"
                   } mt-2 pb-[40vh] sm:pb-[25vh]`}
               >
-                <ArtworkCard eventSlug={eventSlug} artwork={artwork} size={100} />
+                <ArtworkCard
+                  eventSlug={eventSlug}
+                  artwork={artwork}
+                  size={100}
+                />
               </div>
             ))}
           </div>
