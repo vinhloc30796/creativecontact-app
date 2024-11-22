@@ -4,10 +4,10 @@ import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { eventSlots } from "@/drizzle/schema/event"
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
-import InConstruction from '@/components/InConstruction'
+import InConstruct from '@/components/InConstruction'
 
 // show the in-construction page
-const inConstructionPage = true
+const inConstructPage = true
 
 async function getEventSlots(event: string): Promise<EventSlot[]> {
 	console.log('Pulling event slots for event', event)
@@ -23,10 +23,10 @@ export default async function Page({ searchParams }: Props) {
 	const eventId = '10177076-f591-49c8-a87d-042ba7aa6345'
 	const eventSlots = await getEventSlots(eventId)
 	console.log(`Got ${eventSlots.length} event slots`);
-	if (inConstructionPage) {
+	if (inConstructPage) {
 		return (
 			<BackgroundDiv >
-				<InConstruction lang={lang} />
+				<InConstruct lang={lang} />
 			</BackgroundDiv>
 		)
 	}

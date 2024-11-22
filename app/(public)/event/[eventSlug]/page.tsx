@@ -79,26 +79,15 @@ export default async function EventPage({
   // Fetch event data from the database
   const eventData = await db.query.events.findFirst({
     where: eq(events.slug, eventSlug),
-    columns: { id: true, name: true, slug: true, time_end: true },
+    columns: { id: true, name: true, slug: true, time_end: true }
   });
-
-  if (eventData?.time_end && eventData.time_end < new Date()) {
-    return (
-      <EventEnded
-        eventName={eventData.name}
-        eventSlug={eventSlug}
-        lang={lang}
-      />
-    );
-  }
 
   // Fetch recent events for the EventNotFound component
   const recentEvents = await db.query.events.findMany({
     orderBy: desc(events.created_at),
-    limit: 5,
+    limit: 5
   });
-  const eventEnded = (eventData?.time_end &&
-    new Date() > new Date(eventData.time_end)) as boolean;
+  const eventEnded = (eventData?.time_end && new Date() > new Date(eventData.time_end)) as boolean;
   // If event is not found, render the EventNotFound component
   if (!eventData) {
     return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
@@ -145,27 +134,27 @@ export default async function EventPage({
       ) {
         const userInfo: UserInfo = user
           ? {
-              ...user,
-              experience: user.experience || "Entry", // Provide a default value if null
-            }
+            ...user,
+            experience: user.experience || "Entry", // Provide a default value if null
+          }
           : {
-              id: credits.userId,
-              firstName: null,
-              lastName: null,
-              userName: null,
-              displayName: "Anonymous",
-              phoneCountryCode: null,
-              phoneNumber: null,
-              phoneCountryAlpha3: null,
-              location: null,
-              occupation: null,
-              about: null,
-              industries: null,
-              experience: "Entry",
-              profilePicture: null,
-              instagramHandle: null,
-              facebookHandle: null,
-            };
+            id: credits.userId,
+            firstName: null,
+            lastName: null,
+            userName: null,
+            displayName: "Anonymous",
+            phoneCountryCode: null,
+            phoneNumber: null,
+            phoneCountryAlpha3: null,
+            location: null,
+            occupation: null,
+            about: null,
+            industries: null,
+            experience: "Entry",
+            profilePicture: null,
+            instagramHandle: null,
+            facebookHandle: null,
+          };
         acc[artwork.id].credits.push({ ...credits, user: userInfo });
       }
       return acc;
@@ -182,17 +171,12 @@ export default async function EventPage({
   // Render the EventPage component
   return (
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
-      <div className="flex min-h-screen w-full flex-col">
+      <div className="min-h-screen flex flex-col w-full">
         {/* Header section */}
-        <EventHeader
-          eventSlug={eventSlug}
-          lang={lang}
-          eventEnded={eventEnded}
-          className="mb-0"
-        />
+        <EventHeader eventSlug={eventSlug} lang={lang} eventEnded={eventEnded} className="mb-0" />
 
         {/* Background text */}
-        <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center overflow-hidden">
+        <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
           <Suspense fallback={<Loading />}>
             <UploadStatistics
               eventSlug={eventSlug}
@@ -203,15 +187,14 @@ export default async function EventPage({
           </Suspense>
         </div>
         {/* Main content area */}
-        <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
+        <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
           <div className="w-full px-4 sm:px-8 md:px-16">
             {/* Render artwork cards */}
             {shuffledArtworks.map((artwork, index) => (
               <div
                 key={artwork.id}
-                className={`flex ${
-                  index % 2 === 0 ? "justify-start" : "justify-end"
-                } mt-2 pb-[40vh] sm:pb-[25vh]`}
+                className={`flex ${index % 2 === 0 ? "justify-start" : "justify-end"
+                  } mt-2 pb-[40vh] sm:pb-[25vh]`}
               >
                 <ArtworkCard
                   eventSlug={eventSlug}

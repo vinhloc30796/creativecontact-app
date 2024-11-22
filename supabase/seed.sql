@@ -166,6 +166,7 @@ INSERT INTO auth.users (
 -- Seed data for user_infos table
 INSERT INTO user_infos (
     id,
+    user_name,
     first_name,
     last_name,
     display_name,
@@ -182,6 +183,7 @@ INSERT INTO user_infos (
     facebook_handle
 ) VALUES (
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d',
+    'admin_user',
     'Admin',
     'User',
     'Admin User',
@@ -198,6 +200,7 @@ INSERT INTO user_infos (
     'admin_fb'
 ), (
     '13f60da9-8dd4-42f9-8a57-c0569a158857',
+    'regular_user',
     'Regular',
     'User',
     'Regular User',
@@ -214,6 +217,7 @@ INSERT INTO user_infos (
     'user_fb'
 ), (
     '314f834c-3ff2-4382-bc92-d37cbe2286a8',
+    'vinhloc30796',
     'Hoang Vinh Loc',
     'Nguyen',
     'Vinh Loc Nguyen',
