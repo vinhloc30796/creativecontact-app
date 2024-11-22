@@ -173,10 +173,7 @@ export default function PortfolioEditForm({
                   </p>
                 )}
                 {!isNew && !isLoading && artworkWithAssets && (
-                  <div
-                    className="overflow-auto"
-                    style={{ maxHeight: "calc(100vh - 200px)" }}
-                  >
+                  <div className="h-full">
                     {artworkWithAssets.map(
                       (item, index) =>
                         item.assets && (
@@ -224,17 +221,19 @@ export default function PortfolioEditForm({
         </Card>
 
         <div className="flex w-full flex-col" style={{ flex: 3 }}>
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>{t("creditInfo")}</CardTitle>
-            </CardHeader>
+          <div className="sticky top-[100px]">
+            <Card className="w-full">
+              <CardHeader>
+                <CardTitle>{t("creditInfo")}</CardTitle>
+              </CardHeader>
 
-            <CardContent>
-              <div className="flex flex-col space-y-4">
-                <ArtworkCreditInfoStep form={form as any} />
-              </div>
-            </CardContent>
-          </Card>
+              <CardContent>
+                <div className="flex flex-col space-y-4">
+                  <ArtworkCreditInfoStep form={form as any} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           <div className="flex-grow"></div>{" "}
           {/* This div will take up the remaining space */}
           <div className="sticky bottom-0">

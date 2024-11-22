@@ -135,7 +135,7 @@ function ExistingPortfolioProjectCard({
     }
 
     return (
-      <div className="space-y-6">
+      <div className="h-screen space-y-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div className="flex flex-col md:col-span-3">
             <h4 className="mb-2 font-medium">Description</h4>
@@ -162,10 +162,7 @@ function ExistingPortfolioProjectCard({
           </div>
         </div>
         <h4 className="mb-2 font-medium">Media</h4>
-        <div
-          className="h-full overflow-auto"
-          style={{ maxHeight: "calc(100vh - 200px)" }}
-        >
+        <div className="grid grid-cols-1 gap-4">
           {artworkWithAssets?.map(
             (item, index) =>
               item.assets && (
@@ -201,7 +198,7 @@ function ExistingPortfolioProjectCard({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="h-[calc(100vh-425px)] w-full overflow-y-auto">
       <FormProvider {...form}>
         <CardHeader className="items-left flex flex-col">
           <div className="flex items-center gap-4">

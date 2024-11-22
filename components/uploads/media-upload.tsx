@@ -123,7 +123,7 @@ export function MediaUpload({
           />
         )}
         <div className="flex items-center space-x-2">
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="my-4 text-sm text-muted-foreground">
             {t("button.email_description")}{" "}
             <Link href={emailLink} className="text-primary hover:underline">
               {t("button.email")}
