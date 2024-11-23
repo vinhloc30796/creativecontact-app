@@ -121,8 +121,8 @@ function ProfileCard({
   const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
-    <div className="mt-6 w-full overflow-y-auto lg:mt-0 lg:w-1/3 lg:pl-6">
-      <Card className="flex h-full flex-col">
+    <div className="mt-6 w-full lg:mt-0 lg:w-1/3 lg:pl-6">
+      <Card className="flex h-[calc(100vh-225px)] flex-col overflow-auto">
         <CardHeader className="flex flex-col items-center">
           <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
             <img
@@ -324,7 +324,7 @@ export default async function ProfilePage({
           isLoggedIn={isLoggedIn}
           className="bg-background/80 backdrop-blur-sm"
         />
-        <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
+        <main className="mt-10 w-full flex-grow justify-between lg:mt-20">
           <div className="w-full px-4 sm:px-8 md:px-16">
             <div className="flex flex-col lg:flex-row">
               <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
