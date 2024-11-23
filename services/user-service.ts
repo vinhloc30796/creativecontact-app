@@ -43,6 +43,7 @@ export class UserService {
         phoneCountryCode: phoneCountryCode || "84",
         phoneNumber: phoneNumber || "",
         phoneCountryAlpha3: phoneCountryAlpha3 || "VNM",
+        about: about || "",
       },
       {
         industries:

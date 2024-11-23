@@ -14,6 +14,7 @@ export async function writeUserInfo(
     lastName: string;
     displayName?: string;
     userName?: string;
+    about?: string;
   },
   professionalInfo: {
     industries: IndustryType[];
@@ -54,11 +55,13 @@ export async function writeUserInfo(
       phoneCountryAlpha3: userInfo.phoneCountryAlpha3,
       firstName: userInfo.firstName,
       lastName: userInfo.lastName,
+      userName: userInfo.userName,
       displayName: getDisplayName(userInfo.firstName, userInfo.lastName, true),
       instagramHandle: socialInfo.instagramHandle,
       facebookHandle: socialInfo.facebookHandle,
       industries: professionalInfo.industries,
       experience: professionalInfo.experience,
+      about: userInfo.about,
     };
 
     console.log("writeUserInfo updating with:", updateSet);
