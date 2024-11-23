@@ -13,12 +13,9 @@ import { ContactCard } from "@/components/contacts/ContactCard";
 import { EmptyContactCard } from "@/components/contacts/EmptyContactCard";
 
 // UI imports
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProfileCard } from "@/components/profile/ProfileCard";
 
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
@@ -31,28 +28,14 @@ import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
 
-// Utility imports
-import { getSocialMediaLinks } from "@/utils/social_media";
-import { TFunction } from "i18next";
-
-// Icon imports
-import {
-  CheckCircle,
-  Image,
-  Mail,
-  MapPin,
-  Pencil,
-  Phone,
-  UserCircle,
-} from "lucide-react";
-
 // Next.js imports
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 // Local component import
-import PortfolioSection from "./PortfolioSection";
 import { cookies } from "next/headers";
+import PortfolioSection from "./PortfolioSection";
+import { cn } from "@/lib/utils";
 
 interface ProfilePageProps {
   params: {};
@@ -325,6 +308,7 @@ export default async function ProfilePage({
           className="bg-background/80 backdrop-blur-sm"
         />
         <main className="mt-10 w-full flex-grow justify-between lg:mt-20">
+        <main className="mt-10 w-full flex-grow justify-between lg:mt-20">
           <div className="w-full px-4 sm:px-8 md:px-16">
             <div className="flex flex-col lg:flex-row">
               <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
@@ -386,12 +370,23 @@ export default async function ProfilePage({
                 </div>
               </div>
               {userData && (
-                <ProfileCard
-                  t={t}
-                  userData={userData}
-                  userSkills={userSkills}
-                  portfolioArtworks={portfolioArtworks}
-                />
+                <div
+                  className={cn(
+                    // Mobile styles
+                    "mt-6 w-full",
+                    // Set max height and enable scrolling
+                    "max-h-[calc(100vh-225px)] overflow-y-scroll",
+                    // Desktop styles
+                    "lg:mt-0 lg:w-1/3 lg:pl-6"
+                  )}
+                >
+                  <ProfileCard
+                    t={t}
+                    userData={userData}
+                    userSkills={userSkills}
+                    portfolioArtworks={portfolioArtworks}
+                  />
+                </div>
               )}
             </div>
           </div>
