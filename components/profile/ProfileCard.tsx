@@ -72,7 +72,6 @@ function ProfileCard({
   const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
-    <div className="mt-6 w-full lg:mt-0 lg:w-1/3 lg:pl-6">
       <Card className="flex h-fit flex-col overflow-auto">
         <CardHeader className="flex flex-col items-center">
           <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
@@ -215,7 +214,6 @@ function ProfileCard({
           </div>
         </CardContent>
       </Card>
-    </div>
   );
 }
 

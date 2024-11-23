@@ -28,7 +28,6 @@ import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
 
-
 // Next.js imports
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -36,6 +35,7 @@ import { Suspense } from "react";
 // Local component import
 import { cookies } from "next/headers";
 import PortfolioSection from "./PortfolioSection";
+import { cn } from "@/lib/utils";
 
 interface ProfilePageProps {
   params: {};
@@ -76,7 +76,6 @@ async function getUserContacts(userId?: string): Promise<UserData[]> {
     emailConfirmedAt: null, // Set a default value
   }));
 }
-
 
 export default async function ProfilePage({
   params,
@@ -196,12 +195,23 @@ export default async function ProfilePage({
                 </div>
               </div>
               {userData && (
-                <ProfileCard
-                  t={t}
-                  userData={userData}
-                  userSkills={userSkills}
-                  portfolioArtworks={portfolioArtworks}
-                />
+                <div
+                  className={cn(
+                    // Mobile styles
+                    "mt-6 w-full",
+                    // Set max height and enable scrolling
+                    "max-h-[calc(100vh-225px)] overflow-y-scroll",
+                    // Desktop styles
+                    "lg:mt-0 lg:w-1/3 lg:pl-6"
+                  )}
+                >
+                  <ProfileCard
+                    t={t}
+                    userData={userData}
+                    userSkills={userSkills}
+                    portfolioArtworks={portfolioArtworks}
+                  />
+                </div>
               )}
             </div>
           </div>
