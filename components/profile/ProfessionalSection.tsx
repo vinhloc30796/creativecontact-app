@@ -30,6 +30,110 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
+interface IndustryComboboxProps {
+  value: Industry | null;
+  onChange: (value: Industry) => void;
+}
+
+function IndustryCombobox({ value, onChange }: IndustryComboboxProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          className="w-full justify-between"
+        >
+          {value || "Select Industry"}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+        <Command>
+          <CommandInput placeholder="Search industry..." />
+          <CommandList>
+            <CommandEmpty>No industry found</CommandEmpty>
+            <CommandGroup>
+              {industriesMapper.map((industry) => (
+                <CommandItem
+                  key={industry.value}
+                  value={industry.value}
+                  onSelect={() => {
+                    onChange(industry.value as Industry);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === industry.value ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  {industry.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+interface ExperienceComboboxProps {
+  value: ExperienceLevel | null;
+  onChange: (value: ExperienceLevel) => void;
+}
+
+function ExperienceCombobox({ value, onChange }: ExperienceComboboxProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          className="w-full justify-between"
+        >
+          {value || "Select Experience"}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+        <Command>
+          <CommandInput placeholder="Search experience level..." />
+          <CommandList>
+            <CommandEmpty>No experience level found</CommandEmpty>
+            <CommandGroup>
+              {experienceLevelsMapper.map((level) => (
+                <CommandItem
+                  key={level.value}
+                  value={level.value}
+                  onSelect={() => {
+                    onChange(level.value as ExperienceLevel);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === level.value ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  {level.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 interface ProfessionalSectionProps {
   userData: UserData;
   lang?: string;
@@ -113,93 +217,17 @@ export function ProfessionalSection({
             ) : (
               <div className="mt-2 flex gap-2">
                 <div className="flex-1">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className="w-full justify-between"
-                      >
-                        {newIndustry || "Select Industry"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Search industry..." />
-                        <CommandList>
-                          <CommandEmpty>No industry found</CommandEmpty>
-                          <CommandGroup>
-                            {industriesMapper.map((industry) => (
-                              <CommandItem
-                                key={industry.value}
-                                value={industry.value}
-                                onSelect={() =>
-                                  setNewIndustry(industry.value as Industry)
-                                }
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    newIndustry === industry.value
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                                {industry.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <IndustryCombobox 
+                    value={newIndustry}
+                    onChange={setNewIndustry}
+                  />
                 </div>
 
                 <div className="flex-1">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className="w-full justify-between"
-                      >
-                        {newExperience || "Select Experience"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                      <Command>
-                        <CommandInput placeholder="Search experience level..." />
-                        <CommandList>
-                          <CommandEmpty>No experience level found</CommandEmpty>
-                          <CommandGroup>
-                            {experienceLevelsMapper.map((level) => (
-                              <CommandItem
-                                key={level.value}
-                                value={level.value}
-                                onSelect={() =>
-                                  setNewExperience(
-                                    level.value as ExperienceLevel,
-                                  )
-                                }
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    newExperience === level.value
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                                {level.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <ExperienceCombobox
+                    value={newExperience}
+                    onChange={setNewExperience}
+                  />
                 </div>
 
                 <Button
