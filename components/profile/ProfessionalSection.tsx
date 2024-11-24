@@ -144,8 +144,12 @@ export function ProfessionalSection({
   lang = "en",
 }: ProfessionalSectionProps) {
   const { t } = useTranslation(lang, "ProfilePage");
-  const [selectedIndustryExperiences, setSelectedIndustryExperiences] =
-    useState(userData.industryExperiences || []);
+  const [selectedIndustryExperiences, setSelectedIndustryExperiences] = useState(
+    (userData.industryExperiences || []).map(ie => ({
+      ...ie,
+      id: ie.id || crypto.randomUUID()
+    }))
+  );
   const [isAdding, setIsAdding] = useState(false);
   const [newIndustry, setNewIndustry] = useState<Industry | null>(null);
   const [newExperience, setNewExperience] = useState<ExperienceLevel | null>(
@@ -172,10 +176,13 @@ export function ProfessionalSection({
 
   const addIndustryExperience = () => {
     if (newIndustry && newExperience) {
+      const newId = crypto.randomUUID();
+      console.log('Adding new item with ID:', newId);
+      
       setSelectedIndustryExperiences((current) => [
         ...current,
         {
-          id: crypto.randomUUID(),
+          id: newId,
           userId: userData.id,
           industry: newIndustry,
           experienceLevel: newExperience,
@@ -185,6 +192,19 @@ export function ProfessionalSection({
       setNewIndustry(null);
       setNewExperience(null);
     }
+  };
+
+  const deleteIndustryExperience = (idToDelete: string) => {
+    console.log('Deleting item with ID:', idToDelete);
+    
+    setSelectedIndustryExperiences((current) => {
+      console.log('Current items:', current);
+      
+      return current.filter((ie) => {
+        console.log('Comparing:', ie.id, idToDelete);
+        return ie.id !== idToDelete;
+      });
+    });
   };
 
   return (
@@ -199,11 +219,16 @@ export function ProfessionalSection({
             <div className="mt-2 flex flex-wrap gap-2">
               {selectedIndustryExperiences.map((ie) => (
                 <ComboBadge
-                  key={ie.industry}
+                  key={ie.id}
+                  data-id={ie.id}
                   leftContent={ie.industry}
                   rightContent={ie.experienceLevel}
                   leftColor="bg-primary"
                   rightColor="bg-primary/80"
+                  onDelete={() => {
+                    console.log('Deleting badge with ID:', ie.id);
+                    deleteIndustryExperience(ie.id);
+                  }}
                 />
               ))}
             </div>
