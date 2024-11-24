@@ -60,7 +60,7 @@ export function ContactCard({
                     leftContent={exp.industry}
                     rightContent={exp.experienceLevel}
                     leftColor="bg-primary"
-                    rightColor="bg-secondary"
+                    rightColor="bg-primary/80"
                   />
                 ))}
               </div>

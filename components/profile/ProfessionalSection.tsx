@@ -4,9 +4,9 @@
 
 import { useFormState } from "@/app/(protected)/profile/edit/FormStateNav";
 import { ExperienceLevel, Industry, UserData } from "@/app/types/UserInfo";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ComboBadge } from "@/components/ui/combo-badge";
 import {
   Command,
   CommandEmpty,
@@ -198,9 +198,13 @@ export function ProfessionalSection({
             <Label>{t("ProfessionalSection.currentIndustries")}</Label>
             <div className="mt-2 flex flex-wrap gap-2">
               {selectedIndustryExperiences.map((ie) => (
-                <Badge key={ie.industry}>
-                  {ie.industry} - {ie.experienceLevel}
-                </Badge>
+                <ComboBadge
+                  key={ie.industry}
+                  leftContent={ie.industry}
+                  rightContent={ie.experienceLevel}
+                  leftColor="bg-primary"
+                  rightColor="bg-primary/80"
+                />
               ))}
             </div>
 
@@ -217,7 +221,7 @@ export function ProfessionalSection({
             ) : (
               <div className="mt-2 flex gap-2">
                 <div className="flex-1">
-                  <IndustryCombobox 
+                  <IndustryCombobox
                     value={newIndustry}
                     onChange={setNewIndustry}
                   />
