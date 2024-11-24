@@ -10,13 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
-// Wrapper imports
+import { ComboBadge } from "@/components/ui/combo-badge";
 
 // Schema imports
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
-
-// Hook imports
 
 // Utility imports
 import { getSocialMediaLinks } from "@/utils/social_media";
@@ -40,18 +37,6 @@ interface UserSkills {
   name: string;
 }
 
-async function getUserSkills(userId?: string): Promise<UserSkills[]> {
-  // TODO: Implement actual skill fetching logic
-  // This is a placeholder implementation
-  return [
-    { id: 1, name: "JavaScript" },
-    { id: 2, name: "React" },
-    { id: 3, name: "Node.js" },
-    { id: 4, name: "TypeScript" },
-    { id: 5, name: "GraphQL" },
-  ];
-}
-
 function ProfileCard({
   t,
   userData,
@@ -72,148 +57,139 @@ function ProfileCard({
   const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
-      <Card className="flex h-fit flex-col overflow-auto">
-        <CardHeader className="flex flex-col items-center">
-          <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
-            <img
-              src={profilePictureUrl}
-              alt={`${name}'s profile`}
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <CardTitle className="mb-2 flex items-center text-2xl font-bold">
-            <UserCircle className="mr-2 h-6 w-6" />
-            {name}
-          </CardTitle>
-          {userName && (
-            <p className="mb-2 flex items-center text-sm text-gray-500">
-              @{userName}
-            </p>
-          )}
-          <div className="mb-2 flex items-center gap-2">
-            <Badge variant="success" className="flex items-center">
-              <CheckCircle className="mr-1 h-3 w-3" />
-              {t("openToCollab")}
-            </Badge>
-            <Badge variant="secondary" className="flex items-center">
-              <Image className="mr-1 h-3 w-3" />
-              {portfolioArtworks.length} {t("artworks")}
-            </Badge>
-          </div>
-          <p className="mb-4 flex items-center text-sm text-gray-500">
-            <MapPin className="mr-1 h-4 w-4" />
-            {userData.location}
+    <Card className="flex h-fit flex-col overflow-auto">
+      <CardHeader className="flex flex-col items-center">
+        <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
+          <img
+            src={profilePictureUrl}
+            alt={`${name}'s profile`}
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <CardTitle className="mb-2 flex items-center text-2xl font-bold">
+          <UserCircle className="mr-2 h-6 w-6" />
+          {name}
+        </CardTitle>
+        {userName && (
+          <p className="mb-2 flex items-center text-sm text-gray-500">
+            @{userName}
           </p>
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" asChild>
-              <a href="/profile/edit">
-                <Pencil className="mr-1 h-4 w-4" />
-                {t("edit")}
-              </a>
-            </Button>
-          </div>
-          {userData.about && (
-            <section data-section="about" className="pt-4">
-              <h3 className="mb-2 text-lg font-semibold">{t("about")}</h3>
-              <p>{userData.about}</p>
-            </section>
-          )}
-        </CardHeader>
-        <Separator className="my-4" />
-        <CardContent className="mt-4">
-          <div className="space-y-6">
-            {userData.industries && userData.industries.length > 0 && (
+        )}
+        <div className="mb-2 flex items-center gap-2">
+          <Badge variant="success" className="flex items-center">
+            <CheckCircle className="mr-1 h-3 w-3" />
+            {t("openToCollab")}
+          </Badge>
+          <Badge variant="secondary" className="flex items-center">
+            <Image className="mr-1 h-3 w-3" />
+            {portfolioArtworks.length} {t("artworks")}
+          </Badge>
+        </div>
+        <p className="mb-4 flex items-center text-sm text-gray-500">
+          <MapPin className="mr-1 h-4 w-4" />
+          {userData.location}
+        </p>
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/profile/edit">
+              <Pencil className="mr-1 h-4 w-4" />
+              {t("edit")}
+            </a>
+          </Button>
+        </div>
+        {userData.about && (
+          <section data-section="about" className="pt-4">
+            <h3 className="mb-2 text-lg font-semibold">{t("about")}</h3>
+            <p>{userData.about}</p>
+          </section>
+        )}
+      </CardHeader>
+      <Separator className="my-4" />
+      <CardContent className="mt-4">
+        <div className="space-y-6">
+          {userData.industryExperiences &&
+            userData.industryExperiences.length > 0 && (
               <section data-section="industry">
                 <h3 className="mb-2 text-lg font-semibold">{t("industry")}</h3>
                 <div className="flex flex-wrap gap-2">
-                  {userData.industries.map((industry) => (
-                    <Badge key={industry} variant="default" className="text-xs">
-                      {industry}
-                    </Badge>
+                  {userData.industryExperiences.map((exp) => (
+                    <ComboBadge
+                      key={`${exp.industry}-${exp.experienceLevel}`}
+                      leftContent={exp.industry}
+                      rightContent={exp.experienceLevel}
+                      leftColor="bg-primary"
+                      rightColor="bg-primary/80"
+                    />
                   ))}
                 </div>
               </section>
             )}
-            {userData.experience && (
-              <section data-section="experience">
-                <h3 className="mb-2 text-lg font-semibold">
-                  {t("experience")}
-                </h3>
-                <p>{userData.experience}</p>
-              </section>
-            )}
-            {userSkills && userSkills.length > 0 && (
-              <section data-section="skills">
-                <h3 className="mb-2 text-lg font-semibold">{t("skills")}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {userSkills.map((skill) => (
-                    <Badge
-                      key={skill.id}
-                      variant="secondary"
-                      className="text-xs"
-                    >
-                      {skill.name}
-                    </Badge>
-                  ))}
-                </div>
-              </section>
-            )}
-            <Separator className="my-4" />
-            <section data-section="contact">
-              <h3 className="mb-2 text-lg font-semibold">{t("contact")}</h3>
-              <ul className="space-y-2">
-                {userData.email && (
-                  <li className="flex items-center">
-                    <Mail className="mr-2 h-4 w-4" />
-                    <a
-                      href={`mailto:${userData.email}`}
-                      className="text-primary hover:underline"
-                    >
-                      {userData.email}
-                    </a>
-                  </li>
-                )}
-                {phoneNumber && (
-                  <li className="flex items-center">
-                    <Phone className="mr-2 h-4 w-4" />
-                    <a
-                      href={`tel:${phoneNumber}`}
-                      className="text-primary hover:underline"
-                    >
-                      {phoneNumber}
-                    </a>
-                  </li>
-                )}
-              </ul>
+          {userSkills && userSkills.length > 0 && (
+            <section data-section="skills">
+              <h3 className="mb-2 text-lg font-semibold">{t("skills")}</h3>
+              <div className="flex flex-wrap gap-2">
+                {userSkills.map((skill) => (
+                  <Badge key={skill.id} variant="secondary" className="text-xs">
+                    {skill.name}
+                  </Badge>
+                ))}
+              </div>
             </section>
-            <Separator className="my-4" />
-            {userData && (
-              <section data-section="social-links">
-                <h3 className="mb-2 text-lg font-semibold">
-                  {t("socialLinks")}
-                </h3>
-                <div className="flex space-x-4">
-                  {getSocialMediaLinks(userData).map(
-                    (link, index) =>
-                      link &&
-                      link.url && (
-                        <a
-                          key={index}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary-600"
-                        >
-                          <link.icon className="h-6 w-6" />
-                        </a>
-                      ),
-                  )}
-                </div>
-              </section>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          )}
+          <Separator className="my-4" />
+          <section data-section="contact">
+            <h3 className="mb-2 text-lg font-semibold">{t("contact")}</h3>
+            <ul className="space-y-2">
+              {userData.email && (
+                <li className="flex items-center">
+                  <Mail className="mr-2 h-4 w-4" />
+                  <a
+                    href={`mailto:${userData.email}`}
+                    className="text-primary hover:underline"
+                  >
+                    {userData.email}
+                  </a>
+                </li>
+              )}
+              {phoneNumber && (
+                <li className="flex items-center">
+                  <Phone className="mr-2 h-4 w-4" />
+                  <a
+                    href={`tel:${phoneNumber}`}
+                    className="text-primary hover:underline"
+                  >
+                    {phoneNumber}
+                  </a>
+                </li>
+              )}
+            </ul>
+          </section>
+          <Separator className="my-4" />
+          {userData && (
+            <section data-section="social-links">
+              <h3 className="mb-2 text-lg font-semibold">{t("socialLinks")}</h3>
+              <div className="flex space-x-4">
+                {getSocialMediaLinks(userData).map(
+                  (link, index) =>
+                    link &&
+                    link.url && (
+                      <a
+                        key={index}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:text-primary-600"
+                      >
+                        <link.icon className="h-6 w-6" />
+                      </a>
+                    ),
+                )}
+              </div>
+            </section>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -6,6 +6,7 @@ export { contactInfoSchema, professionalInfoSchema }
 
 export const aboutSchema = z.object({
   about: z.string().optional(),
+  ...professionalInfoSchema.shape
 })
 
 export type AboutInfoData = z.infer<typeof aboutSchema>

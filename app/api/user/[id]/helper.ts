@@ -1,9 +1,14 @@
 // app/api/user/[id]/helper.ts
-import { authUsers, userInfos } from "@/drizzle/schema/user";
+import {
+  authUsers,
+  userInfos,
+  userIndustryExperience,
+} from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
 export async function fetchUserData(userId: string) {
+  // First get user info and auth data
   const result = await db
     .select({
       id: authUsers.id,
@@ -20,8 +25,6 @@ export async function fetchUserData(userId: string) {
       location: userInfos.location,
       occupation: userInfos.occupation,
       about: userInfos.about,
-      industries: userInfos.industries,
-      experience: userInfos.experience,
       instagramHandle: userInfos.instagramHandle,
       facebookHandle: userInfos.facebookHandle,
       profilePicture: userInfos.profilePicture,
@@ -32,11 +35,24 @@ export async function fetchUserData(userId: string) {
     .limit(1);
 
   if (result.length === 0) {
+    console.error(`User with ID ${userId} not found`);
     return null;
   }
-
   const userData = result[0];
 
+  // Then get industry experiences
+  const industryExperiences = await db
+    .select({
+      industry: userIndustryExperience.industry,
+      experienceLevel: userIndustryExperience.experienceLevel,
+    })
+    .from(userIndustryExperience)
+    .where(eq(userIndustryExperience.userId, userId));
+
+  if (industryExperiences.length === 0) {
+    console.warn(`No industry experiences found for user with ID ${userId}`);
+  }
+  
   // Transform the data to match the UserData interface
   return {
     id: userData.id,
@@ -53,8 +69,7 @@ export async function fetchUserData(userId: string) {
     location: userData.location || "",
     occupation: userData.occupation || "",
     about: userData.about || "",
-    industries: userData.industries || [],
-    experience: userData.experience || "",
+    industryExperiences: industryExperiences,
     instagramHandle: userData.instagramHandle,
     facebookHandle: userData.facebookHandle,
     profilePicture: userData.profilePicture,
