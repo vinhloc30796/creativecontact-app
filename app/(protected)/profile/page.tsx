@@ -202,7 +202,7 @@ export default async function ProfilePage({
                     // Set max height and enable scrolling
                     "max-h-[calc(100vh-225px)] overflow-y-scroll",
                     // Desktop styles
-                    "lg:mt-0 lg:w-1/3 lg:pl-6"
+                    "lg:mt-0 lg:w-1/3 lg:pl-6",
                   )}
                 >
                   <ProfileCard
