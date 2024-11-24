@@ -18,24 +18,6 @@ export const authUsers = authSchema.table("users", {
   emailConfirmedAt: timestamp("email_confirmed_at", { withTimezone: true }),
 });
 
-/* postgres=> \d user_infos
-                    Table "public.user_infos"
-    Column    |       Type       | Collation | Nullable | Default
---------------+------------------+-----------+----------+---------
- id           | uuid             |           | not null |
- display_name | text             |           |          |
- location     | text             |           |          |
- occupation   | text             |           |          |
- about        | text             |           |          |
- industries   | industry[]       |           |          |
- experience   | experience_level |           |          |
-Indexes:
-    "user_infos_pkey" PRIMARY KEY, btree (id)
-    "idx_user_infos_industries" gin (industries)
-Foreign-key constraints:
-    "user_infos_id_fkey" FOREIGN KEY (id) REFERENCES auth.users(id)
-Policies (row security enabled): (none)
-*/
 export const industries = [
   "Advertising",
   "Architecture",
@@ -51,6 +33,7 @@ export const industries = [
   "Visual Arts",
   "Other",
 ] as const;
+
 export const experienceLevels = [
   "Entry",
   "Junior",
@@ -59,8 +42,39 @@ export const experienceLevels = [
   "Manager",
   "C-level",
 ] as const;
+
 export const industryEnum = pgEnum("industry", industries);
 export const experienceEnum = pgEnum("experience_level", experienceLevels);
+
+/* postgres=> \d user_infos
+                         Table "public.user_infos"
+        Column        |     Type     | Collation | Nullable |    Default    
+----------------------+--------------+-----------+----------+---------------
+ id                   | uuid         |           | not null | 
+ display_name         | text         |           |          | 
+ location             | text         |           |          | 
+ occupation           | text         |           |          | 
+ about                | text         |           |          | 
+ first_name           | text         |           |          | 
+ last_name            | text         |           |          | 
+ phone                | text         |           |          | 
+ instagram_handle     | text         |           |          | 
+ facebook_handle      | text         |           |          | 
+ profile_picture      | text         |           |          | 
+ phone_country_code   | text         |           |          | '84'::text
+ phone_number         | text         |           |          | 
+ phone_country_alpha3 | character(3) |           |          | 'VNM'::bpchar
+ user_name            | text         |           | not null | 
+Indexes:
+    "user_infos_pkey" PRIMARY KEY, btree (id)
+    "user_name_unique" UNIQUE CONSTRAINT, btree (user_name)
+Foreign-key constraints:
+    "user_infos_id_fkey" FOREIGN KEY (id) REFERENCES auth.users(id)
+Referenced by:
+    TABLE "user_industry_experience" CONSTRAINT "user_industry_experience_user_id_fkey" FOREIGN KEY (user_id) REFERENCES user_infos(id) ON DELETE CASCADE
+Policies (row security enabled): (none)
+*/
+
 export const userInfos = pgTable("user_infos", {
   id: uuid("id")
     .primaryKey()
@@ -75,17 +89,44 @@ export const userInfos = pgTable("user_infos", {
   location: text("location"),
   occupation: text("occupation"),
   about: text("about"),
-  industries: industryEnum("industries").array(),
-  experience: experienceEnum("experience"),
   profilePicture: text("profile_picture"),
   instagramHandle: text("instagram_handle"),
   facebookHandle: text("facebook_handle"),
+});
+
+/* postgres=> \d user_industry_experience
+postgres=> \d user_industry_experience
+                    Table "public.user_industry_experience"
+      Column      |       Type       | Collation | Nullable |      Default      
+------------------+------------------+-----------+----------+-------------------
+ id               | uuid             |           | not null | gen_random_uuid()
+ user_id          | uuid             |           | not null | 
+ industry         | industry         |           | not null | 
+ experience_level | experience_level |           | not null | 
+Indexes:
+    "user_industry_experience_pkey" PRIMARY KEY, btree (id)
+    "idx_user_industry_experience_user_id" btree (user_id)
+    "user_industry_experience_user_id_industry_key" UNIQUE CONSTRAINT, btree (user_id, industry)
+Foreign-key constraints:
+    "user_industry_experience_user_id_fkey" FOREIGN KEY (user_id) REFERENCES user_infos(id) ON DELETE CASCADE
+*/
+
+export const userIndustryExperience = pgTable("user_industry_experience", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => userInfos.id, { onDelete: "cascade" }),
+  industry: industryEnum("industry").notNull(),
+  experienceLevel: experienceEnum("experience_level").notNull(),
 });
 
 // TypeScript types for use in your application
 export type IndustryType = (typeof industries)[number];
 export type ExperienceType = (typeof experienceLevels)[number];
 export type UserInfo = InferSelectModel<typeof userInfos>;
+export type UserIndustryExperience = InferSelectModel<
+  typeof userIndustryExperience
+>;
 
 // Mappers
 export const industriesMapper = [

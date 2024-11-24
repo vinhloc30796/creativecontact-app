@@ -152,8 +152,7 @@ function UploadPageContent({
     resolver: zodResolver(professionalInfoSchema),
     mode: "onSubmit",
     defaultValues: {
-      industries: [],
-      experience: undefined,
+      industryExperiences: [],
     },
   });
 
@@ -178,7 +177,6 @@ function UploadPageContent({
   // Effects
   useEffect(() => {
     if (userData && !isLoading) {
-      // Auto-fill form fields
       contactInfoForm.reset({
         email: userData.email,
         firstName: userData.firstName ?? '',
@@ -188,9 +186,14 @@ function UploadPageContent({
         instagramHandle: userData.instagramHandle || undefined,
         facebookHandle: userData.facebookHandle || undefined,
       });
+      
+      const industryExperiences = userData.industryExperiences?.map(exp => ({
+        industry: exp.industry,
+        experienceLevel: exp.experienceLevel
+      })) || [];
+      
       professionalInfoForm.reset({
-        industries: userData.industries || [],
-        experience: userData.experience || undefined,
+        industryExperiences
       });
     }
   }, [userData, isLoading, professionalInfoForm, contactInfoForm]);

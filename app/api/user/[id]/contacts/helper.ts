@@ -2,7 +2,7 @@
 
 import { UserData } from "@/app/types/UserInfo";
 import { contacts } from "@/drizzle/schema/contact";
-import { authUsers, userInfos } from "@/drizzle/schema/user";
+import { authUsers, userInfos, userIndustryExperience } from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
@@ -15,8 +15,6 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
       location: userInfos.location,
       occupation: userInfos.occupation,
       about: userInfos.about,
-      industries: userInfos.industries,
-      experience: userInfos.experience,
       email: authUsers.email,
       isAnonymous: authUsers.isAnonymous,
       emailConfirmedAt: authUsers.emailConfirmedAt,
@@ -34,8 +32,26 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
     .innerJoin(contacts, eq(contacts.contactId, userInfos.id))
     .where(eq(contacts.userId, userId));
 
+  // Fetch industry experiences for each contact
+  const contactsWithIndustryExperiences = await Promise.all(
+    contactsInfo.map(async (contact) => {
+      const industryExperiences = await db
+        .select({
+          industry: userIndustryExperience.industry,
+          experienceLevel: userIndustryExperience.experienceLevel,
+        })
+        .from(userIndustryExperience)
+        .where(eq(userIndustryExperience.userId, contact.id));
+
+      return {
+        ...contact,
+        industryExperiences,
+      };
+    })
+  );
+
   // Ensure type safety by mapping the result to UserData
-  const typeSafeContacts: UserData[] = contactsInfo.map((contact) => ({
+  const typeSafeContacts: UserData[] = contactsWithIndustryExperiences.map((contact) => ({
     ...contact,
     firstName: contact.firstName ?? "",
     lastName: contact.lastName ?? "",
@@ -44,11 +60,21 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
     email: contact.email ?? "",
     isAnonymous: contact.isAnonymous ?? false,
     emailConfirmedAt: contact.emailConfirmedAt ?? null,
-    industries: contact.industries ?? [],
-    experience: contact.experience ?? null,
-    phoneCountryCode: contact.phoneCountryCode ?? "84",
+    phoneCountryCode: contact.phoneCountryCode ?? "84", 
     phoneNumber: contact.phoneNumber ?? "",
     phoneCountryAlpha3: contact.phoneCountryAlpha3 ?? "VNM",
+    location: contact.location ?? null,
+    occupation: contact.occupation ?? null,
+    about: contact.about ?? null,
+    profilePicture: contact.profilePicture ?? null,
+    instagramHandle: contact.instagramHandle ?? null,
+    facebookHandle: contact.facebookHandle ?? null,
+    industryExperiences: contact.industryExperiences.map(exp => ({
+      id: contact.id, // Using contact ID as a fallback
+      userId: contact.id,
+      industry: exp.industry,
+      experienceLevel: exp.experienceLevel
+    }))
   }));
 
   return typeSafeContacts;

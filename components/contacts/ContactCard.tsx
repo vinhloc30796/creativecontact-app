@@ -4,7 +4,8 @@ import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/lib/i18n/init-client";
-import { Briefcase, CheckCircle, MapPin, TrendingUp, UserCircle } from 'lucide-react';
+import { Briefcase, CheckCircle, MapPin, UserCircle } from 'lucide-react';
+import { ComboBadge } from "@/components/ui/combo-badge";
 
 interface ContactCardProps {
   userData: UserData;
@@ -47,22 +48,22 @@ export function ContactCard({
         </div>
       </CardHeader>
 
-      <CardContent className="flex-grow p-4">
+        <CardContent className="flex-grow p-4">
         <ul className="space-y-3">
-          {userData.industries && userData.industries.length > 0 && (
+          {userData.industryExperiences && userData.industryExperiences.length > 0 && (
             <li className="flex items-center">
               <Briefcase className="mr-2 h-4 w-4 flex-shrink-0" />
               <div className="flex flex-wrap gap-2">
-                {userData.industries.map((industry, index) => (
-                  <Badge key={index} variant="secondary">{industry}</Badge>
+                {userData.industryExperiences.map((exp, index) => (
+                  <ComboBadge
+                    key={index}
+                    leftContent={exp.industry}
+                    rightContent={exp.experienceLevel}
+                    leftColor="bg-primary"
+                    rightColor="bg-secondary"
+                  />
                 ))}
               </div>
-            </li>
-          )}
-          {userData.experience && (
-            <li className="flex items-center">
-              <TrendingUp className="mr-2 h-4 w-4 flex-shrink-0" />
-              <span>{userData.experience}</span>
             </li>
           )}
           {userData.location && (

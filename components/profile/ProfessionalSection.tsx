@@ -1,6 +1,6 @@
 "use client";
 
-import { UserData } from "@/app/types/UserInfo";
+import { UserData, Industry, ExperienceLevel } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,29 +21,34 @@ interface ProfessionalSectionProps {
 
 export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSectionProps) {
   const { t } = useTranslation(lang, "ProfilePage");
-  const [selectedIndustries, setSelectedIndustries] = useState<string[]>(userData.industries || []);
-  const [selectedExperience, setSelectedExperience] = useState<string>(userData.experience || '');
+  const [selectedIndustryExperiences, setSelectedIndustryExperiences] = useState(
+    userData.industryExperiences || []
+  );
   const { setFieldDirty, setFormData } = useFormState();
 
   useEffect(() => {
-    const industriesChanged = JSON.stringify(selectedIndustries) !== JSON.stringify(userData.industries || []);
-    const experienceChanged = selectedExperience !== (userData.experience || '');
-    const isDirty = industriesChanged || experienceChanged;
+    const industryExperiencesChanged = JSON.stringify(selectedIndustryExperiences) !== 
+      JSON.stringify(userData.industryExperiences || []);
     
-    setFieldDirty('professional', isDirty);
-    // Always set form data, not just when dirty
+    setFieldDirty('professional', industryExperiencesChanged);
+    
     setFormData('professional', {
-        industries: selectedIndustries,
-        experience: selectedExperience
+      industryExperiences: selectedIndustryExperiences
     });
-  }, [selectedIndustries, selectedExperience, userData.industries, userData.experience, setFieldDirty, setFormData]);
+  }, [selectedIndustryExperiences, userData.industryExperiences, setFieldDirty, setFormData]);
 
-  const toggleIndustry = (value: string) => {
-    setSelectedIndustries(current => {
-      if (current.includes(value)) {
-        return current.filter(i => i !== value);
+  const toggleIndustryExperience = (industry: Industry, experienceLevel: ExperienceLevel) => {
+    setSelectedIndustryExperiences(current => {
+      const exists = current.find(ie => ie.industry === industry);
+      if (exists) {
+        return current.filter(ie => ie.industry !== industry);
       } else {
-        return [...current, value];
+        return [...current, { 
+          id: crypto.randomUUID(), 
+          userId: userData.id, 
+          industry, 
+          experienceLevel 
+        }];
       }
     });
   };
@@ -58,8 +63,10 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
           <div className="space-y-2">
             <Label>{t('ProfessionalSection.currentIndustries')}</Label>
             <div className="flex flex-wrap gap-2 mt-2">
-              {selectedIndustries.map((industry) => (
-                <Badge key={industry}>{industry}</Badge>
+              {selectedIndustryExperiences.map((ie) => (
+                <Badge key={ie.industry}>
+                  {ie.industry} - {ie.experienceLevel}
+                </Badge>
               ))}
             </div>
             <div className="max-w-md">
@@ -70,11 +77,11 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
                     role="combobox"
                     className={cn(
                       "w-full justify-between",
-                      !selectedIndustries.length && "text-muted-foreground"
+                      !selectedIndustryExperiences.length && "text-muted-foreground"
                     )}
                   >
-                    {selectedIndustries.length
-                      ? `${selectedIndustries.length} selected`
+                    {selectedIndustryExperiences.length
+                      ? `${selectedIndustryExperiences.length} selected`
                       : t('ProfessionalSection.select')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -89,12 +96,14 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
                           <CommandItem
                             key={industry.value}
                             value={industry.value}
-                            onSelect={toggleIndustry}
+                            onSelect={() => toggleIndustryExperience(industry.value as Industry, 'BEGINNER' as ExperienceLevel)}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                selectedIndustries.includes(industry.value) ? "opacity-100" : "opacity-0"
+                                selectedIndustryExperiences.some(ie => ie.industry === industry.value) 
+                                  ? "opacity-100" 
+                                  : "opacity-0"
                               )}
                             />
                             {industry.label}
@@ -108,7 +117,7 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="experience">{t('ProfessionalSection.experience')}</Label>
+            <Label>{t('ProfessionalSection.experience')}</Label>
             <div className="max-w-md">
               <Popover>
                 <PopoverTrigger asChild>
@@ -117,12 +126,10 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
                     role="combobox"
                     className={cn(
                       "w-full justify-between",
-                      !selectedExperience && "text-muted-foreground"
+                      !selectedIndustryExperiences.length && "text-muted-foreground"
                     )}
                   >
-                    {selectedExperience
-                      ? experienceLevelsMapper.find((level: any) => level.value === selectedExperience)?.label
-                      : t('ProfessionalSection.select')}
+                    {t('ProfessionalSection.select')}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -132,16 +139,27 @@ export function ProfessionalSection({ userData, lang = "en" }: ProfessionalSecti
                     <CommandEmpty>{t('ProfessionalSection.noExperienceFound')}</CommandEmpty>
                     <CommandGroup>
                       <CommandList>
-                        {experienceLevelsMapper.map((level: any) => (
+                        {experienceLevelsMapper.map((level) => (
                           <CommandItem
                             key={level.value}
                             value={level.value}
-                            onSelect={(value) => setSelectedExperience(value)}
+                            onSelect={(value) => {
+                              if (selectedIndustryExperiences.length > 0) {
+                                setSelectedIndustryExperiences(current => 
+                                  current.map(ie => ({
+                                    ...ie,
+                                    experienceLevel: value as ExperienceLevel
+                                  }))
+                                );
+                              }
+                            }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                selectedExperience === level.value ? "opacity-100" : "opacity-0"
+                                selectedIndustryExperiences.some(ie => ie.experienceLevel === level.value)
+                                  ? "opacity-100"
+                                  : "opacity-0"
                               )}
                             />
                             {level.label}

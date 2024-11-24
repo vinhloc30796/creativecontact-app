@@ -30,8 +30,7 @@ export async function handleUserInfo(
       lastName: contactInfoData.lastName,
     },
     {
-      industries: professionalInfoData.industries as Industry[],
-      experience: professionalInfoData.experience as ExperienceLevel | null,
+      industryExperiences: professionalInfoData.industryExperiences
     },
     {
       instagramHandle: contactInfoData.instagramHandle,
@@ -91,8 +90,7 @@ export async function handleCoArtists(artworkData: ArtworkInfoData, artworkCredi
         lastName: coartist.last_name,
       },
       {
-        industries: [],
-        experience: null,
+        industryExperiences: []
       },
       {
         instagramHandle: undefined,

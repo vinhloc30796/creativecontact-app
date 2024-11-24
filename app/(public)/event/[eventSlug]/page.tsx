@@ -2,23 +2,12 @@
 "use server";
 
 // React and Next.js imports
-import Link from "next/link";
 import { Suspense } from "react";
 
 // Database and ORM imports
-import { db } from "@/lib/db";
 import { createClient } from "@supabase/supabase-js";
-import { and, desc, eq, gt, lt } from "drizzle-orm";
 
 // Schema imports
-import {
-  artworkAssets,
-  artworkCredits,
-  artworkEvents,
-  artworks,
-} from "@/drizzle/schema/artwork";
-import { events } from "@/drizzle/schema/event";
-import { UserInfo, userInfos } from "@/drizzle/schema/user";
 
 // Component imports
 import {
@@ -27,13 +16,16 @@ import {
 } from "@/components/artwork/ArtworkCard";
 import { Loading } from "@/components/Loading";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { EventHeader } from "@/components/wrappers/EventHeader";
 import { EventFooter } from "@/components/wrappers/EventFooter";
+import { EventHeader } from "@/components/wrappers/EventHeader";
 import { EventNotFound } from "./EventNotFound";
 import { UploadStatistics } from "./UploadStatistics";
 // Utility imports
 import { useTranslation } from "@/lib/i18n/init-server";
-import EventEnded from "./EventEnded";
+import { fetchEvent } from "@/app/(public)/(event)/api/events/[slug]/helper";
+import { fetchRecentEvents } from "@/app/(public)/(event)/api/recent-events/helper";
+import { fetchEventArtworks } from "@/app/(public)/(event)/api/event-artworks/helper";
+
 // Define the props interface for the EventPage component
 interface EventPageProps {
   params: {
@@ -77,106 +69,48 @@ export default async function EventPage({
   const { eventSlug } = params;
 
   // Fetch event data from the database
-  const eventData = await db.query.events.findFirst({
-    where: eq(events.slug, eventSlug),
-    columns: { id: true, name: true, slug: true, time_end: true }
-  });
+  const eventData = await fetchEvent(eventSlug);
 
   // Fetch recent events for the EventNotFound component
-  const recentEvents = await db.query.events.findMany({
-    orderBy: desc(events.created_at),
-    limit: 5
-  });
-  const eventEnded = (eventData?.time_end && new Date() > new Date(eventData.time_end)) as boolean;
+  const recentEvents = await fetchRecentEvents(5);
+
+  const eventEnded = (eventData?.time_end &&
+    new Date() > new Date(eventData.time_end)) as boolean;
+
   // If event is not found, render the EventNotFound component
   if (!eventData) {
     return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
   }
 
   // Fetch artworks and their assets for the current event
-  const eventArtworks = await db
-    .select({
-      artwork: artworks,
-      assets: artworkAssets,
-      credits: artworkCredits,
-      user: userInfos,
-    })
-    .from(artworkEvents)
-    .innerJoin(artworks, eq(artworkEvents.artworkId, artworks.id))
-    .leftJoin(artworkAssets, eq(artworks.id, artworkAssets.artworkId))
-    .leftJoin(artworkCredits, eq(artworks.id, artworkCredits.artworkId))
-    .leftJoin(userInfos, eq(artworkCredits.userId, userInfos.id))
-    .where(eq(artworkEvents.eventId, eventData.id));
+  const eventArtworksData = await fetchEventArtworks(eventData.id);
 
-  // Process fetched artworks to group assets with their respective artworks
-  const processedArtworks = eventArtworks.reduce(
-    (acc, { artwork, assets, credits, user }) => {
-      if (!acc[artwork.id]) {
-        acc[artwork.id] = {
-          ...artwork,
-          assets: [],
-          thumbnail: null,
-          credits: [],
-        };
-      }
-      if (assets && !acc[artwork.id].assets.some((a) => a.id === assets.id)) {
-        acc[artwork.id].assets.push(assets);
-        if (assets.isThumbnail) {
-          acc[artwork.id].thumbnail = {
-            filePath: assets.filePath,
-            assetType: assets.assetType || "image",
-          };
-        }
-      }
-      if (
-        credits &&
-        !acc[artwork.id].credits.some((c) => c.id === credits.id)
-      ) {
-        const userInfo: UserInfo = user
-          ? {
-            ...user,
-            experience: user.experience || "Entry", // Provide a default value if null
-          }
-          : {
-            id: credits.userId,
-            firstName: null,
-            lastName: null,
-            userName: null,
-            displayName: "Anonymous",
-            phoneCountryCode: null,
-            phoneNumber: null,
-            phoneCountryAlpha3: null,
-            location: null,
-            occupation: null,
-            about: null,
-            industries: null,
-            experience: "Entry",
-            profilePicture: null,
-            instagramHandle: null,
-            facebookHandle: null,
-          };
-        acc[artwork.id].credits.push({ ...credits, user: userInfo });
-      }
-      return acc;
-    },
-    {} as Record<string, ArtworkWithAssetsThumbnailCredits>,
-  );
+  if (!eventArtworksData) {
+    return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
+  }
 
   // Calculate the total number of artworks
-  const artworkCount = Object.keys(processedArtworks).length;
+  const artworkCount = Object.keys(eventArtworksData).length;
 
   // Shuffle the artworks
-  const shuffledArtworks = shuffleArray(Object.values(processedArtworks));
+  const shuffledArtworks = shuffleArray<ArtworkWithAssetsThumbnailCredits>(
+    Object.values(eventArtworksData),
+  );
 
   // Render the EventPage component
   return (
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
-      <div className="min-h-screen flex flex-col w-full">
+      <div className="flex min-h-screen w-full flex-col">
         {/* Header section */}
-        <EventHeader eventSlug={eventSlug} lang={lang} eventEnded={eventEnded} className="mb-0" />
+        <EventHeader
+          eventSlug={eventSlug}
+          lang={lang}
+          eventEnded={eventEnded}
+          className="mb-0"
+        />
 
         {/* Background text */}
-        <div className="fixed inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
+        <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center overflow-hidden">
           <Suspense fallback={<Loading />}>
             <UploadStatistics
               eventSlug={eventSlug}
@@ -187,14 +121,15 @@ export default async function EventPage({
           </Suspense>
         </div>
         {/* Main content area */}
-        <main className="flex-grow mt-10 lg:mt-20 relative z-20 justify-between w-full">
+        <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
           <div className="w-full px-4 sm:px-8 md:px-16">
             {/* Render artwork cards */}
             {shuffledArtworks.map((artwork, index) => (
               <div
                 key={artwork.id}
-                className={`flex ${index % 2 === 0 ? "justify-start" : "justify-end"
-                  } mt-2 pb-[40vh] sm:pb-[25vh]`}
+                className={`flex ${
+                  index % 2 === 0 ? "justify-start" : "justify-end"
+                } mt-2 pb-[40vh] sm:pb-[25vh]`}
               >
                 <ArtworkCard
                   eventSlug={eventSlug}

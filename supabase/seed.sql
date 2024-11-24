@@ -176,8 +176,6 @@ INSERT INTO user_infos (
     location,
     occupation,
     about,
-    industries,
-    experience,
     profile_picture,
     instagram_handle,
     facebook_handle
@@ -193,8 +191,6 @@ INSERT INTO user_infos (
     'New York',
     'System Administrator',
     'Experienced creative technologist with a passion for integrating cutting-edge technology into artistic projects and interactive experiences.',
-    ARRAY['Software and Interactive', 'Other']::industry[],
-    'Senior'::experience_level,
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d/lukewarm._Abstract_expressionism_emerald-powered_river-dwelling_9c99d61d-cd4b-4534-8a4e-ee60d1862ed2.png',
     'admin_insta',
     'admin_fb'
@@ -210,8 +206,6 @@ INSERT INTO user_infos (
     'San Francisco',
     'Software Developer',
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
-    ARRAY['Software and Interactive']::industry[],
-    'Entry'::experience_level,
     NULL,
     'user_insta',
     'user_fb'
@@ -227,12 +221,19 @@ INSERT INTO user_infos (
     'Lam Dong, Vietnam',
     'Software Developer',
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
-    ARRAY['Software and Interactive']::industry[],
-    'Senior'::experience_level,
     '314f834c-3ff2-4382-bc92-d37cbe2286a8/lukewarm._a_river_water-elemental_lion_drawing_power_from_emera_cd875218-db8a-4ab4-afdd-a00a1a6deb49.png',
     'vl307',
     'vl307'
 );
+
+-- Seed data for user_industry_experience table
+INSERT INTO user_industry_experience (user_id, industry, experience_level) VALUES
+('7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', 'Software and Interactive', 'Senior'),
+('7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', 'Other', 'Senior'),
+('13f60da9-8dd4-42f9-8a57-c0569a158857', 'Software and Interactive', 'Entry'),
+('13f60da9-8dd4-42f9-8a57-c0569a158857', 'Film, Video, and Photography', 'Junior'),
+('314f834c-3ff2-4382-bc92-d37cbe2286a8', 'Software and Interactive', 'Senior'),
+('314f834c-3ff2-4382-bc92-d37cbe2286a8', 'Advertising', 'Mid-level');
 
 -- Seed data for events table
 INSERT INTO events (id, created_at, name, slug, created_by)
