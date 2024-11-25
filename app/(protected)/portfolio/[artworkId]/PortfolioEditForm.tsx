@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaUpload } from "@/components/uploads/media-upload";
-import UploadProgressBar from "@/components/uploads/DataUsage";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { useTranslation } from "@/lib/i18n/init-client";
@@ -18,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import DataUsage from "@/components/uploads/DataUsage";
+import { ArtworkService } from "@/services/artwork-service";
 
 interface ArtworkFormValues {
   title: string;
@@ -46,7 +46,6 @@ export default function PortfolioEditForm({
 }: PortfolioEditFormProps) {
   const { t } = useTranslation(lang, "Portfolio");
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<string>("info");
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   // Form setup with default values
@@ -76,65 +75,83 @@ export default function PortfolioEditForm({
   });
 
   const handleSubmit = async (formData: ArtworkFormValues) => {
+    console.log("Form data:", formData);
+
     try {
-      // Create or update artwork
-      const artworkResponse = await fetch("/api/artworks", {
-        method: isNew ? "POST" : "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          id: artwork?.artworks?.id,
-        }),
+      // Update artwork
+      await ArtworkService.updateArtwork(formData.uuid, {
+        title: formData.title,
+        description: formData.description,
       });
 
-      if (!artworkResponse.ok) {
-        throw new Error("Failed to save artwork");
-      }
-
-      const savedArtwork = await artworkResponse.json();
-
-      // Handle file uploads if any
-      if (pendingFiles.length > 0) {
-        const formData = new FormData();
-        pendingFiles.forEach((file) => {
-          formData.append("files", file);
-        });
-        formData.append("artworkId", savedArtwork.id);
-
-        const uploadResponse = await fetch("/api/uploads", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error("Failed to upload files");
-        }
-      }
-
-      // Update portfolio artwork
-      // TODO: This endpoint is not implemented yet
-      const portfolioResponse = await fetch("/api/portfolio-artworks", {
-        method: isNew ? "POST" : "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: artwork?.portfolioArtworks?.id,
-          userId: userData.id,
-          artworkId: savedArtwork.id,
-        }),
-      });
-
-      if (!portfolioResponse.ok) {
-        throw new Error("Failed to update portfolio");
-      }
-
-      // Redirect back to portfolio page
       router.push("/profile");
-      router.refresh();
     } catch (error) {
-      console.error("Error saving portfolio artwork:", error);
-      // Handle error (show toast notification, etc.)
+      console.error(error);
     }
   };
+
+  // const handleSubmit = async (formData: ArtworkFormValues) => {
+  //   console.log("Form data:", formData);
+
+  //   try {
+  //     // Create or update artwork
+  //     const artworkResponse = await fetch("/api/artworks", {
+  //       method: isNew ? "POST" : "PUT",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         ...formData,
+  //         id: artwork?.artworks?.id,
+  //       }),
+  //     });
+
+  //     if (!artworkResponse.ok) {
+  //       throw new Error("Failed to save artwork");
+  //     }
+
+  //     const savedArtwork = await artworkResponse.json();
+
+  //     // Handle file uploads if any
+  //     if (pendingFiles.length > 0) {
+  //       const formData = new FormData();
+  //       pendingFiles.forEach((file) => {
+  //         formData.append("files", file);
+  //       });
+  //       formData.append("artworkId", savedArtwork.id);
+
+  //       const uploadResponse = await fetch("/api/uploads", {
+  //         method: "POST",
+  //         body: formData,
+  //       });
+
+  //       if (!uploadResponse.ok) {
+  //         throw new Error("Failed to upload files");
+  //       }
+  //     }
+
+  //     // Update portfolio artwork
+  //     // TODO: This endpoint is not implemented yet
+  //     const portfolioResponse = await fetch("/api/portfolio-artworks", {
+  //       method: isNew ? "POST" : "PUT",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         id: artwork?.portfolioArtworks?.id,
+  //         userId: userData.id,
+  //         artworkId: savedArtwork.id,
+  //       }),
+  //     });
+
+  //     if (!portfolioResponse.ok) {
+  //       throw new Error("Failed to update portfolio");
+  //     }
+
+  //     // Redirect back to portfolio page
+  //     router.push("/profile");
+  //     router.refresh();
+  //   } catch (error) {
+  //     console.error("Error saving portfolio artwork:", error);
+  //     // Handle error (show toast notification, etc.)
+  //   }
+  // };
 
   return (
     <FormProvider {...form}>
@@ -249,7 +266,11 @@ export default function PortfolioEditForm({
               </CardContent>
             </Card>
             <div className="mt-4 flex flex-col gap-4">
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={form.handleSubmit(handleSubmit)}
+              >
                 {isNew ? t("create") : t("save")}
               </Button>
               <Button
