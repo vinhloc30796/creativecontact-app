@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { handleMagicLinkRequest } from '@/app/(public)/(event)/checkin/_utils/apiHelpers';
+import { useRouter } from 'next/navigation';
 
 interface MagicSignInProps {
   purpose: 'login' | 'checkin';
@@ -20,6 +21,7 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   // I18n
   const { t } = useTranslation('MagicSignIn');
+  const router = useRouter();
 
   // Effects
   useEffect(() => {
@@ -55,9 +57,12 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
       setMagicLinkSent(false);
       localStorage.removeItem('magicLinkCountdown');
       localStorage.removeItem('magicLinkTimestamp');
+      if (purpose === 'login') {
+        router.push('/profile');
+      }
     }
     return () => clearInterval(timer);
-  }, [magicLinkSent, countdown]);
+  }, [magicLinkSent, countdown, purpose, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
