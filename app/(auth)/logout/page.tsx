@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function LogoutPage() {
   const router = useRouter();
@@ -12,11 +12,11 @@ export default function LogoutPage() {
     async function handleLogout() {
       try {
         // Specify the correct signout route
-        const response = await fetch('/signout', {
-          method: 'POST',
-          credentials: 'include', // Important for cookies
+        const response = await fetch("/signout", {
+          method: "POST",
+          credentials: "include", // Important for cookies
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
@@ -25,10 +25,10 @@ export default function LogoutPage() {
         }
 
         // Handle the redirect here instead of relying on the route
-        router.push('/');
+        router.push("/");
       } catch (error) {
-        console.error('Error during logout:', error);
-        router.push('/');
+        console.error("Error during logout:", error);
+        router.push("/");
       }
     }
 
@@ -53,4 +53,3 @@ export default function LogoutPage() {
     </div>
   );
 }
-

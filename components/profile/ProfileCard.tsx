@@ -9,13 +9,14 @@ import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { ComboBadge } from "@/components/ui/combo-badge";
+import { Separator } from "@/components/ui/separator";
 
 // Schema imports
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 
 // Utility imports
+import { getPlaceholderImage } from "@/utils/placeholder";
 import { getSocialMediaLinks } from "@/utils/social_media";
 import { TFunction } from "i18next";
 
@@ -37,7 +38,69 @@ interface UserSkills {
   name: string;
 }
 
-function ProfileCard({
+async function getName(userData: UserData) {
+  if (userData.displayName) {
+    return userData.displayName;
+  } else if (userData.firstName || userData.lastName) {
+    return `${userData.firstName} ${userData.lastName}`;
+  } else {
+    return "Unknown";
+  }
+}
+
+async function getProfileImageUrl(userData: UserData) {
+  const placeholderName = await getName(userData);
+  if (!userData.profilePicture) {
+    // If no profile picture set, get placeholder
+    return getPlaceholderImage(placeholderName);
+  }
+
+  const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
+
+  try {
+    // Check if image exists
+    const response = await fetch(profilePictureUrl, { method: "HEAD" });
+    if (!response.ok) {
+      return getPlaceholderImage(placeholderName);
+    }
+    return profilePictureUrl;
+  } catch (error) {
+    console.error("Error checking profile image:", error);
+    return getPlaceholderImage(placeholderName);
+  }
+}
+
+async function SocialSubsection({ userData }: { userData?: UserData }) {
+  const emptyMessage = (
+    <p className="text-sm text-muted-foreground">
+      No social media links available
+    </p>
+  );
+  if (!userData) {
+    return emptyMessage;
+  }
+  const socialLinks = getSocialMediaLinks(userData);
+  if (socialLinks.length === 0) {
+    return emptyMessage;
+  }
+  return socialLinks.map(
+    (link, index) =>
+      link &&
+      link.url && (
+        <a
+          key={index}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary-600"
+        >
+          <link.icon className="h-6 w-6" />
+        </a>
+      ),
+  );
+}
+
+async function ProfileCard({
   t,
   userData,
   userSkills,
@@ -50,10 +113,9 @@ function ProfileCard({
   portfolioArtworks: PortfolioArtworkWithDetails[];
   showButtons?: boolean;
 }) {
-  const name =
-    userData.displayName || `${userData.firstName} ${userData.lastName}`;
+  const name = await getName(userData);
   const userName = userData.userName || "";
-  const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
+  const profilePictureUrl = await getProfileImageUrl(userData);
   const phoneNumber = getFormattedPhoneNumber(userData);
 
   return (
@@ -87,7 +149,7 @@ function ProfileCard({
         </div>
         <p className="mb-4 flex items-center text-sm text-gray-500">
           <MapPin className="mr-1 h-4 w-4" />
-          {userData.location}
+          {userData.location || "Unset Location"}
         </p>
         <div className="flex space-x-2">
           <Button variant="outline" size="sm" asChild>
@@ -169,21 +231,7 @@ function ProfileCard({
             <section data-section="social-links">
               <h3 className="mb-2 text-lg font-semibold">{t("socialLinks")}</h3>
               <div className="flex space-x-4">
-                {getSocialMediaLinks(userData).map(
-                  (link, index) =>
-                    link &&
-                    link.url && (
-                      <a
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary-600"
-                      >
-                        <link.icon className="h-6 w-6" />
-                      </a>
-                    ),
-                )}
+                <SocialSubsection userData={userData} />
               </div>
             </section>
           )}
