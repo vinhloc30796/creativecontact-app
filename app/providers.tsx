@@ -25,7 +25,7 @@ export function SearchParamsProvider({ children }: { children: React.ReactNode }
     // First try URL param
     const urlLang = searchParams.get('lang');
     if (urlLang) return urlLang;
-    
+
     // Then try cookie
     if (typeof document !== 'undefined') {
       const cookieLang = document.cookie
@@ -34,7 +34,7 @@ export function SearchParamsProvider({ children }: { children: React.ReactNode }
         ?.split('=')[1];
       if (cookieLang) return cookieLang;
     }
-    
+
     // Default to 'en'
     return 'en';
   });
@@ -90,12 +90,14 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <SearchParamsProvider>
-          <PosthogProvider>
-            {children}
-          </PosthogProvider>
-          <Toaster visibleToasts={9} closeButton={true} />
-        </SearchParamsProvider>
+        <Suspense fallback={<Loading />}>
+          <SearchParamsProvider>
+            <PosthogProvider>
+              {children}
+            </PosthogProvider>
+            <Toaster visibleToasts={9} closeButton={true} />
+          </SearchParamsProvider>
+        </Suspense>
       </QueryClientProvider>
     </ThemeProvider>
   )

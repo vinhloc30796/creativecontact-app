@@ -130,7 +130,7 @@ export async function ProfileCard({
         <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
           <img
             src={profilePictureUrl}
-            alt={`${name}'s profile`}
+            alt={`${name}'s profile picture`}
             className="h-full w-full object-cover"
           />
         </div>
