@@ -3,7 +3,7 @@ import i18n from "i18next";
 import ChainedBackend from 'i18next-chained-backend';
 import HttpBackend from 'i18next-http-backend';
 import resourcesToBackend from 'i18next-resources-to-backend';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { initReactI18next, useTranslation as useTranslationOrg } from "react-i18next";
 import { buildResources } from "./settings";
 
@@ -57,47 +57,50 @@ i18n
   .init({
     backend: {
       backends: [
-        // if a namespace can't be loaded via normal http-backend loadPath, 
-        //then the inMemoryLocalBackend will try to return the correct resources
         HttpBackend,
         resourcesToBackend(buildResources)
       ],
       backendOptions: [{
-        loadPath: `${hostUrl}/translations/{{lng}}/{{ns}}.json`
+        loadPath: `${hostUrl}/translations/{{lng}}/{{ns}}.json`,
+        addPath: `${hostUrl}/translations/add/{{lng}}/{{ns}}`,
       }]
     },
-    lng: "en", // Default language
+    detection: {
+      order: ['path', 'cookie', 'header'],
+      lookupCookie: 'i18next',
+      lookupHeader: 'accept-language',
+      caches: ['cookie']
+    },
     fallbackLng: "en",
+    supportedLngs: ['en', 'fr', 'vi'],
     interpolation: {
       escapeValue: false
     },
     partialBundledLanguages: true
-  })
+  });
 
 export default i18n;
 
 interface UseTranslationOptions {
-  keyPrefix?: string
+  keyPrefix?: string;
+  useSuspense?: boolean;
 }
 
 export function useTranslation(lng: string, ns: string | string[], options: UseTranslationOptions = {}) {
-  const ret = useTranslationOrg(ns, options)
-  const { i18n } = ret
-  if (runsOnServerSide && lng && i18n.resolvedLanguage !== lng) {
-    i18n.changeLanguage(lng)
-  } else {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [activeLng, setActiveLng] = useState(i18n.resolvedLanguage)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (activeLng === i18n.resolvedLanguage) return
-      setActiveLng(i18n.resolvedLanguage)
-    }, [activeLng, i18n.resolvedLanguage])
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (!lng || i18n.resolvedLanguage === lng) return
-      i18n.changeLanguage(lng)
-    }, [lng, i18n])
-  }
-  return ret
+  const ret = useTranslationOrg(ns, options);
+  const { i18n } = ret;
+  
+  // Use a ref to prevent unnecessary effect triggers
+  const initialRender = useRef(true);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+      if (lng && i18n.resolvedLanguage !== lng) {
+        i18n.changeLanguage(lng);
+      }
+    }
+  }, [lng, i18n]);
+
+  return ret;
 }

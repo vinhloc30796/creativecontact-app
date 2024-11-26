@@ -19,9 +19,25 @@ export async function generateStaticParams() {
   return languages.map((lang: string) => ({ lang }))
 }
 
-export async function SearchParamsProvider({ children }: { children: React.ReactNode }) {
+export function SearchParamsProvider({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
-  const [language, setLanguage] = useState(searchParams.get('lang') || 'en')
+  const [language, setLanguage] = useState(() => {
+    // First try URL param
+    const urlLang = searchParams.get('lang');
+    if (urlLang) return urlLang;
+    
+    // Then try cookie
+    if (typeof document !== 'undefined') {
+      const cookieLang = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('NEXT_LOCALE='))
+        ?.split('=')[1];
+      if (cookieLang) return cookieLang;
+    }
+    
+    // Default to 'en'
+    return 'en';
+  });
 
   return (
     <I18nProvider lng={language} fallbackLng="en">
@@ -74,14 +90,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<Loading />}>
-          <SearchParamsProvider>
-            <PosthogProvider>
-              {children}
-            </PosthogProvider>
-            <Toaster visibleToasts={9} closeButton={true} />
-          </SearchParamsProvider>
-        </Suspense>
+        <SearchParamsProvider>
+          <PosthogProvider>
+            {children}
+          </PosthogProvider>
+          <Toaster visibleToasts={9} closeButton={true} />
+        </SearchParamsProvider>
       </QueryClientProvider>
     </ThemeProvider>
   )

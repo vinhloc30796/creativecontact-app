@@ -1,7 +1,7 @@
 // File: app/(public)/(event)/checkin/page.tsx
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { CheckInContainer } from './_sections/CheckInContainer';
 import { UserDetails } from './_sections/UserDetails';
@@ -15,7 +15,9 @@ export default function CheckInPage() {
       {isLoading ? (
         <p>Loading...</p>
       ) : (user && !isAnonymous) ? (
-        <UserDetails user={user} />
+        <Suspense fallback={null}>
+          <UserDetails user={user} />
+        </Suspense>
       ) : (
         <MagicSignIn purpose="checkin" />
       )}

@@ -1,6 +1,10 @@
 // File: app/(protected)/profile/page.tsx
 
-"use server";
+"use client";
+
+// External imports
+import { useTranslation } from "@/lib/i18n/init-client";
+import { useQuery } from "@tanstack/react-query";
 
 // API imports
 import { UserData } from "@/app/types/UserInfo";
@@ -16,9 +20,9 @@ import { Separator } from "@/components/ui/separator";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 
 // Utility imports
-import { getPlaceholderImage } from "@/utils/placeholder";
+import { getProfileImageUrl } from "@/utils/profile_image";
 import { getSocialMediaLinks } from "@/utils/social_media";
-import { TFunction } from "i18next";
+import { getName } from "@/utils/user_name";
 
 // Icon imports
 import { getFormattedPhoneNumber } from "@/lib/phone";
@@ -38,51 +42,24 @@ interface UserSkills {
   name: string;
 }
 
-async function getName(userData: UserData) {
-  if (userData.displayName) {
-    return userData.displayName;
-  } else if (userData.firstName || userData.lastName) {
-    return `${userData.firstName} ${userData.lastName}`;
-  } else {
-    return "Unknown";
-  }
-}
-
-async function getProfileImageUrl(userData: UserData) {
-  const placeholderName = await getName(userData);
-  if (!userData.profilePicture) {
-    // If no profile picture set, get placeholder
-    return getPlaceholderImage(placeholderName);
-  }
-
-  const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
-
-  try {
-    // Check if image exists
-    const response = await fetch(profilePictureUrl, { method: "HEAD" });
-    if (!response.ok) {
-      return getPlaceholderImage(placeholderName);
-    }
-    return profilePictureUrl;
-  } catch (error) {
-    console.error("Error checking profile image:", error);
-    return getPlaceholderImage(placeholderName);
-  }
-}
-
-async function SocialSubsection({ userData }: { userData?: UserData }) {
+async function SocialSubsection({ userData, lang = "en" }: { userData?: UserData, lang?: string }) {
+  const { t } = useTranslation(lang, "ProfileCard");
+  
   const emptyMessage = (
     <p className="text-sm text-muted-foreground">
-      No social media links available
+      {t("noSocialLinks")}
     </p>
   );
+  
   if (!userData) {
     return emptyMessage;
   }
+  
   const socialLinks = getSocialMediaLinks(userData);
   if (socialLinks.length === 0) {
     return emptyMessage;
   }
+  
   return socialLinks.map(
     (link, index) =>
       link &&
@@ -100,19 +77,48 @@ async function SocialSubsection({ userData }: { userData?: UserData }) {
   );
 }
 
-async function ProfileCard({
-  t,
-  userData,
-  userSkills,
-  portfolioArtworks,
-  showButtons = false,
-}: {
-  t: TFunction;
-  userData: UserData;
-  userSkills: UserSkills[];
-  portfolioArtworks: PortfolioArtworkWithDetails[];
+interface ProfileCardProps {
+  userDataPromise: Promise<UserData | null>;
+  userSkillsPromise: Promise<UserSkills[]>;
+  portfolioPromise: Promise<PortfolioArtworkWithDetails[]>;
   showButtons?: boolean;
-}) {
+  lang?: string;
+}
+
+export async function ProfileCard({
+  userDataPromise,
+  userSkillsPromise,
+  portfolioPromise,
+  showButtons = false,
+  lang = "en",
+}: ProfileCardProps) {
+  const { t } = useTranslation(lang, "ProfileCard", {
+    useSuspense: false,
+  });
+
+  const { data: userData } = useQuery({
+    queryKey: ['userData'],
+    queryFn: () => userDataPromise,
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000
+  });
+
+  const { data: userSkills } = useQuery({
+    queryKey: ['userSkills'],
+    queryFn: () => userSkillsPromise,
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000
+  });
+
+  const { data: portfolioArtworks } = useQuery({
+    queryKey: ['portfolio'],
+    queryFn: () => portfolioPromise,
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000
+  });
+
+  if (!userData || !userSkills || !portfolioArtworks) return null;
+
   const name = await getName(userData);
   const userName = userData.userName || "";
   const profilePictureUrl = await getProfileImageUrl(userData);
@@ -149,7 +155,7 @@ async function ProfileCard({
         </div>
         <p className="mb-4 flex items-center text-sm text-gray-500">
           <MapPin className="mr-1 h-4 w-4" />
-          {userData.location || "Unset Location"}
+          {userData.location || t("unsetLocation")}
         </p>
         <div className="flex space-x-2">
           <Button variant="outline" size="sm" asChild>
@@ -231,7 +237,7 @@ async function ProfileCard({
             <section data-section="social-links">
               <h3 className="mb-2 text-lg font-semibold">{t("socialLinks")}</h3>
               <div className="flex space-x-4">
-                <SocialSubsection userData={userData} />
+                <SocialSubsection userData={userData} lang={lang} />
               </div>
             </section>
           )}
@@ -240,5 +246,3 @@ async function ProfileCard({
     </Card>
   );
 }
-
-export { ProfileCard };
