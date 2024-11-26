@@ -8,7 +8,7 @@ import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
 import { writeArtworkInfo } from "@/app/actions/artwork/writeArtworkInfo";
 
 export class ArtworkService {
-  static async updateArtwork(
+  static async updateArtworkInfo(
     artworkId: string,
     data: Partial<ArtworkInfoData & ArtworkCreditInfoData>,
   ) {

@@ -18,6 +18,9 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import DataUsage from "@/components/uploads/DataUsage";
 import { ArtworkService } from "@/services/artwork-service";
+import { handleFileUpload } from "@/app/(public)/event/[eventSlug]/upload/client-helpers";
+import { insertArtworkAssets } from "@/app/(public)/event/[eventSlug]/upload/actions";
+import { useUploadStore } from "@/stores/uploadStore";
 
 interface ArtworkFormValues {
   title: string;
@@ -47,6 +50,13 @@ export default function PortfolioEditForm({
   const { t } = useTranslation(lang, "Portfolio");
   const router = useRouter();
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const {
+    uploadProgress,
+    uploadedFileCount,
+    totalFileCount,
+    setUploadProgress,
+    resetUploadProgress,
+  } = useUploadStore();
 
   // Form setup with default values
   const form = useForm<ArtworkFormValues>({
@@ -79,79 +89,36 @@ export default function PortfolioEditForm({
 
     try {
       // Update artwork
-      await ArtworkService.updateArtwork(formData.uuid, {
+      await ArtworkService.updateArtworkInfo(formData.uuid, {
         title: formData.title,
         description: formData.description,
       });
+
+      if (pendingFiles.length > 0) {
+        const files = pendingFiles.map(
+          (file) => new File([file], file.name, { type: file.type }),
+        );
+
+        const uploadedResults = await handleFileUpload(
+          formData.uuid,
+          files,
+          "thumbnail.jpg",
+          setUploadProgress,
+        );
+
+        // Insert assets
+        const insertAssetsResult = await insertArtworkAssets(
+          formData.uuid,
+          uploadedResults,
+        );
+        console.log("Insert assets successful:", insertAssetsResult);
+      }
 
       router.push("/profile");
     } catch (error) {
       console.error(error);
     }
   };
-
-  // const handleSubmit = async (formData: ArtworkFormValues) => {
-  //   console.log("Form data:", formData);
-
-  //   try {
-  //     // Create or update artwork
-  //     const artworkResponse = await fetch("/api/artworks", {
-  //       method: isNew ? "POST" : "PUT",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         ...formData,
-  //         id: artwork?.artworks?.id,
-  //       }),
-  //     });
-
-  //     if (!artworkResponse.ok) {
-  //       throw new Error("Failed to save artwork");
-  //     }
-
-  //     const savedArtwork = await artworkResponse.json();
-
-  //     // Handle file uploads if any
-  //     if (pendingFiles.length > 0) {
-  //       const formData = new FormData();
-  //       pendingFiles.forEach((file) => {
-  //         formData.append("files", file);
-  //       });
-  //       formData.append("artworkId", savedArtwork.id);
-
-  //       const uploadResponse = await fetch("/api/uploads", {
-  //         method: "POST",
-  //         body: formData,
-  //       });
-
-  //       if (!uploadResponse.ok) {
-  //         throw new Error("Failed to upload files");
-  //       }
-  //     }
-
-  //     // Update portfolio artwork
-  //     // TODO: This endpoint is not implemented yet
-  //     const portfolioResponse = await fetch("/api/portfolio-artworks", {
-  //       method: isNew ? "POST" : "PUT",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         id: artwork?.portfolioArtworks?.id,
-  //         userId: userData.id,
-  //         artworkId: savedArtwork.id,
-  //       }),
-  //     });
-
-  //     if (!portfolioResponse.ok) {
-  //       throw new Error("Failed to update portfolio");
-  //     }
-
-  //     // Redirect back to portfolio page
-  //     router.push("/profile");
-  //     router.refresh();
-  //   } catch (error) {
-  //     console.error("Error saving portfolio artwork:", error);
-  //     // Handle error (show toast notification, etc.)
-  //   }
-  // };
 
   return (
     <FormProvider {...form}>
