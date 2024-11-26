@@ -6,10 +6,10 @@ import { useTranslation } from "@/lib/i18n/init-server";
 import { TFunction } from "i18next";
 
 interface EmptyContactCardProps {
-  lang: string;
+  lang?: string;
 }
 
-export async function EmptyContactCard({ lang }: EmptyContactCardProps) {
+export async function EmptyContactCard({ lang = "en" }: EmptyContactCardProps) {
   const { t } = await useTranslation(lang, "ContactCard");
   return (
     <div className="col-span-full">
