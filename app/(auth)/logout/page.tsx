@@ -12,7 +12,7 @@ export default function LogoutPage() {
     async function handleLogout() {
       try {
         // Specify the correct signout route
-        const response = await fetch('/auth/signout', {
+        const response = await fetch('/signout', {
           method: 'POST',
           credentials: 'include', // Important for cookies
           headers: {
