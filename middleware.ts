@@ -7,6 +7,11 @@ import { handleLangPersist } from '@/utils/middleware/lang-persist';
 export async function middleware(req: NextRequest) {
   console.log("Middleware called for:", req.nextUrl.toString());
 
+  // Skip middleware for signout routes
+  if (req.nextUrl.pathname.includes('/signout')) {
+    return NextResponse.next();
+  }
+
   try {
     // First, attempt to handle staff access
     const staffResponse = await handleStaffAccess(req);

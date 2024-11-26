@@ -3,7 +3,6 @@
 "use server";
 
 // API imports
-import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
 import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
@@ -12,7 +11,6 @@ import { UserData } from "@/app/types/UserInfo";
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
@@ -30,9 +28,11 @@ import { Suspense } from "react";
 
 // Local component import
 import { ContactList } from "@/components/contacts/ContactList";
+import { ContactListSkeleton } from "@/components/contacts/ContactListSkeleton";
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
 import PortfolioSection from "./PortfolioSection";
+import PortfolioSectionSkeleton from "./PortfolioSectionSkeleton";
 
 interface ProfilePageProps {
   params: {};
@@ -74,33 +74,72 @@ export default async function ProfilePage({
     redirect("/login");
   }
 
-  // Add null checks before fetching
+  // Configure retry settings
+  const MAX_RETRIES = 3;
+  const INITIAL_DELAY = 1000; // 1 second
+  const CIRCUIT_BREAKER_THRESHOLD = 2; // Number of consecutive failures before breaking
+
+  // Initialize circuit breaker state
   let userData: UserData | null = null;
   let portfolioArtworks: PortfolioArtworkWithDetails[] = [];
-  try {
-    const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
-      fetchUserData(user.id),
-      fetchUserPortfolioArtworksWithDetails(user.id),
-    ]);
+  let userDataFailures = 0;
+  let portfolioFailures = 0;
 
-    if (userDataResult.status === "fulfilled" && userDataResult.value) {
-      userData = userDataResult.value;
-    } else {
-      console.error("Error fetching user data:", 
-        userDataResult.status === "rejected" ? userDataResult.reason : "No data returned");
-    }
+  // Helper function for exponential backoff retry
+  const fetchWithRetry = async (fetchFn: () => Promise<any>, label: string) => {
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        // Check circuit breaker
+        if ((label === 'userData' && userDataFailures >= CIRCUIT_BREAKER_THRESHOLD) ||
+            (label === 'portfolio' && portfolioFailures >= CIRCUIT_BREAKER_THRESHOLD)) {
+          console.error(`Circuit breaker open for ${label}`);
+          return null;
+        }
 
-    if (portfolioArtworksResult.status === "fulfilled") {
-      portfolioArtworks = portfolioArtworksResult.value || [];
-    } else {
-      console.error("Error fetching portfolio artworks:", portfolioArtworksResult.reason);
+        const result = await fetchFn();
+        // Reset failure count on success
+        if (label === 'userData') userDataFailures = 0;
+        if (label === 'portfolio') portfolioFailures = 0;
+        return result;
+      } catch (error) {
+        // Increment failure counters
+        if (label === 'userData') userDataFailures++;
+        if (label === 'portfolio') portfolioFailures++;
+
+        if (attempt === MAX_RETRIES - 1) {
+          console.error(`Max retries reached for ${label}:`, error);
+          return null;
+        }
+        
+        // Exponential backoff
+        const delay = INITIAL_DELAY * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
     }
-  } catch (error) {
-    console.error("Error in data fetching:", error);
+    return null;
+  };
+
+  // Fetch data in parallel with independent retry logic
+  const [userDataResult, portfolioResult] = await Promise.all([
+    fetchWithRetry(() => fetchUserData(user.id), 'userData'),
+    fetchWithRetry(() => fetchUserPortfolioArtworksWithDetails(user.id), 'portfolio')
+  ]);
+
+  // Process results
+  if (userDataResult) {
+    userData = userDataResult;
+  } else {
+    console.error("Failed to fetch user data after retries");
+  }
+
+  if (portfolioResult) {
+    portfolioArtworks = portfolioResult;
+  } else {
+    console.error("Failed to fetch portfolio data after retries");
   }
 
   // Fetch user skills
-  const userSkills = await getUserSkills(userData?.id);
+  const userSkills = await getUserSkills(user.id);
 
   return (
     <BackgroundDiv>
@@ -131,8 +170,8 @@ export default async function ProfilePage({
                     <TabsContent value="contacts">
                       <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                         {userData && (
-                          <Suspense fallback={<div>Loading contacts...</div>}>
-                            <ContactList userId={userData.id} lang={lang} />
+                          <Suspense fallback={<ContactListSkeleton />}>
+                            <ContactList userId={user.id} lang={lang} />
                           </Suspense>
                         )}
                       </div>
@@ -140,7 +179,7 @@ export default async function ProfilePage({
 
                     <TabsContent value="portfolio">
                       {userData && (
-                        <Suspense fallback={<div>Loading portfolio...</div>}>
+                        <Suspense fallback={<PortfolioSectionSkeleton />}>
                           <PortfolioSection
                             userData={userData}
                             lang={lang}
