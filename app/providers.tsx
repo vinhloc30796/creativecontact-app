@@ -19,15 +19,33 @@ export async function generateStaticParams() {
   return languages.map((lang: string) => ({ lang }))
 }
 
-export async function SearchParamsProvider({ children }: { children: React.ReactNode }) {
+// export async function SearchParamsProvider({ children }: { children: React.ReactNode }) {
+//   const searchParams = useSearchParams();
+//   const [language, setLanguage] = useState(searchParams.get('lang') || 'en')
+
+//   return (
+//     <I18nProvider lng={language} fallbackLng="en">
+//       {children}
+//     </I18nProvider>
+//   )
+// }
+
+export function SearchParamsProvider({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
-  const [language, setLanguage] = useState(searchParams.get('lang') || 'en')
+  const [language, setLanguage] = useState('en');
+
+  useEffect(() => {
+    const lang = searchParams.get('lang');
+    if (lang) {
+      setLanguage(lang);
+    }
+  }, [searchParams]);
 
   return (
     <I18nProvider lng={language} fallbackLng="en">
       {children}
     </I18nProvider>
-  )
+  );
 }
 
 function makeQueryClient() {
