@@ -8,14 +8,10 @@ import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portf
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 
-// Component imports
-import { ContactCard } from "@/components/contacts/ContactCard";
-import { EmptyContactCard } from "@/components/contacts/EmptyContactCard";
-
 // UI imports
 import { ErrorMessage } from "@/components/ErrorMessage";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileCard } from "@/components/profile/ProfileCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
@@ -33,9 +29,10 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 // Local component import
+import { ContactList } from "@/components/contacts/ContactList";
+import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
 import PortfolioSection from "./PortfolioSection";
-import { cn } from "@/lib/utils";
 
 interface ProfilePageProps {
   params: {};
@@ -61,22 +58,6 @@ async function getUserSkills(userId?: string): Promise<UserSkills[]> {
   ];
 }
 
-async function getUserContacts(userId?: string): Promise<UserData[]> {
-  if (!userId) {
-    return [] as UserData[];
-  }
-
-  const contacts = await fetchUserContacts(userId);
-
-  // Map UserInfo to UserData
-  return contacts.map((contact) => ({
-    ...contact,
-    email: "", // Add a default empty string or fetch the actual email
-    isAnonymous: false, // Set a default value
-    emailConfirmedAt: null, // Set a default value
-  }));
-}
-
 export default async function ProfilePage({
   params,
   searchParams,
@@ -89,34 +70,33 @@ export default async function ProfilePage({
   const cookieStore = cookies();
   const errorMessage = cookieStore.get("error_message")?.value;
 
-  if (!isLoggedIn || isAnonymous) {
+  if (!isLoggedIn || isAnonymous || !user?.id) {
     redirect("/login");
   }
 
-  // Fetch user data and portfolio artworks in parallel
+  // Add null checks before fetching
   let userData: UserData | null = null;
   let portfolioArtworks: PortfolioArtworkWithDetails[] = [];
-  if (user) {
+  try {
     const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
       fetchUserData(user.id),
       fetchUserPortfolioArtworksWithDetails(user.id),
     ]);
-    // Handle user data
-    if (userDataResult.status === "fulfilled") {
+
+    if (userDataResult.status === "fulfilled" && userDataResult.value) {
       userData = userDataResult.value;
     } else {
-      console.error("Error fetching user data:", userDataResult.reason);
+      console.error("Error fetching user data:", 
+        userDataResult.status === "rejected" ? userDataResult.reason : "No data returned");
     }
 
-    // Handle portfolio artworks
     if (portfolioArtworksResult.status === "fulfilled") {
-      portfolioArtworks = portfolioArtworksResult.value;
+      portfolioArtworks = portfolioArtworksResult.value || [];
     } else {
-      console.error(
-        "Error fetching portfolio artworks:",
-        portfolioArtworksResult.reason,
-      );
+      console.error("Error fetching portfolio artworks:", portfolioArtworksResult.reason);
     }
+  } catch (error) {
+    console.error("Error in data fetching:", error);
   }
 
   // Fetch user skills
@@ -151,21 +131,9 @@ export default async function ProfilePage({
                     <TabsContent value="contacts">
                       <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                         {userData && (
-                          <>
-                            {getUserContacts(userData.id).then((contacts) => {
-                              if (contacts.length === 0) {
-                                return <EmptyContactCard lang={lang} />;
-                              }
-                              return contacts.map((contact) => (
-                                <ContactCard
-                                  key={contact.id}
-                                  lang={lang}
-                                  userData={contact}
-                                  showButtons={false}
-                                />
-                              ));
-                            })}
-                          </>
+                          <Suspense fallback={<div>Loading contacts...</div>}>
+                            <ContactList userId={userData.id} lang={lang} />
+                          </Suspense>
                         )}
                       </div>
                     </TabsContent>

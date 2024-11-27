@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import { contactInfoSchema, ContactInfoData } from '@/app/form-schemas/contact-info'
 import { professionalInfoSchema, ProfessionalInfoData } from '@/app/form-schemas/professional-info'
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
-import { Industry, ExperienceLevel } from '@/app/types/UserInfo'
+import { IndustryType, ExperienceType } from '@/drizzle/schema/user'
 
 const signupSchema = z.object({
   ...contactInfoSchema.shape,
@@ -57,8 +57,7 @@ export default function SignupPage({
     resolver: zodResolver(professionalInfoSchema),
     mode: 'onSubmit',
     defaultValues: {
-      industries: [],
-      experience: undefined,
+      industryExperiences: []
     },
   })
 
@@ -73,8 +72,7 @@ export default function SignupPage({
         phoneCountryAlpha3: userData.phoneCountryAlpha3 ?? 'VNM',
       })
       professionalInfoForm.reset({
-        industries: userData.industries || [],
-        experience: userData.experience || undefined,
+        industryExperiences: userData.industryExperiences || []
       })
     }
   }, [userData, isLoading, contactInfoForm, professionalInfoForm])
@@ -125,8 +123,10 @@ export default function SignupPage({
           lastName: contactInfoData.lastName,
         },
         {
-          industries: professionalInfoData.industries as Industry[],
-          experience: professionalInfoData.experience as ExperienceLevel | null,
+          industryExperiences: professionalInfoData.industryExperiences.map(exp => ({
+            industry: exp.industry as IndustryType,
+            experienceLevel: exp.experienceLevel as ExperienceType
+          }))
         },
         {
           instagramHandle: contactInfoData.instagramHandle,

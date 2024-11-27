@@ -8,6 +8,7 @@ import {
   professionalInfoSchema,
   type ProfessionalInfoData,
 } from "@/app/form-schemas/professional-info";
+import { type UserIndustryExperience } from "@/drizzle/schema/user";
 
 export class UserService {
   static async updateUserInfo(
@@ -26,8 +27,7 @@ export class UserService {
       phoneCountryAlpha3,
       instagramHandle,
       facebookHandle,
-      industries,
-      experience,
+      industryExperiences,
       about,
     } = data;
 
@@ -44,33 +44,7 @@ export class UserService {
         about: about || "",
       },
       {
-        industries:
-          industries ||
-          ([] as (
-            | "Advertising"
-            | "Architecture"
-            | "Arts and Crafts"
-            | "Design"
-            | "Fashion"
-            | "Film, Video, and Photography"
-            | "Music"
-            | "Performing Arts"
-            | "Publishing"
-            | "Software and Interactive"
-            | "Television and Radio"
-            | "Visual Arts"
-            | "Other"
-          )[]),
-        experience:
-          experience ||
-          (null as
-            | "Entry"
-            | "Junior"
-            | "Mid-level"
-            | "Senior"
-            | "Manager"
-            | "C-level"
-            | null),
+        industryExperiences: (industryExperiences || []) as UserIndustryExperience[],
       },
       {
         instagramHandle,
