@@ -1,42 +1,41 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { UserData } from "@/app/types/UserInfo";
 import { ContactCard } from "./ContactCard";
 import { EmptyContactCard } from "./EmptyContactCard";
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { useMemo } from 'react';
+import { ContactListSkeleton } from './ContactListSkeleton';
 
-export function ContactList({ userId, lang }: { userId: string, lang: string }) {
-  const [contacts, setContacts] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true);
+interface ContactListProps {
+  contactsPromise: Promise<UserData[]>;
+  lang: string;
+}
 
-  useEffect(() => {
-    async function loadContacts() {
-      try {
-        const response = await fetch(`/api/user/${userId}/contacts`);
-        const data = await response.json();
-        setContacts(data);
-      } catch (error) {
-        console.error('Error loading contacts:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
+export function ContactList({ contactsPromise, lang }: ContactListProps) {
+  const { data: contacts, isLoading } = useQuery<UserData[]>({
+    queryKey: ['contacts'],
+    queryFn: () => contactsPromise,
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000
+  });
 
-    loadContacts();
-  }, [userId]);
+  const emptyState = useMemo(() => (
+    <EmptyContactCard lang={lang} />
+  ), [lang]);
 
-  if (loading) return <div>Loading...</div>;
-  
-  if (contacts.length === 0) {
-    return <EmptyContactCard lang={lang} />;
-  }
+  if (isLoading) return <ContactListSkeleton />;
 
-  return contacts.map((contact) => (
-    <ContactCard
-      key={contact.id}
-      lang={lang}
-      userData={contact}
-      showButtons={false}
-    />
-  ));
+  return !contacts || contacts.length === 0 ? emptyState : (
+    contacts.map((contact) => (
+      <ContactCard
+        key={contact.id}
+        lang={lang}
+        userData={contact}
+        showButtons={false}
+      />
+    ))
+  );
 }

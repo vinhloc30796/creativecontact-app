@@ -1,12 +1,30 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  // Sign out the user
-  await supabase.auth.signOut();
+    // Sign out the user
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('Supabase signout error:', error);
+      return NextResponse.json({ error: 'Signout failed' }, { status: 500 });
+    }
 
-  // Redirect to the login page after sign out
-  return NextResponse.redirect(new URL("/", request.url));
+    // Clear any auth cookies
+    const cookieStore = cookies();
+    cookieStore.getAll().forEach(cookie => {
+      if (cookie.name.includes('supabase') || cookie.name.includes('auth')) {
+        cookieStore.delete(cookie.name);
+      }
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error('Server signout error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
