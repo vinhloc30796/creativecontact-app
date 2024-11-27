@@ -38,6 +38,7 @@
   "pending_table": {
     "file": "File",
     "remove": "Xóa",
+    "description":"Nội dung",
     "thumbnail": "Ảnh bìa"
   },
   "button": {

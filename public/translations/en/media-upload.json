@@ -38,6 +38,7 @@
   "pending_table": {
     "file": "File",
     "remove": "Remove",
+    "description": "Description",
     "thumbnail": "Thumbnail"
   },
   "button": {

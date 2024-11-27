@@ -90,7 +90,8 @@ export function MediaUpload({
   }, [pendingFiles, setPendingSize]);
 
   return (
-    <div className="mx-auto w-full max-w-md bg-background">
+    // <div className="mx-auto w-full max-w-md bg-background">
+    <div className="mx-auto w-full bg-background">
       <form
         onSubmit={(e) => {
           e.preventDefault();

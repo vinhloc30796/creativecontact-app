@@ -55,9 +55,10 @@ export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, removeF
     <Table className="mt-4">
       <TableHeader>
         <TableRow>
-          <TableHead className="text-center">{t("pending_table.thumbnail")}</TableHead>
-          <TableHead>{t("pending_table.file")}</TableHead>
-          {!isReadonly && <TableHead className="text-center">{t("pending_table.remove")}</TableHead>}
+          <TableHead className="text-center w-1/5">{t("pending_table.thumbnail")}</TableHead>
+          <TableHead className=" w-1/5">{t("pending_table.file")}</TableHead>
+          <TableHead className=" w-3/5">{t("pending_table.description")}</TableHead>
+          {!isReadonly && <TableHead className="text-center w-1/5">{t("pending_table.remove")}</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -76,15 +77,20 @@ export const FileTable: React.FC<FileTableProps> = ({ files, isReadonly, removeF
                 />
               </RadioGroup>
             </TableCell>
-            <TableCell className="flex items-center">
+            <TableCell className="flex items-center w-full">
               <div className="truncate">
                 <span>{truncateFileName(file.name)}</span>
                 <br />
                 <span className="text-muted-foreground">{formatSize(file.size)}</span>
               </div>
             </TableCell>
+            <TableCell className="items-center w-full">
+              <div>
+              <input type="text" className=" bg-white w-full h-10 rounded-lg border-orange-200 border-2"></input>
+              </div>
+            </TableCell>
             {!isReadonly && (
-              <TableCell className="text-center">
+              <TableCell className="text-center w-full">
                 <button
                   type="button"
                   className="text-destructive"

@@ -189,6 +189,9 @@ function ExistingPortfolioProjectCard({
                       className="object-contain"
                     />
                   )}
+                  <div className=" flex w-full content-center">
+                    <label className=" min-w-full text-center italic text-sm lg:text-base text-gray-600">{item.assets.description}</label>
+                  </div>
                 </div>
               ),
           )}
