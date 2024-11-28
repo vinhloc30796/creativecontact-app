@@ -1,43 +1,38 @@
 // File: app/(public)/(event)/register/_sections/types.ts
+import { InferSelectModel } from "drizzle-orm";
+import { eventRegistrations, eventSlots } from "@/drizzle/schema/event";
+import { IndustryType, ExperienceType } from "@/drizzle/schema/user";
 
-interface EventSlot {
-	id: string
-	created_at: string
-	time_start: string
-	time_end: string
-	capacity: number
-}
-
-export interface EventRegistration {
-	id: string
-	slot: string
-	created_at: string
-	created_by: string
-	signature: string
-	status: 'confirmed' | 'pending' | 'checked-in' | 'cancelled'
-}
+// Use schema types directly
+export type EventSlot = InferSelectModel<typeof eventSlots>;
+export type EventRegistration = InferSelectModel<typeof eventRegistrations>;
 
 export type FormData = {
-	// Contact Info
-	email: string
-	firstName: string
-	lastName: string
-	phoneCountryCode: string
-	phoneNumber: string
-	phoneCountryAlpha3: string
+  // Contact Info
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  phoneCountryAlpha3: string;
 
-	// Professional Info
-	industries: string[]
-	experience: string
+  // Professional Info
+  industryExperiences: {
+    industry: IndustryType;
+    experienceLevel: ExperienceType;
+  }[];
 
-	// Event Registration
-	slot: string
+  // Event Registration
+  slot: string;
 
-	// Social Media
-	instagramHandle?: string
-	facebookHandle?: string
+  // Social Media
+  instagramHandle?: string;
+  facebookHandle?: string;
 }
 
 export interface EventRegistrationWithSlot extends EventRegistration {
-	event_slot: EventSlot
+  event_slot: EventSlot;
+  slot_time_start: string;
+  slot_time_end: string;
+  slot_details: EventSlot;
 }

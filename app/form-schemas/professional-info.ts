@@ -1,12 +1,12 @@
-// File: app/(public)/(event)/register/_sections/formSchema.ts
-
 import { z } from "zod";
 import { industries, experienceLevels } from "@/drizzle/schema/user";
 
-// Define the schema for ProfessionalInfoStep
+// Define the schema for professional info form
 export const professionalInfoSchema = z.object({
-  industries: z.array(z.enum(industries)).min(1, { message: "Please select at least one industry" }),
-  experience: z.enum(experienceLevels),
-})
+  industryExperiences: z.array(z.object({
+    industry: z.enum(industries),
+    experienceLevel: z.enum(experienceLevels)
+  })).min(1, { message: "Please add at least one industry experience" })
+});
 
-export type ProfessionalInfoData = z.infer<typeof professionalInfoSchema>
+export type ProfessionalInfoData = z.infer<typeof professionalInfoSchema>;

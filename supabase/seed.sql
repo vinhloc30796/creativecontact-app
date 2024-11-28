@@ -176,8 +176,6 @@ INSERT INTO user_infos (
     location,
     occupation,
     about,
-    industries,
-    experience,
     profile_picture,
     instagram_handle,
     facebook_handle
@@ -193,8 +191,6 @@ INSERT INTO user_infos (
     'New York',
     'System Administrator',
     'Experienced creative technologist with a passion for integrating cutting-edge technology into artistic projects and interactive experiences.',
-    ARRAY['Software and Interactive', 'Other']::industry[],
-    'Senior'::experience_level,
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d/lukewarm._Abstract_expressionism_emerald-powered_river-dwelling_9c99d61d-cd4b-4534-8a4e-ee60d1862ed2.png',
     'admin_insta',
     'admin_fb'
@@ -210,8 +206,6 @@ INSERT INTO user_infos (
     'San Francisco',
     'Software Developer',
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
-    ARRAY['Software and Interactive']::industry[],
-    'Entry'::experience_level,
     NULL,
     'user_insta',
     'user_fb'
@@ -227,12 +221,19 @@ INSERT INTO user_infos (
     'Lam Dong, Vietnam',
     'Software Developer',
     'Passionate software developer with a focus on creative technologies, eager to innovate at the intersection of art and code.',
-    ARRAY['Software and Interactive']::industry[],
-    'Senior'::experience_level,
     '314f834c-3ff2-4382-bc92-d37cbe2286a8/lukewarm._a_river_water-elemental_lion_drawing_power_from_emera_cd875218-db8a-4ab4-afdd-a00a1a6deb49.png',
     'vl307',
     'vl307'
 );
+
+-- Seed data for user_industry_experience table
+INSERT INTO user_industry_experience (user_id, industry, experience_level) VALUES
+('7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', 'Software and Interactive', 'Senior'),
+('7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', 'Other', 'Senior'),
+('13f60da9-8dd4-42f9-8a57-c0569a158857', 'Software and Interactive', 'Entry'),
+('13f60da9-8dd4-42f9-8a57-c0569a158857', 'Film, Video, and Photography', 'Junior'),
+('314f834c-3ff2-4382-bc92-d37cbe2286a8', 'Software and Interactive', 'Senior'),
+('314f834c-3ff2-4382-bc92-d37cbe2286a8', 'Advertising', 'Mid-level');
 
 -- Seed data for events table
 INSERT INTO events (id, created_at, name, slug, created_by)
@@ -425,7 +426,8 @@ INSERT INTO artwork_assets (
     asset_type,
     created_at,
     bucket_id,
-    is_thumbnail
+    is_thumbnail,
+    description
 ) VALUES (
     '8690f354-c948-4335-b0ba-82bdc2e9ccad',
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
@@ -433,7 +435,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    true
+    true,
+    'artwork asset'
 ), (
     'ca6e7d44-d402-4cc6-9d36-691e1cfb8d87',
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
@@ -441,7 +444,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     '0e950002-4574-405b-9dff-df8fe7a3894d',
     '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
@@ -449,7 +453,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    true
+    true,
+    'artwork asset'
 ), (
     '07c90874-d851-46cf-9f8b-562e74ff3111',
     '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
@@ -457,7 +462,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     '751d51e9-675b-44ba-b2b0-daac08e30ee9',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -465,7 +471,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     'a99eaa31-f672-4194-95b2-d2848b832787',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -473,7 +480,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     'fa869ede-9390-4ad6-82b2-cc4b446d976c',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -481,7 +489,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     'eacdf935-3090-4b27-8591-8480fff4f91a',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -489,7 +498,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     '85699a87-bb54-497a-96dc-e9942dd71ff7',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -497,7 +507,8 @@ INSERT INTO artwork_assets (
     'video',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    true
+    true,
+    'artwork asset'
 );
 
 -- Seed contacts table
