@@ -2,11 +2,11 @@
 import { languages } from "@/lib/i18n/settings"
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
-import React from 'react'
+import dynamic from 'next/dynamic'
+import React, { Suspense } from 'react'
 import { plusJakartaSans } from './fonts'
 import './globals.css'
 import Providers from './providers'
-import dynamic from 'next/dynamic'
 
 export const metadata: Metadata = {
   title: 'Creative Contact',
@@ -33,7 +33,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
         <Providers>
           {children}
-          <PostHogPageView />
         </Providers>
       </body>
     </html>

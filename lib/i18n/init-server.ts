@@ -4,6 +4,7 @@ import HttpBackend from 'i18next-http-backend';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { initReactI18next } from 'react-i18next/initReactI18next';
 import { buildResources, getOptions } from './settings';
+import { cache } from 'react'
 
 const hostUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
@@ -13,7 +14,8 @@ interface I18nOptions {
   options?: any
 }
 
-const initI18next = async ({ lng, ns, options }: I18nOptions) => {
+// Cache the i18next instance initialization
+const initI18next = cache(async ({ lng, ns, options }: I18nOptions) => {
   const i18nInstance = createInstance()
   await i18nInstance
     .use(initReactI18next)
@@ -38,17 +40,18 @@ const initI18next = async ({ lng, ns, options }: I18nOptions) => {
       ...options
     })
   return i18nInstance
-}
+})
 
 interface UseTranslationOptions {
   keyPrefix?: string
 }
 
-export async function useTranslation(lng: string, ns: string | string[], options: UseTranslationOptions = {}) {
+// Cache the translation hook
+export const useTranslation = cache(async (lng: string, ns: string | string[], options: UseTranslationOptions = {}) => {
   console.debug("useTranslation: initI18next", lng, ns, options)
   const i18nextInstance = await initI18next({ lng, ns, options })
   return {
     t: i18nextInstance.getFixedT(lng, Array.isArray(ns) ? ns[0] : ns, options.keyPrefix),
     i18n: i18nextInstance
   }
-}
+})

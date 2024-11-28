@@ -17,7 +17,12 @@ const nextConfig = {
     });
 
     return config;
-  }
+  },
+  // Add proper i18n configuration
+  i18n: {
+    locales: ['en', 'vi'],
+    defaultLocale: 'en',
+  },
 };
 
 if (process.env.NODE_ENV === 'development') {

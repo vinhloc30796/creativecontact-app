@@ -140,6 +140,9 @@ importers:
       i18next-http-backend:
         specifier: ^2.6.1
         version: 2.6.1
+      i18next-http-middleware:
+        specifier: ^3.7.0
+        version: 3.7.0
       i18next-resources-to-backend:
         specifier: ^1.2.1
         version: 1.2.1
@@ -3617,6 +3620,9 @@ packages:
 
   i18next-http-backend@2.6.1:
     resolution: {integrity: sha512-rCilMAnlEQNeKOZY1+x8wLM5IpYOj10guGvEpeC59tNjj6MMreLIjIW8D1RclhD3ifLwn6d/Y9HEM1RUE6DSog==}
+
+  i18next-http-middleware@3.7.0:
+    resolution: {integrity: sha512-QzzOwQp1NKtN2q50419vJoR4jePjEzlOverBWZvUDCznHWt/rYTNQCNk1j1zdUnnHCfHxmAMHrfn9YNDc0TB5g==}
 
   i18next-resources-to-backend@1.2.1:
     resolution: {integrity: sha512-okHbVA+HZ7n1/76MsfhPqDou0fptl2dAlhRDu2ideXloRRduzHsqDOznJBef+R3DFZnbvWoBW+KxJ7fnFjd6Yw==}
@@ -8624,6 +8630,8 @@ snapshots:
       cross-fetch: 4.0.0
     transitivePeerDependencies:
       - encoding
+
+  i18next-http-middleware@3.7.0: {}
 
   i18next-resources-to-backend@1.2.1:
     dependencies:

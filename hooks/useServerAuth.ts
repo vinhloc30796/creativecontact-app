@@ -1,9 +1,8 @@
-"use server";
-
 import { checkUserIsAnonymous } from '@/app/actions/user/auth';
 import { createClient } from '@/utils/supabase/server';
+import { cache } from 'react';
 
-export async function useServerAuth() {
+export const useServerAuth = cache(async () => {
   const supabase = await createClient();
 
   const {
@@ -12,7 +11,9 @@ export async function useServerAuth() {
 
   let isAnonymous = true;
   if (session?.user) {
-    isAnonymous = session.user.email ? await checkUserIsAnonymous(session.user.email) ?? true : true;
+    isAnonymous = session.user.email ? 
+      await checkUserIsAnonymous(session.user.email) ?? true : 
+      true;
   }
 
   return {
@@ -20,4 +21,4 @@ export async function useServerAuth() {
     isLoggedIn: !!session?.user,
     isAnonymous,
   };
-}
+});

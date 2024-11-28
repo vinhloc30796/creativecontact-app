@@ -5,17 +5,15 @@ export async function GET(
   request: Request,
   { params }: { params: { eventSlug: string } }
 ) {
+  if (!params || !params.eventSlug) {
+    return NextResponse.json(
+      { error: "Event slug is required" },
+      { status: 400 }
+    );
+  }
   try {
-    // Extract eventSlug from URL
-    const url = new URL(request.url);
-    const eventSlug = url.searchParams.get("eventSlug");
-
-    if (!eventSlug) {
-      return NextResponse.json(
-        { error: "Event slug is required" },
-        { status: 400 }
-      );
-    }
+    // Get eventSlug from params instead of URL to avoid dynamic usage
+    const eventSlug = params.eventSlug;
 
     // Fetch event artworks using helper function
     const eventArtworks = await fetchEventArtworks(eventSlug);

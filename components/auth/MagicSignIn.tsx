@@ -20,6 +20,7 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   // I18n
   const { t } = useTranslation('MagicSignIn');
+  const redirectTo = purpose === 'checkin' ? '/checkin' : '/';
 
   // Effects
   useEffect(() => {
@@ -40,30 +41,11 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
     }
   }, []);
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (magicLinkSent && countdown > 0) {
-      timer = setInterval(() => {
-        setCountdown((prevCountdown) => {
-          const newCountdown = prevCountdown - 1;
-          localStorage.setItem('magicLinkCountdown', newCountdown.toString());
-          localStorage.setItem('magicLinkTimestamp', Date.now().toString());
-          return newCountdown;
-        });
-      }, 1000);
-    } else if (countdown === 0) {
-      setMagicLinkSent(false);
-      localStorage.removeItem('magicLinkCountdown');
-      localStorage.removeItem('magicLinkTimestamp');
-    }
-    return () => clearInterval(timer);
-  }, [magicLinkSent, countdown]);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await handleMagicLinkRequest(e, email, setMagicLinkSent);
+      await handleMagicLinkRequest(e, email, setMagicLinkSent, redirectTo);
       setCountdown(60);
       localStorage.setItem('magicLinkCountdown', '60');
       localStorage.setItem('magicLinkTimestamp', Date.now().toString());
