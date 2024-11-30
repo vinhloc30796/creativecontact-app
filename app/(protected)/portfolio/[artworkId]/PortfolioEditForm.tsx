@@ -134,8 +134,9 @@ export default function PortfolioEditForm({
               className="flex flex-col space-y-8"
             >
               <div className="flex flex-col space-y-4">
-                {/* <ArtworkInfoStep
+                <ArtworkInfoStep
                   form={form as any}
+                  artworksCount={artworkWithAssets?.length || 0}
                   artworks={
                     artwork?.artworks
                       ? [
@@ -146,11 +147,6 @@ export default function PortfolioEditForm({
                         ]
                       : []
                   }
-                /> */}
-
-                <ArtworkInfoStep
-                  form={form as any}
-                  artworksCount={artworkWithAssets?.length || 0}
                 />
 
                 {pendingFiles.length > 0 && (

@@ -29,7 +29,8 @@ import { Trans, useTranslation } from "react-i18next";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 interface ArtworkInfoStepProps {
-  artworksCount: number;
+  artworksCount?: number;
+  artworks: ArtworkInfoData[];
   form: UseFormReturn<{
     id: string;
     title: string;
@@ -37,7 +38,7 @@ interface ArtworkInfoStepProps {
   }>;
 }
 
-/* function ExistingArtworkSidepane({
+function ExistingArtworkSidepane({
   artworks,
   isOpen,
   setIsOpen,
@@ -96,7 +97,7 @@ interface ArtworkInfoStepProps {
       </SheetContent>
     </Sheet>
   );
-} */
+}
 
 export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
   // State
@@ -105,7 +106,7 @@ export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
   // I18n
   const { t } = useTranslation(["ArtworkInfoStep"]);
 
-  /*   const {
+  const {
     data: fetchedArtworks,
     isLoading,
     error,
@@ -130,7 +131,7 @@ export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
     },
     enabled: !!user?.id,
   });
- */
+
   return (
     <>
       <FormField
@@ -159,7 +160,7 @@ export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
           </FormItem>
         )}
       />
-      {/* {isLoading && (
+      {isLoading && (
         <div className="flex items-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-muted-foreground">
@@ -167,9 +168,9 @@ export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
           </span>
         </div>
       )}
-      {error && <p>{t("ExistingArtworkSelector.error")}</p>} */}
+      {error && <p>{t("ExistingArtworkSelector.error")}</p>}
 
-      {/* {fetchedArtworks && (
+      {fetchedArtworks && !artworksCount && (
         <>
           <div className="mb-2 mt-4">
             {fetchedArtworks.length > 0 ? (
@@ -199,9 +200,9 @@ export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
             setIsOpen={setIsOpen}
           />
         </>
-      )} */}
+      )}
 
-      {artworksCount > 0 ? (
+      {artworksCount && artworksCount > 0 ? (
         <div className="mb-2 mt-4">
           <div className="flex items-center">
             <p className="text-sm">

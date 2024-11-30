@@ -65,7 +65,7 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
         <CardHeader>
           <h3 className="mb-4 text-lg font-medium">Project Info</h3>
           <FormProvider {...artworkForm}>
-            <ArtworkInfoStep form={artworkForm} artworksCount={0} />
+            <ArtworkInfoStep form={artworkForm} artworks={[]} />
           </FormProvider>
         </CardHeader>
 
