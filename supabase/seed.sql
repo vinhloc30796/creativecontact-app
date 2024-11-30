@@ -131,7 +131,7 @@ INSERT INTO auth.users (
     '314f834c-3ff2-4382-bc92-d37cbe2286a8',                             -- id
     'authenticated',                                                    -- aud
     'authenticated',                                                    -- role
-    'vinhloc30796@gmail.com',                                           -- email
+    'letrunghoahieu@gmail.com',                                           -- email
     '',                                                                 -- encrypted_password
     '2024-07-31 13:29:02.204237+00',                                    -- email_confirmed_at
     NULL,                                                               -- invited_at
