@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Configure remote image patterns for Supabase storage
   images: {
     remotePatterns: [
       {
@@ -10,12 +11,18 @@ const nextConfig = {
       },
     ],
   },
+  // Configure webpack to handle SVG files
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ["@svgr/webpack"]
+      use: [{
+        loader: '@svgr/webpack',
+        options: {
+          typescript: true,
+          dimensions: false
+        }
+      }]
     });
-
     return config;
   },
   // Add proper i18n configuration
@@ -25,6 +32,7 @@ const nextConfig = {
   },
 };
 
+// Add development environment specific configuration
 if (process.env.NODE_ENV === 'development') {
   nextConfig.images.remotePatterns.push({
     protocol: 'http',

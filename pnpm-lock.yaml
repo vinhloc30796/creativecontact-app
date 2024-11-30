@@ -86,9 +86,6 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.45.3
         version: 2.45.3
-      '@svgr/webpack':
-        specifier: ^8.1.0
-        version: 8.1.0(typescript@5.3.3)
       '@tanstack/react-query':
         specifier: ^5.54.1
         version: 5.54.1(react@18.2.0)
@@ -219,6 +216,9 @@ importers:
       '@formatjs/cli':
         specifier: ^6.2.12
         version: 6.2.12
+      '@svgr/webpack':
+        specifier: ^8.1.0
+        version: 8.1.0(typescript@5.3.3)
       '@tanstack/eslint-plugin-query':
         specifier: ^5.53.0
         version: 5.53.0(eslint@8.57.0)(typescript@5.3.3)
