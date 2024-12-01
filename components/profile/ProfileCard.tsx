@@ -5,6 +5,7 @@
 // External imports
 import { useTranslation } from "@/lib/i18n/init-client";
 import { useQuery } from "@tanstack/react-query";
+import { Suspense, use } from "react";
 
 // API imports
 import { UserData } from "@/app/types/UserInfo";
@@ -91,14 +92,14 @@ function SocialSubsection({ userData, lang = "en" }: { userData?: UserData, lang
 
 interface ProfileCardProps {
   userData: UserData;
-  portfolioArtworks: PortfolioArtworkWithDetails[];
+  portfolioArtworksPromise: Promise<PortfolioArtworkWithDetails[]>;
   showButtons?: boolean;
   lang?: string;
 }
 
 export function ProfileCard({
   userData,
-  portfolioArtworks,
+  portfolioArtworksPromise,
   showButtons = false,
   lang = "en",
 }: ProfileCardProps) {
@@ -117,6 +118,8 @@ export function ProfileCard({
     queryFn: () => getUserSkills(userData.id),
   });
   const phoneNumber = getFormattedPhoneNumber(userData);
+
+  const portfolioArtworks = use(portfolioArtworksPromise);
 
   return (
     <Card className="flex h-fit flex-col overflow-auto">

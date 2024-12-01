@@ -57,20 +57,11 @@ export default async function ProfilePage({
     );
   }
 
-  // Pre-fetch all data in parallel at the server level
-  const [userDataResult, portfolioArtworksResult] =
-    await Promise.allSettled([
-      fetchUserData(user.id),
-      fetchUserPortfolioArtworksWithDetails(user.id),
-    ]);
-
-  // Handle errors for each promise separately
-  const userData =
-    userDataResult.status === "fulfilled" ? userDataResult.value : null;
-  const portfolioArtworks =
-    portfolioArtworksResult.status === "fulfilled"
-      ? portfolioArtworksResult.value
-      : [];
+  // Get user data synchronously as it's needed for the layout
+  const userData = await fetchUserData(user.id);
+  
+  // Create the promise but don't await it
+  const portfolioArtworksPromise = fetchUserPortfolioArtworksWithDetails(user.id);
 
   return (
     <BackgroundDiv>
@@ -105,17 +96,13 @@ export default async function ProfilePage({
                     </TabsContent>
 
                     <TabsContent value="portfolio">
-                      {portfolioArtworksResult.status === "rejected" || !userData ? (
-                        <ErrorPortfolioProjectCard lang={lang} />
-                      ) : (
-                        <ErrorBoundary fallback={<ErrorPortfolioProjectCard lang={lang} />}>
-                          <PortfolioSection
-                            userData={userData}
-                            portfolioArtworks={portfolioArtworks}
-                            lang={lang}
-                          />
-                        </ErrorBoundary>
-                      )}
+                      <ErrorBoundary fallback={<ErrorPortfolioProjectCard lang={lang} />}>
+                        <PortfolioSection
+                          userData={userData}
+                          portfolioArtworksPromise={portfolioArtworksPromise}
+                          lang={lang}
+                        />
+                      </ErrorBoundary>
                     </TabsContent>
                   </Tabs>
                 </div>
@@ -129,16 +116,14 @@ export default async function ProfilePage({
                 )}
               >
                 <Suspense fallback={<ProfileCardSkeleton />}>
-                  {portfolioArtworksResult.status === "rejected" || !userData ? (
-                    <ErrorProfileCard lang={lang} />
+                  {userData ? (
+                    <ProfileCard
+                      userData={userData}
+                      portfolioArtworksPromise={portfolioArtworksPromise}
+                      lang={lang}
+                    />
                   ) : (
-                    <ErrorBoundary fallback={<ErrorProfileCard lang={lang} />}>
-                      <ProfileCard
-                        userData={userData}
-                        portfolioArtworks={portfolioArtworks}
-                        lang={lang}
-                      />
-                    </ErrorBoundary>
+                    <ErrorProfileCard lang={lang} />
                   )}
                 </Suspense>
               </div>
