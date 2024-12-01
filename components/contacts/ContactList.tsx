@@ -10,14 +10,14 @@ import { useMemo } from 'react';
 import { ContactListSkeleton } from './ContactListSkeleton';
 
 interface ContactListProps {
-  contactsPromise: Promise<UserData[]>;
+  initialContacts: UserData[];
   lang: string;
 }
 
-export function ContactList({ contactsPromise, lang }: ContactListProps) {
-  const { data: contacts, isLoading } = useQuery<UserData[]>({
+export function ContactList({ initialContacts, lang }: ContactListProps) {
+  const { data: contacts } = useQuery<UserData[]>({
     queryKey: ['contacts'],
-    queryFn: () => contactsPromise,
+    initialData: initialContacts,
     staleTime: 30000,
     gcTime: 5 * 60 * 1000
   });
@@ -25,8 +25,6 @@ export function ContactList({ contactsPromise, lang }: ContactListProps) {
   const emptyState = useMemo(() => (
     <EmptyContactCard lang={lang} />
   ), [lang]);
-
-  if (isLoading) return <ContactListSkeleton />;
 
   return !contacts || contacts.length === 0 ? emptyState : (
     contacts.map((contact) => (
