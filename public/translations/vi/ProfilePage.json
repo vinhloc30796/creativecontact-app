@@ -71,6 +71,9 @@
     "artists": "Nghệ sĩ",
     "noArtists": "Chưa có nghệ sĩ",
     "media": "Media",
-    "loadingProject": "Đang tải dự án..."
+    "loadingProject": "Đang tải dự án...",
+    "errorLoadingProjects": "Lỗi Tải Dự án",
+    "tryAgainLater": "Đã xảy ra lỗi khi tải dự án của bạn. Vui lòng thử lại sau.",
+    "retry": "Thử lại"
   }
 }
