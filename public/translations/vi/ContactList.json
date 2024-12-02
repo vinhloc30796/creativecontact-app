@@ -1,5 +1,6 @@
 {
-  "errorLoadingContacts": "Lỗi Tải Danh bạ",
+  "errorLoadingContacts": "Lỗi Tải Danh Bạ",
   "tryAgainLater": "Đã xảy ra lỗi khi tải danh bạ của bạn. Vui lòng thử lại sau.",
-  "retry": "Thử lại"
+  "retry": "Thử lại",
+  "noUserError": "Không thể tải thông tin người dùng. Vui lòng đăng nhập lại."
 } 

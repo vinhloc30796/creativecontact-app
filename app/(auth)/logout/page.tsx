@@ -6,8 +6,18 @@ import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useTranslation } from "@/lib/i18n/init-client";
 
-export default function LogoutPage() {
+interface LogoutPageProps {
+  params: {};
+  searchParams: {
+    lang?: string;
+  };
+}
+
+export default function LogoutPage({ searchParams }: LogoutPageProps) {
+  const lang = searchParams.lang || "en";
+  const { t } = useTranslation(lang, "LogoutPage");
   const router = useRouter();
 
   const logoutMutation = useMutation({
@@ -27,14 +37,12 @@ export default function LogoutPage() {
       return response;
     },
     onSuccess: () => {
-      // Redirect after 5 seconds
       setTimeout(() => {
         router.push("/");
       }, 5000);
     },
     onError: (error) => {
       console.error("Error during logout:", error);
-      // Redirect after 5 seconds
       setTimeout(() => {
         router.push("/");
       }, 5000);
@@ -52,12 +60,12 @@ export default function LogoutPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin" />
-              Logging Out
+              {t("states.pending.title")}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
             <p className="text-center text-muted-foreground">
-              Please wait while we sign you out...
+              {t("states.pending.description")}
             </p>
           </CardContent>
         </Card>
@@ -72,18 +80,18 @@ export default function LogoutPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2 text-destructive">
               <AlertCircle className="h-5 w-5" />
-              Logout Error
+              {t("states.error.title")}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center gap-4">
             <p className="text-center text-muted-foreground">
-              There was an error signing you out.
+              {t("states.error.description")}
             </p>
             <Button onClick={() => router.push("/")}>
-              Return to Home
+              {t("states.error.returnHome")}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Redirecting in 5 seconds...
+              {t("states.error.redirecting")}
             </p>
           </CardContent>
         </Card>
@@ -97,18 +105,18 @@ export default function LogoutPage() {
         <CardHeader>
           <CardTitle className="flex items-center justify-center gap-2 text-green-600">
             <CheckCircle className="h-5 w-5" />
-            Logged Out Successfully
+            {t("states.success.title")}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
           <p className="text-center text-muted-foreground">
-            You have been successfully signed out.
+            {t("states.success.description")}
           </p>
           <Button onClick={() => router.push("/")}>
-            Return to Home
+            {t("states.success.returnHome")}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Redirecting in 5 seconds...
+            {t("states.success.redirecting")}
           </p>
         </CardContent>
       </Card>

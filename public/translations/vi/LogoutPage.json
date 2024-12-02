@@ -1,0 +1,20 @@
+{
+  "states": {
+    "pending": {
+      "title": "Đang Đăng xuất",
+      "description": "Vui lòng đợi trong khi chúng tôi đăng xuất tài khoản của bạn..."
+    },
+    "error": {
+      "title": "Lỗi Đăng xuất",
+      "description": "Đã xảy ra lỗi khi đăng xuất.",
+      "returnHome": "Trở về Trang Chủ",
+      "redirecting": "Chuyển hướng trong 5 giây..."
+    },
+    "success": {
+      "title": "Đăng xuất Thành công",
+      "description": "Bạn đã đăng xuất thành công.",
+      "returnHome": "Trở về Trang Chủ",
+      "redirecting": "Chuyển hướng trong 5 giây..."
+    }
+  }
+} 
