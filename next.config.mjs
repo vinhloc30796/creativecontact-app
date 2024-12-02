@@ -1,3 +1,6 @@
+const imageHost = process.env.NEXT_PUBLIC_SUPABASE_URL || '127.0.0.1:54321';
+console.log('[next.config.mjs] imageHost:', imageHost);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configure remote image patterns for Supabase storage
@@ -5,8 +8,14 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('https://', ''),
+        hostname: imageHost.replace(/^https?:\/\//, '').split(':')[0],
         port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'http',
+        hostname: imageHost.replace(/^https?:\/\//, '').split(':')[0],
+        port: '54321',
         pathname: '/storage/v1/object/public/**',
       },
     ],
@@ -31,15 +40,5 @@ const nextConfig = {
     defaultLocale: 'en',
   },
 };
-
-// Add development environment specific configuration
-if (process.env.NODE_ENV === 'development') {
-  nextConfig.images.remotePatterns.push({
-    protocol: 'http',
-    hostname: '127.0.0.1',
-    port: '54321',
-    pathname: '/storage/v1/object/public/**',
-  });
-}
 
 export default nextConfig;

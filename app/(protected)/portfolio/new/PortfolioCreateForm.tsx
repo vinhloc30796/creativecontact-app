@@ -4,7 +4,8 @@ import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
-import { CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ArtworkProvider } from "@/contexts/ArtworkContext";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
@@ -27,7 +28,6 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
   // Initialize artwork form
   const artworkForm = useForm<ArtworkInfoData>({
     defaultValues: {
-      id: projectId,
       title: "",
       description: "",
     },
@@ -62,27 +62,40 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
   return (
     <ArtworkProvider>
       <ThumbnailProvider>
-        <CardHeader>
-          <h3 className="mb-4 text-lg font-medium">Project Info</h3>
-          <FormProvider {...artworkForm}>
-            <ArtworkInfoStep form={artworkForm} artworks={[]} />
-          </FormProvider>
-        </CardHeader>
+        <div className="h-full w-full">
+          <CardHeader>
+            <h3 className="mb-4 text-lg font-medium">Project Info</h3>
+            <FormProvider {...artworkForm}>
+              <ArtworkInfoStep form={artworkForm} artworks={[]} />
+            </FormProvider>
+          </CardHeader>
 
-        <CardContent className="space-y-6 p-6">
-          <h3 className="mb-4 text-lg font-medium">Project Media</h3>
-          <MediaUpload
-            isNewArtwork={true}
-            emailLink="/contact"
-            onPendingFilesUpdate={handlePendingFilesUpdate}
-          />
-        </CardContent>
+          <CardContent className="space-y-6 p-6">
 
-        <CardFooter className="flex flex-col items-start gap-4 p-6">
-          <h3 className="mb-4 text-lg font-medium">Project Credits</h3>
-          <FormProvider {...artworkCreditForm}>
-            <ArtworkCreditInfoStep form={artworkCreditForm} />
-          </FormProvider>
+          </CardContent>
+        </div>
+
+        <CardFooter className="max-w-xl flex flex-col justify-between gap-4 p-6">
+          <div className="container">
+            <h3 className="mb-4 text-lg font-medium">Project Credits</h3>
+            <FormProvider {...artworkCreditForm}>
+              <ArtworkCreditInfoStep form={artworkCreditForm} />
+            </FormProvider>
+          </div>
+          <div className="container">
+            <h3 className="mb-4 text-lg font-medium">Project Media</h3>
+            <MediaUpload
+              isNewArtwork={true}
+              emailLink="/contact"
+              onPendingFilesUpdate={handlePendingFilesUpdate}
+            />
+          </div>
+
+          <div className="container flex flex-col lg:gap-1">
+            <Button className="rounded-full">Save</Button>
+            <Button className="rounded-full">Save</Button>
+            <Button className="rounded-full">Save</Button>
+          </div>
         </CardFooter>
       </ThumbnailProvider>
     </ArtworkProvider>

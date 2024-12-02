@@ -71,6 +71,9 @@
     "artists": "Artists",
     "noArtists": "No artists provided",
     "media": "Media",
-    "loadingProject": "Loading project..."
+    "loadingProject": "Loading project...",
+    "errorLoadingProjects": "Error Loading Projects",
+    "tryAgainLater": "There was an error loading your projects. Please try again later.",
+    "retry": "Retry"
   }
 }

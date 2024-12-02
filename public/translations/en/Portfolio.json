@@ -8,5 +8,21 @@
   "creditInfo": "Credit Info",
   "cancel": "Cancel",
   "create": "Create",
-  "save": "Save"
+  "save": "Save",
+  "form": {
+    "submit": {
+      "create": "Create Project",
+      "submitting": "Creating project..."
+    },
+    "toast": {
+      "success": {
+        "title": "Success",
+        "description": "Project created successfully"
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to create project"
+      }
+    }
+  }
 }
