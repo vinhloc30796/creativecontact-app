@@ -1,15 +1,10 @@
 // File: app/(protected)/profile/page.tsx
 
-"use server";
-
 // API imports
-import { fetchUserContacts } from "@/app/api/user/[id]/contacts/helper";
 import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
 import { fetchUserData } from "@/app/api/user/helper";
-import { UserData } from "@/app/types/UserInfo";
 
 // UI imports
-import { ErrorMessage } from "@/components/ErrorMessage";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -17,22 +12,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
 
-// Schema imports
-import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
-
 // Hook imports
 import { useServerAuth } from "@/hooks/useServerAuth";
 import { useTranslation } from "@/lib/i18n/init-server";
-
-// Next.js imports
-import { redirect } from "next/navigation";
-import { Suspense } from "react";
-
-// Local component import
-import { ContactList } from "@/components/contacts/ContactList";
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
+
+// Next.js imports
+import { Suspense } from "react";
+// Local component import
+import { ContactList } from "@/components/contacts/ContactList";
+import { ErrorContactCard } from "@/components/contacts/ErrorContactCard";
+import { ProfileCardSkeleton } from "@/components/profile/ProfileCardSkeleton";
+import ErrorBoundary from "@/components/wrappers/ErrorBoundary";
+import AnonymousProfilePage from "./AnonymousProfilePage";
+import { ErrorPortfolioProjectCard } from "./ErrorPortfolioProjectCard";
+import { ErrorProfileCard } from "./ErrorProfileCard";
 import PortfolioSection from "./PortfolioSection";
+import { ContactListSkeleton } from "@/components/contacts/ContactListSkeleton";
 
 interface ProfilePageProps {
   params: {};
@@ -41,72 +38,33 @@ interface ProfilePageProps {
   };
 }
 
-interface UserSkills {
-  id: number;
-  name: string;
-}
-
-async function getUserSkills(userId?: string): Promise<UserSkills[]> {
-  // TODO: Implement actual skill fetching logic
-  // This is a placeholder implementation
-  return [
-    { id: 1, name: "JavaScript" },
-    { id: 2, name: "React" },
-    { id: 3, name: "Node.js" },
-    { id: 4, name: "TypeScript" },
-    { id: 5, name: "GraphQL" },
-  ];
-}
-
 export default async function ProfilePage({
   params,
   searchParams,
 }: ProfilePageProps) {
-  // User
   const lang = searchParams.lang || "en";
   const { t } = await useTranslation(lang, "ProfilePage");
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
-  // Cookies
-  const cookieStore = cookies();
-  const errorMessage = cookieStore.get("error_message")?.value;
 
-  if (!isLoggedIn || isAnonymous || !user?.id) {
-    redirect("/login");
+  // Early return for anonymous users
+  if (!isLoggedIn || !user?.id) {
+    return (
+      <AnonymousProfilePage
+        lang={lang}
+        isLoggedIn={isLoggedIn}
+        errorMessage={cookies().get("error_message")?.value}
+      />
+    );
   }
 
-  // Add null checks before fetching
-  let userData: UserData | null = null;
-  let portfolioArtworks: PortfolioArtworkWithDetails[] = [];
-  try {
-    const [userDataResult, portfolioArtworksResult] = await Promise.allSettled([
-      fetchUserData(user.id),
-      fetchUserPortfolioArtworksWithDetails(user.id),
-    ]);
-
-    if (userDataResult.status === "fulfilled" && userDataResult.value) {
-      userData = userDataResult.value;
-    } else {
-      console.error("Error fetching user data:", 
-        userDataResult.status === "rejected" ? userDataResult.reason : "No data returned");
-    }
-
-    if (portfolioArtworksResult.status === "fulfilled") {
-      portfolioArtworks = portfolioArtworksResult.value || [];
-    } else {
-      console.error("Error fetching portfolio artworks:", portfolioArtworksResult.reason);
-    }
-  } catch (error) {
-    console.error("Error in data fetching:", error);
-  }
-
-  // Fetch user skills
-  const userSkills = await getUserSkills(userData?.id);
+  // Get user data synchronously as it's needed for the layout
+  const userData = await fetchUserData(user.id);
+  
+  // Create the promise but don't await it
+  const portfolioArtworksPromise = fetchUserPortfolioArtworksWithDetails(user.id);
 
   return (
     <BackgroundDiv>
-      <Suspense fallback={null}>
-        {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
-      </Suspense>
       <div className="flex min-h-screen w-full flex-col">
         <UserHeader
           lang={lang}
@@ -121,66 +79,54 @@ export default async function ProfilePage({
                   <Tabs defaultValue="contacts">
                     <TabsList>
                       <TabsTrigger value="contacts">
-                        {t("contacts")}
+                        {t("contactsHeader")}
                       </TabsTrigger>
                       <TabsTrigger value="portfolio">
-                        {t("portfolio")}
+                        {t("portfolioHeader")}
                       </TabsTrigger>
                     </TabsList>
-
                     <TabsContent value="contacts">
-                      <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-                        {userData && (
-                          <Suspense fallback={<div>Loading contacts...</div>}>
-                            <ContactList userId={userData.id} lang={lang} />
-                          </Suspense>
-                        )}
-                      </div>
+                      <ErrorBoundary fallback={<ErrorContactCard lang={lang} />}>
+                        <Suspense fallback={<ContactListSkeleton />}>
+                          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+                            <ContactList userId={user.id} lang={lang} />
+                          </div>
+                        </Suspense>
+                      </ErrorBoundary>
                     </TabsContent>
 
                     <TabsContent value="portfolio">
-                      {userData && (
-                        <Suspense fallback={<div>Loading portfolio...</div>}>
-                          <PortfolioSection
-                            userData={userData}
-                            lang={lang}
-                            existingPortfolioArtworks={
-                              portfolioArtworks as PortfolioArtworkWithDetails[]
-                            }
-                          />
-                        </Suspense>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="activity">
-                      <div>Activity content coming soon...</div>
-                    </TabsContent>
-
-                    <TabsContent value="settings">
-                      <div>Settings content coming soon...</div>
+                      <ErrorBoundary fallback={<ErrorPortfolioProjectCard lang={lang} />}>
+                        <PortfolioSection
+                          userData={userData}
+                          portfolioArtworksPromise={portfolioArtworksPromise}
+                          lang={lang}
+                        />
+                      </ErrorBoundary>
                     </TabsContent>
                   </Tabs>
                 </div>
               </div>
-              {userData && (
-                <div
-                  className={cn(
-                    // Mobile styles
-                    "mt-6 w-full",
-                    // Set max height and enable scrolling
-                    "max-h-[calc(100vh-225px)] overflow-y-scroll",
-                    // Desktop styles
-                    "lg:mt-0 lg:w-1/3 lg:pl-6",
+
+              <div
+                className={cn(
+                  "mt-6 w-full",
+                  "max-h-[calc(100vh-225px)] overflow-y-scroll", 
+                  "lg:mt-0 lg:w-1/3 lg:pl-6",
+                )}
+              >
+                <Suspense fallback={<ProfileCardSkeleton />}>
+                  {userData ? (
+                    <ProfileCard
+                      userData={userData}
+                      portfolioArtworksPromise={portfolioArtworksPromise}
+                      lang={lang}
+                    />
+                  ) : (
+                    <ErrorProfileCard lang={lang} />
                   )}
-                >
-                  <ProfileCard
-                    t={t}
-                    userData={userData}
-                    userSkills={userSkills}
-                    portfolioArtworks={portfolioArtworks}
-                  />
-                </div>
-              )}
+                </Suspense>
+              </div>
             </div>
           </div>
         </main>

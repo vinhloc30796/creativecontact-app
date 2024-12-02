@@ -3,25 +3,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleStaffAccess } from '@/utils/middleware/staff-access';
 import { handleLangPersist } from '@/utils/middleware/lang-persist';
+import { handleI18n } from '@/utils/middleware/i18n-middleware';
 
 export async function middleware(req: NextRequest) {
+  // Skip middleware for auth-related routes and static files
+  if (
+    req.nextUrl.pathname.startsWith('/auth') ||
+    req.nextUrl.pathname.startsWith('/login') ||
+    req.nextUrl.pathname.startsWith('/_next') ||
+    req.nextUrl.pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
   console.log("Middleware called for:", req.nextUrl.toString());
 
   try {
-    // First, attempt to handle staff access
+    // Handle staff access
     const staffResponse = await handleStaffAccess(req);
-    
-    // If staffResponse is not the default next response and it's a rewrite or redirect, return it
     if (staffResponse && staffResponse !== NextResponse.next() && 
         (staffResponse.headers.get("x-middleware-rewrite") || staffResponse.headers.get("Location"))) {
-      console.log("Staff access handled, returning early");
       return staffResponse;
     }
     
-    // In all other cases, including when handleStaffAccess returns NextResponse.next(),
-    // we want to handle language persistence
-    console.debug("Proceeding to lang persist");
-    return handleLangPersist(req);
+    // Handle i18n
+    // const i18nResponse = await handleI18n(req);
+    // if (i18nResponse !== NextResponse.next()) {
+    //   return i18nResponse;
+    // }
   } catch (error) {
     console.error("Error in middleware:", error);
     return NextResponse.next();

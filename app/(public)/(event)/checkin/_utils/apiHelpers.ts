@@ -71,14 +71,16 @@ export async function handleCheckin(
 export async function handleMagicLinkRequest(
   e: React.FormEvent<HTMLFormElement>,
   email: string,
-  setMagicLinkSent: SetMagicLinkSent
+  setMagicLinkSent: SetMagicLinkSent,
+  redirectTo?: string,
 ): Promise<void> {
   e.preventDefault();
   try {
+    const body = { email, redirectTo };
     const response = await fetch('/api/magic-link', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {

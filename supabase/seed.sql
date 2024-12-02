@@ -426,7 +426,8 @@ INSERT INTO artwork_assets (
     asset_type,
     created_at,
     bucket_id,
-    is_thumbnail
+    is_thumbnail,
+    description
 ) VALUES (
     '8690f354-c948-4335-b0ba-82bdc2e9ccad',
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
@@ -434,7 +435,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    true
+    true,
+    'artwork asset'
 ), (
     'ca6e7d44-d402-4cc6-9d36-691e1cfb8d87',
     'b6f0f651-c954-4c88-8486-2d1d5b0a4b1c',
@@ -442,7 +444,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     '0e950002-4574-405b-9dff-df8fe7a3894d',
     '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
@@ -450,7 +453,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    true
+    true,
+    'artwork asset'
 ), (
     '07c90874-d851-46cf-9f8b-562e74ff3111',
     '247dbc2a-3d80-49f6-83db-6a6ae3497b2a',
@@ -458,7 +462,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     '751d51e9-675b-44ba-b2b0-daac08e30ee9',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -466,7 +471,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     'a99eaa31-f672-4194-95b2-d2848b832787',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -474,7 +480,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     'fa869ede-9390-4ad6-82b2-cc4b446d976c',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -482,7 +489,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     'eacdf935-3090-4b27-8591-8480fff4f91a',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -490,7 +498,8 @@ INSERT INTO artwork_assets (
     'image',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    false
+    false,
+    'artwork asset'
 ), (
     '85699a87-bb54-497a-96dc-e9942dd71ff7',
     '3197dbc5-711d-4c84-8db2-6ac20a2ded25',
@@ -498,7 +507,8 @@ INSERT INTO artwork_assets (
     'video',
     CURRENT_TIMESTAMP,
     'artwork_assets',
-    true
+    true,
+    'artwork asset'
 );
 
 -- Seed contacts table

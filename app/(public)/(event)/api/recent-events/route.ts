@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { fetchRecentEvents } from "./helper";
 
-export async function GET(request: Request) {
-  try {
-    // Extract limit from URL query params if provided
-    const url = new URL(request.url);
-    const limit = url.searchParams.get("limit");
-    const limitNum = limit ? parseInt(limit) : 5;
+// Set a default limit of 5 events
+const DEFAULT_LIMIT = 5;
 
-    // Fetch recent events using helper function
-    const recentEvents = await fetchRecentEvents(limitNum);
+export async function GET() {
+  try {
+    // Fetch recent events using helper function with default limit
+    const recentEvents = await fetchRecentEvents(DEFAULT_LIMIT);
 
     // Return successful response with recent events data
     return NextResponse.json(recentEvents);

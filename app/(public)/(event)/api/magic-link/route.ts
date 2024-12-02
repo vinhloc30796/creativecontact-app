@@ -4,10 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    const { email, redirectTo } = await req.json();
     const hostUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const redirectUrl = redirectTo ? `${hostUrl}${redirectTo}` : `${hostUrl}`;
     const result = await sendSignInWithOtp(email, {
-      redirectTo: `${hostUrl}/checkin`,
+      redirectTo: redirectUrl,
       shouldCreateUser: false,
     });
 

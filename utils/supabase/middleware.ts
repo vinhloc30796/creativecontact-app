@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+	console.log('updateSession called');
 	let supabaseResponse = NextResponse.next({
 		request,
 	})

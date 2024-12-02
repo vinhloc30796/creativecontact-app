@@ -3,9 +3,12 @@
 import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTranslation } from "@/lib/i18n/init-client";
-import { Briefcase, CheckCircle, MapPin, UserCircle } from 'lucide-react';
 import { ComboBadge } from "@/components/ui/combo-badge";
+import { useTranslation } from "@/lib/i18n/init-client";
+import { getProfileImageUrl } from "@/utils/profile_image";
+import { getName } from "@/utils/user_name";
+import { useQuery } from "@tanstack/react-query";
+import { Briefcase, CheckCircle, MapPin, UserCircle } from 'lucide-react';
 
 interface ContactCardProps {
   userData: UserData;
@@ -18,10 +21,16 @@ export function ContactCard({
   showButtons = false,
   lang = "en",
 }: ContactCardProps) {
-  const { t } = useTranslation(lang, "ProfilePage");
+  const { t } = useTranslation(lang, "ProfilePage", {
+    useSuspense: false,
+  });
   const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
-  const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
-  const contactImage = profilePictureUrl || placeholderImage;
+  const name = getName(userData);
+  const { data: profilePictureUrl, isLoading } = useQuery({
+    queryKey: ['profilePicture', userData.id],
+    queryFn: () => getProfileImageUrl(userData),
+  });
+  const contactImage = isLoading ? placeholderImage : (profilePictureUrl || placeholderImage);
 
   return (
     <Card className="flex flex-col h-full">
@@ -29,8 +38,8 @@ export function ContactCard({
         <div className="relative w-full h-48">
           <img
             src={contactImage}
-            alt={`${userData.displayName}'s profile`}
-            className="w-full h-full object-cover"
+            alt={`${name}'s profile`}
+            className={`w-full h-full object-cover ${isLoading ? 'animate-pulse' : ''}`}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
           <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
@@ -48,7 +57,7 @@ export function ContactCard({
         </div>
       </CardHeader>
 
-        <CardContent className="flex-grow p-4">
+      <CardContent className="flex-grow p-4">
         <ul className="space-y-3">
           {userData.industryExperiences && userData.industryExperiences.length > 0 && (
             <li className="flex items-center">

@@ -1,6 +1,11 @@
 // File: app/(protected)/profile/page.tsx
 
-"use server";
+"use client";
+
+// External imports
+import { useTranslation } from "@/lib/i18n/init-client";
+import { useQuery } from "@tanstack/react-query";
+import { Suspense, use } from "react";
 
 // API imports
 import { UserData } from "@/app/types/UserInfo";
@@ -9,15 +14,16 @@ import { UserData } from "@/app/types/UserInfo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { ComboBadge } from "@/components/ui/combo-badge";
+import { Separator } from "@/components/ui/separator";
 
 // Schema imports
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 
 // Utility imports
+import { getProfileImageUrl } from "@/utils/profile_image";
 import { getSocialMediaLinks } from "@/utils/social_media";
-import { TFunction } from "i18next";
+import { getName } from "@/utils/user_name";
 
 // Icon imports
 import { getFormattedPhoneNumber } from "@/lib/phone";
@@ -37,24 +43,83 @@ interface UserSkills {
   name: string;
 }
 
-function ProfileCard({
-  t,
-  userData,
-  userSkills,
-  portfolioArtworks,
-  showButtons = false,
-}: {
-  t: TFunction;
+async function getUserSkills(userId?: string): Promise<UserSkills[]> {
+  // TODO: Implement actual skill fetching logic
+  // This is a placeholder implementation
+  return [
+    { id: 1, name: "JavaScript" },
+    { id: 2, name: "React" },
+    { id: 3, name: "Node.js" },
+    { id: 4, name: "TypeScript" },
+    { id: 5, name: "GraphQL" },
+  ];
+}
+
+function SocialSubsection({ userData, lang = "en" }: { userData?: UserData, lang?: string }) {
+  const { t } = useTranslation(lang, "ProfileCard");
+  
+  const emptyMessage = (
+    <p className="text-sm text-muted-foreground">
+      {t("noSocialLinks")}
+    </p>
+  );
+  
+  if (!userData) {
+    return emptyMessage;
+  }
+  
+  const socialLinks = getSocialMediaLinks(userData);
+  if (socialLinks.length === 0) {
+    return emptyMessage;
+  }
+  
+  return socialLinks.map(
+    (link, index) =>
+      link &&
+      link.url && (
+        <a
+          key={index}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary-600"
+        >
+          <link.icon className="h-6 w-6" />
+        </a>
+      ),
+  );
+}
+
+interface ProfileCardProps {
   userData: UserData;
-  userSkills: UserSkills[];
-  portfolioArtworks: PortfolioArtworkWithDetails[];
+  portfolioArtworksPromise: Promise<PortfolioArtworkWithDetails[]>;
   showButtons?: boolean;
-}) {
-  const name =
-    userData.displayName || `${userData.firstName} ${userData.lastName}`;
+  lang?: string;
+}
+
+export function ProfileCard({
+  userData,
+  portfolioArtworksPromise,
+  showButtons = false,
+  lang = "en",
+}: ProfileCardProps) {
+  const { t } = useTranslation(lang, "ProfileCard", {
+    useSuspense: false,
+  });
+
+  const name = getName(userData);
   const userName = userData.userName || "";
-  const profilePictureUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pictures/${userData.profilePicture}`;
+  const { data: profilePictureUrl, isLoading: isLoadingProfilePicture } = useQuery({
+    queryKey: ['profilePicture', userData.id],
+    queryFn: () => getProfileImageUrl(userData),
+  });
+  const { data: userSkills } = useQuery({
+    queryKey: ['userSkills', userData.id],
+    queryFn: () => getUserSkills(userData.id),
+  });
   const phoneNumber = getFormattedPhoneNumber(userData);
+
+  const portfolioArtworks = use(portfolioArtworksPromise);
 
   return (
     <Card className="flex h-fit flex-col overflow-auto">
@@ -62,8 +127,8 @@ function ProfileCard({
         <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
           <img
             src={profilePictureUrl}
-            alt={`${name}'s profile`}
-            className="h-full w-full object-cover"
+            alt={`${name}'s profile picture`}
+            className={`h-full w-full object-cover ${isLoadingProfilePicture ? 'animate-pulse bg-gray-200' : ''}`}
           />
         </div>
         <CardTitle className="mb-2 flex items-center text-2xl font-bold">
@@ -87,7 +152,7 @@ function ProfileCard({
         </div>
         <p className="mb-4 flex items-center text-sm text-gray-500">
           <MapPin className="mr-1 h-4 w-4" />
-          {userData.location}
+          {userData.location || t("unsetLocation")}
         </p>
         <div className="flex space-x-2">
           <Button variant="outline" size="sm" asChild>
@@ -169,21 +234,7 @@ function ProfileCard({
             <section data-section="social-links">
               <h3 className="mb-2 text-lg font-semibold">{t("socialLinks")}</h3>
               <div className="flex space-x-4">
-                {getSocialMediaLinks(userData).map(
-                  (link, index) =>
-                    link &&
-                    link.url && (
-                      <a
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary-600"
-                      >
-                        <link.icon className="h-6 w-6" />
-                      </a>
-                    ),
-                )}
+                <SocialSubsection userData={userData} lang={lang} />
               </div>
             </section>
           )}
@@ -192,5 +243,3 @@ function ProfileCard({
     </Card>
   );
 }
-
-export { ProfileCard };
