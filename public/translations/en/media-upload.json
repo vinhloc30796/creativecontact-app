@@ -25,7 +25,9 @@
       "pending": "<strong>{{count}}</strong> pending",
       "total": "out of {{limit}} limit"
     },
-    "upload_description": "Clicking <strong>Upload</strong> will overwrite the files."
+    "upload_description": "Clicking <strong>Upload</strong> will overwrite the files.",
+    "files": "{{count}} files",
+    "size": "{{size}} of {{limit}}MB"
   },
   "dialog": {
     "title": "Uploaded Files",
@@ -46,5 +48,9 @@
     "reset": "Reset",
     "uploading": "Uploading...",
     "upload": "Upload Files"
+  },
+  "thumbnail": {
+    "set": "Set as thumbnail",
+    "current": "Current thumbnail"
   }
 }

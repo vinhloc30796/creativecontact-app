@@ -110,25 +110,27 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingIndex !== null ? t('dialog.update_label') : t('dialog.add_label')}</DialogTitle>
+            <DialogTitle>
+              {editingIndex !== null ? t('dialog.edit.title') : t('dialog.add.title')}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex space-x-4">
               <FormItem className="flex-1">
-                <FormLabel>{t('dialog.first_name')}</FormLabel>
+                <FormLabel>{t('dialog.fields.first_name.label')}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t('dialog.first_name_placeholder')}
+                    placeholder={t('dialog.fields.first_name.placeholder')}
                     value={newCoartist.first_name}
                     onChange={(e) => setNewCoartist({ ...newCoartist, first_name: e.target.value })}
                   />
                 </FormControl>
               </FormItem>
               <FormItem className="flex-1">
-                <FormLabel>{t('dialog.last_name')}</FormLabel>
+                <FormLabel>{t('dialog.fields.last_name.label')}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t('dialog.last_name_placeholder')}
+                    placeholder={t('dialog.fields.last_name.placeholder')}
                     value={newCoartist.last_name}
                     onChange={(e) => setNewCoartist({ ...newCoartist, last_name: e.target.value })}
                   />
@@ -136,10 +138,10 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
               </FormItem>
             </div>
             <FormItem>
-              <FormLabel>{t('dialog.email')}</FormLabel>
+              <FormLabel>{t('dialog.fields.email.label')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={t('dialog.email_placeholder')}
+                  placeholder={t('dialog.fields.email.placeholder')}
                   type="email"
                   value={newCoartist.email}
                   onChange={(e) => setNewCoartist({ ...newCoartist, email: e.target.value })}
@@ -147,17 +149,17 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
               </FormControl>
             </FormItem>
             <FormItem>
-              <FormLabel>{t('dialog.title')}</FormLabel>
+              <FormLabel>{t('dialog.fields.title.label')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={t('dialog.title_placeholder')}
+                  placeholder={t('dialog.fields.title.placeholder')}
                   value={newCoartist.title}
                   onChange={(e) => setNewCoartist({ ...newCoartist, title: e.target.value })}
                 />
               </FormControl>
             </FormItem>
             <Button type="button" onClick={addCoartist}>
-              {editingIndex !== null ? t('dialog.update_button') : t('dialog.add_button')}
+              {editingIndex !== null ? t('dialog.edit.submit') : t('dialog.add.submit')}
             </Button>
           </div>
         </DialogContent>

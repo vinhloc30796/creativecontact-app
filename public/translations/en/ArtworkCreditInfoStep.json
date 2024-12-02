@@ -4,20 +4,33 @@
   "add": "Add Co-artist",
   "edit": "Edit",
   "dialog": {
-    "update_label": "Edit Co-artist",
-    "add_label": "Add Co-artist",
-    "update_button": "Update",
-    "add_button": "Add",
-    "first_name": "First Name",
-    "first_name_placeholder": "Jane",
-    "last_name": "Last Name",
-    "last_name_placeholder": "Doe",
-    "email": "Co-artist Email",
-    "email_placeholder": "janedoe@example.com",
-    "title": "Co-artist Title",
-    "title_placeholder": "Painter"
+    "add": {
+      "title": "Add Co-artist",
+      "submit": "Add"
+    },
+    "edit": {
+      "title": "Edit Co-artist",
+      "submit": "Update"
+    },
+    "cancel": "Cancel",
+    "fields": {
+      "first_name": {
+        "label": "First Name",
+        "placeholder": "Jane"
+      },
+      "last_name": {
+        "label": "Last Name",
+        "placeholder": "Doe"
+      },
+      "email": {
+        "label": "Co-artist Email",
+        "placeholder": "janedoe@example.com"
+      },
+      "title": {
+        "label": "Co-artist Title",
+        "placeholder": "Painter"
+      }
+    }
   },
-  "remove": "Remove",
-  "cancel": "Cancel",
-  "save": "Save changes"
+  "remove": "Remove"
 }
