@@ -43,7 +43,7 @@ export default async function ProfilePage({
   searchParams,
 }: ProfilePageProps) {
   const lang = searchParams.lang || "en";
-  const { t } = await useTranslation(lang, "ProfilePage");
+  const { t } = await useTranslation(lang, ["ProfilePage", "ContactList"]);
   const { user, isLoggedIn, isAnonymous } = await useServerAuth();
 
   // Early return for anonymous users
@@ -86,13 +86,20 @@ export default async function ProfilePage({
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="contacts">
-                      <ErrorBoundary fallback={<ErrorContactCard lang={lang} />}>
-                        <Suspense fallback={<ContactListSkeleton />}>
-                          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-                            <ContactList userId={user.id} lang={lang} />
-                          </div>
-                        </Suspense>
-                      </ErrorBoundary>
+                      {!user || !user.id ? (
+                        <ErrorContactCard 
+                          lang={lang}
+                          message={t("noUserError", { ns: "ContactList" })} 
+                        />
+                      ) : (
+                        <ErrorBoundary fallback={<ErrorContactCard lang={lang} />}>
+                          <Suspense fallback={<ContactListSkeleton />}>
+                            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+                              <ContactList userId={user.id} lang={lang} />
+                            </div>
+                          </Suspense>
+                        </ErrorBoundary>
+                      )}
                     </TabsContent>
 
                     <TabsContent value="portfolio">
