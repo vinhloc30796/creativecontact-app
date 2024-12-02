@@ -8,10 +8,10 @@ import { Plus, TrashIcon } from 'lucide-react'
 import React, { useState } from 'react'
 import { FormProvider, UseFormReturn } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-interface AddCoonwerProps {
+interface AddCoOwnerProps {
   artworkCreditForm: UseFormReturn<ArtworkCreditInfoData>
 }
-export default function AddCoonwer({ artworkCreditForm }: AddCoonwerProps) {
+export default function AddCoOwner({ artworkCreditForm }: AddCoOwnerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [coartists, setCoartists] = useState(artworkCreditForm.getValues().coartists || [])
   const addCoartist = (first_name: string, last_name: string, email: string, title: string) => {
@@ -40,14 +40,14 @@ export default function AddCoonwer({ artworkCreditForm }: AddCoonwerProps) {
         }
       </div>
       <FormProvider {...artworkCreditForm}>
-        <AddCoonwerDialog isOpen={isDialogOpen} setIsOpenDialog={() => setIsDialogOpen(!isDialogOpen)} addCoartist={addCoartist} />
+        <AddCoOwnerDialog isOpen={isDialogOpen} setIsOpenDialog={() => setIsDialogOpen(!isDialogOpen)} addCoartist={addCoartist} />
       </FormProvider>
     </div>
   )
 }
 
 
-// Card for coonwer
+// Card for co-owner
 interface CoOwnerCardProps {
   title: string,
   firstName: string,
@@ -73,7 +73,7 @@ export function CoOwnerCard(props: CoOwnerCardProps) {
 
 
 // dialog add co-owner
-interface AddCoonwerDialogProps {
+interface AddCoOwnerDialogProps {
   isOpen: boolean,
   setIsOpenDialog: () => void,
   addCoartist: (
@@ -83,7 +83,7 @@ interface AddCoonwerDialogProps {
     title: string
   ) => void
 }
-export function AddCoonwerDialog(props: AddCoonwerDialogProps) {
+export function AddCoOwnerDialog(props: AddCoOwnerDialogProps) {
   const { t } = useTranslation('ArtworkCreditInfoStep')
   const [newCoartist, setNewCoartist] = useState({ firstName: '', lastName: '', email: '', title: '' })
   return (
