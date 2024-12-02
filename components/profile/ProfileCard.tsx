@@ -5,6 +5,7 @@
 // External imports
 import { useTranslation } from "@/lib/i18n/init-client";
 import { useQuery } from "@tanstack/react-query";
+import { Suspense, use } from "react";
 
 // API imports
 import { UserData } from "@/app/types/UserInfo";
@@ -42,7 +43,19 @@ interface UserSkills {
   name: string;
 }
 
-async function SocialSubsection({ userData, lang = "en" }: { userData?: UserData, lang?: string }) {
+async function getUserSkills(userId?: string): Promise<UserSkills[]> {
+  // TODO: Implement actual skill fetching logic
+  // This is a placeholder implementation
+  return [
+    { id: 1, name: "JavaScript" },
+    { id: 2, name: "React" },
+    { id: 3, name: "Node.js" },
+    { id: 4, name: "TypeScript" },
+    { id: 5, name: "GraphQL" },
+  ];
+}
+
+function SocialSubsection({ userData, lang = "en" }: { userData?: UserData, lang?: string }) {
   const { t } = useTranslation(lang, "ProfileCard");
   
   const emptyMessage = (
@@ -78,17 +91,15 @@ async function SocialSubsection({ userData, lang = "en" }: { userData?: UserData
 }
 
 interface ProfileCardProps {
-  userDataPromise: Promise<UserData | null>;
-  userSkillsPromise: Promise<UserSkills[]>;
-  portfolioPromise: Promise<PortfolioArtworkWithDetails[]>;
+  userData: UserData;
+  portfolioArtworksPromise: Promise<PortfolioArtworkWithDetails[]>;
   showButtons?: boolean;
   lang?: string;
 }
 
-export async function ProfileCard({
-  userDataPromise,
-  userSkillsPromise,
-  portfolioPromise,
+export function ProfileCard({
+  userData,
+  portfolioArtworksPromise,
   showButtons = false,
   lang = "en",
 }: ProfileCardProps) {
@@ -96,33 +107,19 @@ export async function ProfileCard({
     useSuspense: false,
   });
 
-  const { data: userData } = useQuery({
-    queryKey: ['userData'],
-    queryFn: () => userDataPromise,
-    staleTime: 30000,
-    gcTime: 5 * 60 * 1000
-  });
-
-  const { data: userSkills } = useQuery({
-    queryKey: ['userSkills'],
-    queryFn: () => userSkillsPromise,
-    staleTime: 30000,
-    gcTime: 5 * 60 * 1000
-  });
-
-  const { data: portfolioArtworks } = useQuery({
-    queryKey: ['portfolio'],
-    queryFn: () => portfolioPromise,
-    staleTime: 30000,
-    gcTime: 5 * 60 * 1000
-  });
-
-  if (!userData || !userSkills || !portfolioArtworks) return null;
-
-  const name = await getName(userData);
+  const name = getName(userData);
   const userName = userData.userName || "";
-  const profilePictureUrl = await getProfileImageUrl(userData);
+  const { data: profilePictureUrl, isLoading: isLoadingProfilePicture } = useQuery({
+    queryKey: ['profilePicture', userData.id],
+    queryFn: () => getProfileImageUrl(userData),
+  });
+  const { data: userSkills } = useQuery({
+    queryKey: ['userSkills', userData.id],
+    queryFn: () => getUserSkills(userData.id),
+  });
   const phoneNumber = getFormattedPhoneNumber(userData);
+
+  const portfolioArtworks = use(portfolioArtworksPromise);
 
   return (
     <Card className="flex h-fit flex-col overflow-auto">
@@ -131,7 +128,7 @@ export async function ProfileCard({
           <img
             src={profilePictureUrl}
             alt={`${name}'s profile picture`}
-            className="h-full w-full object-cover"
+            className={`h-full w-full object-cover ${isLoadingProfilePicture ? 'animate-pulse bg-gray-200' : ''}`}
           />
         </div>
         <CardTitle className="mb-2 flex items-center text-2xl font-bold">

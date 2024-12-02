@@ -1,63 +1,42 @@
-"use server";
-
-import { Card } from "@/components/ui/card";
-import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import {
-  LoadingUserHeader,
-  UserHeader,
-} from "@/components/wrappers/UserHeader";
-import { ArtworkProvider } from "@/contexts/ArtworkContext";
-import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
-import { useServerAuth } from "@/hooks/useServerAuth";
-import { Suspense } from "react";
-import { useForm } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
-import { BackButton } from "../../profile/BackButton";
-import { PortfolioProjectCard } from "./PortfolioCreateForm";
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import { LoadingUserHeader, UserHeader } from '@/components/wrappers/UserHeader';
+import { useServerAuth } from '@/hooks/useServerAuth';
+import React, { Suspense } from 'react'
+import { BackButton } from '../../profile/BackButton';
+import PortfolioCreateCard from './portfolio_create_card.component';
+import Wrapper from './wrapper.component';
 
 interface PortfolioCreatePageProps {
-  params: {};
+  params: {},
   searchParams: {
-    lang: string;
-  };
+    lang: string
+  }
 }
 
-export default async function PortfolioCreatePage({
-  params,
-  searchParams,
-}: PortfolioCreatePageProps) {
-  const { user, isLoggedIn, isAnonymous } = await useServerAuth();
-  const lang = searchParams.lang || "en";
-
+export default async function PortfolioCreatePage(props: PortfolioCreatePageProps) {
+  const { isLoggedIn } = await useServerAuth();
+  const lang = props.searchParams.lang || "en";
   const project = {
     portfolioArtworks: {
       id: "new",
     },
     artworks: null,
-  };
-
+  }
   return (
-    <BackgroundDiv>
-      <div className="flex min-h-screen w-full flex-col">
-        <Suspense fallback={<LoadingUserHeader />}>
-          <UserHeader
-            lang={lang}
-            isLoggedIn={isLoggedIn}
-            className="bg-background/80 backdrop-blur-sm"
-          />
-        </Suspense>
-
-        <main className="relative z-20 mt-10 w-full flex-grow lg:mt-20">
-          <div className="container mx-auto mb-4 px-4">
-            <BackButton />
-          </div>
-          <div className="container mx-auto px-4">
-            <Card className="w-full">
-              <PortfolioProjectCard project={project as any} />
-            </Card>
-          </div>
-        </main>
-      </div>
+    <BackgroundDiv className='w-full min-h-screen'>
+      <Suspense fallback={<LoadingUserHeader />}>
+        <UserHeader
+          lang={lang}
+          isLoggedIn={isLoggedIn}
+          className="bg-background/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-30"
+        />
+      </Suspense>
+      <main className='min-h-screen w-screen pt-10 lg:pt-32 flex flex-col flex-grow px-2'>
+        <div className="container mx-auto mb-4">
+          <BackButton />
+        </div>
+        <Wrapper />
+      </main>
     </BackgroundDiv>
-  );
+  )
 }

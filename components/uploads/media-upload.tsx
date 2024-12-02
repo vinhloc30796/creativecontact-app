@@ -98,9 +98,8 @@ export function MediaUpload({
       >
         <div
           {...getRootProps()}
-          className={`cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors ${
-            isDragActive ? "border-primary bg-primary/10" : "border-border"
-          }`}
+          className={`cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors ${isDragActive ? "border-primary bg-primary/10" : "border-border"
+            }`}
         >
           <input {...getInputProps()} />
           <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
