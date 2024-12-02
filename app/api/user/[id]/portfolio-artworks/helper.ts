@@ -16,7 +16,6 @@ export async function fetchUserPortfolioArtworks(
     .select()
     .from(portfolioArtworks)
     .where(eq(portfolioArtworks.userId, userId));
-  await new Promise(resolve => setTimeout(resolve, 15000)); // Sleep for 15 seconds
   return results;
 }
 
@@ -41,7 +40,6 @@ export async function fetchUserPortfolioArtworksWithDetails(
     .innerJoin(artworks, eq(portfolioArtworks.artworkId, artworks.id));
 
   const results = await query;
-  await new Promise(resolve => setTimeout(resolve, 15000)); // Sleep for 15 seconds
   console.debug("fetchUserPortfolioArtworksWithDetails: ", results);
   return results as PortfolioArtworkWithDetails[];
 }
