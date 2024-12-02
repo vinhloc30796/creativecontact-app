@@ -9,7 +9,7 @@ import { ThumbnailProvider } from '@/contexts/ThumbnailContext'
 import React, { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { v4 } from 'uuid'
-import AddCoonwer from './add_coonwer.component'
+import AddCoOwner from './add_coowner.component'
 import UploadInfo from './upload_info.component'
 import { MediaUploadComponent } from './media_upload.component'
 import { FileUploadProvider, useFileUpload } from './files_uplooad_provider.component'
@@ -105,7 +105,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
         </div>
       </div>
       <CardFooter className="flex flex-col gap-2 p-4 md:min-w-[400px] items-start lg:gap-4">
-        <AddCoonwer artworkCreditForm={artworkCreditForm} />
+        <AddCoOwner artworkCreditForm={artworkCreditForm} />
         <UploadInfo />
         <div className='w-full pt-10 flex flex-col gap-2'>
           <Button 
