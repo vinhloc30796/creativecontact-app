@@ -1,0 +1,20 @@
+{
+  "states": {
+    "pending": {
+      "title": "Logging Out",
+      "description": "Please wait while we sign you out..."
+    },
+    "error": {
+      "title": "Logout Error",
+      "description": "There was an error signing you out.",
+      "returnHome": "Return to Home",
+      "redirecting": "Redirecting in 5 seconds..."
+    },
+    "success": {
+      "title": "Logged Out Successfully",
+      "description": "You have been successfully signed out.",
+      "returnHome": "Return to Home",
+      "redirecting": "Redirecting in 5 seconds..."
+    }
+  }
+} 

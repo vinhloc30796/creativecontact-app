@@ -2,14 +2,14 @@
 
 import { InferInsertModel, InferSelectModel, sql } from "drizzle-orm";
 import {
-    integer,
-    pgEnum,
-    pgTable,
-    text,
-    timestamp,
-    unique,
-    uuid,
-    boolean,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { authUsers } from "./user";
 import { events } from "./event";
@@ -34,8 +34,12 @@ Referenced by:
 */
 
 export const artworks = pgTable("artworks", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   title: text("title").notNull(),
   description: text("description"),
 });
@@ -61,14 +65,27 @@ Foreign-key constraints:
     "artwork_credits_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
 */
 
-export const artworkCredits = pgTable("artwork_credits", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  artworkId: uuid("artwork_id").notNull().references(() => artworks.id, { onDelete: "cascade" }),
-  userId: uuid("user_id").notNull().references(() => authUsers.id, { onDelete: "cascade" }),
-  title: text("title"),
-}, (table) => ({
-  uniqueArtworkUser: unique("unique_artwork_user").on(table.artworkId, table.userId),
-}));
+export const artworkCredits = pgTable(
+  "artwork_credits",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    artworkId: uuid("artwork_id")
+      .notNull()
+      .references(() => artworks.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
+    title: text("title"),
+  },
+  (table) => ({
+    uniqueArtworkUser: unique("unique_artwork_user").on(
+      table.artworkId,
+      table.userId,
+    ),
+  }),
+);
 
 export type ArtworkCredit = InferSelectModel<typeof artworkCredits>;
 
@@ -89,13 +106,26 @@ Foreign-key constraints:
     "artwork_events_event_id_fkey" FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 */
 
-export const artworkEvents = pgTable("artwork_events", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  artworkId: uuid("artwork_id").notNull().references(() => artworks.id, { onDelete: "cascade" }),
-  eventId: uuid("event_id").notNull().references(() => events.id, { onDelete: "cascade" }),
-}, (table) => ({
-  uniqueArtworkEvent: unique("unique_artwork_event").on(table.artworkId, table.eventId),
-}));
+export const artworkEvents = pgTable(
+  "artwork_events",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    artworkId: uuid("artwork_id")
+      .notNull()
+      .references(() => artworks.id, { onDelete: "cascade" }),
+    eventId: uuid("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    uniqueArtworkEvent: unique("unique_artwork_event").on(
+      table.artworkId,
+      table.eventId,
+    ),
+  }),
+);
 
 export type ArtworkEvent = InferSelectModel<typeof artworkEvents>;
 
@@ -110,7 +140,12 @@ export type ArtworkEvent = InferSelectModel<typeof artworkEvents>;
 (1 row)
 */
 
-export const assetTypeEnum = pgEnum("asset_type", ["image", "video", "audio", "font"]);
+export const assetTypeEnum = pgEnum("asset_type", [
+  "image",
+  "video",
+  "audio",
+  "font",
+]);
 
 /* postgres=> \d artwork_assets
                              Table "public.artwork_assets"
@@ -133,12 +168,18 @@ Foreign-key constraints:
 */
 
 export const artworkAssets = pgTable("artwork_assets", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  artworkId: uuid("artwork_id").notNull().references(() => artworks.id, { onDelete: "cascade" }),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  artworkId: uuid("artwork_id")
+    .notNull()
+    .references(() => artworks.id, { onDelete: "cascade" }),
   filePath: text("file_path").notNull(),
   description: text("description"),
   assetType: assetTypeEnum("asset_type"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   bucketId: text("bucket_id").notNull().default("artwork_assets"),
   isThumbnail: boolean("is_thumbnail").notNull().default(false),
 });

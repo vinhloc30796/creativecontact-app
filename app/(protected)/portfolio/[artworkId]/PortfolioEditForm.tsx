@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaUpload } from "@/components/uploads/media-upload";
-import UploadProgressBar from "@/components/uploads/DataUsage";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { useTranslation } from "@/lib/i18n/init-client";
@@ -18,6 +17,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import DataUsage from "@/components/uploads/DataUsage";
+import { ArtworkService } from "@/services/artwork-service";
+import { handleFileUpload } from "@/app/(public)/event/[eventSlug]/upload/client-helpers";
+import { insertArtworkAssets } from "@/app/(public)/event/[eventSlug]/upload/actions";
+import { useUploadStore } from "@/stores/uploadStore";
 
 interface ArtworkFormValues {
   title: string;
@@ -46,8 +49,14 @@ export default function PortfolioEditForm({
 }: PortfolioEditFormProps) {
   const { t } = useTranslation(lang, "Portfolio");
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<string>("info");
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const {
+    uploadProgress,
+    uploadedFileCount,
+    totalFileCount,
+    setUploadProgress,
+    resetUploadProgress,
+  } = useUploadStore();
 
   // Form setup with default values
   const form = useForm<ArtworkFormValues>({
@@ -76,63 +85,38 @@ export default function PortfolioEditForm({
   });
 
   const handleSubmit = async (formData: ArtworkFormValues) => {
+    console.log("Form data:", formData);
+
     try {
-      // Create or update artwork
-      const artworkResponse = await fetch("/api/artworks", {
-        method: isNew ? "POST" : "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          id: artwork?.artworks?.id,
-        }),
+      // Update artwork
+      await ArtworkService.updateArtworkInfo(formData.uuid, {
+        title: formData.title,
+        description: formData.description,
       });
 
-      if (!artworkResponse.ok) {
-        throw new Error("Failed to save artwork");
-      }
-
-      const savedArtwork = await artworkResponse.json();
-
-      // Handle file uploads if any
       if (pendingFiles.length > 0) {
-        const formData = new FormData();
-        pendingFiles.forEach((file) => {
-          formData.append("files", file);
-        });
-        formData.append("artworkId", savedArtwork.id);
+        const files = pendingFiles.map(
+          (file) => new File([file], file.name, { type: file.type }),
+        );
 
-        const uploadResponse = await fetch("/api/uploads", {
-          method: "POST",
-          body: formData,
-        });
+        const uploadedResults = await handleFileUpload(
+          formData.uuid,
+          files,
+          "thumbnail.jpg",
+          setUploadProgress,
+        );
 
-        if (!uploadResponse.ok) {
-          throw new Error("Failed to upload files");
-        }
+        // Insert assets
+        const insertAssetsResult = await insertArtworkAssets(
+          formData.uuid,
+          uploadedResults,
+        );
+        console.log("Insert assets successful:", insertAssetsResult);
       }
 
-      // Update portfolio artwork
-      // TODO: This endpoint is not implemented yet
-      const portfolioResponse = await fetch("/api/portfolio-artworks", {
-        method: isNew ? "POST" : "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: artwork?.portfolioArtworks?.id,
-          userId: userData.id,
-          artworkId: savedArtwork.id,
-        }),
-      });
-
-      if (!portfolioResponse.ok) {
-        throw new Error("Failed to update portfolio");
-      }
-
-      // Redirect back to portfolio page
       router.push("/profile");
-      router.refresh();
     } catch (error) {
-      console.error("Error saving portfolio artwork:", error);
-      // Handle error (show toast notification, etc.)
+      console.error(error);
     }
   };
 
@@ -249,7 +233,11 @@ export default function PortfolioEditForm({
               </CardContent>
             </Card>
             <div className="mt-4 flex flex-col gap-4">
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={form.handleSubmit(handleSubmit)}
+              >
                 {isNew ? t("create") : t("save")}
               </Button>
               <Button

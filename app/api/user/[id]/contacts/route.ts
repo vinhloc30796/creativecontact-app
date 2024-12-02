@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchUserContacts } from './helper';
 
-
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }

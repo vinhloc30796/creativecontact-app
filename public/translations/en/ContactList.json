@@ -1,0 +1,6 @@
+{
+  "errorLoadingContacts": "Error Loading Contacts",
+  "tryAgainLater": "There was an error loading your contacts. Please try again later.",
+  "retry": "Retry",
+  "noUserError": "Unable to load user information. Please try logging in again."
+} 
