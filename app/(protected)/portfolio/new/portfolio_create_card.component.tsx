@@ -30,7 +30,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const { fileUploads, thumbnailFileName } = useFileUpload();
   const { t } = useTranslation(['ArtworkInfoStep'])
   const { toast } = useToast()
-  const [submidLoading, setSubmidLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const projectId = v4();
 
@@ -49,7 +49,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   })
 
   async function onSubmit() {
-    setSubmidLoading(true);
+    setSubmitLoading(true);
     const rs = await handlerSubmit(artworkForm.getValues(), {}, fileUploads, thumbnailFileName);
     if (rs) {
       toast({
@@ -62,7 +62,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
         description: t("submit.error.description"),
       })
     }
-    setSubmidLoading(false);
+    setSubmitLoading(false);
   }
 
   return (
@@ -108,8 +108,8 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
         <AddCoonwer artworkCreditForm={artworkCreditForm} />
         <UploadInfo />
         <div className='w-full pt-10 flex flex-col gap-2'>
-          <Button className='rounded-full w-full' onClick={onSubmit} disabled={submidLoading}>{
-            submidLoading ? t('submitting') : t('submit')}</Button>
+          <Button className='rounded-full w-full' onClick={onSubmit} disabled={submitLoading}>{
+            submitLoading ? t('submitting') : t('submit')}</Button>
           <Button className='rounded-full w-full underline' variant={"secondary"} onClick={() => {
             artworkForm.reset();
             artworkCreditForm.reset();
