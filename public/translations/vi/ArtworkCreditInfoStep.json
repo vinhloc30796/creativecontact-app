@@ -1,23 +1,36 @@
 {
-  "label": "Ghi nhận Đồng tác giả",
-  "description": "Thêm thông tin về đồng tác giả đã đóng góp vào bức tranh này.",
+  "label": "Thông tin Đồng tác giả",
+  "description": "Thêm thông tin về đồng tác giả đã đóng góp vào tác phẩm này.",
   "add": "Thêm Đồng tác giả",
-  "edit": "Sửa",
+  "edit": "Chỉnh sửa",
   "dialog": {
-    "update_label": "Cập nhật Đồng tác giả",
-    "add_label": "Thêm Đồng tác giả",
-    "update_button": "Cập nhật",
-    "add_button": "Thêm",
-    "first_name": "Tên",
-    "first_name_placeholder": "Khánh Linh",
-    "last_name": "Họ",
-    "last_name_placeholder": "Lê",
-    "email": "Email Đồng tác giả",
-    "email_placeholder": "khanhlinh@example.com",
-    "title": "Chức vụ Đồng tác giả",
-    "title_placeholder": "Họa sĩ"
+    "add": {
+      "title": "Thêm Đồng tác giả",
+      "submit": "Thêm"
+    },
+    "edit": {
+      "title": "Chỉnh sửa Đồng tác giả",
+      "submit": "Cập nhật"
+    },
+    "cancel": "Hủy",
+    "fields": {
+      "first_name": {
+        "label": "Tên",
+        "placeholder": "Văn"
+      },
+      "last_name": {
+        "label": "Họ",
+        "placeholder": "Nguyễn"
+      },
+      "email": {
+        "label": "Email Đồng tác giả",
+        "placeholder": "nguyenvan@example.com"
+      },
+      "title": {
+        "label": "Chức danh",
+        "placeholder": "Họa sĩ"
+      }
+    }
   },
-  "remove": "Xóa",
-  "cancel": "Hủy bỏ",
-  "save": "Lưu thay đổi"
+  "remove": "Xóa"
 }

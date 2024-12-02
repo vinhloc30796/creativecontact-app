@@ -1,0 +1,11 @@
+{
+  "title": "Thêm đồng tác giả",
+  "add": "Thêm đồng tác giả",
+  "firstName": "Tên",
+  "lastName": "Họ",
+  "email": "Email",
+  "role": "Vai trò",
+  "cancel": "Hủy",
+  "save": "Lưu",
+  "delete": "Xóa"
+} 

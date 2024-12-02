@@ -28,7 +28,7 @@ interface PortfolioCreateCardProps {
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const { fileUploads, thumbnailFileName } = useFileUpload();
-  const { t } = useTranslation(['ArtworkInfoStep'])
+  const { t } = useTranslation(['Portfolio', 'ArtworkInfoStep'])
   const { toast } = useToast()
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -53,13 +53,13 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     const rs = await handlerSubmit(artworkForm.getValues(), {}, fileUploads, thumbnailFileName);
     if (rs) {
       toast({
-        title: t("submit.success.title"),
-        description: t("submit.success.description"),
+        title: t("form.toast.success.title"),
+        description: t("form.toast.success.description"),
       })
     } else {
       toast({
-        title: t("submit.error.title"),
-        description: t("submit.error.description"),
+        title: t("form.toast.error.title"),
+        description: t("form.toast.error.description"),
       })
     }
     setSubmitLoading(false);
@@ -76,9 +76,9 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
               render={({ field }) => {
                 return (
                   <FormItem>
-                    <FormLabel>{t('title.label')}</FormLabel>
+                    <FormLabel>{t('title.label', { ns: 'ArtworkInfoStep' })}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t('title.placeholder')} {...field} />
+                      <Input placeholder={t('title.placeholder', { ns: 'ArtworkInfoStep' })} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,9 +90,9 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('description.label')}</FormLabel>
+                  <FormLabel>{t('description.label', { ns: 'ArtworkInfoStep' })}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={t('description.placeholder')} {...field} />
+                    <Textarea placeholder={t('description.placeholder', { ns: 'ArtworkInfoStep' })} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,12 +108,23 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
         <AddCoonwer artworkCreditForm={artworkCreditForm} />
         <UploadInfo />
         <div className='w-full pt-10 flex flex-col gap-2'>
-          <Button className='rounded-full w-full' onClick={onSubmit} disabled={submitLoading}>{
-            submitLoading ? t('submitting') : t('submit')}</Button>
-          <Button className='rounded-full w-full underline' variant={"secondary"} onClick={() => {
-            artworkForm.reset();
-            artworkCreditForm.reset();
-          }}>Cancel</Button>
+          <Button 
+            className='rounded-full w-full' 
+            onClick={onSubmit} 
+            disabled={submitLoading}
+          >
+            {submitLoading ? t('form.submit.submitting') : t('form.submit.create')}
+          </Button>
+          <Button 
+            className='rounded-full w-full underline' 
+            variant={"secondary"} 
+            onClick={() => {
+              artworkForm.reset();
+              artworkCreditForm.reset();
+            }}
+          >
+            {t('cancel')}
+          </Button>
         </div>
       </CardFooter>
     </Card >

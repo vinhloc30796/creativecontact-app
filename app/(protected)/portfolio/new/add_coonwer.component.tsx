@@ -96,15 +96,15 @@ export function AddCoonwerDialog(props: AddCoonwerDialogProps) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('dialog.add_label')}</DialogTitle>
+          <DialogTitle>{t('dialog.add.title')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="flex space-x-4">
             <FormItem>
-              <FormLabel>{t('dialog.first_name')}</FormLabel>
+              <FormLabel>{t('dialog.fields.first_name.label')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={t('dialog.first_name_placeholder')}
+                  placeholder={t('dialog.fields.first_name.placeholder')}
                   value={newCoartist.firstName}
                   onChange={(e) => setNewCoartist({ ...newCoartist, firstName: e.target.value })}
                 />
@@ -112,10 +112,10 @@ export function AddCoonwerDialog(props: AddCoonwerDialogProps) {
             </FormItem>
 
             <FormItem>
-              <FormLabel>{t('dialog.last_name')}</FormLabel>
+              <FormLabel>{t('dialog.fields.last_name.label')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={t('dialog.last_name_placeholder')}
+                  placeholder={t('dialog.fields.last_name.placeholder')}
                   value={newCoartist.lastName}
                   onChange={(e) => setNewCoartist({ ...newCoartist, lastName: e.target.value })}
                 />
@@ -124,10 +124,10 @@ export function AddCoonwerDialog(props: AddCoonwerDialogProps) {
           </div>
 
           <FormItem>
-            <FormLabel>{t('dialog.email')}</FormLabel>
+            <FormLabel>{t('dialog.fields.email.label')}</FormLabel>
             <FormControl>
               <Input
-                placeholder={t('dialog.email_placeholder')}
+                placeholder={t('dialog.fields.email.placeholder')}
                 type="email"
                 value={newCoartist.email}
                 onChange={(e) => setNewCoartist({ ...newCoartist, email: e.target.value })}
@@ -136,27 +136,34 @@ export function AddCoonwerDialog(props: AddCoonwerDialogProps) {
           </FormItem>
 
           <FormItem>
-            <FormLabel>{t('dialog.title')}</FormLabel>
+            <FormLabel>{t('dialog.fields.title.label')}</FormLabel>
             <FormControl>
               <Input
-                placeholder={t('dialog.title_placeholder')}
+                placeholder={t('dialog.fields.title.placeholder')}
                 value={newCoartist.title}
                 onChange={(e) => setNewCoartist({ ...newCoartist, title: e.target.value })}
               />
             </FormControl>
           </FormItem>
           <div className='flex justify-space-between'>
-            <Button type='button'
+            <Button 
+              type='button'
               className='w-full rounded-full'
-              onClick={() => props.addCoartist(newCoartist.firstName, newCoartist.lastName, newCoartist.email, newCoartist.title)}>
-              {t('dialog.add_button')}
+              onClick={() => props.addCoartist(
+                newCoartist.firstName, 
+                newCoartist.lastName, 
+                newCoartist.email, 
+                newCoartist.title
+              )}
+            >
+              {t('dialog.add.submit')}
             </Button>
             <Button
               variant={'outline'}
               className='w-full rounded-full'
               onClick={props.setIsOpenDialog}
             >
-              {t('dialog.cancel_button')}
+              {t('dialog.cancel')}
             </Button>
           </div>
         </div>
