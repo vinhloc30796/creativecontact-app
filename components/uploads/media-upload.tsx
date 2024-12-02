@@ -43,21 +43,27 @@ export function MediaUpload({
   // I18n
   const { t } = useTranslation(["media-upload"]);
   // Callbacks
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      setPendingFiles((prevFiles) => {
-        const newFiles = [...prevFiles, ...acceptedFiles];
-        if (newFiles.length > 0 && !thumbnailFileName) {
-          const newThumbnailFile = newFiles[0].name;
-          setThumbnailFileName(newThumbnailFile);
-        }
-        // Pass the updated file list to the parent component
-        onPendingFilesUpdate(newFiles);
-        return newFiles;
-      });
-    },
-    [thumbnailFileName, onPendingFilesUpdate],
-  );
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    setPendingFiles((prevFiles) => {
+      const newFiles = [...prevFiles, ...acceptedFiles];
+      return newFiles;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (pendingFiles.length > 0 && !thumbnailFileName) {
+      const newThumbnailFile = pendingFiles[0].name;
+      setThumbnailFileName(newThumbnailFile);
+    }
+    // Pass the updated file list to the parent component
+    onPendingFilesUpdate(pendingFiles);
+  }, [
+    pendingFiles,
+    thumbnailFileName,
+    setThumbnailFileName,
+    onPendingFilesUpdate,
+  ]);
+
   // Remove a file from the pending files list
   const removeFile = (fileToRemove: File | SupabaseFile) => {
     setPendingFiles((prevFiles) => {
@@ -91,45 +97,40 @@ export function MediaUpload({
 
   return (
     <div className="mx-auto w-full max-w-md bg-background">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
+      <div
+        {...getRootProps()}
+        className={`cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors ${
+          isDragActive ? "border-primary bg-primary/10" : "border-border"
+        }`}
       >
-        <div
-          {...getRootProps()}
-          className={`cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors ${isDragActive ? "border-primary bg-primary/10" : "border-border"
-            }`}
-        >
-          <input {...getInputProps()} />
-          <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("form.dropzone")}
-          </p>
-        </div>
-        {pendingFiles.length > 0 && (
-          <FileTable
-            files={pendingFiles.map((file) => ({
-              id: file.name,
-              path: file.name,
-              fullPath: file.name,
-              name: file.name,
-              size: file.size,
-              isThumbnail: file.name === thumbnailFileName,
-            }))}
-            isReadonly={false}
-            removeFile={removeFile}
-          />
-        )}
-        <div className="flex items-center space-x-2">
-          <p className="my-4 text-sm text-muted-foreground">
-            {t("button.email_description")}{" "}
-            <Link href={emailLink} className="text-primary hover:underline">
-              {t("button.email")}
-            </Link>
-          </p>
-        </div>
-      </form>
+        <input {...getInputProps()} />
+        <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t("form.dropzone")}
+        </p>
+      </div>
+      {pendingFiles.length > 0 && (
+        <FileTable
+          files={pendingFiles.map((file) => ({
+            id: file.name,
+            path: file.name,
+            fullPath: file.name,
+            name: file.name,
+            size: file.size,
+            isThumbnail: file.name === thumbnailFileName,
+          }))}
+          isReadonly={false}
+          removeFile={removeFile}
+        />
+      )}
+      <div className="flex items-center space-x-2">
+        <p className="my-4 text-sm text-muted-foreground">
+          {t("button.email_description")}{" "}
+          <Link href={emailLink} className="text-primary hover:underline">
+            {t("button.email")}
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
