@@ -123,15 +123,18 @@ export const addArtworkAssets = async (artworkId: string, files: File[], thumbna
   }
 }
 
-export const handlerSubmit = async (artWorkData: {
-  title: string,
-  description: string
-}, portfolioData: {
-  displayOrder?: number
-  isHightlighted?: boolean
-},
+export const handlerSubmit = async (
+  artWorkData: {
+    title: string,
+    description: string
+  }, 
+  portfolioData: {
+    displayOrder?: number
+    isHightlighted?: boolean
+  },
   files: File[],
-  thumbnailFileName: string
+  thumbnailFileName: string,
+  onProgress?: (progress: number, uploadedCount: number, totalCount: number) => void
 ) => {
   const result = await createPortfolio(artWorkData, portfolioData);
   if (!result.artwork.id) {
