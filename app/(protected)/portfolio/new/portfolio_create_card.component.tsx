@@ -52,12 +52,13 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     setUploadProgress,
     resetUploadProgress,
   } = useUploadStore();
-
+  
+  const artworkUUID = v4();
   const projectId = v4();
 
   const artworkForm = useForm<ArtworkInfoData>({
     defaultValues: {
-      id: projectId,
+      id: artworkUUID,
       title: "",
       description: "",
     },
@@ -75,7 +76,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
 
     const rs = await handlerSubmit(
       artworkForm.getValues(),
-      {},
+      { id: projectId },
       fileUploads,
       thumbnailFileName,
       (progress, uploadedCount, totalCount) => {

@@ -15,7 +15,7 @@ export const performUpload = async (
   thumbnailFileName: string,
   onProgress: (progress: number, uploadedCount: number, totalCount: number) => void
 ) => {
-  console.log("performUpload: artworkUUID", artworkUUID, "thumbnailFileName", thumbnailFileName);
+  console.log("[performUpload]: artworkUUID", artworkUUID, "thumbnailFileName", thumbnailFileName);
   const supabase = createClient();
   let results: ThumbnailSupabaseFile[] = [];
   let errors: { message: string }[] = [];
@@ -67,35 +67,41 @@ export const performUpload = async (
 
   const uploadResults = await Promise.all(uploadPromises);
 
-  const { results: uploadedResults, errors: uploadErrors } = uploadResults.reduce<{ results: ThumbnailSupabaseFile[], errors: { message: string }[] }>(
+  const { results: uploadedResults, errors: uploadErrors } = uploadResults.reduce<{ 
+    results: ThumbnailSupabaseFile[], 
+    errors: { message: string }[] 
+  }>(
     (acc, { data, error, file }) => {
       if (error) {
-        console.error('Error uploading file:', error.message);
+        console.error("[performUpload] Error uploading file:", error.message);
         acc.errors.push({ message: error.message });
       } else if (data) {
-        console.log('File uploaded successfully:', data);
+        console.log("[performUpload] File uploaded successfully:", data);
         const normalizedThumbnailFileName = normalizeFileNameForS3(toNonAccentVietnamese(thumbnailFileName));
         const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name));
         const matched = normalizedFileName === normalizedThumbnailFileName;
         if (matched) {
-          console.log("matched", matched, "for file", file.name);
+          console.log("[performUpload] matched", matched, "for file", file.name);
         }
         acc.results.push({
-          id: data.path,
+          id: data.id,
           path: data.path,
-          fullPath: `${bucketName}/${data.path}`,
-          name: data.path,
+          fullPath: data.fullPath,
+          name: file.name,
           size: file.size,
           isThumbnail: matched
         });
       } else {
         // This should never happen, but we handle it for completeness
-        acc.errors.push({ message: "Unexpected error occurred" });
+        acc.errors.push({ message: "[performUpload] Unexpected error occurred" });
       }
       return acc;
     },
     { results: [], errors: [] }
   );
 
-  return { results: uploadedResults, errors: uploadErrors };
+  return { 
+    results: uploadedResults.length > 0 ? uploadedResults : null, 
+    errors: uploadErrors.length > 0 ? uploadErrors : null 
+  };
 };
