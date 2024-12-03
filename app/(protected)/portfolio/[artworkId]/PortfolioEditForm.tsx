@@ -102,14 +102,19 @@ export default function PortfolioEditForm({
         const uploadedResults = await handleFileUpload(
           formData.uuid,
           files,
-          "thumbnail.jpg",
+          "thumbnail.jpg", 
           setUploadProgress,
         );
+
+        if (!uploadedResults) {
+          console.error("File upload failed");
+          throw new Error("File upload failed");
+        }
 
         // Insert assets
         const insertAssetsResult = await insertArtworkAssets(
           formData.uuid,
-          uploadedResults,
+          uploadedResults
         );
         console.log("Insert assets successful:", insertAssetsResult);
       }
