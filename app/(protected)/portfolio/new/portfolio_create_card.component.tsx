@@ -26,7 +26,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { v4 } from "uuid";
-import { handlerSubmit } from "./action.client";
+import { handleSubmit } from "./action.client";
 import AddCoOwner from "./add_coowner.component";
 import { useFileUpload } from "./files_uplooad_provider.component";
 import { MediaUploadComponent } from "./media_upload.component";
@@ -74,7 +74,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     setSubmitLoading(true);
     resetUploadProgress();
 
-    const rs = await handlerSubmit(
+    const rs = await handleSubmit(
       artworkForm.getValues(),
       { id: projectId },
       fileUploads,

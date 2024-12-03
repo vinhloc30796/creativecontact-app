@@ -87,7 +87,7 @@ export const addArtworkAssets = async (
   };
 };
 
-export const handlerSubmit = async (
+export const handleSubmit = async (
   artWorkData: {
     id: string;
     title: string;
