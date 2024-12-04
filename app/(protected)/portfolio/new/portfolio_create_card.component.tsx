@@ -1,7 +1,7 @@
 "use client";
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
-import { useToast } from "@/components/hooks/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import {
@@ -31,6 +31,7 @@ import AddCoOwner from "./add_coowner.component";
 import { useFileUpload } from "./files_uplooad_provider.component";
 import { MediaUploadComponent } from "./media_upload.component";
 import UploadInfo from "./upload_info.component";
+import { useRouter } from "next/navigation";
 
 interface PortfolioCreateCardProps {
   project?: {
@@ -40,9 +41,9 @@ interface PortfolioCreateCardProps {
   };
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
+  const router = useRouter()
   const { fileUploads, thumbnailFileName } = useFileUpload();
   const { t } = useTranslation(["Portfolio", "ArtworkInfoStep"]);
-  const { toast } = useToast();
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const {
@@ -52,7 +53,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     setUploadProgress,
     resetUploadProgress,
   } = useUploadStore();
-  
+
   const artworkUUID = v4();
   const projectId = v4();
 
@@ -84,18 +85,17 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       },
     );
 
-    if (rs) {
-      toast({
-        title: t("form.toast.success.title"),
-        description: t("form.toast.success.description"),
-      });
-    } else {
-      toast({
-        title: t("form.toast.error.title"),
-        description: t("form.toast.error.description"),
-      });
-    }
     setSubmitLoading(false);
+    if (rs) {
+      toast.success(t("form.toast.success.title"), {
+        duration: 5000,
+      })
+      router.push("/profile#portfolio?project=" + projectId)
+    } else {
+      toast.error(t("form.toast.error.title"), {
+        duration: 5000,
+      })
+    }
   }
 
   return (
@@ -178,7 +178,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       </CardFooter>
 
       {submitLoading && uploadProgress > 0 && (
-        <Dialog open={true} onOpenChange={() => {}}>
+        <Dialog open={true} onOpenChange={() => { }}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="mb-2 text-2xl font-bold">
