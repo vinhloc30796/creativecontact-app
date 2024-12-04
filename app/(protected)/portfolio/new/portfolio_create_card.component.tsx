@@ -90,7 +90,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       toast.success(t("form.toast.success.title"), {
         duration: 5000,
       })
-      router.push("/profile#portfolio?project=" + projectId)
+      router.push("/profile#portfolio?projectId=" + projectId)
     } else {
       toast.error(t("form.toast.error.title"), {
         duration: 5000,
