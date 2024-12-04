@@ -276,6 +276,11 @@ export function PortfolioTabs({
 
   // Active tab state
   const [activeTab, setActiveTab] = useState<string>(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const projectId = searchParams.get("projectId");
+    if (projectId && projects.find((p) => p.portfolioArtworks.id === projectId)) {
+      return projectId;
+    }
     const initialTab = projects.length > 0 ? projects[0].portfolioArtworks.id : "new";
     console.log("[PortfolioTabs] Setting initial active tab:", initialTab);
     return initialTab;
