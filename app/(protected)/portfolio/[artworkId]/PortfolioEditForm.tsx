@@ -14,19 +14,25 @@ import { useTranslation } from "@/lib/i18n/init-client";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import DataUsage from "@/components/uploads/DataUsage";
 import { ArtworkService } from "@/services/artwork-service";
-import { handleFileUpload } from "@/app/(public)/event/[eventSlug]/upload/client-helpers";
+import {
+  handleCoArtists,
+  handleFileUpload,
+} from "@/app/(public)/event/[eventSlug]/upload/client-helpers";
 import { insertArtworkAssets } from "@/app/(public)/event/[eventSlug]/upload/actions";
 import { useUploadStore } from "@/stores/uploadStore";
+import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 
 interface ArtworkFormValues {
   title: string;
   description: string;
+  id: string;
   uuid: string;
   coartists: {
+    userId: string;
     email: string;
     first_name: string;
     last_name: string;
@@ -39,6 +45,14 @@ interface PortfolioEditFormProps {
   artwork?: PortfolioArtworkWithDetails;
   isNew: boolean;
   lang?: string;
+}
+
+interface ArtworkCredit {
+  userId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  title: string;
 }
 
 export default function PortfolioEditForm({
@@ -62,6 +76,7 @@ export default function PortfolioEditForm({
   const form = useForm<ArtworkFormValues>({
     defaultValues: {
       title: artwork?.artworks?.title || "",
+      id: artwork?.artworks?.id || "",
       description: artwork?.artworks?.description || "",
       uuid: artwork?.artworks?.id || "",
       coartists: [],
@@ -84,15 +99,54 @@ export default function PortfolioEditForm({
     enabled: !!artwork?.artworks?.id,
   });
 
-  const handleSubmit = async (formData: ArtworkFormValues) => {
-    console.log("Form data:", formData);
+  const { data: artworkCredits, isLoading: isLoadingCredits } = useQuery<
+    ArtworkCredit[]
+  >({
+    queryKey: ["artwork-credits", artwork?.artworks?.id],
+    queryFn: async () => {
+      if (!artwork?.artworks?.id) {
+        return [];
+      }
+      const response = await fetch(
+        `/api/artworks/${artwork.artworks.id}/credits`,
+      );
+      if (!response.ok) throw new Error("Failed to fetch artwork credits");
+      const data: ArtworkCredit[] = await response.json();
+      return data;
+    },
+    enabled: !!artwork?.artworks?.id,
+  });
 
+  useEffect(() => {
+    if (artworkCredits) {
+      const coartists = (artworkCredits || []).map((credit: ArtworkCredit) => ({
+        userId: credit.userId,
+        email: "", // Email is not stored in the credits table
+        first_name: credit.firstName,
+        last_name: credit.lastName,
+        title: credit.title,
+      }));
+      form.setValue("coartists", coartists);
+    }
+  }, [artworkCredits, form]);
+
+  console.log("Artwork credits:", artworkCredits);
+
+  console.log("Form data", form.getValues());
+
+  const handleSubmit = async (formData: ArtworkFormValues) => {
     try {
       // Update artwork
       await ArtworkService.updateArtworkInfo(formData.uuid, {
         title: formData.title,
         description: formData.description,
       });
+
+      await handleCoArtists(
+        formData,
+        form.getValues() as ArtworkCreditInfoData,
+        "eventSlug",
+      );
 
       if (pendingFiles.length > 0) {
         const files = pendingFiles.map(
@@ -120,6 +174,7 @@ export default function PortfolioEditForm({
       }
 
       router.push("/profile");
+      router.refresh();
     } catch (error) {
       console.error(error);
     }
@@ -141,6 +196,7 @@ export default function PortfolioEditForm({
               <div className="flex flex-col space-y-4">
                 <ArtworkInfoStep
                   form={form as any}
+                  artworksCount={artworkWithAssets?.length || 0}
                   artworks={
                     artwork?.artworks
                       ? [
@@ -196,16 +252,15 @@ export default function PortfolioEditForm({
                     )}
                   </div>
                 )}
-
-                <ThumbnailProvider>
-                  <MediaUpload
-                    isNewArtwork={isNew}
-                    emailLink="/contact"
-                    onPendingFilesUpdate={setPendingFiles}
-                  />
-                </ThumbnailProvider>
               </div>
             </form>
+            <ThumbnailProvider>
+              <MediaUpload
+                isNewArtwork={isNew}
+                emailLink="/contact"
+                onPendingFilesUpdate={setPendingFiles}
+              />
+            </ThumbnailProvider>
           </CardContent>
         </Card>
 
