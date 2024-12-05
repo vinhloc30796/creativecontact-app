@@ -8,14 +8,20 @@ import { redirect } from "next/navigation";
 
 // API imports
 import { fetchUserData } from "@/app/api/user/helper";
-import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
+import {
+  calculateUserDataUsage,
+  fetchUserPortfolioArtworksWithDetails,
+} from "@/app/api/user/[id]/portfolio-artworks/helper";
 
 // Type imports
 import { UserData } from "@/app/types/UserInfo";
 
 // Component imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader, LoadingUserHeader } from "@/components/wrappers/UserHeader";
+import {
+  UserHeader,
+  LoadingUserHeader,
+} from "@/components/wrappers/UserHeader";
 import { BackButton } from "@/app/(protected)/profile/BackButton";
 import PortfolioEditForm from "./PortfolioEditForm";
 
@@ -63,10 +69,12 @@ export default async function PortfolioEditPage({
   );
 
   const currentArtwork = portfolioArtworks.find(
-    (artwork) => artwork.artworks?.id === params.artworkId
+    (artwork) => artwork.artworks?.id === params.artworkId,
   );
 
-  if (!currentArtwork && params.artworkId !== 'new') {
+  const dataUsage = await calculateUserDataUsage(userData.id);
+
+  if (!currentArtwork && params.artworkId !== "new") {
     console.error("Artwork not found: ", params.artworkId);
     redirect("/profile");
   }
@@ -88,10 +96,11 @@ export default async function PortfolioEditPage({
           </div>
           <div className="container mx-auto px-4">
             <PortfolioEditForm
+              dataUsage={dataUsage}
               userData={userData}
               lang={lang}
               artwork={currentArtwork}
-              isNew={params.artworkId === 'new'}
+              isNew={params.artworkId === "new"}
             />
           </div>
         </main>

@@ -35,6 +35,7 @@ interface ArtworkFormValues {
 }
 
 interface PortfolioEditFormProps {
+  dataUsage: number;
   userData: UserData;
   artwork?: PortfolioArtworkWithDetails;
   isNew: boolean;
@@ -42,6 +43,7 @@ interface PortfolioEditFormProps {
 }
 
 export default function PortfolioEditForm({
+  dataUsage,
   userData,
   artwork,
   isNew,
@@ -102,7 +104,7 @@ export default function PortfolioEditForm({
         const uploadedResults = await handleFileUpload(
           formData.uuid,
           files,
-          "thumbnail.jpg", 
+          "thumbnail.jpg",
           setUploadProgress,
         );
 
@@ -114,7 +116,7 @@ export default function PortfolioEditForm({
         // Insert assets
         const insertAssetsResult = await insertArtworkAssets(
           formData.uuid,
-          uploadedResults
+          uploadedResults,
         );
         console.log("Insert assets successful:", insertAssetsResult);
       }
@@ -199,6 +201,7 @@ export default function PortfolioEditForm({
 
                 <ThumbnailProvider>
                   <MediaUpload
+                    dataUsage={dataUsage}
                     isNewArtwork={isNew}
                     emailLink="/contact"
                     onPendingFilesUpdate={setPendingFiles}
@@ -233,7 +236,7 @@ export default function PortfolioEditForm({
 
               <CardContent>
                 <div className="mt-1">
-                  <DataUsage />
+                  <DataUsage dataUsage={dataUsage} />
                 </div>
               </CardContent>
             </Card>

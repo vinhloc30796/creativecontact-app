@@ -10,7 +10,11 @@ const formatSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
-const DataUsage: React.FC = () => {
+interface DataUsageProps {
+  dataUsage: number;
+}
+
+export default function DataUsage({ dataUsage }: DataUsageProps) {
   const { pendingSize } = usePendingSizeStore();
   const maxSize = 25 * 1024 * 1024; // 25MB in bytes
   const isOverLimit = pendingSize > maxSize;
@@ -41,6 +45,4 @@ const DataUsage: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default DataUsage;
+}
