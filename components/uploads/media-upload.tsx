@@ -15,6 +15,7 @@ import { useThumbnail } from "@/contexts/ThumbnailContext";
 import usePendingSizeStore from "@/stores/usePendingSizeStore";
 
 interface MediaUploadProps {
+  dataUsage: number;
   artworkUUID?: string;
   emailLink: string;
   isNewArtwork: boolean;
@@ -22,6 +23,7 @@ interface MediaUploadProps {
 }
 
 export function MediaUpload({
+  dataUsage,
   artworkUUID,
   isNewArtwork,
   emailLink,
@@ -56,7 +58,7 @@ export function MediaUpload({
         return newFiles;
       });
     },
-    [thumbnailFileName, onPendingFilesUpdate],
+    [thumbnailFileName, onPendingFilesUpdate, setThumbnailFileName],
   );
   // Remove a file from the pending files list
   const removeFile = (fileToRemove: File | SupabaseFile) => {
@@ -85,9 +87,9 @@ export function MediaUpload({
   };
 
   useEffect(() => {
-    const size = pendingFiles.reduce((acc, file) => acc + file.size, 0);
+    const size = pendingFiles.reduce((acc, file) => acc + file.size, dataUsage);
     setPendingSize(size);
-  }, [pendingFiles, setPendingSize]);
+  }, [dataUsage, pendingFiles, setPendingSize]);
 
   return (
     <div className="mx-auto w-full max-w-md bg-background">
@@ -98,8 +100,9 @@ export function MediaUpload({
       >
         <div
           {...getRootProps()}
-          className={`cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors ${isDragActive ? "border-primary bg-primary/10" : "border-border"
-            }`}
+          className={`cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors ${
+            isDragActive ? "border-primary bg-primary/10" : "border-border"
+          }`}
         >
           <input {...getInputProps()} />
           <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
