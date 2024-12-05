@@ -168,7 +168,7 @@ export default function PortfolioEditForm({
         console.log("Insert assets successful:", insertAssetsResult);
       }
 
-      router.push("/profile");
+      // router.push("/profile");
       router.refresh();
     } catch (error) {
       console.error(error);

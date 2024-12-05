@@ -22,6 +22,7 @@ import { performUpload } from "./client";
 import { ContactInfoData } from "@/app/form-schemas/contact-info";
 import { Industry, ExperienceLevel } from "@/app/types/UserInfo";
 import { fetchArtworkCredits } from "@/app/api/artworks/[id]/credits/helper";
+import { check } from "drizzle-orm/mysql-core";
 
 export async function handleUserInfo(
   contactInfoData: ContactInfoData,
@@ -102,17 +103,31 @@ export async function handleCoArtists(
   eventSlug: string,
 ) {
   for (const coartist of artworkCreditData.coartists || []) {
-    // Check if the coartist is already a user
-    const existingUser = await checkUserIsAnonymousById(coartist.userId);
+    console.log("coartist", coartist);
+    let existingUser = await checkUserIsAnonymous(coartist.email);
+    console.log("existingUserEmail", existingUser);
+    const userId = await getUserId(coartist.email);
+    if (existingUser === false) {
+      await insertArtworkCredit(artworkData.id, userId!, coartist.title);
+    }
+
+    if (existingUser === null) {
+      existingUser = await checkUserIsAnonymousById(coartist.userId!);
+      console.log("existingUserId", existingUser);
+
+      if (existingUser === null) {
+        throw new Error("User not found");
+      }
+      if (existingUser === false) {
+        await insertArtworkCredit(
+          artworkData.id,
+          coartist.userId!,
+          coartist.title,
+        );
+      }
+    }
 
     // isAnonymous is true if the user is not found, false if the user is found
-    if (existingUser === false) {
-      await insertArtworkCredit(
-        artworkData.id,
-        coartist.userId!,
-        coartist.title,
-      );
-    }
 
     // BUG: This will signin the anonymous user and logout the current user
     /*     else {
