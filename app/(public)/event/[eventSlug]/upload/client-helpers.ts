@@ -104,11 +104,14 @@ export async function handleCoArtists(
 ) {
   for (const coartist of artworkCreditData.coartists || []) {
     console.log("coartist", coartist);
+
     let existingUser = await checkUserIsAnonymous(coartist.email);
     console.log("existingUserEmail", existingUser);
-    const userId = await getUserId(coartist.email);
+
     if (existingUser === false) {
+      const userId = await getUserId(coartist.email);
       await insertArtworkCredit(artworkData.id, userId!, coartist.title);
+      continue;
     }
 
     if (existingUser === null) {
@@ -118,6 +121,7 @@ export async function handleCoArtists(
       if (existingUser === null) {
         throw new Error("User not found");
       }
+
       if (existingUser === false) {
         await insertArtworkCredit(
           artworkData.id,
