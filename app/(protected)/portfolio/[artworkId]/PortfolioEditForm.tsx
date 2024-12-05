@@ -32,6 +32,7 @@ interface ArtworkFormValues {
   id: string;
   uuid: string;
   coartists: {
+    userId: string;
     email: string;
     first_name: string;
     last_name: string;
@@ -47,6 +48,7 @@ interface PortfolioEditFormProps {
 }
 
 interface ArtworkCredit {
+  userId: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -118,6 +120,7 @@ export default function PortfolioEditForm({
   useEffect(() => {
     if (artworkCredits) {
       const coartists = (artworkCredits || []).map((credit: ArtworkCredit) => ({
+        userId: credit.userId,
         email: "", // Email is not stored in the credits table
         first_name: credit.firstName,
         last_name: credit.lastName,
@@ -129,9 +132,9 @@ export default function PortfolioEditForm({
 
   console.log("Artwork credits:", artworkCredits);
 
-  const handleSubmit = async (formData: ArtworkFormValues) => {
-    console.log("Form data:", formData);
+  console.log("Form data", form.getValues());
 
+  const handleSubmit = async (formData: ArtworkFormValues) => {
     try {
       // Update artwork
       await ArtworkService.updateArtworkInfo(formData.uuid, {

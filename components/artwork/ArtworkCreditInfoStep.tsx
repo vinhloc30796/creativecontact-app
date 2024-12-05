@@ -38,6 +38,7 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
     last_name: "",
     email: "",
     title: "",
+    userId: "",
   });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   // I18n
@@ -52,7 +53,13 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
     } else {
       form.setValue("coartists", [...currentCoartists, newCoartist]);
     }
-    setNewCoartist({ first_name: "", last_name: "", email: "", title: "" });
+    setNewCoartist({
+      first_name: "",
+      last_name: "",
+      email: "",
+      title: "",
+      userId: "",
+    });
     setIsDialogOpen(false);
     setEditingIndex(null);
   };
@@ -71,6 +78,7 @@ export function ArtworkCreditInfoStep({ form }: ArtworkCreditInfoStepProps) {
       last_name: coartistToEdit.last_name,
       email: coartistToEdit.email,
       title: coartistToEdit.title,
+      userId: coartistToEdit.userId,
     });
     setEditingIndex(index);
     setIsDialogOpen(true);

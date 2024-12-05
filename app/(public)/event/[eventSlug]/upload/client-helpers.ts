@@ -1,7 +1,11 @@
 // Actions
 import { sendArtworkUploadConfirmationEmail } from "@/app/actions/email/artworkDetails";
 import { sendArtworkCreditRequestEmail } from "@/app/actions/email/creditRequest";
-import { checkUserIsAnonymous, getUserId } from "@/app/actions/user/auth";
+import {
+  checkUserIsAnonymous,
+  checkUserIsAnonymousById,
+  getUserId,
+} from "@/app/actions/user/auth";
 import { signUpUser } from "@/app/actions/user/signUp";
 import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
 import {
@@ -99,17 +103,15 @@ export async function handleCoArtists(
 ) {
   for (const coartist of artworkCreditData.coartists || []) {
     // Check if the coartist is already a user
-    const existingUser = await checkUserIsAnonymous(coartist.email);
-
-    console.log("ARtworkData", artworkData);
+    const existingUser = await checkUserIsAnonymousById(coartist.userId);
 
     // isAnonymous is true if the user is not found, false if the user is found
     if (existingUser === false) {
-      const userId = await getUserId(coartist.email);
-      console.log("userId", userId);
-      console.log("artworkData.id", artworkData.id);
-
-      await insertArtworkCredit(artworkData.id, userId!, coartist.title);
+      await insertArtworkCredit(
+        artworkData.id,
+        coartist.userId!,
+        coartist.title,
+      );
     }
 
     // BUG: This will signin the anonymous user and logout the current user
