@@ -101,6 +101,8 @@ export async function handleCoArtists(
     // Check if the coartist is already a user
     const existingUser = await checkUserIsAnonymous(coartist.email);
 
+    console.log("ARtworkData", artworkData);
+
     // isAnonymous is true if the user is not found, false if the user is found
     if (existingUser === false) {
       const userId = await getUserId(coartist.email);

@@ -115,16 +115,6 @@ export default function PortfolioEditForm({
     enabled: !!artwork?.artworks?.id,
   });
 
-  const { data: totalSize, isLoading: isLoadingSize } = useQuery({
-    queryKey: ["user-data-usage", userData.id],
-    queryFn: async () => {
-      const response = await fetch(`/api/user/${userData.id}/data-usage`);
-      if (!response.ok) throw new Error("Failed to fetch user data usage");
-      const data = await response.json();
-      return data;
-    },
-  });
-
   useEffect(() => {
     if (artworkCredits) {
       const coartists = (artworkCredits || []).map((credit: ArtworkCredit) => ({
