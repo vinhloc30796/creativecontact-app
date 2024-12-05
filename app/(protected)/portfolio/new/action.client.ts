@@ -1,145 +1,130 @@
-import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile";
-import { createPortfolioTransaction, insertArtworkAssetsTransaction } from "./transaction.actions";
+import {
+  createPortfolioTransaction,
+  insertArtworkAssetsTransaction,
+} from "./transaction.actions";
 import { createClient } from "@/utils/supabase/client";
-import { normalizeFileNameForS3 } from "@/lib/s3_convention";
-import { toNonAccentVietnamese } from "@/lib/vietnamese";
-const supabase = createClient()
+import { performUpload } from "@/app/(public)/event/[eventSlug]/upload/client";
+const supabase = createClient();
+
 async function createPortfolio(
   artWorkData: {
-    title: string,
-    description: string
+    id: string;
+    title: string;
+    description: string;
   },
   portfolioData: {
-    displayOrder?: number
-    isHightlighted?: boolean
-  }
+    id?: string;
+    displayOrder?: number;
+    isHightlighted?: boolean;
+  },
 ) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     throw new Error("could not find user");
   }
   const result = await createPortfolioTransaction(
     { id: user.id },
     { ...artWorkData },
-    { ...portfolioData }
+    { ...portfolioData },
   );
-  return result
+  return result;
 }
 
 async function deleteAllFileInArtwork(artworkId: string) {
-  const { data, error } = await supabase
-    .storage
-    .from('artwork_assets')
-    .list(artworkId)
+  const { data, error } = await supabase.storage
+    .from("artwork_assets")
+    .list(artworkId);
   if (error) {
-    return error
+    return error;
   }
-  const errors: Error[] = []
+  const errors: Error[] = [];
   for (const file of data) {
-    const { error } = await supabase
-      .storage
-      .from('artwork_assets')
+    const { error } = await supabase.storage
+      .from("artwork_assets")
       .remove([`${artworkId}/${file.name}`]);
     if (error) {
-      errors.push(error)
+      errors.push(error);
     }
   }
-  return errors.length > 0 ? errors : null
+  return errors.length > 0 ? errors : null;
 }
 
-async function uploadFile(artworkId: string, files: File[], thumbnailFileName: string) {
-  const errors = await deleteAllFileInArtwork(artworkId);
-  if (errors) {
-    return {
-      results: null,
-      errors
-    }
-  }
-
-  const normalizedThumbnailFileName = normalizeFileNameForS3(toNonAccentVietnamese(thumbnailFileName));
-  const uploadPromies = files.map(async (file) => {
-    const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name));
-    const { data, error } = await supabase
-      .storage
-      .from('artwork_assets')
-      .upload(`${artworkId}/${normalizedFileName}`, file, { upsert: false });
-    return { data, error, file }
-  })
-
-  const uploadResults = await Promise.all(uploadPromies);
-  return uploadResults.reduce<{ results: ThumbnailSupabaseFile[] | null, errors: Error[] | null }>(
-    (acc, { data, error, file }) => {
-      if (error) {
-        if (acc.errors === null) {
-          acc.errors = [];
-        }
-        acc.errors.push(error);
-      } else if (data) {
-        if (acc.results === null) {
-          acc.results = [];
-        }
-
-        const normalizedFileName = normalizeFileNameForS3(toNonAccentVietnamese(file.name));
-        const matched = normalizedFileName === normalizedThumbnailFileName;
-
-        acc.results.push({
-          id: data.id,
-          path: data.path,
-          fullPath: data.fullPath,
-          name: file.name,
-          size: file.size,
-          isThumbnail: matched,
-        });
-      }
-      else {
-        if (acc.errors === null) {
-          acc.errors = [];
-        }
-        acc.errors.push(new Error('unknown error when uploading file'));
-      }
-      return acc
-    }, { results: [], errors: null });
-}
-
-export const addArtworkAssets = async (artworkId: string, files: File[], thumbnailFileName: string) => {
-  const { results, errors } = await uploadFile(artworkId, files, thumbnailFileName);
+export const addArtworkAssets = async (
+  artworkId: string,
+  files: File[],
+  thumbnailFileName: string,
+  onProgress?: (
+    progress: number,
+    uploadedCount: number,
+    totalCount: number,
+  ) => void,
+) => {
+  const { results, errors } = await performUpload(
+    artworkId,
+    files,
+    thumbnailFileName,
+    onProgress ?? (() => {}),
+  );
   if (errors) {
     return {
       data: null,
-      errors
-    }
+      errors,
+    };
   }
   const rs = await insertArtworkAssetsTransaction(artworkId, results!);
   if (rs.errors || rs.data.length === 0) {
     await deleteAllFileInArtwork(artworkId);
     return {
       data: null,
-      errors: rs.errors || [new Error("could not insert artwork assets")]
-    }
+      errors: rs.errors || [new Error("could not insert artwork assets")],
+    };
   }
   return {
     data: true,
-    errors: null
-  }
-}
+    errors: null,
+  };
+};
 
-export const handlerSubmit = async (artWorkData: {
-  title: string,
-  description: string
-}, portfolioData: {
-  displayOrder?: number
-  isHightlighted?: boolean
-},
+export const handleSubmit = async (
+  artWorkData: {
+    id: string;
+    title: string;
+    description: string;
+  },
+  portfolioData: {
+    id: string;
+    displayOrder?: number;
+    isHightlighted?: boolean;
+  },
   files: File[],
-  thumbnailFileName: string
+  thumbnailFileName: string,
+  onProgress?: (
+    progress: number,
+    uploadedCount: number,
+    totalCount: number,
+  ) => void,
 ) => {
   const result = await createPortfolio(artWorkData, portfolioData);
   if (!result.artwork.id) {
-    return new Error("could not create portfolio");
+    return new Error("[handlerSubmit] could not create portfolio");
+  } else {
+    console.log(
+      "[handlerSubmit] created portfolio with portfolioId",
+      result.portfolioArtwork.id,
+      "and artworkId",
+      result.artwork.id,
+    );
   }
-  const rs = await addArtworkAssets(result.artwork.id, files, thumbnailFileName);
+  const rs = await addArtworkAssets(
+    artWorkData.id,
+    files,
+    thumbnailFileName,
+    onProgress,
+  );
   if (rs.errors) {
     return rs.errors;
   }
-  return true
-}
+  return true;
+};
