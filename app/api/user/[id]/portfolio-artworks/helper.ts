@@ -1,12 +1,17 @@
 // File: app/api/user/[id]/portfolio-artworks/helper.ts
 
-import { artworkCredits, artworks } from "@/drizzle/schema/artwork";
+import {
+  artworkAssets,
+  artworkCredits,
+  artworks,
+} from "@/drizzle/schema/artwork";
 import {
   PortfolioArtwork,
   PortfolioArtworkWithDetails,
   portfolioArtworks,
 } from "@/drizzle/schema/portfolio";
 import { db } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { eq, and } from "drizzle-orm";
 
 export async function fetchUserPortfolioArtworks(
@@ -33,9 +38,9 @@ export async function fetchUserPortfolioArtworksWithDetails(
       artworkId
         ? and(
             eq(portfolioArtworks.userId, userId),
-            eq(portfolioArtworks.id, artworkId)
+            eq(portfolioArtworks.id, artworkId),
           )
-        : eq(portfolioArtworks.userId, userId)
+        : eq(portfolioArtworks.userId, userId),
     )
     .innerJoin(artworks, eq(portfolioArtworks.artworkId, artworks.id));
 

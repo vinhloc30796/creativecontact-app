@@ -18,13 +18,18 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import DataUsage from "@/components/uploads/DataUsage";
 import { ArtworkService } from "@/services/artwork-service";
-import { handleFileUpload } from "@/app/(public)/event/[eventSlug]/upload/client-helpers";
+import {
+  handleCoArtists,
+  handleFileUpload,
+} from "@/app/(public)/event/[eventSlug]/upload/client-helpers";
 import { insertArtworkAssets } from "@/app/(public)/event/[eventSlug]/upload/actions";
 import { useUploadStore } from "@/stores/uploadStore";
+import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 
 interface ArtworkFormValues {
   title: string;
   description: string;
+  id: string;
   uuid: string;
   coartists: {
     email: string;
@@ -39,6 +44,13 @@ interface PortfolioEditFormProps {
   artwork?: PortfolioArtworkWithDetails;
   isNew: boolean;
   lang?: string;
+}
+
+interface ArtworkCredit {
+  email: string;
+  firstName: string;
+  lastName: string;
+  title: string;
 }
 
 export default function PortfolioEditForm({
@@ -62,6 +74,7 @@ export default function PortfolioEditForm({
   const form = useForm<ArtworkFormValues>({
     defaultValues: {
       title: artwork?.artworks?.title || "",
+      id: artwork?.artworks?.id || "",
       description: artwork?.artworks?.description || "",
       uuid: artwork?.artworks?.id || "",
       coartists: [],
@@ -84,6 +97,48 @@ export default function PortfolioEditForm({
     enabled: !!artwork?.artworks?.id,
   });
 
+  const { data: artworkCredits, isLoading: isLoadingCredits } = useQuery<
+    ArtworkCredit[]
+  >({
+    queryKey: ["artwork-credits", artwork?.artworks?.id],
+    queryFn: async () => {
+      if (!artwork?.artworks?.id) {
+        return [];
+      }
+      const response = await fetch(
+        `/api/artworks/${artwork.artworks.id}/credits`,
+      );
+      if (!response.ok) throw new Error("Failed to fetch artwork credits");
+      const data: ArtworkCredit[] = await response.json();
+      return data;
+    },
+    enabled: !!artwork?.artworks?.id,
+  });
+
+  const { data: totalSize, isLoading: isLoadingSize } = useQuery({
+    queryKey: ["user-data-usage", userData.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/user/${userData.id}/data-usage`);
+      if (!response.ok) throw new Error("Failed to fetch user data usage");
+      const data = await response.json();
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (artworkCredits) {
+      const coartists = (artworkCredits || []).map((credit: ArtworkCredit) => ({
+        email: "", // Email is not stored in the credits table
+        first_name: credit.firstName,
+        last_name: credit.lastName,
+        title: credit.title,
+      }));
+      form.setValue("coartists", coartists);
+    }
+  }, [artworkCredits, form]);
+
+  console.log("Artwork credits:", artworkCredits);
+
   const handleSubmit = async (formData: ArtworkFormValues) => {
     console.log("Form data:", formData);
 
@@ -93,6 +148,12 @@ export default function PortfolioEditForm({
         title: formData.title,
         description: formData.description,
       });
+
+      await handleCoArtists(
+        formData,
+        form.getValues() as ArtworkCreditInfoData,
+        "eventSlug",
+      );
 
       if (pendingFiles.length > 0) {
         const files = pendingFiles.map(
