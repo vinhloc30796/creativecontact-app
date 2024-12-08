@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import { normalizeFileNameForS3 } from "../s3_convention";
 import { toNonAccentVietnamese } from "../vietnamese";
 import { getFileType, isMediaFile } from "@/utils/file_type";
+import { getDataUseage } from "./getDatUsage";
 
 
 
@@ -39,6 +40,10 @@ async function UploadMediaFile(
   })
   if (err.length > 0) {
     return { results: null, errors: err }
+  }
+  const checkLimitFiles = await checkLimit(files)
+  if (!checkLimitFiles.success) {
+    return { results: null, errors: [checkLimitFiles.error!] }
   }
 
   const supabaseClient = createClient();
@@ -120,6 +125,23 @@ async function deleteMediaFile(path: string) {
   return { results: "true", errors: null }
 }
 
+async function checkLimit(files: File[]): Promise<{ success: boolean, error: Error | null }> {
+  let size = 0
+  files.forEach((file) => {
+    size += file.size
+  })
+  try {
+    const dataUsageData = await getDataUseage()
+    const dataUsage = dataUsageData.result as number
+    const newDataUsage = (dataUsage + size) / (1024 * 1024)
+    if (newDataUsage > 25) {
+      return { success: false, error: new Error("data usage limit exceeded") }
+    }
+    return { success: true, error: null }
+  } catch {
+    return { success: false, error: new Error("data usage api error") }
+  }
+}
 
 export {
   UploadMediaFile,

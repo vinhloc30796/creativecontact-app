@@ -7,7 +7,6 @@ import { Upload } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { deleteMediaFile, UploadedMediaFileType, UploadMediaFile } from '@/lib/client/uploadMediaFile';
 import { toast } from 'sonner';
-import { number } from 'zod';
 import { useQuery } from '@tanstack/react-query';
 
 // Context
@@ -117,7 +116,7 @@ function UploadFile({ lang, path }: UploadFileProps) {
     console.info(rs)
     if (rs.errors) {
       console.error(rs.errors)
-      toast.error(t("toast.error.title"))
+      toast.error(t("toast.error.title"), { duration: 5000 })
     } else {
       toast.success(t("toast.success.title"))
       addFiles(rs.results || [])
