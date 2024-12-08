@@ -1,4 +1,10 @@
 {
+  "supportFile": {
+    "title": "Hỗ trợ file:",
+    "images": "Tệp ảnh (.png, .jpg, .gif)",
+    "videos": "Tệp videos (.mp4, .mkv)",
+    "audios": "Tệp âm thanh (.mp3, .wav)"
+  },
   "toast": {
     "error": {
       "title": "Lỗi Tải File"
