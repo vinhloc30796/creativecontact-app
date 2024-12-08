@@ -4,7 +4,16 @@
   "projectInfo": "Thông tin Dự án",
   "projectMedia": "Media",
   "projectCredits": "Tác giả",
+  "dataUsage": "Dung lượng dữ liệu",
   "cancel": "Hủy",
   "create": "Tạo mới",
-  "save": "Lưu"
+  "save": "Lưu",
+  "publish": "Xuất bản",
+  "projectName": "Tên Dự án",
+  "projectDescription": "Mô tả dự án",
+  "addCoOwner": "Đồng tác giả",
+  "toast":{
+    "success": "Đã tạo dự án!",
+    "error": "Lỗi khi tạo dự án" 
+  }
 }

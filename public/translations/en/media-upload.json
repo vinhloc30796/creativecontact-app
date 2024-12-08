@@ -1,4 +1,10 @@
 {
+  "supportFile": {
+    "title": "We support",
+    "images": "High resolution image (.png, .jpg, .gif)",
+    "videos": "Videos (.mp4, .mkv)",
+    "audios": "Audio (.mp3, .wav)"
+  },
   "toast": {
     "error": {
       "title":"Error Uploading File"
