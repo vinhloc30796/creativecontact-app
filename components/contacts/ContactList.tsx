@@ -4,38 +4,50 @@ import { useQuery } from '@tanstack/react-query';
 import { UserData } from "@/app/types/UserInfo";
 import { ContactCard } from "./ContactCard";
 import { EmptyContactCard } from "./EmptyContactCard";
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { useMemo } from 'react';
-import { ContactListSkeleton } from './ContactListSkeleton';
+import { useEffect } from 'react';
+import { ErrorContactCard } from "./ErrorContactCard";
+import { ContactListSkeleton } from "./ContactListSkeleton";
 
 interface ContactListProps {
-  contactsPromise: Promise<UserData[]>;
+  userId: string;
   lang: string;
 }
-
-export function ContactList({ contactsPromise, lang }: ContactListProps) {
-  const { data: contacts, isLoading } = useQuery<UserData[]>({
-    queryKey: ['contacts'],
-    queryFn: () => contactsPromise,
+export function ContactList({ userId, lang }: ContactListProps) {
+  const { data: contacts, isError, isLoading } = useQuery<UserData[]>({
+    queryKey: ['contacts', userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/user/${userId}/contacts`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch contacts');
+      }
+      return response.json();
+    },
     staleTime: 30000,
     gcTime: 5 * 60 * 1000
   });
 
-  const emptyState = useMemo(() => (
-    <EmptyContactCard lang={lang} />
-  ), [lang]);
+  if (isLoading) {
+    return <ContactListSkeleton />;
+  }
 
-  if (isLoading) return <ContactListSkeleton />;
+  if (isError) {
+    return <ErrorContactCard lang={lang} />;
+  }
 
-  return !contacts || contacts.length === 0 ? emptyState : (
-    contacts.map((contact) => (
-      <ContactCard
-        key={contact.id}
-        lang={lang}
-        userData={contact}
-        showButtons={false}
-      />
-    ))
+  if (!contacts || contacts.length === 0) {
+    return <EmptyContactCard lang={lang} />;
+  }
+
+  return (
+    <>
+      {contacts.map((contact) => (
+        <ContactCard
+          key={contact.id}
+          lang={lang}
+          userData={contact}
+          showButtons={false}
+        />
+      ))}
+    </>
   );
 }

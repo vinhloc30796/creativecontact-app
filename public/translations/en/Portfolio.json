@@ -16,5 +16,21 @@
   "toast":{
     "success": "project created!",
     "error": "Error creating project" 
+  },
+  "form": {
+    "submit": {
+      "create": "Create Project",
+      "submitting": "Creating project..."
+    },
+    "toast": {
+      "success": {
+        "title": "Success",
+        "description": "Project created successfully"
+      },
+      "error": {
+        "title": "Error",
+        "description": "Failed to create project"
+      }
+    }
   }
 }

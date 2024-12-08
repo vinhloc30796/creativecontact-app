@@ -7,6 +7,7 @@ import { ComboBadge } from "@/components/ui/combo-badge";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { getProfileImageUrl } from "@/utils/profile_image";
 import { getName } from "@/utils/user_name";
+import { useQuery } from "@tanstack/react-query";
 import { Briefcase, CheckCircle, MapPin, UserCircle } from 'lucide-react';
 
 interface ContactCardProps {
@@ -15,7 +16,7 @@ interface ContactCardProps {
   lang?: string;
 }
 
-export async function ContactCard({
+export function ContactCard({
   userData,
   showButtons = false,
   lang = "en",
@@ -24,9 +25,12 @@ export async function ContactCard({
     useSuspense: false,
   });
   const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
-  const name = await getName(userData);
-  const profilePictureUrl = await getProfileImageUrl(userData);
-  const contactImage = profilePictureUrl || placeholderImage;
+  const name = getName(userData);
+  const { data: profilePictureUrl, isLoading } = useQuery({
+    queryKey: ['profilePicture', userData.id],
+    queryFn: () => getProfileImageUrl(userData),
+  });
+  const contactImage = isLoading ? placeholderImage : (profilePictureUrl || placeholderImage);
 
   return (
     <Card className="flex flex-col h-full">
@@ -35,7 +39,7 @@ export async function ContactCard({
           <img
             src={contactImage}
             alt={`${name}'s profile`}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover ${isLoading ? 'animate-pulse' : ''}`}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
           <div className="absolute bottom-0 left-0 right-0 p-4 text-white">

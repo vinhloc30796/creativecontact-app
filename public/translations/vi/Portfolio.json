@@ -4,10 +4,6 @@
   "projectInfo": "Thông tin Dự án",
   "projectMedia": "Media",
   "projectCredits": "Tác giả",
-  "dataUsage": "Dung lượng dữ liệu",
-  "cancel": "Hủy",
-  "create": "Tạo mới",
-  "save": "Lưu",
   "publish": "Xuất bản",
   "projectName": "Tên Dự án",
   "projectDescription": "Mô tả dự án",
@@ -15,5 +11,26 @@
   "toast":{
     "success": "Đã tạo dự án!",
     "error": "Lỗi khi tạo dự án" 
+  },
+  "dataUsage": "Dung lượng sử dụng",
+  "creditInfo": "Thông tin tác giả",
+  "cancel": "Hủy",
+  "create": "Tạo mới",
+  "save": "Lưu",
+  "form": {
+    "submit": {
+      "create": "Tạo dự án",
+      "submitting": "Đang tạo dự án..."
+    },
+    "toast": {
+      "success": {
+        "title": "Thành công",
+        "description": "Đã tạo dự án thành công"
+      },
+      "error": {
+        "title": "Lỗi",
+        "description": "Không thể tạo dự án"
+      }
+    }
   }
 }

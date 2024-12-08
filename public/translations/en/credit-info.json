@@ -1,0 +1,11 @@
+{
+  "title": "Add Co-owner",
+  "add": "Add Co-owner",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
+  "role": "Role",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Remove"
+} 

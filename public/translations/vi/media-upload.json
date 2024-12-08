@@ -25,13 +25,15 @@
   },
   "form": {
     "label": "Tải File",
-    "dropzone": "Kéo thả file vào đây, hoặc nhấn để chọn file",
+    "dropzone": "Kéo thả file vào đây hoặc nhấp để chọn file",
     "size": {
       "uploaded": "Đã tải <strong>{{count}}</strong> (sẽ ghi đè). Xem lại: ",
       "pending": "Đang chờ <strong>{{count}}</strong>",
       "total": "trên giới hạn {{limit}}"
     },
-    "upload_description": "Nhấn <strong>Tải file</strong> sẽ ghi đè lên các file."
+    "upload_description": "Nhấn <strong>Tải file</strong> sẽ ghi đè lên các file.",
+    "files": "{{count}} file",
+    "size": "{{size}} của {{limit}}MB"
   },
   "dialog": {
     "title": "File Đã tải",
@@ -52,5 +54,9 @@
     "reset": "Xóa",
     "uploading": "Đang tải...",
     "upload": "Tải file"
+  },
+  "thumbnail": {
+    "set": "Đặt làm ảnh đại diện",
+    "current": "Ảnh đại diện hiện tại"
   }
 }

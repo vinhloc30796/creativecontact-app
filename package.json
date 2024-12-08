@@ -40,7 +40,6 @@
 		"@react-email/tailwind": "0.1.0",
 		"@supabase/ssr": "^0.5.1",
 		"@supabase/supabase-js": "^2.45.3",
-		"@svgr/webpack": "^8.1.0",
 		"@tanstack/react-query": "^5.54.1",
 		"@tanstack/react-table": "^8.20.1",
 		"@types/ical": "^0.8.3",
@@ -86,6 +85,7 @@
 	},
 	"devDependencies": {
 		"@formatjs/cli": "^6.2.12",
+		"@svgr/webpack": "^8.1.0",
 		"@tanstack/eslint-plugin-query": "^5.53.0",
 		"@types/node": "^22.2.0",
 		"@types/pg": "^8.11.6",

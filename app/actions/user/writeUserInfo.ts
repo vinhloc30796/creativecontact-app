@@ -1,6 +1,11 @@
 "use server";
 
-import { IndustryType, ExperienceType, userInfos, userIndustryExperience } from "@/drizzle/schema/user";
+import {
+  IndustryType,
+  ExperienceType,
+  userInfos,
+  userIndustryExperience,
+} from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
 import { getDisplayName } from "@/lib/name";
 import { eq } from "drizzle-orm";
@@ -31,10 +36,13 @@ export async function writeUserInfo(
   validateUserInfo: boolean = true,
 ) {
   console.log("Received professionalInfo:", professionalInfo);
-  
+
   // Validate professional info
   if (validateProfessionalInfo) {
-    if (!professionalInfo.industryExperiences || professionalInfo.industryExperiences.length === 0) {
+    if (
+      !professionalInfo.industryExperiences ||
+      professionalInfo.industryExperiences.length === 0
+    ) {
       console.error("Invalid professional info:", professionalInfo);
       return { success: false, error: "Invalid professional info" };
     }
@@ -86,15 +94,13 @@ export async function writeUserInfo(
 
       // Insert new industry experiences
       if (professionalInfo.industryExperiences.length > 0) {
-        await tx
-          .insert(userIndustryExperience)
-          .values(
-            professionalInfo.industryExperiences.map(exp => ({
-              userId,
-              industry: exp.industry,
-              experienceLevel: exp.experienceLevel,
-            }))
-          );
+        await tx.insert(userIndustryExperience).values(
+          professionalInfo.industryExperiences.map((exp) => ({
+            userId,
+            industry: exp.industry,
+            experienceLevel: exp.experienceLevel,
+          })),
+        );
       }
 
       return userInfoResult[0];

@@ -24,6 +24,8 @@ import { ArtworkWithAssets } from "@/app/api/artworks/[id]/assets/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { ArtworkWithCredits } from "@/app/api/artworks/[id]/credits/helper";
+import { deletePortfolio } from "@/app/actions/portfolio/server.action";
+import { deletePortfolioClient } from "@/app/actions/portfolio/client.actions";
 
 interface ProjectFormValues {
   title: string;
@@ -104,6 +106,7 @@ function ExistingPortfolioProjectCard({
     },
     enabled: !!project?.artworks?.id,
   });
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   if (!project?.artworks) {
     return <div>Project not found</div>;
@@ -119,10 +122,27 @@ function ExistingPortfolioProjectCard({
       });
     }
   };
-
-  const handleDelete = () => {
-    // TODO: Implement delete functionality
-    console.log("Delete");
+  const handleDelete = async () => {
+    setDeleteLoading(true)
+    if (!project?.artworks?.id) {
+      toast.error("Failed to delete the portfolio artwork", {
+        description: "The artwork could not be found",
+        duration: 5000,
+      })
+      return;
+    }
+    const rs = await deletePortfolioClient(project.portfolioArtworks.id);
+    setDeleteLoading(false)
+    if (rs.data?.success) {
+      toast.success("Portfolio deleted successfully", {
+        duration: 5000,
+      });
+    } else {
+      toast.error("Failed to delete the portfolio artwork", {
+        description: "The artwork could not be found",
+        duration: 5000,
+      });
+    }
   };
 
   const renderContent = () => {
@@ -151,11 +171,11 @@ function ExistingPortfolioProjectCard({
               <p className="text-gray-600">
                 {artworkCredits && artworkCredits?.length > 0
                   ? artworkCredits
-                      .map(
-                        (credit: ArtworkWithCredits) =>
-                          `${credit.displayName || "Anonymous"} (${credit.title})`,
-                      )
-                      .join(", ")
+                    .map(
+                      (credit: ArtworkWithCredits) =>
+                        `${credit.displayName || "Anonymous"} (${credit.title})`,
+                    )
+                    .join(", ")
                   : t("portfolio.noArtists")}
               </p>
             )}
