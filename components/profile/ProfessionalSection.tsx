@@ -24,11 +24,13 @@ import {
 import {
   experienceLevelsMapper,
   industriesMapper,
+  skillsMapper,
 } from "@/drizzle/schema/user";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Badge } from "../ui/badge";
 
 interface IndustryComboboxProps {
   value: Industry | null;
@@ -144,18 +146,29 @@ export function ProfessionalSection({
   lang = "en",
 }: ProfessionalSectionProps) {
   const { t } = useTranslation(lang, "ProfilePage");
-  const [selectedIndustryExperiences, setSelectedIndustryExperiences] = useState(
-    (userData.industryExperiences || []).map(ie => ({
-      ...ie,
-      id: ie.id || crypto.randomUUID()
-    }))
-  );
+  const [selectedIndustryExperiences, setSelectedIndustryExperiences] =
+    useState(
+      (userData.industryExperiences || []).map((ie) => ({
+        ...ie,
+        id: ie.id || crypto.randomUUID(),
+      })),
+    );
   const [isAdding, setIsAdding] = useState(false);
   const [newIndustry, setNewIndustry] = useState<Industry | null>(null);
   const [newExperience, setNewExperience] = useState<ExperienceLevel | null>(
     null,
   );
   const { setFieldDirty, setFormData } = useFormState();
+
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+
+  const handleSkillClick = (skill: string) => {
+    setSelectedSkills((prevSelectedSkills) =>
+      prevSelectedSkills.includes(skill)
+        ? prevSelectedSkills.filter((s) => s !== skill)
+        : [...prevSelectedSkills, skill],
+    );
+  };
 
   useEffect(() => {
     const industryExperiencesChanged =
@@ -177,8 +190,8 @@ export function ProfessionalSection({
   const addIndustryExperience = () => {
     if (newIndustry && newExperience) {
       const newId = crypto.randomUUID();
-      console.log('Adding new item with ID:', newId);
-      
+      console.log("Adding new item with ID:", newId);
+
       setSelectedIndustryExperiences((current) => [
         ...current,
         {
@@ -195,13 +208,13 @@ export function ProfessionalSection({
   };
 
   const deleteIndustryExperience = (idToDelete: string) => {
-    console.log('Deleting item with ID:', idToDelete);
-    
+    console.log("Deleting item with ID:", idToDelete);
+
     setSelectedIndustryExperiences((current) => {
-      console.log('Current items:', current);
-      
+      console.log("Current items:", current);
+
       return current.filter((ie) => {
-        console.log('Comparing:', ie.id, idToDelete);
+        console.log("Comparing:", ie.id, idToDelete);
         return ie.id !== idToDelete;
       });
     });
@@ -226,7 +239,7 @@ export function ProfessionalSection({
                   leftColor="bg-primary"
                   rightColor="bg-primary/80"
                   onDelete={() => {
-                    console.log('Deleting badge with ID:', ie.id);
+                    console.log("Deleting badge with ID:", ie.id);
                     deleteIndustryExperience(ie.id);
                   }}
                 />
@@ -267,6 +280,24 @@ export function ProfessionalSection({
                 </Button>
               </div>
             )}
+          </div>
+          <div className="space-y-2">
+            <Label>{t("ProfessionalSection.skills")}</Label>
+            <div className="flex flex-wrap gap-2">
+              {skillsMapper.map((skill) => (
+                <Badge
+                  key={skill.value}
+                  data-id={skill}
+                  onClick={() => handleSkillClick(skill.value)}
+                  variant={
+                    selectedSkills.includes(skill.value) ? undefined : "outline"
+                  }
+                  className="cursor-pointer"
+                >
+                  {skill.value}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
       </CardContent>
