@@ -418,6 +418,7 @@ function UploadPageContent({
       component: (
         <>
           <MediaUpload
+            dataUsage={0}
             artworkUUID={artworkUUID || undefined}
             emailLink={emailLink}
             isNewArtwork={true}

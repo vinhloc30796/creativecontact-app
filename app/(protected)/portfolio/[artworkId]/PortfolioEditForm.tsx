@@ -35,6 +35,7 @@ interface ArtworkFormValues {
 }
 
 interface PortfolioEditFormProps {
+  dataUsage: number;
   userData: UserData;
   artwork?: PortfolioArtworkWithDetails;
   isNew: boolean;
@@ -42,6 +43,7 @@ interface PortfolioEditFormProps {
 }
 
 export default function PortfolioEditForm({
+  dataUsage,
   userData,
   artwork,
   isNew,
@@ -102,7 +104,7 @@ export default function PortfolioEditForm({
         const uploadedResults = await handleFileUpload(
           formData.uuid,
           files,
-          "thumbnail.jpg", 
+          "thumbnail.jpg",
           setUploadProgress,
         );
 
@@ -114,7 +116,7 @@ export default function PortfolioEditForm({
         // Insert assets
         const insertAssetsResult = await insertArtworkAssets(
           formData.uuid,
-          uploadedResults
+          uploadedResults,
         );
         console.log("Insert assets successful:", insertAssetsResult);
       }
@@ -134,8 +136,7 @@ export default function PortfolioEditForm({
           </CardHeader>
 
           <CardContent>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
+            <div
               className="flex flex-col space-y-8"
             >
               <div className="flex flex-col space-y-4">
@@ -199,13 +200,14 @@ export default function PortfolioEditForm({
 
                 <ThumbnailProvider>
                   <MediaUpload
+                    dataUsage={dataUsage}
                     isNewArtwork={isNew}
                     emailLink="/contact"
                     onPendingFilesUpdate={setPendingFiles}
                   />
                 </ThumbnailProvider>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
 
@@ -233,7 +235,7 @@ export default function PortfolioEditForm({
 
               <CardContent>
                 <div className="mt-1">
-                  <DataUsage />
+                  <DataUsage dataUsage={dataUsage} />
                 </div>
               </CardContent>
             </Card>
