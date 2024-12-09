@@ -49,16 +49,11 @@ export function MediaUpload({
     (acceptedFiles: File[]) => {
       setPendingFiles((prevFiles) => {
         const newFiles = [...prevFiles, ...acceptedFiles];
-        if (newFiles.length > 0 && !thumbnailFileName) {
-          const newThumbnailFile = newFiles[0].name;
-          setThumbnailFileName(newThumbnailFile);
-        }
-        // Pass the updated file list to the parent component
         onPendingFilesUpdate(newFiles);
         return newFiles;
       });
     },
-    [thumbnailFileName, onPendingFilesUpdate, setThumbnailFileName],
+    [onPendingFilesUpdate],
   );
   // Remove a file from the pending files list
   const removeFile = (fileToRemove: File | SupabaseFile) => {
@@ -90,6 +85,12 @@ export function MediaUpload({
     const size = pendingFiles.reduce((acc, file) => acc + file.size, dataUsage);
     setPendingSize(size);
   }, [dataUsage, pendingFiles, setPendingSize]);
+
+  useEffect(() => {
+    if (pendingFiles.length > 0 && !thumbnailFileName) {
+      setThumbnailFileName(pendingFiles[0].name);
+    }
+  }, [pendingFiles, thumbnailFileName, setThumbnailFileName]);
 
   return (
     <div className="mx-auto w-full max-w-md bg-background">

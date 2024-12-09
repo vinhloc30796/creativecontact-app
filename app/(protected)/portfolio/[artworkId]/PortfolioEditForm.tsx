@@ -136,8 +136,7 @@ export default function PortfolioEditForm({
           </CardHeader>
 
           <CardContent>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
+            <div
               className="flex flex-col space-y-8"
             >
               <div className="flex flex-col space-y-4">
@@ -208,7 +207,7 @@ export default function PortfolioEditForm({
                   />
                 </ThumbnailProvider>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
 
