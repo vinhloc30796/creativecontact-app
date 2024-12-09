@@ -36,6 +36,8 @@ import {
   Phone,
   UserCircle,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useServerAuth } from "@/hooks/useServerAuth";
 
 // Local component import
 interface UserSkills {
@@ -55,24 +57,28 @@ async function getUserSkills(userId?: string): Promise<UserSkills[]> {
   ];
 }
 
-function SocialSubsection({ userData, lang = "en" }: { userData?: UserData, lang?: string }) {
+function SocialSubsection({
+  userData,
+  lang = "en",
+}: {
+  userData?: UserData;
+  lang?: string;
+}) {
   const { t } = useTranslation(lang, "ProfileCard");
-  
+
   const emptyMessage = (
-    <p className="text-sm text-muted-foreground">
-      {t("noSocialLinks")}
-    </p>
+    <p className="text-sm text-muted-foreground">{t("noSocialLinks")}</p>
   );
-  
+
   if (!userData) {
     return emptyMessage;
   }
-  
+
   const socialLinks = getSocialMediaLinks(userData);
   if (socialLinks.length === 0) {
     return emptyMessage;
   }
-  
+
   return socialLinks.map(
     (link, index) =>
       link &&
@@ -109,12 +115,13 @@ export function ProfileCard({
 
   const name = getName(userData);
   const userName = userData.userName || "";
-  const { data: profilePictureUrl, isLoading: isLoadingProfilePicture } = useQuery({
-    queryKey: ['profilePicture', userData.id],
-    queryFn: () => getProfileImageUrl(userData),
-  });
+  const { data: profilePictureUrl, isLoading: isLoadingProfilePicture } =
+    useQuery({
+      queryKey: ["profilePicture", userData.id],
+      queryFn: () => getProfileImageUrl(userData),
+    });
   const { data: userSkills } = useQuery({
-    queryKey: ['userSkills', userData.id],
+    queryKey: ["userSkills", userData.id],
     queryFn: () => getUserSkills(userData.id),
   });
   const phoneNumber = getFormattedPhoneNumber(userData);
@@ -128,7 +135,7 @@ export function ProfileCard({
           <img
             src={profilePictureUrl}
             alt={`${name}'s profile picture`}
-            className={`h-full w-full object-cover ${isLoadingProfilePicture ? 'animate-pulse bg-gray-200' : ''}`}
+            className={`h-full w-full object-cover ${isLoadingProfilePicture ? "animate-pulse bg-gray-200" : ""}`}
           />
         </div>
         <CardTitle className="mb-2 flex items-center text-2xl font-bold">
@@ -155,12 +162,14 @@ export function ProfileCard({
           {userData.location || t("unsetLocation")}
         </p>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" asChild>
-            <a href="/profile/edit">
-              <Pencil className="mr-1 h-4 w-4" />
-              {t("edit")}
-            </a>
-          </Button>
+          {showButtons && (
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/edit">
+                <Pencil className="mr-1 h-4 w-4" />
+                {t("edit")}
+              </a>
+            </Button>
+          )}
         </div>
         {userData.about && (
           <section data-section="about" className="pt-4">
