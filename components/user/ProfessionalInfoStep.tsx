@@ -25,13 +25,14 @@ import { industriesMapper, experienceLevelsMapper, IndustryType, ExperienceType 
 
 interface ProfessionalInfoStepProps {
   form: UseFormReturn<ProfessionalInfoData>
+  lang?: string
 }
 
-const IndustryExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
+const IndustryExperienceSelect = ({ form, lang = "en" }: ProfessionalInfoStepProps) => {
   // State
   const [open, setOpen] = React.useState(false)
   // I18n
-  const { t } = useTranslation(["ProfessionalInfoStep"], { keyPrefix: "IndustrySelect" });
+  const { t } = useTranslation(lang, "ProfessionalInfoStep", { keyPrefix: "IndustrySelect" });
 
   return (
     <FormField

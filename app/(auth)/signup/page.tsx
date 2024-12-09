@@ -82,13 +82,13 @@ export default function SignupPage(
     {
       title: t('ContactInfoStep.title'),
       description: t('ContactInfoStep.description'),
-      component: <ContactInfoStep form={contactInfoForm} />,
+      component: <ContactInfoStep form={contactInfoForm} lang={lang} />,
       form: contactInfoForm,
     },
     {
       title: t('ProfessionalInfoStep.title'),
       description: t('ProfessionalInfoStep.description'),
-      component: <ProfessionalInfoStep form={professionalInfoForm} />,
+      component: <ProfessionalInfoStep form={professionalInfoForm} lang={lang} />,
       form: professionalInfoForm,
     },
   ]
