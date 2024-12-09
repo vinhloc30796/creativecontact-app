@@ -1,21 +1,20 @@
-"use server";
-
-import React from "react";
+// File: components/wrappers/EventFooter.tsx
+import React, { use } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 
 interface EventFooterProps {
   className?: string;
   lang: string;
 }
 
-export const EventFooter: React.FC<EventFooterProps> = async ({
+export async function EventFooter({
   className,
   lang = 'en',
-}) => {
-  const { t } = await useTranslation(lang, "common");
+}: EventFooterProps) {
+  const { t } = await getServerTranslation(lang, "common");
 
   return (
     <footer

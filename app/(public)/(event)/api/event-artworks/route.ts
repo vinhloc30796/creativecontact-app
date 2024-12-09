@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { fetchEventArtworks } from "./helper";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { eventSlug: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ eventSlug: string }> }) {
+  const params = await props.params;
   if (!params || !params.eventSlug) {
     return NextResponse.json(
       { error: "Event slug is required" },

@@ -48,3 +48,30 @@ export async function fetchUserPortfolioArtworksWithDetails(
   console.debug("fetchUserPortfolioArtworksWithDetails: ", results);
   return results as PortfolioArtworkWithDetails[];
 }
+
+export async function calculateUserDataUsage(userId: string) {
+  console.log("Userid: ", userId);
+  const query = db
+    .select({
+      portfolioArtworks: portfolioArtworks.artworkId,
+    })
+    .from(portfolioArtworks)
+    .where(eq(portfolioArtworks.userId, userId));
+
+  const results = await query;
+  console.log("Result: ", results);
+
+  let totalSize = 0;
+
+  for (const result of results) {
+    const artworkId = result.portfolioArtworks;
+    const query = supabase.storage.from("artwork_assets").list(artworkId);
+    const { data, error } = await query;
+    console.log("Data: ", data);
+    totalSize += data!.reduce((acc, file) => acc + file.metadata.size, 0);
+  }
+
+  console.log("Total size: ", totalSize);
+
+  return totalSize;
+}

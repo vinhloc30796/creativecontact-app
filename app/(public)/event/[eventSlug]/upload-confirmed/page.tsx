@@ -1,5 +1,4 @@
 // File: app/(public)/[eventSlug]/upload-confirmed/page.tsx
-"use server";
 // Actions
 import { getArtwork } from '@/app/actions/artwork/getArtwork';
 import { getUserInfo } from '@/app/actions/user/getUserInfo';
@@ -8,29 +7,32 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
 // Hooks
-import { useTranslation } from '@/lib/i18n/init-server';
+import { getServerTranslation } from '@/lib/i18n/init-server';
+import { use } from "react";
 // Next
 import Link from 'next/link';
 
 interface UploadConfirmedContentProps {
-  params: {
+  params: Promise<{
     eventSlug: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     email?: string;
     userId?: string;
     artworkId?: string;
     emailSent?: string;
     lang?: string;
-  };
+  }>;
 }
 
-async function UploadConfirmedContent({ params, searchParams }: UploadConfirmedContentProps) {
+async function UploadConfirmedContent(props: UploadConfirmedContentProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { eventSlug } = params;
   const { email, userId, artworkId, emailSent, lang } = searchParams;
   const artwork = artworkId ? await getArtwork(artworkId) : null;
   const user = userId ? await getUserInfo(userId) : null;
-  const { t } = await useTranslation(lang || 'en', ['upload-confirmed', 'common']);
+  const { t } = await getServerTranslation(lang || 'en', ['upload-confirmed', 'common']);
 
   return (
     <BackgroundDiv eventSlug={eventSlug}>
