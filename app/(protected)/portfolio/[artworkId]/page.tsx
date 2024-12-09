@@ -1,7 +1,5 @@
-"use server";
-
 // React imports
-import { Suspense } from "react";
+import { Suspense, use } from "react";
 
 // Next.js imports
 import { redirect } from "next/navigation";
@@ -15,31 +13,35 @@ import { UserData } from "@/app/types/UserInfo";
 
 // Component imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader, LoadingUserHeader } from "@/components/wrappers/UserHeader";
+import { LoadingUserHeader } from "@/components/wrappers/LoadingUserHeader";
+import { UserHeader } from "@/components/wrappers/UserHeader";
 import { BackButton } from "@/app/(protected)/profile/BackButton";
 import PortfolioEditForm from "./PortfolioEditForm";
 
 // Hook imports
-import { useServerAuth } from "@/hooks/useServerAuth";
+import { getServerAuth } from "@/hooks/useServerAuth";
 
 // Action imports
 import { handleArtworkNotFound } from "./action";
 
+// Translation imports
+import { getServerTranslation } from "@/lib/i18n/init-server";
+
 interface PortfolioEditPageProps {
-  params: {
+  params: Promise<{
     artworkId: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     lang: string;
-  };
+  }>;
 }
 
-export default async function PortfolioEditPage({
-  params,
-  searchParams,
-}: PortfolioEditPageProps) {
+export default async function PortfolioEditPage(props: PortfolioEditPageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const lang = searchParams.lang || "en";
-  const { user, isLoggedIn, isAnonymous } = await useServerAuth();
+  const { t } = await getServerTranslation(lang, "EventPage");
+  const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   if (!isLoggedIn || isAnonymous) {
     redirect("/login");

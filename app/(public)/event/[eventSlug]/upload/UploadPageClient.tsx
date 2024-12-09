@@ -76,6 +76,7 @@ interface UploadPageClientProps {
     name: string;
     slug: string;
   }>;
+  lang?: string;
 }
 
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>;
@@ -84,6 +85,7 @@ export default function UploadPageClient({
   eventSlug,
   eventData,
   recentEvents,
+  lang = "en",
 }: UploadPageClientProps) {
   return (
     <ArtworkProvider>
@@ -92,6 +94,7 @@ export default function UploadPageClient({
           eventSlug={eventSlug}
           eventData={eventData}
           recentEvents={recentEvents}
+          lang={lang}
         />
       </ThumbnailProvider>
     </ArtworkProvider>
@@ -102,6 +105,7 @@ function UploadPageContent({
   eventSlug,
   eventData,
   recentEvents,
+  lang = "en",
 }: UploadPageClientProps) {
   // Router
   const router = useRouter();
@@ -179,21 +183,22 @@ function UploadPageContent({
     if (userData && !isLoading) {
       contactInfoForm.reset({
         email: userData.email,
-        firstName: userData.firstName ?? '',
-        lastName: userData.lastName ?? '',
-        phoneCountryCode: userData.phoneCountryCode ?? '',
-        phoneNumber: userData.phoneNumber ?? '',
+        firstName: userData.firstName ?? "",
+        lastName: userData.lastName ?? "",
+        phoneCountryCode: userData.phoneCountryCode ?? "",
+        phoneNumber: userData.phoneNumber ?? "",
         instagramHandle: userData.instagramHandle || undefined,
         facebookHandle: userData.facebookHandle || undefined,
       });
-      
-      const industryExperiences = userData.industryExperiences?.map(exp => ({
-        industry: exp.industry,
-        experienceLevel: exp.experienceLevel
-      })) || [];
-      
+
+      const industryExperiences =
+        userData.industryExperiences?.map((exp) => ({
+          industry: exp.industry,
+          experienceLevel: exp.experienceLevel,
+        })) || [];
+
       professionalInfoForm.reset({
-        industryExperiences
+        industryExperiences,
       });
     }
   }, [userData, isLoading, professionalInfoForm, contactInfoForm]);
@@ -358,7 +363,7 @@ function UploadPageContent({
     {
       title: t("formSteps:ContactInfoStep.title"),
       description: t("formSteps:ContactInfoStep.description"),
-      component: <ContactInfoStep form={contactInfoForm} />,
+      component: <ContactInfoStep form={contactInfoForm} lang={lang} />,
       form: contactInfoForm,
       handlePreSubmit: async (data: ContactInfoData) => {
         // Add any custom logic for contact info submission
@@ -368,7 +373,9 @@ function UploadPageContent({
     {
       title: t("formSteps:ProfessionalInfoStep.title"),
       description: t("formSteps:ProfessionalInfoStep.description"),
-      component: <ProfessionalInfoStep form={professionalInfoForm} />,
+      component: (
+        <ProfessionalInfoStep form={professionalInfoForm} lang={lang} />
+      ),
       form: professionalInfoForm,
       handlePreSubmit: async (data: ProfessionalInfoData) => {
         // Add any custom logic for professional info submission
@@ -530,7 +537,7 @@ function UploadPageContent({
       </Card>
       {/* Upload Progress Dialog */}
       {isSubmitting && uploadProgress > 0 && (
-        <Dialog open={true} onOpenChange={() => { }}>
+        <Dialog open={true} onOpenChange={() => {}}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="mb-2 text-2xl font-bold">
