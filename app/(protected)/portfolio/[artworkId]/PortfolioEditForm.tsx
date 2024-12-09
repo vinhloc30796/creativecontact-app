@@ -14,7 +14,7 @@ import { useTranslation } from "@/lib/i18n/init-client";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import DataUsage from "@/components/uploads/DataUsage";
 import { ArtworkService } from "@/services/artwork-service";
@@ -122,6 +122,7 @@ export default function PortfolioEditForm({
       }
 
       router.push("/profile");
+      router.refresh();
     } catch (error) {
       console.error(error);
     }
@@ -142,6 +143,7 @@ export default function PortfolioEditForm({
               <div className="flex flex-col space-y-4">
                 <ArtworkInfoStep
                   form={form as any}
+                  artworksCount={artworkWithAssets?.length || 0}
                   artworks={
                     artwork?.artworks
                       ? [
