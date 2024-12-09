@@ -41,7 +41,7 @@ interface PortfolioCreateCardProps {
   };
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
-  const router = useRouter()
+  const router = useRouter();
   const { fileUploads, thumbnailFileName } = useFileUpload();
   const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -89,12 +89,12 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     if (rs) {
       toast.success(t("form.toast.success.title"), {
         duration: 5000,
-      })
-      router.push("/profile#portfolio?projectId=" + projectId)
+      });
+      router.push("/profile#portfolio?projectId=" + projectId);
     } else {
       toast.error(t("form.toast.error.title"), {
         duration: 5000,
-      })
+      });
     }
   }
 
@@ -178,7 +178,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       </CardFooter>
 
       {submitLoading && uploadProgress > 0 && (
-        <Dialog open={true} onOpenChange={() => { }}>
+        <Dialog open={true} onOpenChange={() => {}}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="mb-2 text-2xl font-bold">
