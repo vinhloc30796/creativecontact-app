@@ -1,8 +1,9 @@
+import type { NextConfig } from 'next';
+
 const imageHost = process.env.NEXT_PUBLIC_SUPABASE_URL || '127.0.0.1:54321';
 console.log('[next.config.mjs] imageHost:', imageHost);
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   // Configure remote image patterns for Supabase storage
   images: {
     remotePatterns: [
