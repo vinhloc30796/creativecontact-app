@@ -1,22 +1,21 @@
-import styles from './_register.module.scss'
-import { cn } from '@/lib/utils'
-import RegisterWrapper from './wrapper'
 import { EventSlot } from '@/app/types/EventSlot'
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
 import RegistrationForm from './RegistrationForm'
-import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import RegisterWrapper from './wrapper'
 
 interface RegisterPageProps {
-	eventSlots: EventSlot[]
+  eventSlots: EventSlot[]
+  lang?: string
 }
 
-const RegisterPage = ({ eventSlots }: RegisterPageProps) => {
-	return (
-		<BackgroundDiv>
-			<RegisterWrapper>
-				<RegistrationForm initialEventSlots={eventSlots} />
-			</RegisterWrapper>
-		</BackgroundDiv>
-	)
+const RegisterPage = ({ eventSlots, lang = 'en' }: RegisterPageProps) => {
+  return (
+    <BackgroundDiv>
+      <RegisterWrapper>
+        <RegistrationForm initialEventSlots={eventSlots} lang={lang} />
+      </RegisterWrapper>
+    </BackgroundDiv>
+  )
 }
 
 export default RegisterPage

@@ -1,50 +1,26 @@
-"use server";
-
+import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { UserBurgerMenu } from "@/components/UserBurgerMenu";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import React from "react";
-import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
-import { UserBurgerMenu } from "@/components/UserBurgerMenu";
-import { Skeleton } from "@/components/ui/skeleton";
+import React, { use } from "react";
 
 interface UserHeaderProps {
   lang: string;
   className?: string;
   stickyOverlay?: boolean;
-  isLoggedIn: boolean; // New prop to check if user is logged in
+  isLoggedIn: boolean;
 }
 
-export const LoadingUserHeader = () => {
-  return (
-    <div className="w-full flex">
-      <div className="mx-auto flex w-full px-4 py-4 md:px-16 gap-4">
-        <div className="flex-1">
-          <div className="h-8 w-32 sm:h-12 md:h-16">
-            <Skeleton className="h-full w-full" />
-          </div>
-        </div>
-        <div className="flex w-full items-center justify-between">
-          <div className="hidden flex-1 justify-start lg:flex">
-            <Skeleton className="h-8 w-24" />
-          </div>
-          <div className="hidden flex-1 justify-end lg:flex">
-            <Skeleton className="h-8 w-24" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export const UserHeader: React.FC<UserHeaderProps> = async ({
+export async function UserHeader({
   lang,
   className,
   stickyOverlay = true,
   isLoggedIn,
-}) => {
-  const { t } = await useTranslation(lang, "UserPage");
+}: UserHeaderProps) {
+  const { t } = await getServerTranslation(lang, "UserPage");
+  
   const headerLayoutClassName = stickyOverlay
     ? "sticky top-0 left-0 right-0 z-30"
     : "";
@@ -70,7 +46,7 @@ export const UserHeader: React.FC<UserHeaderProps> = async ({
                     textShadow: `hsl(var(--primary)) 0px 0px 10px`,
                   }}
                 >
-                  {t("about", { ns: "UserPage" })}
+                  {t("about")}
                 </span>
               </Link>
             </div>
@@ -84,7 +60,7 @@ export const UserHeader: React.FC<UserHeaderProps> = async ({
                   className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
                   asChild
                 >
-                  <Link href="/logout">{t("logout", { ns: "UserPage" })}</Link>
+                  <Link href="/logout">{t("logout")}</Link>
                 </Button>
               ) : (
                 <div>
@@ -93,14 +69,14 @@ export const UserHeader: React.FC<UserHeaderProps> = async ({
                     className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground mr-2"
                     asChild
                   >
-                    <Link href="/login">{t("login", { ns: "UserPage" })}</Link>
+                    <Link href="/login">{t("login")}</Link>
                   </Button>
                   <Button
                     variant="ghost"
                     className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
                     asChild
                   >
-                    <Link href="/signup">{t("signup", { ns: "UserPage" })}</Link>
+                    <Link href="/signup">{t("signup")}</Link>
                   </Button>
                 </div>
               )}

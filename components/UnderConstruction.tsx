@@ -1,6 +1,7 @@
 // Imports
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
-import { useTranslation } from '@/lib/i18n/init-server';
+import { getServerTranslation } from '@/lib/i18n/init-server';
+import { use } from "react";
 
 // Props
 interface UnderConstructionProps {
@@ -9,8 +10,7 @@ interface UnderConstructionProps {
 
 // Main UnderConstruction component
 export default async function UnderConstruction({ eventSlug }: UnderConstructionProps) {
-  // I18n
-  const { t } = await useTranslation('en', 'UnderConstructionPage');
+  const { t } = await getServerTranslation('en', 'UnderConstructionPage');
 
   return (
     // Render centered background with content

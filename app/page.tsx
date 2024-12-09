@@ -14,21 +14,22 @@ async function getEventSlots(event: string): Promise<EventSlot[]> {
 	return (await db.select().from(eventSlots).where(eq(eventSlots.event, event))).map(slot => slot as EventSlot)
 }
 interface Props {
-	searchParams: {
+	searchParams: Promise<{
 		lang?: string
-	}
+	}>
 }
-export default async function Page({ searchParams }: Props) {
-	const lang = searchParams.lang || 'en'
-	const eventId = '10177076-f591-49c8-a87d-042ba7aa6345'
-	const eventSlots = await getEventSlots(eventId)
-	console.log(`Got ${eventSlots.length} event slots`);
-	if (inConstructPage) {
+export default async function Page(props: Props) {
+    const searchParams = await props.searchParams;
+    const lang = searchParams.lang || 'en'
+    const eventId = '10177076-f591-49c8-a87d-042ba7aa6345'
+    const eventSlots = await getEventSlots(eventId)
+    console.log(`Got ${eventSlots.length} event slots`);
+    if (inConstructPage) {
 		return (
 			<BackgroundDiv >
 				<InConstruct lang={lang} />
 			</BackgroundDiv>
 		)
 	}
-	return <RegisterPage eventSlots={eventSlots} />
+    return <RegisterPage eventSlots={eventSlots} />
 }

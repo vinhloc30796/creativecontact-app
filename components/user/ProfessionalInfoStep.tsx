@@ -20,18 +20,19 @@ import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
 import React from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n/init-client";
 import { industriesMapper, experienceLevelsMapper, IndustryType, ExperienceType } from "@/drizzle/schema/user";
 
 interface ProfessionalInfoStepProps {
   form: UseFormReturn<ProfessionalInfoData>
+  lang?: string
 }
 
-const IndustryExperienceSelect = ({ form }: ProfessionalInfoStepProps) => {
+const IndustryExperienceSelect = ({ form, lang = "en" }: ProfessionalInfoStepProps) => {
   // State
   const [open, setOpen] = React.useState(false)
   // I18n
-  const { t } = useTranslation(["ProfessionalInfoStep"], { keyPrefix: "IndustrySelect" });
+  const { t } = useTranslation(lang, "ProfessionalInfoStep", { keyPrefix: "IndustrySelect" });
 
   return (
     <FormField

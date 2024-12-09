@@ -5,17 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, use } from "react";
 import { useTranslation } from "@/lib/i18n/init-client";
 
 interface LogoutPageProps {
-  params: {};
-  searchParams: {
+  params: Promise<{}>;
+  searchParams: Promise<{
     lang?: string;
-  };
+  }>;
 }
 
-export default function LogoutPage({ searchParams }: LogoutPageProps) {
+export default function LogoutPage(props: LogoutPageProps) {
+  const searchParams = use(props.searchParams);
   const lang = searchParams.lang || "en";
   const { t } = useTranslation(lang, "LogoutPage");
   const router = useRouter();
