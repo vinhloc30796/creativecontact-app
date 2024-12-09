@@ -34,7 +34,7 @@ export const performUpload = async (
     .from("artwork_assets")
     .list(artworkUUID);
   if (error) {
-    console.error("Error listing files:", error.message);
+    console.error("[performUpload] Error listing files:", error.message);
     return { results, errors };
   }
 
@@ -44,7 +44,7 @@ export const performUpload = async (
       .from("artwork_assets")
       .remove([`${artworkUUID}/${file.name}`]);
     if (deleteError) {
-      console.error("Error deleting file:", deleteError.message);
+      console.error("[performUpload] Error deleting file:", deleteError.message);
       errors.push({ message: deleteError.message });
     }
   }

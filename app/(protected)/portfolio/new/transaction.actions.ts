@@ -58,6 +58,7 @@ export async function insertArtworkAssetsTransaction(
   artworkId: string,
   artworkAssetsData: ThumbnailSupabaseFile[]
 ) {
+  console.debug("[insertArtworkAssetsTransaction] inserting assets for artworkId:", artworkId);
   if (artworkAssetsData.length === 0) {
     return { data: null, errors: [new Error("No files to upload")] };
   }
@@ -71,8 +72,10 @@ export async function insertArtworkAssetsTransaction(
         isThumbnail: asset.isThumbnail
       }))
     ).returning();
+    console.log("[insertArtworkAssetsTransaction] inserted assets:", assets);
     return assets
   });
+  console.error("[insertArtworkAssetsTransaction] results:", result);
   return { data: result, errors: null }
 }
 

@@ -47,7 +47,7 @@ interface UseTranslationOptions {
 }
 
 // Cache the translation hook
-export const useTranslation = cache(async (lng: string, ns: string | string[], options: UseTranslationOptions = {}) => {
+export const getServerTranslation = cache(async (lng: string, ns: string | string[], options: UseTranslationOptions = {}) => {
   console.debug("useTranslation: initI18next", lng, ns, options)
   const i18nextInstance = await initI18next({ lng, ns, options })
   return {

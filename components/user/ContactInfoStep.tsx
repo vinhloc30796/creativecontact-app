@@ -5,16 +5,17 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { UseFormReturn } from 'react-hook-form'
 import { ContactInfoData } from "@/app/form-schemas/contact-info"
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from '@/lib/i18n/init-client'
 import { Separator } from '@/components/ui/separator'
 import { CountryCodeSelector } from '@/components/profile/CountryCodeSelector'
 
 interface ContactInfoStepProps {
   form: UseFormReturn<ContactInfoData>
+  lang?: string
 }
 
-export function ContactInfoStep({ form }: ContactInfoStepProps) {
-  const { t } = useTranslation(['ContactInfoStep'])
+export function ContactInfoStep({ form, lang = "en" }: ContactInfoStepProps) {
+  const { t } = useTranslation(lang, ['ContactInfoStep'])
   return (
     <>
       <FormField

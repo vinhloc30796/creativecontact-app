@@ -1,10 +1,10 @@
-"use server";
+// File: components/wrappers/EventHeader.tsx
 
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import React from "react";
+import React, { use } from "react";
 import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
 import BurgerMenu from "@/components/EventBurgerMenu";
 
@@ -16,14 +16,14 @@ interface EventHeaderProps {
   eventEnded?: boolean;
 }
 
-export const EventHeader: React.FC<EventHeaderProps> = async ({
+export async function EventHeader({
   eventSlug,
   lang,
   className,
   eventEnded = false,
   stickyOverlay = true,
-}) => {
-  const { t } = await useTranslation(lang, "EventPage");
+}: EventHeaderProps) {
+  const { t } = await getServerTranslation(lang, "EventPage");
   const headerLayoutClassName = stickyOverlay
     ? "sticky top-0 left-0 right-0 z-30"
     : "";
