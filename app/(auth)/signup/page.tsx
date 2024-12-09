@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, use } from 'react';
 import { useForm, FormProvider, UseFormReturn } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -26,13 +26,14 @@ const signupSchema = z.object({
 type SignupData = z.infer<typeof signupSchema>
 type FormContextType = UseFormReturn<ContactInfoData & ProfessionalInfoData>
 
-export default function SignupPage({
-  searchParams,
-}: {
-  searchParams: {
-    lang: string;
-  };
-}) {
+export default function SignupPage(
+  props: {
+    searchParams: Promise<{
+      lang: string;
+    }>;
+  }
+) {
+  const searchParams = use(props.searchParams);
   const lang = searchParams.lang || "en";
   const [step, setStep] = useState(0)
   const { t } = useTranslation(lang, ['formSteps'])

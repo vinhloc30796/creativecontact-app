@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export async function handleArtworkNotFound() {
   // First set the cookie
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   cookieStore.set("error_message", "Artwork not found", {
     maxAge: 5,

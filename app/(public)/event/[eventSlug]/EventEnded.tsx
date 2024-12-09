@@ -1,16 +1,18 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import Image from "next/image";
 import Link from "next/link";
+import { use } from "react";
+
 interface EventEndedProps {
   eventName: string;
   eventSlug: string;
   lang?: string;
 }
 export default async function EventEnded({ eventName, eventSlug, lang = "en" }: EventEndedProps) {
-  const { t } = await useTranslation(lang, 'eventSlug')
-  const { t: tButton } = await useTranslation(lang, 'common')
+  const { t } = await getServerTranslation(lang, 'eventSlug');
+  const { t: tButton } = await getServerTranslation(lang, 'common');
   return (
     <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
 

@@ -2,7 +2,7 @@
 "use server";
 
 // React and Next.js imports
-import { Suspense } from "react";
+import { Suspense, use } from "react";
 
 // Database and ORM imports
 import { createClient } from "@supabase/supabase-js";
@@ -21,19 +21,19 @@ import { EventHeader } from "@/components/wrappers/EventHeader";
 import { EventNotFound } from "./EventNotFound";
 import { UploadStatistics } from "./UploadStatistics";
 // Utility imports
-import { useTranslation } from "@/lib/i18n/init-server";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { fetchEvent } from "@/app/(public)/(event)/api/events/[slug]/helper";
 import { fetchRecentEvents } from "@/app/(public)/(event)/api/recent-events/helper";
 import { fetchEventArtworks } from "@/app/(public)/(event)/api/event-artworks/helper";
 
 // Define the props interface for the EventPage component
 interface EventPageProps {
-  params: {
+  params: Promise<{
     eventSlug: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     lang: string;
-  };
+  }>;
 }
 
 // Helper function to shuffle an array
@@ -57,13 +57,11 @@ function getRandomSize() {
 }
 
 // Main EventPage component
-export default async function EventPage({
-  params,
-  searchParams,
-}: EventPageProps) {
-  // Initialize language and translation
+export default async function EventPage(props: EventPageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const lang = searchParams.lang || "en";
-  const { t } = await useTranslation(lang, "EventPage");
+  const { t } = await getServerTranslation(lang, "EventPage");
 
   // Extract event slug from params
   const { eventSlug } = params;

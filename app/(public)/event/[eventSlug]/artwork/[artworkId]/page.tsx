@@ -1,9 +1,8 @@
-"use server";
-
+// File: app/(public)/event/[eventSlug]/artwork/[artworkId]/page.tsx
 // React and Next.js imports
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, use } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react"; // Import chevron icons
 
 // Database ORM imports
@@ -28,45 +27,19 @@ import { userInfos } from "@/drizzle/schema/user";
 
 // Utility imports
 import { db } from "@/lib/db";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 
 interface ArtworkPageProps {
-  params: {
+  params: Promise<{
     eventSlug: string;
     artworkId: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     lang: string;
-  };
+  }>;
 }
 
-export default async function ArtworkPage({
-  params,
-  searchParams,
-}: ArtworkPageProps) {
-  const { eventSlug, artworkId } = params;
-  const lang = searchParams.lang || "en";
-  const { t } = await useTranslation(lang, ["ArtworkPage", "common"]);
-
-  // Fetch artwork data
-  const artworkData = await db
-    .select({
-      artwork: artworks,
-      assets: artworkAssets,
-      event: artworkEvents,
-    })
-    .from(artworks)
-    .leftJoin(artworkAssets, eq(artworks.id, artworkAssets.artworkId))
-    .leftJoin(artworkEvents, eq(artworks.id, artworkEvents.artworkId))
-    .where(eq(artworks.id, artworkId))
-    .orderBy(desc(artworkAssets.isThumbnail)); // Sort thumbnail to the top
-
-  if (!artworkData || artworkData.length === 0) {
-    return <div>Artwork not found</div>;
-  }
-  const currentArtwork = artworkData[0].artwork;
-
-  // Fetch next and previous artwork by createdAt
+async function getNextArtworks(currentArtwork: typeof artworks.$inferSelect) {
   const nextArtwork = await db
     .select({
       id: artworks.id,
@@ -81,6 +54,10 @@ export default async function ArtworkPage({
     .orderBy(asc(artworks.createdAt), asc(artworks.id))
     .limit(1);
 
+  return nextArtwork;
+}
+
+async function getPrevArtworks(currentArtwork: typeof artworks.$inferSelect) {
   const prevArtwork = await db
     .select({
       id: artworks.id,
@@ -95,7 +72,10 @@ export default async function ArtworkPage({
     .orderBy(desc(artworks.createdAt), desc(artworks.id))
     .limit(1);
 
-  // Fetch artwork credits
+  return prevArtwork;
+}
+
+async function getArtworkCredits(artworkId: string) {
   const credits = await db
     .select({
       id: artworkCredits.id,
@@ -106,6 +86,40 @@ export default async function ArtworkPage({
     .from(artworkCredits)
     .leftJoin(userInfos, eq(artworkCredits.userId, userInfos.id))
     .where(eq(artworkCredits.artworkId, artworkId));
+  return credits;
+}
+
+export default async function ArtworkPage(props: ArtworkPageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const { eventSlug, artworkId } = params;
+  const lang = searchParams.lang || "en";
+  const { t } = await getServerTranslation(lang, ["ArtworkPage", "common"]);
+
+  // Fetch artwork data
+  const artworkData = await db
+    .select({
+      artwork: artworks,
+      assets: artworkAssets,
+      event: artworkEvents,
+    })
+    .from(artworks)
+    .leftJoin(artworkAssets, eq(artworks.id, artworkAssets.artworkId))
+    .where(eq(artworks.id, artworkId))
+    .orderBy(desc(artworkAssets.isThumbnail)); // Sort thumbnail to the top
+
+  if (!artworkData || artworkData.length === 0) {
+    return <div>Artwork not found</div>;
+  }
+  const currentArtwork = artworkData[0].artwork;
+
+  // Fetch next and previous artwork by createdAt
+  const nextArtwork = await getNextArtworks(currentArtwork);
+
+  const prevArtwork = await getPrevArtworks(currentArtwork);
+
+  // Fetch artwork credits
+  const credits = await getArtworkCredits(artworkId);
 
   // Process and sort assets
   const assets = artworkData
@@ -148,9 +162,15 @@ export default async function ArtworkPage({
                 asChild
                 variant="outline"
                 size="icon"
-                className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
+                className={`h-10 w-10 rounded-none border border-primary bg-transparent transition-shadow hover:bg-primary/10 hover:shadow-md ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
               >
-                <Link href={prevArtworkId ? `/event/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+                <Link
+                  href={
+                    prevArtworkId
+                      ? `/event/${eventSlug}/artwork/${prevArtworkId}`
+                      : "#"
+                  }
+                >
                   <ChevronLeft className="h-4 w-4 text-primary" />
                   <span className="sr-only">{t("previousArtwork")}</span>
                 </Link>
@@ -159,9 +179,15 @@ export default async function ArtworkPage({
                 asChild
                 variant="outline"
                 size="icon"
-                className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
+                className={`h-10 w-10 rounded-none border border-primary bg-transparent transition-shadow hover:bg-primary/10 hover:shadow-md ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
               >
-                <Link href={nextArtworkId ? `/event/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+                <Link
+                  href={
+                    nextArtworkId
+                      ? `/event/${eventSlug}/artwork/${nextArtworkId}`
+                      : "#"
+                  }
+                >
                   <ChevronRight className="h-4 w-4 text-primary" />
                   <span className="sr-only">{t("nextArtwork")}</span>
                 </Link>
@@ -169,7 +195,7 @@ export default async function ArtworkPage({
             </div>
           </div>
           {/* Don't show artwork header on desktop (because it's on the content section) */}
-          <div className="mx-4 sticky top-0 z-10 pb-4 lg:hidden">
+          <div className="sticky top-0 z-10 mx-4 pb-4 lg:hidden">
             <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
               {t("artwork")}
             </h2>
@@ -190,12 +216,12 @@ export default async function ArtworkPage({
         </div>
 
         {/* Artwork details and Main content */}
-        <div className="mx-4 mb-14 flex h-[calc(100vh-16rem)] overflow-y-auto flex-col gap-8 md:mx-8 lg:mx-16 lg:flex-row">
+        <div className="mx-4 mb-14 flex h-[calc(100vh-16rem)] flex-col gap-8 overflow-y-auto md:mx-8 lg:mx-16 lg:flex-row">
           {/* Artwork details */}
-          <div className="flex flex-col gap-4 text-primary-foreground lg:h-full lg:w-1/3 relative">
+          <div className="relative flex flex-col gap-4 text-primary-foreground lg:h-full lg:w-1/3">
             <div className="pb-16">
               {/* Artwork header: frozen on desktop, hidden on mobile */}
-              <div className="hidden sticky top-0 z-10 pb-4 lg:block">
+              <div className="sticky top-0 z-10 hidden pb-4 lg:block">
                 <h2 className="text-md text-transform: mb-2 font-semibold uppercase text-accent md:text-lg">
                   {t("artwork")}
                 </h2>
@@ -247,15 +273,21 @@ export default async function ArtworkPage({
               </div>
             </div>
             {/* Nav buttons: only show in footer on desktop (otherwise in the header already) */}
-            <div className="absolute bottom-0 left-0 right-0 py-4 hidden lg:block">
+            <div className="absolute bottom-0 left-0 right-0 hidden py-4 lg:block">
               <div className="flex items-center justify-start gap-4">
                 <Button
                   asChild
                   variant="outline"
                   size="icon"
-                  className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
+                  className={`h-10 w-10 rounded-none border border-primary bg-transparent transition-shadow hover:bg-primary/10 hover:shadow-md ${!prevArtworkId ? "pointer-events-none opacity-50" : ""}`}
                 >
-                  <Link href={prevArtworkId ? `/event/${eventSlug}/artwork/${prevArtworkId}` : "#"}>
+                  <Link
+                    href={
+                      prevArtworkId
+                        ? `/event/${eventSlug}/artwork/${prevArtworkId}`
+                        : "#"
+                    }
+                  >
                     <ChevronLeft className="h-4 w-4 text-primary" />
                     <span className="sr-only">{t("previousArtwork")}</span>
                   </Link>
@@ -264,9 +296,15 @@ export default async function ArtworkPage({
                   asChild
                   variant="outline"
                   size="icon"
-                  className={`h-10 w-10 rounded-none border border-primary bg-transparent hover:shadow-md hover:bg-primary/10 transition-shadow ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
+                  className={`h-10 w-10 rounded-none border border-primary bg-transparent transition-shadow hover:bg-primary/10 hover:shadow-md ${!nextArtworkId ? "pointer-events-none opacity-50" : ""}`}
                 >
-                  <Link href={nextArtworkId ? `/event/${eventSlug}/artwork/${nextArtworkId}` : "#"}>
+                  <Link
+                    href={
+                      nextArtworkId
+                        ? `/event/${eventSlug}/artwork/${nextArtworkId}`
+                        : "#"
+                    }
+                  >
                     <ChevronRight className="h-4 w-4 text-primary" />
                     <span className="sr-only">{t("nextArtwork")}</span>
                   </Link>
