@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 export const artworkCreditSchema = z.object({
+  userId: z.string().min(1, "User ID is required"),
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),

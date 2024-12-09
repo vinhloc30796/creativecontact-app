@@ -1,6 +1,10 @@
 // File: app/api/user/[id]/portfolio-artworks/helper.ts
 
-import { artworkCredits, artworks } from "@/drizzle/schema/artwork";
+import {
+  artworkAssets,
+  artworkCredits,
+  artworks,
+} from "@/drizzle/schema/artwork";
 import {
   PortfolioArtwork,
   PortfolioArtworkWithDetails,
