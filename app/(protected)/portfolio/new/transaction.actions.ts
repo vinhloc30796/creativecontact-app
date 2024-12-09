@@ -13,21 +13,24 @@ export async function createPortfolioTransaction(
     id: string,
   },
   artworkData: {
+    id: string,
     title: string,
     description: string
   },
   portfolioData: {
+    id?: string,
     displayOrder?: number
     isHightlighted?: boolean
   }
 ) {
   const result = await db.transaction(async (tx) => {
     const [artwork] = await tx.insert(artworks).values({
+      id: artworkData.id,
       title: artworkData.title,
       description: artworkData.description,
     }).returning();
     await tx.insert(artworkCredits).values({
-      artworkId: artwork.id,
+      artworkId: artworkData.id,
       userId: userData.id,
       title: "Artist",
     })
@@ -37,7 +40,7 @@ export async function createPortfolioTransaction(
       userId: userData.id,
       artworkId: artwork.id,
       displayOrder: displayOrder,
-      // ...portfolioData
+      ...portfolioData
     }).returning()
     return { portfolioArtwork, artwork }
   })
@@ -55,6 +58,7 @@ export async function insertArtworkAssetsTransaction(
   artworkId: string,
   artworkAssetsData: ThumbnailSupabaseFile[]
 ) {
+  console.debug("[insertArtworkAssetsTransaction] inserting assets for artworkId:", artworkId);
   if (artworkAssetsData.length === 0) {
     return { data: null, errors: [new Error("No files to upload")] };
   }
@@ -68,8 +72,10 @@ export async function insertArtworkAssetsTransaction(
         isThumbnail: asset.isThumbnail
       }))
     ).returning();
+    console.log("[insertArtworkAssetsTransaction] inserted assets:", assets);
     return assets
   });
+  console.error("[insertArtworkAssetsTransaction] results:", result);
   return { data: result, errors: null }
 }
 

@@ -5,7 +5,12 @@ import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ArtworkProvider } from "@/contexts/ArtworkContext";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
@@ -70,12 +75,10 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
             </FormProvider>
           </CardHeader>
 
-          <CardContent className="space-y-6 p-6">
-
-          </CardContent>
+          <CardContent className="space-y-6 p-6"></CardContent>
         </div>
 
-        <CardFooter className="max-w-xl flex flex-col justify-between gap-4 p-6">
+        <CardFooter className="flex max-w-xl flex-col justify-between gap-4 p-6">
           <div className="container">
             <h3 className="mb-4 text-lg font-medium">Project Credits</h3>
             <FormProvider {...artworkCreditForm}>
@@ -85,6 +88,7 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
           <div className="container">
             <h3 className="mb-4 text-lg font-medium">Project Media</h3>
             <MediaUpload
+              dataUsage={0}
               isNewArtwork={true}
               emailLink="/contact"
               onPendingFilesUpdate={handlePendingFilesUpdate}

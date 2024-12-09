@@ -35,6 +35,7 @@ interface ArtworkFormValues {
 }
 
 interface PortfolioEditFormProps {
+  dataUsage: number;
   userData: UserData;
   artwork?: PortfolioArtworkWithDetails;
   isNew: boolean;
@@ -42,6 +43,7 @@ interface PortfolioEditFormProps {
 }
 
 export default function PortfolioEditForm({
+  dataUsage,
   userData,
   artwork,
   isNew,
@@ -106,6 +108,11 @@ export default function PortfolioEditForm({
           setUploadProgress,
         );
 
+        if (!uploadedResults) {
+          console.error("File upload failed");
+          throw new Error("File upload failed");
+        }
+
         // Insert assets
         const insertAssetsResult = await insertArtworkAssets(
           formData.uuid,
@@ -130,8 +137,7 @@ export default function PortfolioEditForm({
           </CardHeader>
 
           <CardContent>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
+            <div
               className="flex flex-col space-y-8"
             >
               <div className="flex flex-col space-y-4">
@@ -193,15 +199,17 @@ export default function PortfolioEditForm({
                     )}
                   </div>
                 )}
+
+                <ThumbnailProvider>
+                  <MediaUpload
+                    dataUsage={dataUsage}
+                    isNewArtwork={isNew}
+                    emailLink="/contact"
+                    onPendingFilesUpdate={setPendingFiles}
+                  />
+                </ThumbnailProvider>
               </div>
-            </form>
-            <ThumbnailProvider>
-              <MediaUpload
-                isNewArtwork={isNew}
-                emailLink="/contact"
-                onPendingFilesUpdate={setPendingFiles}
-              />
-            </ThumbnailProvider>
+            </div>
           </CardContent>
         </Card>
 
@@ -229,7 +237,7 @@ export default function PortfolioEditForm({
 
               <CardContent>
                 <div className="mt-1">
-                  <DataUsage />
+                  <DataUsage dataUsage={dataUsage} />
                 </div>
               </CardContent>
             </Card>
