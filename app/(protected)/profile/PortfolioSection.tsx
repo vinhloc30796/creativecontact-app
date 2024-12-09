@@ -7,14 +7,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense, use } from "react";
 import { ErrorPortfolioProjectCard } from "./ErrorPortfolioProjectCard";
 
-
 interface PortfolioSectionProps {
+  showButtons: boolean;
   userData: UserData | null;
   portfolioArtworksPromise: Promise<PortfolioArtworkWithDetails[]>;
   lang?: string;
 }
 
 export default function PortfolioSection({
+  showButtons,
   userData,
   portfolioArtworksPromise,
   lang = "en",
@@ -24,7 +25,8 @@ export default function PortfolioSection({
   return (
     <div className="space-y-8">
       <Suspense fallback={<PortfolioSkeleton />}>
-        <PortfolioContent 
+        <PortfolioContent
+          showButtons={showButtons}
           userData={userData}
           portfolioArtworksPromise={portfolioArtworksPromise}
           lang={lang}
@@ -35,18 +37,20 @@ export default function PortfolioSection({
 }
 
 function PortfolioContent({
+  showButtons,
   userData,
   portfolioArtworksPromise,
-  lang
+  lang,
 }: PortfolioSectionProps) {
   const portfolioArtworks = use(portfolioArtworksPromise);
 
   if (!userData) {
     return <ErrorPortfolioProjectCard lang={lang || "en"} />;
   }
-  
+
   return (
     <PortfolioTabs
+      showButtons={showButtons}
       userData={userData}
       existingPortfolioArtworks={portfolioArtworks}
       lang={lang}
