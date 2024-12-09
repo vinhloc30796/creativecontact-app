@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
 import React from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n/init-client";
 import { industriesMapper, experienceLevelsMapper, IndustryType, ExperienceType } from "@/drizzle/schema/user";
 
 interface ProfessionalInfoStepProps {

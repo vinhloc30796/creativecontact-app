@@ -105,6 +105,7 @@ export default async function ArtworkPage(props: ArtworkPageProps) {
     })
     .from(artworks)
     .leftJoin(artworkAssets, eq(artworks.id, artworkAssets.artworkId))
+    .leftJoin(artworkEvents, eq(artworks.id, artworkEvents.artworkId))
     .where(eq(artworks.id, artworkId))
     .orderBy(desc(artworkAssets.isThumbnail)); // Sort thumbnail to the top
 

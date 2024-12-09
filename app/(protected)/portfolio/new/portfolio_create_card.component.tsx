@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useUploadStore } from "@/stores/uploadStore";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/lib/i18n/init-client";
 import { v4 } from "uuid";
 import { handleSubmit } from "./action.client";
 import AddCoOwner from "./add_coowner.component";

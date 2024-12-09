@@ -1,13 +1,6 @@
 // File: app/(public)/[eventSlug]/page.tsx
-"use server";
-
 // React and Next.js imports
-import { Suspense, use } from "react";
-
-// Database and ORM imports
-import { createClient } from "@supabase/supabase-js";
-
-// Schema imports
+import { Suspense } from "react";
 
 // Component imports
 import {
@@ -21,10 +14,10 @@ import { EventHeader } from "@/components/wrappers/EventHeader";
 import { EventNotFound } from "./EventNotFound";
 import { UploadStatistics } from "./UploadStatistics";
 // Utility imports
-import { getServerTranslation } from "@/lib/i18n/init-server";
+import { fetchEventArtworks } from "@/app/(public)/(event)/api/event-artworks/helper";
 import { fetchEvent } from "@/app/(public)/(event)/api/events/[slug]/helper";
 import { fetchRecentEvents } from "@/app/(public)/(event)/api/recent-events/helper";
-import { fetchEventArtworks } from "@/app/(public)/(event)/api/event-artworks/helper";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 
 // Define the props interface for the EventPage component
 interface EventPageProps {
@@ -45,12 +38,6 @@ function shuffleArray<T>(array: T[]): T[] {
   return array;
 }
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
-
 // Helper function to generate random sizes for artwork cards
 function getRandomSize() {
   return Math.floor(Math.random() * (33 - 25 + 1) + 25);
@@ -58,90 +45,110 @@ function getRandomSize() {
 
 // Main EventPage component
 export default async function EventPage(props: EventPageProps) {
-  const searchParams = await props.searchParams;
-  const params = await props.params;
-  const lang = searchParams.lang || "en";
-  const { t } = await getServerTranslation(lang, "EventPage");
+  console.log("[EventPage] Starting component execution");
+  
+  try {
+    console.log("[EventPage] About to await props.params and props.searchParams");
+    const params = await props.params;
+    const searchParams = await props.searchParams;
+    console.log("[EventPage] Successfully resolved params:", params);
+    console.log("[EventPage] Successfully resolved searchParams:", searchParams);
 
-  // Extract event slug from params
-  const { eventSlug } = params;
+    const lang = searchParams.lang || "en";
+    console.log("[EventPage] Language set to:", lang);
+    
+    const { t } = await getServerTranslation(lang, "EventPage");
+    console.log("[EventPage] Translation loaded");
 
-  // Fetch event data from the database
-  const eventData = await fetchEvent(eventSlug);
+    const { eventSlug } = params;
+    console.log("[EventPage] Event slug extracted:", eventSlug);
 
-  // Fetch recent events for the EventNotFound component
-  const recentEvents = await fetchRecentEvents(5);
+    console.log("[EventPage] About to fetch event data");
+    const eventData = await fetchEvent(eventSlug);
+    console.log("[EventPage] Event data fetched:", eventData);
 
-  const eventEnded = (eventData?.time_end &&
-    new Date() > new Date(eventData.time_end)) as boolean;
+    console.log("[EventPage] About to fetch recent events");
+    const recentEvents = await fetchRecentEvents(5);
+    console.log("[EventPage] Recent events fetched:", recentEvents);
 
-  // If event is not found, render the EventNotFound component
-  if (!eventData) {
-    return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
-  }
+    const eventEnded = (eventData?.time_end &&
+      new Date() > new Date(eventData.time_end)) as boolean;
+    console.log("[EventPage] Event ended status:", eventEnded);
 
-  // Fetch artworks and their assets for the current event
-  const eventArtworksData = await fetchEventArtworks(eventData.id);
+    if (!eventData) {
+      console.log("[EventPage] No event data found, rendering EventNotFound");
+      return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
+    }
 
-  if (!eventArtworksData) {
-    return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
-  }
+    console.log("[EventPage] About to fetch event artworks");
+    const eventArtworksData = await fetchEventArtworks(eventData.id);
+    console.log("[EventPage] Event artworks fetched:", !!eventArtworksData);
 
-  // Calculate the total number of artworks
-  const artworkCount = Object.keys(eventArtworksData).length;
+    if (!eventArtworksData) {
+      console.log("[EventPage] No artwork data found, rendering EventNotFound");
+      return <EventNotFound recentEvents={recentEvents} eventSlug={eventSlug} />;
+    }
 
-  // Shuffle the artworks
-  const shuffledArtworks = shuffleArray<ArtworkWithAssetsThumbnailCredits>(
-    Object.values(eventArtworksData),
-  );
+    const artworkCount = Object.keys(eventArtworksData).length;
+    console.log("[EventPage] Artwork count:", artworkCount);
 
-  // Render the EventPage component
-  return (
-    <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
-      <div className="flex min-h-screen w-full flex-col">
-        {/* Header section */}
-        <EventHeader
-          eventSlug={eventSlug}
-          lang={lang}
-          eventEnded={eventEnded}
-          className="mb-0"
-        />
+    const shuffledArtworks = shuffleArray<ArtworkWithAssetsThumbnailCredits>(
+      Object.values(eventArtworksData),
+    );
+    console.log("[EventPage] Artworks shuffled");
 
-        {/* Background text */}
-        <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center overflow-hidden">
-          <Suspense fallback={<Loading />}>
-            <UploadStatistics
-              eventSlug={eventSlug}
-              eventTitle={eventData.name}
-              artworkCount={artworkCount}
-              countdown={undefined}
-            />
-          </Suspense>
-        </div>
-        {/* Main content area */}
-        <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
-          <div className="w-full px-4 sm:px-8 md:px-16">
-            {/* Render artwork cards */}
-            {shuffledArtworks.map((artwork, index) => (
-              <div
-                key={artwork.id}
-                className={`flex ${
-                  index % 2 === 0 ? "justify-start" : "justify-end"
-                } mt-2 pb-[40vh] sm:pb-[25vh]`}
-              >
-                <ArtworkCard
-                  eventSlug={eventSlug}
-                  artwork={artwork}
-                  size={100}
-                />
-              </div>
-            ))}
+    console.log("[EventPage] About to render component");
+    return (
+      <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
+        <div className="flex min-h-screen w-full flex-col">
+          {/* Header section */}
+          <EventHeader
+            eventSlug={eventSlug}
+            lang={lang}
+            eventEnded={eventEnded}
+            className="mb-0"
+          />
+
+          {/* Background text */}
+          <div className="pointer-events-none fixed inset-0 z-10 flex items-center justify-center overflow-hidden">
+            <Suspense fallback={<Loading />}>
+              <UploadStatistics
+                eventSlug={eventSlug}
+                eventTitle={eventData.name}
+                artworkCount={artworkCount}
+                countdown={undefined}
+              />
+            </Suspense>
           </div>
-        </main>
 
-        {/* Footer section */}
-        <EventFooter lang={lang} />
-      </div>
-    </BackgroundDiv>
-  );
+          {/* Main content area */}
+          <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
+            <div className="w-full px-4 sm:px-8 md:px-16">
+              {/* Render artwork cards */}
+              {shuffledArtworks.map((artwork, index) => (
+                <div
+                  key={artwork.id}
+                  className={`flex ${
+                    index % 2 === 0 ? "justify-start" : "justify-end"
+                  } mt-2 pb-[40vh] sm:pb-[25vh]`}
+                >
+                  <ArtworkCard
+                    eventSlug={eventSlug}
+                    artwork={artwork}
+                    size={100}
+                  />
+                </div>
+              ))}
+            </div>
+          </main>
+
+          {/* Footer section */}
+          <EventFooter lang={lang} />
+        </div>
+      </BackgroundDiv>
+    );
+  } catch (error) {
+    console.error("[EventPage] Error in component:", error);
+    throw error;
+  }
 }
