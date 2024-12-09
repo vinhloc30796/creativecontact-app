@@ -179,21 +179,22 @@ function UploadPageContent({
     if (userData && !isLoading) {
       contactInfoForm.reset({
         email: userData.email,
-        firstName: userData.firstName ?? '',
-        lastName: userData.lastName ?? '',
-        phoneCountryCode: userData.phoneCountryCode ?? '',
-        phoneNumber: userData.phoneNumber ?? '',
+        firstName: userData.firstName ?? "",
+        lastName: userData.lastName ?? "",
+        phoneCountryCode: userData.phoneCountryCode ?? "",
+        phoneNumber: userData.phoneNumber ?? "",
         instagramHandle: userData.instagramHandle || undefined,
         facebookHandle: userData.facebookHandle || undefined,
       });
-      
-      const industryExperiences = userData.industryExperiences?.map(exp => ({
-        industry: exp.industry,
-        experienceLevel: exp.experienceLevel
-      })) || [];
-      
+
+      const industryExperiences =
+        userData.industryExperiences?.map((exp) => ({
+          industry: exp.industry,
+          experienceLevel: exp.experienceLevel,
+        })) || [];
+
       professionalInfoForm.reset({
-        industryExperiences
+        industryExperiences,
       });
     }
   }, [userData, isLoading, professionalInfoForm, contactInfoForm]);
@@ -411,6 +412,7 @@ function UploadPageContent({
       component: (
         <>
           <MediaUpload
+            dataUsage={0}
             artworkUUID={artworkUUID || undefined}
             emailLink={emailLink}
             isNewArtwork={true}
@@ -530,7 +532,7 @@ function UploadPageContent({
       </Card>
       {/* Upload Progress Dialog */}
       {isSubmitting && uploadProgress > 0 && (
-        <Dialog open={true} onOpenChange={() => { }}>
+        <Dialog open={true} onOpenChange={() => {}}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="mb-2 text-2xl font-bold">
