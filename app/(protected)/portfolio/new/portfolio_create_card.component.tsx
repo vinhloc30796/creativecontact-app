@@ -41,7 +41,7 @@ interface PortfolioCreateCardProps {
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const { fileUploads, thumbnailFileName } = useFileUpload();
-  const { t } = useTranslation(["Portfolio", "ArtworkInfoStep"]);
+  const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
   const { toast } = useToast();
   const [submitLoading, setSubmitLoading] = useState(false);
 
