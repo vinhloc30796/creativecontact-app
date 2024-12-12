@@ -1,3 +1,8 @@
+/**
+ * TODO: This route doesn't yet work with /portfolio/new
+ * Need to implement handling for new artwork creation flow
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 
 import { artworkCredits as artworkCreditsTable, artworks as artworksTable } from "@/drizzle/schema/artwork";

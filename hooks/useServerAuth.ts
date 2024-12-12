@@ -2,7 +2,7 @@ import { checkUserIsAnonymous } from '@/app/actions/user/auth';
 import { createClient } from '@/utils/supabase/server';
 import { cache } from 'react';
 
-export const useServerAuth = cache(async () => {
+export const getServerAuth = cache(async () => {
   const supabase = await createClient();
 
   const {

@@ -19,21 +19,36 @@ export function getOptions({ lng = fallbackLng, ns = defaultNS }: GetOptionsPara
   }
 }
 
+// Import all translation files statically
+import enTranslation from '@/public/translations/en/translation.json'
+import viTranslation from '@/public/translations/vi/translation.json'
+
+type Resources = {
+  [key in 'en' | 'vi']: {
+    [key in 'translation']: typeof enTranslation
+  }
+}
+
+const resources: Resources = {
+  en: { translation: enTranslation },
+  vi: { translation: viTranslation }
+}
+
 export const buildResources = (
-  language: string,
-  namespace: string,
-  callback: (error: Error | null, resources: Record<string, any> | null) => void
+  language: 'en' | 'vi',
+  namespace: 'translation',
+  callback: (error: Error | null, resources: typeof enTranslation | null) => void
 ) => {
-  const filePath = `./translations/${language}/${namespace}.json`
-  console.log("resourcesToBackend: trying to load resources from", filePath);
-  import(filePath)
-    .then((resources) => {
-      console.log("resourcesToBackend: loaded resources", resources, "from", filePath);
-      callback(null, resources)
-    })
-    .catch((error) => {
-      console.error("resourcesToBackend: error loading resources", error);
-      console.error("current location:", process.cwd());
-      callback(error, null)
-    })
+  try {
+    const resource = resources[language]?.[namespace]
+    if (resource) {
+      console.log("[resourcesToBackend] loaded resources", resource, "from", language, namespace);
+      callback(null, resource)
+    } else {
+      throw new Error(`Translation not found for ${language}/${namespace}`)
+    }
+  } catch (error) {
+    console.error("[resourcesToBackend] error loading resources", error)
+    callback(error as Error, null)
+  }
 }

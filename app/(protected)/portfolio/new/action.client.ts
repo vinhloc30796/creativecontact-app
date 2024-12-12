@@ -61,13 +61,15 @@ export const addArtworkAssets = async (
     totalCount: number,
   ) => void,
 ) => {
+  console.log("[addArtworkAssets] adding artwork assets to artworkId:", artworkId);
   const { results, errors } = await performUpload(
     artworkId,
     files,
     thumbnailFileName,
     onProgress ?? (() => {}),
   );
-  if (errors) {
+  if (errors && errors.length > 0) {
+    console.error("[addArtworkAssets] errors:", errors);
     return {
       data: null,
       errors,

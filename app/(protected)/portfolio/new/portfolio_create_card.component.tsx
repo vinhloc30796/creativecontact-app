@@ -1,7 +1,6 @@
 "use client";
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
-import { useToast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import {
@@ -21,10 +20,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { useTranslation } from "@/lib/i18n/init-client";
 import { useUploadStore } from "@/stores/uploadStore";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import { v4 } from "uuid";
 import { handleSubmit } from "./action.client";
 import AddCoOwner from "./add_coowner.component";
@@ -40,9 +41,9 @@ interface PortfolioCreateCardProps {
   };
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
+  const router = useRouter();
   const { fileUploads, thumbnailFileName } = useFileUpload();
-  const { t } = useTranslation(["Portfolio", "ArtworkInfoStep"]);
-  const { toast } = useToast();
+  const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const {
@@ -52,7 +53,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     setUploadProgress,
     resetUploadProgress,
   } = useUploadStore();
-  
+
   const artworkUUID = v4();
   const projectId = v4();
 
@@ -84,18 +85,17 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       },
     );
 
+    setSubmitLoading(false);
     if (rs) {
-      toast({
-        title: t("form.toast.success.title"),
-        description: t("form.toast.success.description"),
+      toast.success(t("form.toast.success.title"), {
+        duration: 5000,
       });
+      router.push("/profile#portfolio?projectId=" + projectId);
     } else {
-      toast({
-        title: t("form.toast.error.title"),
-        description: t("form.toast.error.description"),
+      toast.error(t("form.toast.error.title"), {
+        duration: 5000,
       });
     }
-    setSubmitLoading(false);
   }
 
   return (
