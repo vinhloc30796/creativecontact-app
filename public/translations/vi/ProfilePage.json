@@ -75,5 +75,11 @@
     "errorLoadingProjects": "Lỗi Tải Dự án",
     "tryAgainLater": "Đã xảy ra lỗi khi tải dự án của bạn. Vui lòng thử lại sau.",
     "retry": "Thử lại"
+  },
+  "dialogDeleteContact": {
+    "title": "Xóa Liên hệ",
+    "description": "Bạn có chắc muốn xóa liên hệ nây?",
+    "cancel": "Hủy",
+    "delete": "Xóa Liên hệ"
   }
 }
