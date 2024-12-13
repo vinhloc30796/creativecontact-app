@@ -37,42 +37,28 @@ import {
   UserCircle,
 } from "lucide-react";
 
-// Local component import
-interface UserSkills {
-  id: number;
-  name: string;
-}
-
-async function getUserSkills(userId?: string): Promise<UserSkills[]> {
-  // TODO: Implement actual skill fetching logic
-  // This is a placeholder implementation
-  return [
-    { id: 1, name: "JavaScript" },
-    { id: 2, name: "React" },
-    { id: 3, name: "Node.js" },
-    { id: 4, name: "TypeScript" },
-    { id: 5, name: "GraphQL" },
-  ];
-}
-
-function SocialSubsection({ userData, lang = "en" }: { userData?: UserData, lang?: string }) {
+function SocialSubsection({
+  userData,
+  lang = "en",
+}: {
+  userData?: UserData;
+  lang?: string;
+}) {
   const { t } = useTranslation(lang, "ProfileCard");
-  
+
   const emptyMessage = (
-    <p className="text-sm text-muted-foreground">
-      {t("noSocialLinks")}
-    </p>
+    <p className="text-sm text-muted-foreground">{t("noSocialLinks")}</p>
   );
-  
+
   if (!userData) {
     return emptyMessage;
   }
-  
+
   const socialLinks = getSocialMediaLinks(userData);
   if (socialLinks.length === 0) {
     return emptyMessage;
   }
-  
+
   return socialLinks.map(
     (link, index) =>
       link &&
@@ -109,14 +95,13 @@ export function ProfileCard({
 
   const name = getName(userData);
   const userName = userData.userName || "";
-  const { data: profilePictureUrl, isLoading: isLoadingProfilePicture } = useQuery({
-    queryKey: ['profilePicture', userData.id],
-    queryFn: () => getProfileImageUrl(userData),
-  });
-  const { data: userSkills } = useQuery({
-    queryKey: ['userSkills', userData.id],
-    queryFn: () => getUserSkills(userData.id),
-  });
+  const { data: profilePictureUrl, isLoading: isLoadingProfilePicture } =
+    useQuery({
+      queryKey: ["profilePicture", userData.id],
+      queryFn: () => getProfileImageUrl(userData),
+    });
+
+  const userSkills = userData.userSkills;
   const phoneNumber = getFormattedPhoneNumber(userData);
 
   const portfolioArtworks = use(portfolioArtworksPromise);
@@ -128,7 +113,7 @@ export function ProfileCard({
           <img
             src={profilePictureUrl}
             alt={`${name}'s profile picture`}
-            className={`h-full w-full object-cover ${isLoadingProfilePicture ? 'animate-pulse bg-gray-200' : ''}`}
+            className={`h-full w-full object-cover ${isLoadingProfilePicture ? "animate-pulse bg-gray-200" : ""}`}
           />
         </div>
         <CardTitle className="mb-2 flex items-center text-2xl font-bold">
@@ -194,8 +179,12 @@ export function ProfileCard({
               <h3 className="mb-2 text-lg font-semibold">{t("skills")}</h3>
               <div className="flex flex-wrap gap-2">
                 {userSkills.map((skill) => (
-                  <Badge key={skill.id} variant="secondary" className="text-xs">
-                    {skill.name}
+                  <Badge
+                    key={skill.skillId}
+                    variant="secondary"
+                    className="text-xs"
+                  >
+                    {skill.skillName}
                   </Badge>
                 ))}
               </div>

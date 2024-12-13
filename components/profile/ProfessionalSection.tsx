@@ -24,17 +24,27 @@ import {
 import {
   experienceLevelsMapper,
   industriesMapper,
-  skillsMapper,
 } from "@/drizzle/schema/user";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
+import { use } from "i18next";
+
+import { useQuery } from "@tanstack/react-query";
+import { get } from "http";
+import { getAllSkills } from "@/app/api/skills/helper";
 
 interface IndustryComboboxProps {
   value: Industry | null;
   onChange: (value: Industry) => void;
+}
+
+interface Skill {
+  skillId: string;
+  skillName: string;
+  numberOfPeople: number;
 }
 
 function IndustryCombobox({ value, onChange }: IndustryComboboxProps) {
@@ -161,6 +171,28 @@ export function ProfessionalSection({
   const { setFieldDirty, setFormData } = useFormState();
 
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await fetch("/api/skills");
+        if (!response.ok) {
+          throw new Error("Failed to fetch skills");
+        }
+        const data = await response.json();
+        setSkills(data);
+      } catch (error: any) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSkills();
+  }, []);
 
   const handleSkillClick = (skill: string) => {
     setSelectedSkills((prevSelectedSkills) =>
@@ -284,18 +316,18 @@ export function ProfessionalSection({
           <div className="space-y-2">
             <Label>{t("ProfessionalSection.skills")}</Label>
             <div className="flex flex-wrap gap-2">
-              {skillsMapper.map((skill) => (
-                <Badge
-                  key={skill.value}
-                  data-id={skill}
-                  onClick={() => handleSkillClick(skill.value)}
-                  variant={
-                    selectedSkills.includes(skill.value) ? undefined : "outline"
-                  }
-                  className="cursor-pointer"
-                >
-                  {skill.value}
-                </Badge>
+              {skills.map((skill: Skill) => (
+                <ComboBadge
+                  key={skill.skillId}
+                  data-id={skill.skillId}
+                  leftContent={skill.skillName}
+                  rightContent={skill.numberOfPeople}
+                  leftColor="bg-primary"
+                  rightColor="bg-primary/80"
+                  onDelete={() => {
+                    console.log("Deleting badge with ID:", skill.skillId);
+                  }}
+                />
               ))}
             </div>
           </div>

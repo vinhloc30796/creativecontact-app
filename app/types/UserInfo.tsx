@@ -1,10 +1,12 @@
 // File: app/types/UserInfo.tsx
+import { UserSkill } from "@/drizzle/schema/skills";
 import {
   IndustryType,
   ExperienceType,
   UserInfo as DrizzleUserInfo,
   UserIndustryExperience,
 } from "@/drizzle/schema/user";
+import { User } from "@supabase/supabase-js";
 
 export type Industry = IndustryType;
 export type ExperienceLevel = ExperienceType;
@@ -29,4 +31,5 @@ export interface UserData extends Omit<DrizzleUserInfo, "experience"> {
   instagramHandle: string | null;
   facebookHandle: string | null;
   industryExperiences: UserIndustryExperience[];
+  userSkills: UserSkill[];
 }

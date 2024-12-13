@@ -12,6 +12,7 @@ import { getServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
 import { ProfileEditForm } from "./ProfileEditForm";
 import { BackButton } from "../BackButton";
+import { getAllSkills } from "@/app/actions/skills/getSkills";
 
 interface ProfileEditPageProps {
   params: Promise<{}>;
@@ -33,6 +34,7 @@ export default async function ProfileEditPage(props: ProfileEditPageProps) {
   if (user) {
     try {
       userData = await fetchUserData(user.id);
+      console.log("userData", userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
