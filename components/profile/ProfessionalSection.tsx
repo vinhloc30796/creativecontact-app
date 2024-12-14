@@ -37,6 +37,7 @@ interface IndustryComboboxProps {
 }
 
 interface Skill {
+  id: any;
   skillId: string;
   skillName: string;
   numberOfPeople: number;

@@ -31,5 +31,9 @@ export interface UserData extends Omit<DrizzleUserInfo, "experience"> {
   instagramHandle: string | null;
   facebookHandle: string | null;
   industryExperiences: UserIndustryExperience[];
-  userSkills: UserSkill[];
+  userSkills: {
+    skillId: string;
+    skillName: string;
+    numberOfPeople: number;
+  }[];
 }
