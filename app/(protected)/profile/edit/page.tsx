@@ -12,7 +12,6 @@ import { getServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
 import { ProfileEditForm } from "./ProfileEditForm";
 import { BackButton } from "../BackButton";
-import { getAllSkills } from "@/app/actions/skills/getSkills";
 
 interface ProfileEditPageProps {
   params: Promise<{}>;

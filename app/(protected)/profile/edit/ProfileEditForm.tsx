@@ -36,6 +36,7 @@ export function ProfileEditForm({
         userData.id,
         formData.professional.userSkills,
       );
+      router.push("/profile");
     } catch (error) {
       console.error("Error saving profile:", error);
       throw error;
