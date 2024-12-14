@@ -30,11 +30,6 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
-import { use } from "i18next";
-
-import { useQuery } from "@tanstack/react-query";
-import { get } from "http";
-import { getAllSkills } from "@/app/api/skills/helper";
 
 interface IndustryComboboxProps {
   value: Industry | null;
@@ -146,6 +141,67 @@ function ExperienceCombobox({ value, onChange }: ExperienceComboboxProps) {
   );
 }
 
+interface SkillComboboxProps {
+  selectedSkills?: string[];
+  skills?: Skill[];
+  value?: Skill | null;
+  onChange?: (value: Skill) => void;
+}
+
+function SkillCombobox({
+  selectedSkills,
+  skills,
+  value,
+  onChange,
+}: SkillComboboxProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          className="w-full justify-between"
+        >
+          {value ? value.skillName : "Select Skill"}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+        <Command>
+          <CommandInput placeholder="Search skill..." />
+          <CommandList>
+            <CommandEmpty>No skill found</CommandEmpty>
+            <CommandGroup>
+              {skills?.map((skill) => (
+                <CommandItem
+                  key={skill.skillId}
+                  value={skill.skillId}
+                  onSelect={() => {
+                    onChange?.(skill);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedSkills?.includes(skill.skillName)
+                        ? "opacity-100"
+                        : "opacity-0",
+                    )}
+                  />
+                  {skill.skillName}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 interface ProfessionalSectionProps {
   userData: UserData;
   lang?: string;
@@ -168,10 +224,23 @@ export function ProfessionalSection({
   const [newExperience, setNewExperience] = useState<ExperienceLevel | null>(
     null,
   );
+  const [newSkill, setNewSkill] = useState<Skill | null>(null);
   const { setFieldDirty, setFormData } = useFormState();
 
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [skills, setSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState<
+    {
+      skillId: string;
+      skillName: string;
+      numberOfPeople: number;
+    }[]
+  >(
+    userData.userSkills.map((skill) => ({
+      skillId: skill.skillId,
+      skillName: skill.skillName,
+      numberOfPeople: skill.numberOfPeople,
+    })) || [],
+  );
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -194,26 +263,27 @@ export function ProfessionalSection({
     fetchSkills();
   }, []);
 
-  const handleSkillClick = (skill: string) => {
-    setSelectedSkills((prevSelectedSkills) =>
-      prevSelectedSkills.includes(skill)
-        ? prevSelectedSkills.filter((s) => s !== skill)
-        : [...prevSelectedSkills, skill],
-    );
-  };
-
   useEffect(() => {
     const industryExperiencesChanged =
       JSON.stringify(selectedIndustryExperiences) !==
       JSON.stringify(userData.industryExperiences || []);
 
+    const selectedSkillsIds = selectedSkills.map((s) => s.skillId);
+
     setFieldDirty("professional", industryExperiencesChanged);
+    const userSkillsIds = (userData.userSkills || []).map((s) => s.skillId);
+    setFieldDirty(
+      "professional",
+      selectedSkillsIds.join(",") !== userSkillsIds.join(","),
+    );
 
     setFormData("professional", {
       industryExperiences: selectedIndustryExperiences,
+      userSkills: { skills: selectedSkillsIds },
     });
   }, [
     selectedIndustryExperiences,
+    selectedSkills,
     userData.industryExperiences,
     setFieldDirty,
     setFormData,
@@ -251,6 +321,33 @@ export function ProfessionalSection({
       });
     });
   };
+
+  const addSkill = () => {
+    if (newSkill) {
+      console.log("Adding new skill:", newSkill);
+      setSelectedSkills((current) => {
+        const updatedSkills = [
+          ...current,
+          {
+            skillId: newSkill.id,
+            skillName: newSkill.skillName,
+            numberOfPeople: newSkill.numberOfPeople,
+          },
+        ];
+        console.log("Updated skills:", updatedSkills);
+        return updatedSkills;
+      });
+      setNewSkill(null);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <Card id="professional">
@@ -316,7 +413,7 @@ export function ProfessionalSection({
           <div className="space-y-2">
             <Label>{t("ProfessionalSection.skills")}</Label>
             <div className="flex flex-wrap gap-2">
-              {skills.map((skill: Skill) => (
+              {selectedSkills.map((skill) => (
                 <ComboBadge
                   key={skill.skillId}
                   data-id={skill.skillId}
@@ -325,10 +422,25 @@ export function ProfessionalSection({
                   leftColor="bg-primary"
                   rightColor="bg-primary/80"
                   onDelete={() => {
-                    console.log("Deleting badge with ID:", skill.skillId);
+                    setSelectedSkills((prevSelectedSkills) =>
+                      prevSelectedSkills.filter(
+                        (s) => s.skillId !== skill.skillId,
+                      ),
+                    );
                   }}
                 />
               ))}
+            </div>
+            <div className="mt-2 flex gap-2">
+              <SkillCombobox
+                selectedSkills={selectedSkills.map((s) => s.skillName)}
+                skills={skills}
+                value={newSkill}
+                onChange={setNewSkill}
+              />
+              <Button onClick={addSkill} disabled={!newSkill}>
+                Add Skill
+              </Button>
             </div>
           </div>
         </div>

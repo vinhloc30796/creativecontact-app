@@ -34,9 +34,8 @@ export function ProfileEditForm({
       });
       await UserService.updateUserSkills(
         userData.id,
-        formData.professional.skills,
+        formData.professional.userSkills,
       );
-      router.push("/profile");
     } catch (error) {
       console.error("Error saving profile:", error);
       throw error;

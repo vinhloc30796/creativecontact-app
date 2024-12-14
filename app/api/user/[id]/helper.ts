@@ -59,6 +59,7 @@ export async function fetchUserData(userId: string) {
     .select({
       skillId: userSkills.skillId,
       skillName: skills.skillName,
+      numberOfPeople: skills.numberOfPeople,
     })
     .from(userSkills)
     .leftJoin(skills, eq(userSkills.skillId, skills.id))

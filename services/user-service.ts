@@ -1,4 +1,4 @@
-import { writeUserSkills } from "@/app/actions/skills/writeUserSkills";
+import { updateUserSkills } from "@/app/actions/skills/updateUserSkills";
 import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
 import { type AboutInfoData } from "@/app/form-schemas/about-info";
 import {
@@ -55,5 +55,7 @@ export class UserService {
     );
   }
 
-  static async updateUserSkills(userId: string, skills: string[]) {}
+  static async updateUserSkills(userId: string, skills: { skills: string[] }) {
+    return await updateUserSkills(userId, skills);
+  }
 }
