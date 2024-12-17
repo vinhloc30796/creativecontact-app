@@ -177,7 +177,7 @@ function SkillCombobox({
             <CommandGroup>
               {skills?.map((skill) => (
                 <CommandItem
-                  key={skill.skillId}
+                  key={skill.id}
                   value={skill.skillId}
                   onSelect={() => {
                     onChange?.(skill);
