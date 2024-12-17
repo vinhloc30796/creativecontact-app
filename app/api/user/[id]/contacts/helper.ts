@@ -8,7 +8,7 @@ import {
   userIndustryExperience,
 } from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function fetchUserContacts(userId: string): Promise<UserData[]> {
   const contactsInfo = await db
@@ -83,6 +83,5 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
       userSkills: [], // Empty array as a placeholder
     }),
   );
-
   return typeSafeContacts;
 }

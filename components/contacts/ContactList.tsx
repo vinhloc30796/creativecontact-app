@@ -37,12 +37,12 @@ export function ContactList({ userId, lang }: ContactListProps) {
   if (!contacts || contacts.length === 0) {
     return <EmptyContactCard lang={lang} />;
   }
-
   return (
     <>
       {contacts.map((contact) => (
         <ContactCard
           key={contact.id}
+          contactId={contact.id}
           lang={lang}
           userData={contact}
           showButtons={false}
