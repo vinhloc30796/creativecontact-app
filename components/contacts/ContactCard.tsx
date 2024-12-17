@@ -12,8 +12,9 @@ import { Briefcase, CheckCircle, MapPin, Trash2, UserCircle } from 'lucide-react
 import { Button } from "../ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
 import { useState } from "react";
-import deleteContactServerAction from '@/lib/server_action/delete_contact'
 import { toast } from "sonner";
+import { useDeleteContactMutation } from "@/hooks/client/deleteContact";
+import { on } from "events";
 
 interface ContactCardProps {
   contactId: string,
@@ -40,17 +41,24 @@ export function ContactCard({
   const contactImage = isLoading ? placeholderImage : (profilePictureUrl || placeholderImage);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  const deleteContactMutation = useDeleteContactMutation(
+    () => toast.success(t("deleteContactResult.success")),
+    () => toast.error(t("deleteContactResult.failure"))
+  )
   const deleteContact = async () => {
-    const rs = await deleteContactServerAction(contactId)
-    console.info(rs)
-    if (rs.error) {
-      toast.error(t("deleteContactResult.failure"))
-    } else {
+    // call delete api
+    await deleteContactMutation.mutateAsync(contactId)
+    // sleep 10s
+    await new Promise((resolve) => setTimeout(resolve, 10000))
+    if (deleteContactMutation.isSuccess) {
       toast.success(t("deleteContactResult.success"))
-      //sleep for 5 seconds
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-      window.location.reload()
+    } else {
+      toast.error(t("deleteContactResult.failure"))
     }
+
+    console.log(deleteContactMutation.isSuccess)
+    // sleep 5s
     setShowDeleteDialog(false)
   }
 

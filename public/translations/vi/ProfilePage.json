@@ -81,5 +81,9 @@
     "description": "Bạn có chắc muốn xóa liên hệ nây?",
     "cancel": "Hủy",
     "delete": "Xóa Liên hệ"
+  },
+  "deleteContactResult": {
+    "success": "Xóa liên hệ thành công.",
+    "failure": "Xóa liên hệ thất bại."
   }
 }
