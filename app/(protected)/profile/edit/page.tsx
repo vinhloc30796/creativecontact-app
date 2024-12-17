@@ -33,6 +33,7 @@ export default async function ProfileEditPage(props: ProfileEditPageProps) {
   if (user) {
     try {
       userData = await fetchUserData(user.id);
+      console.log("userData", userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
