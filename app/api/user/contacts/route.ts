@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { deleteContactWithContactId } from "./helper";
 
-export const deleteContactSchema = z.object({
+const deleteContactSchema = z.object({
   contactId: z.string().uuid(),
 });
 
