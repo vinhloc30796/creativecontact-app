@@ -2,9 +2,13 @@
 
 import { UserData } from "@/app/types/UserInfo";
 import { contacts } from "@/drizzle/schema/contact";
-import { authUsers, userInfos, userIndustryExperience } from "@/drizzle/schema/user";
+import {
+  authUsers,
+  userInfos,
+  userIndustryExperience,
+} from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export async function fetchUserContacts(userId: string): Promise<UserData[]> {
   const contactsInfo = await db
@@ -47,35 +51,37 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
         ...contact,
         industryExperiences,
       };
-    })
+    }),
   );
 
   // Ensure type safety by mapping the result to UserData
-  const typeSafeContacts: UserData[] = contactsWithIndustryExperiences.map((contact) => ({
-    ...contact,
-    firstName: contact.firstName ?? "",
-    lastName: contact.lastName ?? "",
-    userName: contact.userName ?? "",
-    displayName: contact.displayName ?? "",
-    email: contact.email ?? "",
-    isAnonymous: contact.isAnonymous ?? false,
-    emailConfirmedAt: contact.emailConfirmedAt ?? null,
-    phoneCountryCode: contact.phoneCountryCode ?? "84", 
-    phoneNumber: contact.phoneNumber ?? "",
-    phoneCountryAlpha3: contact.phoneCountryAlpha3 ?? "VNM",
-    location: contact.location ?? null,
-    occupation: contact.occupation ?? null,
-    about: contact.about ?? null,
-    profilePicture: contact.profilePicture ?? null,
-    instagramHandle: contact.instagramHandle ?? null,
-    facebookHandle: contact.facebookHandle ?? null,
-    industryExperiences: contact.industryExperiences.map(exp => ({
-      id: contact.id, // Using contact ID as a fallback
-      userId: contact.id,
-      industry: exp.industry,
-      experienceLevel: exp.experienceLevel
-    }))
-  }));
-
+  const typeSafeContacts: UserData[] = contactsWithIndustryExperiences.map(
+    (contact) => ({
+      ...contact,
+      firstName: contact.firstName ?? "",
+      lastName: contact.lastName ?? "",
+      userName: contact.userName ?? "",
+      displayName: contact.displayName ?? "",
+      email: contact.email ?? "",
+      isAnonymous: contact.isAnonymous ?? false,
+      emailConfirmedAt: contact.emailConfirmedAt ?? null,
+      phoneCountryCode: contact.phoneCountryCode ?? "84",
+      phoneNumber: contact.phoneNumber ?? "",
+      phoneCountryAlpha3: contact.phoneCountryAlpha3 ?? "VNM",
+      location: contact.location ?? null,
+      occupation: contact.occupation ?? null,
+      about: contact.about ?? null,
+      profilePicture: contact.profilePicture ?? null,
+      instagramHandle: contact.instagramHandle ?? null,
+      facebookHandle: contact.facebookHandle ?? null,
+      industryExperiences: contact.industryExperiences.map((exp) => ({
+        id: contact.id, // Using contact ID as a fallback
+        userId: contact.id,
+        industry: exp.industry,
+        experienceLevel: exp.experienceLevel,
+      })),
+      userSkills: [], // Empty array as a placeholder
+    }),
+  );
   return typeSafeContacts;
 }

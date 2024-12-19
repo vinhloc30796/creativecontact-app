@@ -1,3 +1,4 @@
+import { updateUserSkills } from "@/app/actions/skills/updateUserSkills";
 import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
 import { type AboutInfoData } from "@/app/form-schemas/about-info";
 import {
@@ -44,12 +45,17 @@ export class UserService {
         about: about || "",
       },
       {
-        industryExperiences: (industryExperiences || []) as UserIndustryExperience[],
+        industryExperiences: (industryExperiences ||
+          []) as UserIndustryExperience[],
       },
       {
         instagramHandle,
         facebookHandle,
       },
     );
+  }
+
+  static async updateUserSkills(userId: string, skills: { skills: string[] }) {
+    return await updateUserSkills(userId, skills);
   }
 }

@@ -14,3 +14,5 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+
