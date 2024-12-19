@@ -29,6 +29,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 interface ArtworkInfoStepProps {
+  artworksCount?: number;
   artworks: ArtworkInfoData[];
   form: UseFormReturn<{
     id: string;
@@ -98,7 +99,7 @@ function ExistingArtworkSidepane({
   );
 }
 
-export function ArtworkInfoStep({ form }: ArtworkInfoStepProps) {
+export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
   // State
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -123,7 +124,9 @@ export function ArtworkInfoStep({ form }: ArtworkInfoStepProps) {
         throw new Error("Failed to fetch artworks");
       }
       const data = await response.json();
-      console.log("Fetched artworks for user:", user.id, data);
+      if (data.artworks.length === 0) {
+        console.log("No artworks found for user:", user.id);
+      }
       return data.artworks;
     },
     enabled: !!user?.id,
@@ -167,7 +170,7 @@ export function ArtworkInfoStep({ form }: ArtworkInfoStepProps) {
       )}
       {error && <p>{t("ExistingArtworkSelector.error")}</p>}
 
-      {fetchedArtworks && (
+      {fetchedArtworks && !artworksCount && (
         <>
           <div className="mb-2 mt-4">
             {fetchedArtworks.length > 0 ? (
@@ -197,6 +200,23 @@ export function ArtworkInfoStep({ form }: ArtworkInfoStepProps) {
             setIsOpen={setIsOpen}
           />
         </>
+      )}
+
+      {artworksCount && artworksCount > 0 ? (
+        <div className="mb-2 mt-4">
+          <div className="flex items-center">
+            <p className="text-sm">
+              {t("ExistingArtworkSelector.existingArtworksCount")}
+            </p>
+            <Badge variant="secondary" className="mx-2">
+              &nbsp;{artworksCount}&nbsp;
+            </Badge>
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm">
+          {t("ExistingArtworkSelector.noExistingArtworks")}
+        </p>
       )}
     </>
   );

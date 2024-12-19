@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     // Clear any auth cookies
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.getAll().forEach(cookie => {
       if (cookie.name.includes('supabase') || cookie.name.includes('auth')) {
         cookieStore.delete(cookie.name);
