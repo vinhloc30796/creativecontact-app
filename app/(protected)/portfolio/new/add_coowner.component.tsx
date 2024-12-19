@@ -22,7 +22,13 @@ interface AddCoOwnerProps {
 }
 export default function AddCoOwner({ artworkCreditForm }: AddCoOwnerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [coartists, setCoartists] = useState(
+  const [coartists, setCoartists] = useState<{
+    title: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    userId: string;
+  }[]>(
     artworkCreditForm.getValues().coartists || [],
   );
   const addCoartist = (
@@ -32,9 +38,21 @@ export default function AddCoOwner({ artworkCreditForm }: AddCoOwnerProps) {
     title: string,
     userId: string,
   ) => {
-    const newArtist = { first_name, last_name, email, title, userId };
+    const newArtist: {
+      title: string;
+      email: string;
+      first_name: string;
+      last_name: string;
+      userId: string;
+    } = { first_name, last_name, email, title, userId };
     setIsDialogOpen(false);
-    const updatedCoartists = [...coartists, newArtist];
+    const updatedCoartists: {
+      title: string;
+      email: string;
+      first_name: string;
+      last_name: string;
+      userId: string;
+    }[] = [...coartists, newArtist];
     setCoartists(updatedCoartists);
     artworkCreditForm.setValue("coartists", updatedCoartists);
   };

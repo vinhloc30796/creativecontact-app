@@ -4,6 +4,14 @@
   "projectInfo": "Thông tin Dự án",
   "projectMedia": "Media",
   "projectCredits": "Tác giả",
+  "publish": "Xuất bản",
+  "projectName": "Tên Dự án",
+  "projectDescription": "Mô tả dự án",
+  "addCoOwner": "Đồng tác giả",
+  "toast":{
+    "success": "Đã tạo dự án!",
+    "error": "Lỗi khi tạo dự án" 
+  },
   "dataUsage": "Dung lượng sử dụng",
   "creditInfo": "Thông tin tác giả",
   "cancel": "Hủy",
