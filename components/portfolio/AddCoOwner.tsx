@@ -1,16 +1,16 @@
 import { useTranslation } from '@/lib/i18n/init-client';
-import React from 'react'
-import { Button } from '../ui/button';
+import React, { useEffect } from 'react'
+import { Button } from '@/components/ui/button';
 import { EditIcon, Plus, Trash2 } from 'lucide-react';
 import { FormProvider, useForm, UseFormReturn } from 'react-hook-form';
-import { Dialog, DialogContent } from '@radix-ui/react-dialog';
-import { FormControl, FormField, FormItem } from '../ui/form';
-import { Input } from '../ui/input';
-import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Label } from '../ui/label';
-import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
-import { AlertDialog } from '@radix-ui/react-alert-dialog';
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 const CoOwnerSchema = z.object({
   email: z.string().email(),
@@ -27,7 +27,12 @@ function AddCoOwner({ lang, coownersForm }: AddCoOwnerProps) {
   const { t } = useTranslation(lang, ["Portfolio", "ArtworkInfoStep"]);
   const [coowners] = coownersForm.watch(["coowners"])
   const [isOpen, setOpen] = React.useState(false)
-  const coownerForm = useForm<CoOwerInfo>()
+  const coownerForm = useForm<CoOwerInfo>({
+    defaultValues: {
+      email: "",
+      title: "",
+    }
+  })
   const deleteCowner = (email: string) => {
     coownersForm.setValue("coowners", coownersForm.getValues().coowners.filter((coowner) => coowner.email !== email))
   }
@@ -42,8 +47,8 @@ function AddCoOwner({ lang, coownersForm }: AddCoOwnerProps) {
         }} />
       })}
       <Button className='w-full rounded-full' variant='secondary' onClick={() => setOpen(true)}> <Plus className='w-4 h-4 mr-2' /> {t("addCoOwner")}</Button>
-      <CoOwnerDialog isOpen={isOpen} setOpen={setOpen} coownerForm={coownerForm} lang={lang} submit={() => {
-        const updateData = coownerForm.getValues()
+      <CoOwnerDialog isOpen={isOpen} setOpen={setOpen} lang={lang} submit={(coowner) => {
+        const updateData = coowner
         if (coownersForm.getValues().coowners.find((coowner) => coowner.email === updateData.email)) {
           coownersForm.setValue("coowners", coownersForm.getValues().coowners.map((coowner) => {
             if (coowner.email === updateData.email) {
@@ -55,9 +60,13 @@ function AddCoOwner({ lang, coownersForm }: AddCoOwnerProps) {
           coownersForm.setValue("coowners", [...coownersForm.getValues().coowners, updateData])
         }
 
-        coownerForm.reset()
-        console.info(coownersForm.getValues())
-      }} />
+        coownerForm.reset({
+          email: "",
+          title: ""
+        })
+      }}
+        data={coownerForm.getValues()}
+      />
     </>
   )
 }
@@ -67,12 +76,14 @@ interface CoOwnerRowProps {
   edit: () => void
 }
 function CoOwnerRow(props: CoOwnerRowProps) {
-  return <div className='flex justify-between group gap-4 w-full'>
-    <div className='flex justify-between w-full flex-wrap'>
+  return <div className='flex justify-between group gap-4 w-full borde-b border-gray-200 py-2 px-4'>
+    <div className='flex flex-col justify-between w-full flex-wrap'>
       <p className=''>{props.data.email}</p>
-      <span className='text-xs text-white bg-red-500 px-2 py-1 rounded-full'>{props.data.title}</span>
+      <Badge className='w-max lg:px-4'>
+        {props.data.title}
+      </Badge>
     </div>
-    <div className='group-hover:flex gap-2 items-center hidden w-max flex'>
+    <div className='group-hover:flex gap-2 items-center flex'>
       <EditIcon className='h-4 w-4 hover:cursor-pointer' onClick={props.edit} />
       <Trash2 className='h-4 w-4 hover:cursor-pointer' onClick={props.delete} />
     </div>
@@ -80,15 +91,31 @@ function CoOwnerRow(props: CoOwnerRowProps) {
 }
 
 interface CoOwnerDialogProps {
+  data?: {
+    email: string,
+    title: string,
+  },
   isOpen: boolean,
   setOpen: (open: boolean) => void
-  coownerForm: UseFormReturn<CoOwerInfo>,
-  submit: () => void
+  submit: (coowner: CoOwerInfo) => void
   lang: string
 }
 function CoOwnerDialog(props: CoOwnerDialogProps) {
   const lang = props.lang
   const { t } = useTranslation(lang, "ArtworkCreditInfoStep");
+  const coownerForm = useForm<CoOwerInfo>({
+    resolver: zodResolver(CoOwnerSchema),
+    defaultValues: {
+      email: props.data?.email || "",
+      title: props.data?.title || "",
+    }
+  })
+  useEffect(() => {
+    coownerForm.reset({
+      email: props.data?.email || "",
+      title: props.data?.title || "",
+    })
+  }, [props.data])
   return (
     <AlertDialog open={props.isOpen} onOpenChange={props.setOpen}>
       <AlertDialogContent>
@@ -98,43 +125,55 @@ function CoOwnerDialog(props: CoOwnerDialogProps) {
             {t("description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <FormProvider {...props.coownerForm}>
-          <form onSubmit={props.coownerForm.handleSubmit((data) => {
-            console.log(data)
-          })}>
-            <div className="grid gap-4 py-4">
-              <FormField
-                control={props.coownerForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <Label>Email</Label>
-                    <Input placeholder={t("dialog.fields.email.placeholder")} {...field} type='email' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={props.coownerForm.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <Label>{t("dialog.fields.title.label")}</Label>
+        <FormProvider {...coownerForm}>
+          <div className="grid gap-4 py-4">
+            <FormField
+              control={coownerForm.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Email</Label>
+                  <FormControl>
+                    <Input placeholder={t("dialog.fields.email.placeholder")}  {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={coownerForm.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>{t("dialog.fields.title.label")}</Label>
+                  <FormControl>
                     <Input placeholder={t("dialog.fields.title.placeholder")} {...field} />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <DialogFooter>
-              <AlertDialogCancel>{t("dialog.cancel")}</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={props.submit}>
-                {props.coownerForm.getValues().email ? t("edit") : t("add")}
-              </AlertDialogAction>
-            </DialogFooter>
-          </form>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("dialog.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                coownerForm.handleSubmit((data) => {
+                  props.submit(data)
+                }, (err) => {
+                  const errorMessages = Object.values(err)
+                    .map(error => error?.message)
+                    .filter(Boolean)
+                    .join(', ');
+                  toast.error(errorMessages || 'Validation failed');
+                })()
+              }}>
+              {coownerForm.getValues().email ? t("edit") : t("add")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </FormProvider>
       </AlertDialogContent>
-    </AlertDialog>
+    </AlertDialog >
   )
 }
 

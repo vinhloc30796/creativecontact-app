@@ -1,14 +1,9 @@
 import { getQueryClient } from "@/app/providers"
 import { useMutation } from "@tanstack/react-query"
-import { on } from "events"
 
-const deleteContactApi = async (contactId: string) => {
-  const response = await fetch(`/api/user/contacts`, {
+const deleteContactApi = async (userId: string, contactId: string) => {
+  const response = await fetch(`/api/user/${userId}/contacts/${contactId}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ contactId }),
   })
   const data = await response.json()
   if (!response.ok) {
@@ -22,7 +17,7 @@ const useDeleteContactMutation = (
 ) => {
   const queryClient = getQueryClient()
   return useMutation({
-    mutationFn: deleteContactApi,
+    mutationFn: ({ userId, contactId }: { userId: string, contactId: string }) => deleteContactApi(userId, contactId),
     onSuccess: () => {
       onSuccess()
       queryClient.invalidateQueries({
@@ -30,7 +25,7 @@ const useDeleteContactMutation = (
       })
     },
     onError(error, variables, context) {
-      console.error('Error deleting contact:', error)
+      console.error(error)
       onError()
     },
 

@@ -19,7 +19,6 @@ async function deleteContactWithContactId(
   return { result: true, error: null }
 }
 
-
 export {
-  deleteContactWithContactId,
+  deleteContactWithContactId
 }

@@ -1,4 +1,4 @@
-async function getDataUseage(): Promise<number> {
+async function getDataUsage(): Promise<number> {
   const response = await fetch('/api/storage/usage')
   if (!response.ok) {
     throw new Error('Failed to fetch data usage')
@@ -7,4 +7,4 @@ async function getDataUseage(): Promise<number> {
   return data.result as number
 }
 
-export { getDataUseage }
+export { getDataUsage }

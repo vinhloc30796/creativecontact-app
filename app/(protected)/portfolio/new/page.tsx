@@ -3,7 +3,7 @@ import { UserHeader } from '@/components/wrappers/UserHeader';
 import { getServerAuth } from '@/hooks/useServerAuth';
 import React, { Suspense } from 'react'
 import { BackButton } from '../../profile/BackButton';
-import CreateProfoiloForm from '@/components/portfolio/CreateProfoiloForm';
+import CreatePortfolioForm from '@/components/portfolio/CreateProfoiloForm';
 import { UploadMediaProvider } from '@/components/portfolio/UploadFile';
 import { redirect } from 'next/navigation';
 
@@ -34,7 +34,7 @@ export default async function PortfolioCreatePage(props: PortfolioCreatePageProp
           <BackButton />
         </div>
         <UploadMediaProvider>
-          <CreateProfoiloForm lang={lang} />
+          <CreatePortfolioForm lang={lang} />
         </UploadMediaProvider>
       </main>
     </BackgroundDiv>

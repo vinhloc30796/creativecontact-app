@@ -85,3 +85,26 @@ export async function fetchUserContacts(userId: string): Promise<UserData[]> {
   );
   return typeSafeContacts;
 }
+
+
+
+// delete contact
+async function deleteContactWithContactId(
+  userId: string,
+  contactId: string,
+)
+  : Promise<{ result: boolean, error: Error | null }> {
+  const rs = await db.delete(contacts)
+    .where(and(
+      eq(contacts.userId, userId),
+      eq(contacts.contactId, contactId)
+    ))
+  if (rs.rowCount === 0) {
+    return { result: false, error: new Error("contact does not exist or does not belong to you") }
+  }
+  return { result: true, error: null }
+}
+
+export {
+  deleteContactWithContactId
+}

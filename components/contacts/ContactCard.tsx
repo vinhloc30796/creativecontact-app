@@ -9,11 +9,12 @@ import { getProfileImageUrl } from "@/utils/profile_image";
 import { getName } from "@/utils/user_name";
 import { useQuery } from "@tanstack/react-query";
 import { Briefcase, CheckCircle, MapPin, Trash2, UserCircle } from 'lucide-react';
-import { Button } from "../ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useDeleteContactMutation } from "@/hooks/client/deleteContact";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ContactCardProps {
   contactId: string,
@@ -40,24 +41,21 @@ export function ContactCard({
   const contactImage = isLoading ? placeholderImage : (profilePictureUrl || placeholderImage);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const { user, isLoggedIn } = useAuth()
 
   const deleteContactMutation = useDeleteContactMutation(
     () => toast.success(t("deleteContactResult.success")),
     () => toast.error(t("deleteContactResult.failure"))
   )
   const deleteContact = async () => {
-    // call delete api
-    await deleteContactMutation.mutateAsync(contactId)
-    // sleep 10s
-    await new Promise((resolve) => setTimeout(resolve, 10000))
-    if (deleteContactMutation.isSuccess) {
-      toast.success(t("deleteContactResult.success"))
-    } else {
+    if (!user || !isLoggedIn) {
       toast.error(t("deleteContactResult.failure"))
+      return
     }
+    const userId = user.id
+    console.log(userId)
+    deleteContactMutation.mutate({ userId, contactId })
 
-    console.log(deleteContactMutation.isSuccess)
-    // sleep 5s
     setShowDeleteDialog(false)
   }
 

@@ -5,9 +5,8 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useTranslation } from '@/lib/i18n/init-client'
 import { FormControl, FormField, FormItem, FormMessage } from '../ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { DataUsageView, UploadFile, useUploadMedia } from './UploadFile'
 import { v4 } from 'uuid';
 import { MediasView } from './MediaView';
@@ -18,7 +17,7 @@ import { AddCoOwner, CoOwerInfo } from './AddCoOwner';
 interface PortfolioCreatePageProps {
   lang: string
 }
-export default function CreateProfoiloForm({ lang }: PortfolioCreatePageProps) {
+export default function CreatePortfolioForm({ lang }: PortfolioCreatePageProps) {
   const { t } = useTranslation(lang, ["Portfolio", "ArtworkInfoStep"]);
   const router = useRouter();
   const { getfiles } = useUploadMedia();

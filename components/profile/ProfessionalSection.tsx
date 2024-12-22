@@ -29,7 +29,6 @@ import { useTranslation } from "@/lib/i18n/init-client";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Badge } from "../ui/badge";
 
 interface IndustryComboboxProps {
   value: Industry | null;
