@@ -14,7 +14,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useState } from "react";
 import { toast } from "sonner";
 import { useDeleteContactMutation } from "@/hooks/client/deleteContact";
-import { on } from "events";
 
 interface ContactCardProps {
   contactId: string,

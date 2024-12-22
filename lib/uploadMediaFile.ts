@@ -1,9 +1,9 @@
 import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile";
 import { createClient } from "@/utils/supabase/client";
-import { normalizeFileNameForS3 } from "../s3_convention";
-import { toNonAccentVietnamese } from "../vietnamese";
+import { normalizeFileNameForS3 } from "./s3_convention";
+import { toNonAccentVietnamese } from "./vietnamese";
 import { getFileType, isMediaFile } from "@/utils/file_type";
-import { getDataUseage } from "./getDatUsage";
+import { getDataUseage } from "../app/api/storage/usage/utils";
 
 
 
@@ -131,9 +131,8 @@ async function checkLimit(files: File[]): Promise<{ success: boolean, error: Err
     size += file.size
   })
   try {
-    const dataUsageData = await getDataUseage()
-    const dataUsage = dataUsageData.result as number
-    const newDataUsage = (dataUsage + size) / (1024 * 1024)
+    const dataUsage: number = await getDataUseage()
+    const newDataUsage = (+dataUsage + size) / (1024 * 1024)
     if (newDataUsage > 25) {
       return { success: false, error: new Error("data usage limit exceeded") }
     }

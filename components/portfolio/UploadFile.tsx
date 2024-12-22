@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import { Upload } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import { deleteMediaFile, UploadedMediaFileType, UploadMediaFile } from '@/lib/client/uploadMediaFile';
+import { deleteMediaFile, UploadedMediaFileType, UploadMediaFile } from '@/lib/uploadMediaFile';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 
@@ -59,7 +59,7 @@ export function UploadMediaProvider({ children }: { children: React.ReactNode })
       return prevFiles.sort((a, b) => {
         const aValue = a.isThumbnail ? 1 : 0;
         const bValue = b.isThumbnail ? 1 : 0;
-        return aValue - bValue;
+        return bValue - aValue;
       })
 
     })

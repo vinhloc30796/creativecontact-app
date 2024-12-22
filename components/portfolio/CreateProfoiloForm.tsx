@@ -7,22 +7,28 @@ import { FormControl, FormField, FormItem, FormMessage } from '../ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-import { ChevronUp, MoveUpIcon, Plus } from 'lucide-react';
-import { DataUsageView, UploadFile, UploadMediaProvider, useUploadMedia } from './UploadFile'
+import { ChevronUp } from 'lucide-react';
+import { DataUsageView, UploadFile, useUploadMedia } from './UploadFile'
 import { v4 } from 'uuid';
-import { createClient } from '@/utils/supabase/client';
 import { MediasView } from './MediaView';
-import { useFileUpload } from '@/app/(protected)/portfolio/new/files_uplooad_provider.component';
-import { createPortfolio } from '@/lib/server_action/create_portfolio';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { createPortfolio } from '@/app/api/ portfolio/helper';
+import { AddCoOwner, CoOwerInfo } from './AddCoOwner';
 interface PortfolioCreatePageProps {
-  lang?: string
+  lang: string
 }
-export default function CreateProfoiloForm({ lang = "en" }: PortfolioCreatePageProps) {
+export default function CreateProfoiloForm({ lang }: PortfolioCreatePageProps) {
   const { t } = useTranslation(lang, ["Portfolio", "ArtworkInfoStep"]);
   const router = useRouter();
   const { getfiles } = useUploadMedia();
+  const coownersForm = useForm<{
+    coowners: CoOwerInfo[]
+  }>({
+    defaultValues: {
+      coowners: []
+    }
+  })
   const artworkForm = useForm<ArtworkInfoData>({
     defaultValues: {
       id: v4(),
@@ -38,8 +44,9 @@ export default function CreateProfoiloForm({ lang = "en" }: PortfolioCreatePageP
   }
   const submit = async () => {
     const artworkAsset = getfiles();
-    const rs = await createPortfolio(artworkForm.getValues(), artworkAsset);
+    const rs = await createPortfolio(artworkForm.getValues(), artworkAsset, coownersForm.getValues().coowners);
     if (rs.error) {
+      console.error(rs.error)
       toast.error(t("toast.error"), { duration: 5000 });
     }
     else {
@@ -88,10 +95,9 @@ export default function CreateProfoiloForm({ lang = "en" }: PortfolioCreatePageP
           <UploadFile lang={lang} path={artworkForm.getValues().id} />
         </div>
       </div>
-      <div className='min-w-72 flex flex-col justify-between max-h-[640px]'>
+      <div className='relative min-w-72 flex flex-col justify-between max-h-[640px] lg:sticky lg:top-32'>
         <div className='flex flex-col gap-2'>
-          <h2 className='font-semibold uppercase'>{t("projectCredits")}</h2>
-          <Button className='w-full rounded-full' variant='secondary'> <Plus className='w-4 h-4 mr-2' /> {t("addCoOwner")}</Button>
+          <AddCoOwner lang={lang} coownersForm={coownersForm} />
         </div>
         <div className='flex flex-col gap-2 lg:gap-4'>
           <div>
@@ -111,10 +117,10 @@ export default function CreateProfoiloForm({ lang = "en" }: PortfolioCreatePageP
         </div>
       </div>
       <Button
-        variant="secondary"
-        className='fixed bottom-4 right-4 rounded-full'
+        variant="ghost"
+        className='fixed bottom-4 right-4 z-50 flex gap-2 rounded-full items-center hidden lg:inline hover:underline'
         onClick={scrollToTop}>
-        <ChevronUp />
+        go to top
       </Button>
     </div >
   )

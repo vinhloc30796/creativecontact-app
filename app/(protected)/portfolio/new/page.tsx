@@ -16,7 +16,9 @@ interface PortfolioCreatePageProps {
 
 export default async function PortfolioCreatePage(props: PortfolioCreatePageProps) {
   const { isLoggedIn } = await getServerAuth();
-  const lang = (await props.searchParams).lang || "en";
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const lang = searchParams.lang || "en";
   if (!isLoggedIn) {
     redirect("/login");
   }

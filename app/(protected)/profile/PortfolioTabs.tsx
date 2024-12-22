@@ -24,8 +24,9 @@ import { ArtworkWithAssets } from "@/app/api/artworks/[id]/assets/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { ArtworkWithCredits } from "@/app/api/artworks/[id]/credits/helper";
-import { deletePortfolio } from "@/app/actions/portfolio/server.action";
-import { deletePortfolioClient } from "@/app/actions/portfolio/client.actions";
+import { deletePortfolio } from "@/app/api/ portfolio/helper";
+import { Dialog } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface ProjectFormValues {
   title: string;
@@ -107,6 +108,7 @@ function ExistingPortfolioProjectCard({
     enabled: !!project?.artworks?.id,
   });
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   if (!project?.artworks) {
     return <div>Project not found</div>;
@@ -125,20 +127,20 @@ function ExistingPortfolioProjectCard({
   const handleDelete = async () => {
     setDeleteLoading(true)
     if (!project?.artworks?.id) {
-      toast.error("Failed to delete the portfolio artwork", {
+      toast.error(t("deletePortfolioResult.failure"), {
         description: "The artwork could not be found",
         duration: 5000,
       })
       return;
     }
-    const rs = await deletePortfolioClient(project.portfolioArtworks.id);
+    const rs = await deletePortfolio(project.portfolioArtworks.id);
     setDeleteLoading(false)
     if (rs.data?.success) {
-      toast.success("Portfolio deleted successfully", {
+      toast.success(t("deletePortfolioResult.success"), {
         duration: 5000,
       });
     } else {
-      toast.error("Failed to delete the portfolio artwork", {
+      toast.error(t("deletePortfolioResult.failure"), {
         description: "The artwork could not be found",
         duration: 5000,
       });
@@ -219,35 +221,57 @@ function ExistingPortfolioProjectCard({
   };
 
   return (
-    <Card className="h-[calc(100vh-425px)] w-full overflow-y-auto">
-      <FormProvider {...form}>
-        <CardHeader className="items-left flex flex-col">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" asChild>
-              {project.artworks?.id ? (
-                <Link href={`/portfolio/${project.artworks.id}`}>
-                  {t("portfolio.edit")}
-                </Link>
-              ) : (
-                <span className="text-muted-foreground">
-                  {t("portfolio.edit")}
-                </span>
-              )}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleDelete}>
-              {t("portfolio.delete")}
-            </Button>
-          </div>
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">
-              {project.artworks?.title || t("portfolio.untitled")}
-            </h3>
-          </div>
-        </CardHeader>
+    <>
+      <Card className="h-[calc(100vh-425px)] w-full overflow-y-auto">
+        <FormProvider {...form}>
+          <CardHeader className="items-left flex flex-col">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" asChild>
+                {project.artworks?.id ? (
+                  <Link href={`/portfolio/${project.artworks.id}`}>
+                    {t("portfolio.edit")}
+                  </Link>
+                ) : (
+                  <span className="text-muted-foreground">
+                    {t("portfolio.edit")}
+                  </span>
+                )}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowDeleteDialog(true)}>
+                {t("portfolio.delete")}
+              </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium">
+                {project.artworks?.title || t("portfolio.untitled")}
+              </h3>
+            </div>
+          </CardHeader>
 
-        <CardContent className="space-y-6 p-6">{renderContent()}</CardContent>
-      </FormProvider>
-    </Card>
+          <CardContent className="space-y-6 p-6">{renderContent()}</CardContent>
+        </FormProvider>
+      </Card>
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent
+          onCloseAutoFocus={() => setShowDeleteDialog(false)}
+          onEscapeKeyDown={() => setShowDeleteDialog(false)}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("dialogDeletePortfolio.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("dialogDeletePortfolio.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("dialogDeletePortfolio.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+            >{t("dialogDeletePortfolio.delete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
