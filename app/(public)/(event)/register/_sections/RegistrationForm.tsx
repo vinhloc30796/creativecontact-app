@@ -40,6 +40,7 @@ import { FormData, formSchema } from "./formSchema";
 
 interface RegistrationFormProps {
   initialEventSlots: EventSlot[];
+  lang?: string;
 }
 
 type FormContextType = UseFormReturn<
@@ -48,6 +49,7 @@ type FormContextType = UseFormReturn<
 
 export default function RegistrationForm({
   initialEventSlots,
+  lang = "en",
 }: RegistrationFormProps) {
   // Auth
   const { user, isLoading, error: authError, isAnonymous } = useAuth();
@@ -215,7 +217,9 @@ export default function RegistrationForm({
     {
       title: "Professional Information",
       description: "Please provide your professional information",
-      component: <ProfessionalInfoStep form={professionalInfoForm} />,
+      component: (
+        <ProfessionalInfoStep form={professionalInfoForm} lang={lang} />
+      ),
       form: professionalInfoForm,
       fields: ["industryExperiences"] as const,
     },

@@ -147,6 +147,7 @@ function ExistingPortfolioProjectCard({
         duration: 5000,
       });
     }
+    window.location.reload();
   };
 
   const renderContent = () => {

@@ -37,25 +37,6 @@ import {
   UserCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useServerAuth } from "@/hooks/useServerAuth";
-
-// Local component import
-interface UserSkills {
-  id: number;
-  name: string;
-}
-
-async function getUserSkills(userId?: string): Promise<UserSkills[]> {
-  // TODO: Implement actual skill fetching logic
-  // This is a placeholder implementation
-  return [
-    { id: 1, name: "JavaScript" },
-    { id: 2, name: "React" },
-    { id: 3, name: "Node.js" },
-    { id: 4, name: "TypeScript" },
-    { id: 5, name: "GraphQL" },
-  ];
-}
 
 function SocialSubsection({
   userData,
@@ -120,10 +101,8 @@ export function ProfileCard({
       queryKey: ["profilePicture", userData.id],
       queryFn: () => getProfileImageUrl(userData),
     });
-  const { data: userSkills } = useQuery({
-    queryKey: ["userSkills", userData.id],
-    queryFn: () => getUserSkills(userData.id),
-  });
+
+  const userSkills = userData.userSkills;
   const phoneNumber = getFormattedPhoneNumber(userData);
 
   const portfolioArtworks = use(portfolioArtworksPromise);
@@ -203,8 +182,12 @@ export function ProfileCard({
               <h3 className="mb-2 text-lg font-semibold">{t("skills")}</h3>
               <div className="flex flex-wrap gap-2">
                 {userSkills.map((skill) => (
-                  <Badge key={skill.id} variant="secondary" className="text-xs">
-                    {skill.name}
+                  <Badge
+                    key={skill.skillId}
+                    variant="secondary"
+                    className="text-xs"
+                  >
+                    {skill.skillName}
                   </Badge>
                 ))}
               </div>

@@ -1,14 +1,14 @@
-
 "use server";
 
 import { ErrorMessage } from "@/components/ErrorMessage";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { LoadingUserHeader, UserHeader } from "@/components/wrappers/UserHeader";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { LoadingUserHeader } from "@/components/wrappers/LoadingUserHeader";
+import { UserHeader } from "@/components/wrappers/UserHeader";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { UserCircle } from "lucide-react";
 import Image from "next/image";
-import { Suspense } from "react";
+import { Suspense, use } from "react";
 
 interface AnonymousProfilePageProps {
   lang: string;
@@ -16,12 +16,12 @@ interface AnonymousProfilePageProps {
   errorMessage?: string;
 }
 
-const AnonymousProfilePage = async ({
+export default async function AnonymousProfilePage({
   lang,
   isLoggedIn,
   errorMessage,
-}: AnonymousProfilePageProps) => {
-  const { t } = await useTranslation(lang, "ProfilePage");
+}: AnonymousProfilePageProps) {
+  const { t } = await getServerTranslation(lang, "ProfilePage");
 
   return (
     <BackgroundDiv>
@@ -62,6 +62,4 @@ const AnonymousProfilePage = async ({
       </div>
     </BackgroundDiv>
   );
-}
-
-export default AnonymousProfilePage;
+};

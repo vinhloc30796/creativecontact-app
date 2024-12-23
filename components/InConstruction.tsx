@@ -1,10 +1,11 @@
 import { JSX, SVGProps } from "react"
 import { Card, CardContent, CardHeader } from "./ui/card"
-import { useTranslation } from "@/lib/i18n/init-server"
+import { getServerTranslation } from "@/lib/i18n/init-server"
 import Image from "next/image";
+import { use } from "react";
 
 export default async function InConstruction({ lang }: { lang: string }) {
-  const { t } = await useTranslation(lang, 'inConstruction');
+  const { t } = await getServerTranslation(lang, 'inConstruction');
   return (
     <Card className="max-w-3xl min-w-xl mx-auto mt-10">
       <CardHeader

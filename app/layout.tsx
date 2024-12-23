@@ -13,11 +13,6 @@ export const metadata: Metadata = {
   description: 'Vietnamese Creative Network',
 }
 
-const PostHogPageView = dynamic(() => import('@/components/analytics/PostHogPageView'), {
-  ssr: false,
-})
-
-
 interface RootLayoutProps {
   children: React.ReactNode
 }

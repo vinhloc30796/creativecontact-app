@@ -8,24 +8,22 @@ import { UserData } from "@/app/types/UserInfo";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
 // React
-import { useServerAuth } from "@/hooks/useServerAuth";
+import { getServerAuth } from "@/hooks/useServerAuth";
 import { redirect } from "next/navigation";
 import { ProfileEditForm } from "./ProfileEditForm";
 import { BackButton } from "../BackButton";
 
 interface ProfileEditPageProps {
-  params: {};
-  searchParams: {
+  params: Promise<{}>;
+  searchParams: Promise<{
     lang: string;
-  };
+  }>;
 }
 
-export default async function ProfileEditPage({
-  params,
-  searchParams,
-}: ProfileEditPageProps) {
+export default async function ProfileEditPage(props: ProfileEditPageProps) {
+  const searchParams = await props.searchParams;
   const lang = searchParams.lang || "en";
-  const { user, isLoggedIn, isAnonymous } = await useServerAuth();
+  const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   if (!isLoggedIn || isAnonymous) {
     redirect("/login");
@@ -35,6 +33,7 @@ export default async function ProfileEditPage({
   if (user) {
     try {
       userData = await fetchUserData(user.id);
+      console.log("userData", userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
