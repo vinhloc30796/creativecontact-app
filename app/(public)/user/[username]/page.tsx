@@ -1,4 +1,4 @@
-// File: app/(protected)/profile/page.tsx
+// File: app/(public)/user/[username]/page.tsx
 
 // API imports
 import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
@@ -21,48 +21,50 @@ import { cookies } from "next/headers";
 // Next.js imports
 import { Suspense } from "react";
 // Local component import
-import { ContactList } from "@/components/contacts/ContactList";
-import { ErrorContactCard } from "@/components/contacts/ErrorContactCard";
+
 import { ProfileCardSkeleton } from "@/components/profile/ProfileCardSkeleton";
 import ErrorBoundary from "@/components/wrappers/ErrorBoundary";
-import AnonymousProfilePage from "./AnonymousProfilePage";
-import { ErrorPortfolioProjectCard } from "./ErrorPortfolioProjectCard";
-import { ErrorProfileCard } from "./ErrorProfileCard";
-import PortfolioSection from "./PortfolioSection";
-import { ContactListSkeleton } from "@/components/contacts/ContactListSkeleton";
-import { use } from "react";
 
-interface ProfilePageProps {
-  params: Promise<{}>;
+import { getUserIdByUsername } from "@/app/actions/user/auth";
+import PortfolioSection from "@/app/(protected)/profile/PortfolioSection";
+import { ErrorPortfolioProjectCard } from "@/app/(protected)/profile/ErrorPortfolioProjectCard";
+import { ErrorProfileCard } from "@/app/(protected)/profile/ErrorProfileCard";
+
+interface UserPageProps {
+  params: Promise<{ username: string }>;
   searchParams: Promise<{
     lang: string;
   }>;
 }
 
-export default async function ProfilePage(props: ProfilePageProps) {
-  const searchParams = await props.searchParams;
-  const lang = searchParams.lang || "en";
-  const { t } = await getServerTranslation(lang, ["ProfilePage", "ContactList"]);
+export default async function UserPage({
+  params,
+  searchParams,
+}: UserPageProps) {
+  const username = (await params).username;
+  const lang = (await searchParams).lang || "en";
+  const { t } = await getServerTranslation(lang, [
+    "ProfilePage",
+    "ContactList",
+  ]);
   const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
-  // Early return for anonymous users
-  if (!isLoggedIn || !user?.id) {
-    return (
-      (<AnonymousProfilePage
-        lang={lang}
-        isLoggedIn={isLoggedIn}
-        errorMessage={(await cookies()).get("error_message")?.value}
-      />)
-    );
-  }
+  const userId = await getUserIdByUsername(username);
 
-  // Get user data synchronously as it's needed for the layout
-  const userData = await fetchUserData(user.id);
+  const userData = await fetchUserData(userId!);
 
   // Create the promise but don't await it
   const portfolioArtworksPromise = fetchUserPortfolioArtworksWithDetails(
-    user.id,
+    userId!,
   );
+
+  async function checkCurrentUser() {
+    if (user?.id === userId) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   return (
     <BackgroundDiv>
@@ -77,40 +79,19 @@ export default async function ProfilePage(props: ProfilePageProps) {
             <div className="flex flex-col lg:flex-row">
               <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
                 <div className="mb-6">
-                  <Tabs defaultValue="contacts">
+                  <Tabs defaultValue="portfolio">
                     <TabsList>
-                      <TabsTrigger value="contacts">
-                        {t("contactsHeader")}
-                      </TabsTrigger>
                       <TabsTrigger value="portfolio">
                         {t("portfolioHeader")}
                       </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="contacts">
-                      {!user || !user.id ? (
-                        <ErrorContactCard
-                          lang={lang}
-                          message={t("noUserError", { ns: "ContactList" })}
-                        />
-                      ) : (
-                        <ErrorBoundary
-                          fallback={<ErrorContactCard lang={lang} />}
-                        >
-                          <Suspense fallback={<ContactListSkeleton />}>
-                            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-                              <ContactList userId={user.id} lang={lang} />
-                            </div>
-                          </Suspense>
-                        </ErrorBoundary>
-                      )}
-                    </TabsContent>
 
                     <TabsContent value="portfolio">
                       <ErrorBoundary
                         fallback={<ErrorPortfolioProjectCard lang={lang} />}
                       >
                         <PortfolioSection
-                          showButtons={true}
+                          showButtons={false}
                           userData={userData}
                           portfolioArtworksPromise={portfolioArtworksPromise}
                           lang={lang}
@@ -131,7 +112,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
                 <Suspense fallback={<ProfileCardSkeleton />}>
                   {userData ? (
                     <ProfileCard
-                      showButtons={true}
+                      showButtons={false}
                       userData={userData}
                       portfolioArtworksPromise={portfolioArtworksPromise}
                       lang={lang}
