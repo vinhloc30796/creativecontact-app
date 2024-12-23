@@ -1,4 +1,4 @@
-// File: app/(protected)/profile/page.tsx
+// File: app/(public)/user/[username]/page.tsx
 
 // API imports
 import { fetchUserPortfolioArtworksWithDetails } from "@/app/api/user/[id]/portfolio-artworks/helper";
@@ -13,8 +13,8 @@ import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
 
 // Hook imports
-import { useServerAuth } from "@/hooks/useServerAuth";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { getServerAuth } from "@/hooks/useServerAuth";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
 
@@ -32,9 +32,9 @@ import { ErrorProfileCard } from "@/app/(protected)/profile/ErrorProfileCard";
 
 interface UserPageProps {
   params: Promise<{ username: string }>;
-  searchParams: {
+  searchParams: Promise<{
     lang: string;
-  };
+  }>;
 }
 
 export default async function UserPage({
@@ -42,9 +42,12 @@ export default async function UserPage({
   searchParams,
 }: UserPageProps) {
   const username = (await params).username;
-  const lang = searchParams.lang || "en";
-  const { t } = await useTranslation(lang, ["ProfilePage", "ContactList"]);
-  const { user, isLoggedIn, isAnonymous } = await useServerAuth();
+  const lang = (await searchParams).lang || "en";
+  const { t } = await getServerTranslation(lang, [
+    "ProfilePage",
+    "ContactList",
+  ]);
+  const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   const userId = await getUserIdByUsername(username);
 

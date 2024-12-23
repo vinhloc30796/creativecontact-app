@@ -44,6 +44,31 @@ export async function checkUserIsAnonymous(
   return returning;
 }
 
+export async function checkUserIsAnonymousById(
+  userId: string,
+): Promise<boolean | null> {
+  const result = await db
+    .select({ isAnonymous: authUsers.isAnonymous })
+    .from(authUsers)
+    .where(eq(authUsers.id, userId))
+    .limit(1);
+
+  if (result.length === 0) {
+    console.error("User not found");
+    return null;
+  }
+
+  const data = result[0];
+  const returning = data?.isAnonymous ?? null;
+  console.log(
+    "checkUserIsAnonymous result",
+    result,
+    "returning isAnonymous:",
+    returning,
+  );
+  return returning;
+}
+
 export async function checkUserEmailConfirmed(
   email: string,
 ): Promise<boolean | null> {
