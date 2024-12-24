@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, use } from "react";
+import { useEffect, use, useRef } from "react";
 import { useTranslation } from "@/lib/i18n/init-client";
 
 interface LogoutPageProps {
@@ -20,38 +20,41 @@ export default function LogoutPage(props: LogoutPageProps) {
   const lang = searchParams.lang || "en";
   const { t } = useTranslation(lang, "LogoutPage");
   const router = useRouter();
+  const hasMutated = useRef(false);
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch("/signout", {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!response.ok) {
-        throw new Error(`Logout failed: ${response.statusText}`);
+        throw new Error('Logout failed');
       }
 
       return response;
     },
-    onSuccess: () => {
-      setTimeout(() => {
-        router.push("/");
-      }, 5000);
-    },
-    onError: (error) => {
-      console.error("Error during logout:", error);
-      setTimeout(() => {
-        router.push("/");
-      }, 5000);
+    onSettled: () => {
+      setTimeout(() => router.push("/"), 3000);
     },
   });
 
+  // We use a timeout and ref to prevent double mutation on strict mode
+  // See: https://github.com/TanStack/query/issues/5341
+  // Without this, React 18 Strict Mode would cause the mutation to fire twice
+  // during development, potentially causing issues with the auth state.
+  // The ref ensures we only mutate once, while the timeout helps prevent
+  // any race conditions during component mount.
   useEffect(() => {
-    logoutMutation.mutate();
+    const timeout = setTimeout(() => {
+      if (!hasMutated.current) {
+        logoutMutation.mutate();
+        hasMutated.current = true;
+      }
+    }, 100);
+    return () => clearTimeout(timeout);
   }, []);
 
   if (logoutMutation.status === "pending") {

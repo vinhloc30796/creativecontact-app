@@ -56,7 +56,8 @@
   "contact": "Liên hệ",
   "socialLinks": "Mạng xã hội",
   "seeMore": "Xem thêm",
-  "notLoggedIn": "Chưa Đăng Nhập",
+  "userProfileNotAvailable": "Hồ sơ người dùng không khả dụng",
+  "notLoggedIn": "Chưa đăng nhập",
   "pleaseLogIn": "Vui lòng đăng nhập để xem và quản lý hồ sơ của bạn.",
   "portfolio": {
     "title": "Portfolio",

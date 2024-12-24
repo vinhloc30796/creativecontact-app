@@ -15,6 +15,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useDeleteContactMutation } from "@/hooks/client/deleteContact";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ContactCardProps {
   contactId: string,
@@ -34,6 +40,7 @@ export function ContactCard({
   });
   const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E0E0E0'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='14' fill='%23757575' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
   const name = getName(userData);
+  const userName = userData.userName;
   const { data: profilePictureUrl, isLoading } = useQuery({
     queryKey: ['profilePicture', userData.id],
     queryFn: () => getProfileImageUrl(userData),
@@ -75,6 +82,11 @@ export function ContactCard({
                 <UserCircle className="mr-2 h-6 w-6" />
                 {userData.displayName}
               </CardTitle>
+              {userName && (
+                <p className="mb-2 flex items-center text-sm text-gray-200">
+                  @{userName}
+                </p>
+              )}
               <div className="mb-2 flex items-center">
                 <Badge variant="success" className="flex items-center">
                   <CheckCircle className="mr-1 h-3 w-3" />
@@ -113,12 +125,35 @@ export function ContactCard({
         </CardContent>
 
         <CardFooter className="mt-auto p-4 pt-2 border-t container flex justify-between ">
-          <a href="#" className="text-primary hover:underline">
-            {t("seeMore")}
-          </a>
-          <Button variant={"ghost"} className="group-hover:block "
-            onClick={() => setShowDeleteDialog(true)}
-          ><Trash2 className="h-4 w-4" /></Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex w-full justify-between items-center space-x-2">
+                  {userName ? (
+                    <>
+                      <Button variant="link" className="p-0" asChild>
+                        <a href={`/user/${userName}`}>
+                          {t("seeMore")}
+                        </a>
+                      </Button>
+                      <Button variant={"ghost"} className="group-hover:block "
+                        onClick={() => setShowDeleteDialog(true)}
+                      ><Trash2 className="h-4 w-4" /></Button>
+                    </>
+                  ) : (
+                    <Button variant="link" className="p-0" disabled>
+                      <span>{t("seeMore")}</span>
+                    </Button>
+                  )}
+                </div>
+              </TooltipTrigger>
+              {!userName && (
+                <TooltipContent>
+                  <p>{t("userProfileNotAvailable")}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </CardFooter>
       </Card>
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

@@ -36,6 +36,7 @@ import {
   Phone,
   UserCircle,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 function SocialSubsection({
   userData,
@@ -140,12 +141,14 @@ export function ProfileCard({
           {userData.location || t("unsetLocation")}
         </p>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" asChild>
-            <a href="/profile/edit">
-              <Pencil className="mr-1 h-4 w-4" />
-              {t("edit")}
-            </a>
-          </Button>
+          {showButtons && (
+            <Button variant="outline" size="sm" asChild>
+              <a href="/profile/edit">
+                <Pencil className="mr-1 h-4 w-4" />
+                {t("edit")}
+              </a>
+            </Button>
+          )}
         </div>
         {userData.about && (
           <section data-section="about" className="pt-4">

@@ -36,6 +36,7 @@ interface ProjectFormValues {
 }
 
 interface ExistingPortfolioProjectCardProps {
+  showButtons: boolean;
   form: ReturnType<typeof useForm<ProjectFormValues>>;
   handlePendingFilesUpdate: (projectId: string, files: File[]) => void;
   project: PortfolioArtworkWithDetails;
@@ -43,9 +44,11 @@ interface ExistingPortfolioProjectCardProps {
 }
 
 function EmptyPortfolioProjectCard({
+  showButtons,
   handleAddProject,
   lang = "en",
 }: {
+  showButtons: boolean;
   handleAddProject: () => void;
   lang?: string;
 }) {
@@ -56,18 +59,19 @@ function EmptyPortfolioProjectCard({
       <h3 className="mb-4 text-lg font-medium text-gray-600">
         {t("portfolio.noProjects")}
       </h3>
-      <p className="mb-6 text-gray-500">
-        {t("portfolio.getStarted")}
-      </p>
-      <Button onClick={handleAddProject} variant="outline" size="sm">
-        <Plus className="mr-2 h-4 w-4" />
-        {t("portfolio.addProject")}
-      </Button>
+      <p className="mb-6 text-gray-500">{t("portfolio.getStarted")}</p>
+      {showButtons && (
+        <Button onClick={handleAddProject} variant="outline" size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          {t("portfolio.addProject")}
+        </Button>
+      )}
     </div>
   );
 }
 
 function ExistingPortfolioProjectCard({
+  showButtons,
   form,
   project,
   lang = "en",
@@ -125,12 +129,12 @@ function ExistingPortfolioProjectCard({
     }
   };
   const handleDelete = async () => {
-    setDeleteLoading(true)
+    setDeleteLoading(true);
     if (!project?.artworks?.id) {
       toast.error(t("deletePortfolioResult.failure"), {
         description: "The artwork could not be found",
         duration: 5000,
-      })
+      });
       return;
     }
     const rs = await deletePortfolio(project.portfolioArtworks.id);
@@ -226,20 +230,28 @@ function ExistingPortfolioProjectCard({
         <FormProvider {...form}>
           <CardHeader className="items-left flex flex-col">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" asChild>
-                {project.artworks?.id ? (
-                  <Link href={`/portfolio/${project.artworks.id}`}>
-                    {t("portfolio.edit")}
-                  </Link>
-                ) : (
-                  <span className="text-muted-foreground">
-                    {t("portfolio.edit")}
-                  </span>
-                )}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setShowDeleteDialog(true)}>
-                {t("portfolio.delete")}
-              </Button>
+              {showButtons && (
+                <>
+                  <Button variant="ghost" size="sm" asChild>
+                    {project.artworks?.id ? (
+                      <Link href={`/portfolio/${project.artworks.id}`}>
+                        {t("portfolio.edit")}
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground">
+                        {t("portfolio.edit")}
+                      </span>
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    {t("portfolio.delete")}
+                  </Button>
+                </>
+              )}
             </div>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">
@@ -276,32 +288,37 @@ function ExistingPortfolioProjectCard({
 }
 
 export function PortfolioTabs({
+  showButtons,
   userData,
   existingPortfolioArtworks,
   lang = "en",
 }: {
+  showButtons: boolean;
   userData: UserData;
   existingPortfolioArtworks: PortfolioArtworkWithDetails[];
   lang?: string;
 }) {
   console.log("[PortfolioTabs] Component mounting", {
     userId: userData?.id,
-    existingArtworksCount: existingPortfolioArtworks?.length
+    existingArtworksCount: existingPortfolioArtworks?.length,
   });
 
   const router = useRouter();
 
   // Projects state
-  const [projects, setProjects] = useState<PortfolioArtworkWithDetails[]>(() => {
-    console.log("[PortfolioTabs] Initializing projects state", {
-      count: existingPortfolioArtworks?.length
-    });
-    return existingPortfolioArtworks || [];
-  });
+  const [projects, setProjects] = useState<PortfolioArtworkWithDetails[]>(
+    () => {
+      console.log("[PortfolioTabs] Initializing projects state", {
+        count: existingPortfolioArtworks?.length,
+      });
+      return existingPortfolioArtworks || [];
+    },
+  );
 
   // Active tab state
   const [activeTab, setActiveTab] = useState<string>(() => {
-    const initialTab = projects.length > 0 ? projects[0].portfolioArtworks.id : "new";
+    const initialTab =
+      projects.length > 0 ? projects[0].portfolioArtworks.id : "new";
     console.log("[PortfolioTabs] Setting initial active tab:", initialTab);
     return initialTab;
   });
@@ -326,7 +343,7 @@ export function PortfolioTabs({
   const handlePendingFilesUpdate = (projectId: string, files: File[]) => {
     console.log("[PortfolioTabs] Updating pending files", {
       projectId,
-      filesCount: files.length
+      filesCount: files.length,
     });
     setProjects(
       projects.map((p) =>
@@ -338,7 +355,7 @@ export function PortfolioTabs({
   console.log("[PortfolioTabs] Rendering with state:", {
     projectsCount: projects.length,
     activeTab,
-    hasForm: !!form
+    hasForm: !!form,
   });
 
   const { t } = useTranslation(lang, "ProfilePage");
@@ -351,6 +368,7 @@ export function PortfolioTabs({
       <CardContent>
         {projects.length === 0 ? (
           <EmptyPortfolioProjectCard
+            showButtons={showButtons}
             handleAddProject={handleAddProject}
             lang={lang}
           />
@@ -368,10 +386,12 @@ export function PortfolioTabs({
                 ))}
               </TabsList>
 
-              <Button onClick={handleAddProject} variant="outline" size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                {t("portfolio.addProject")}
-              </Button>
+              {showButtons === true && (
+                <Button onClick={handleAddProject} variant="outline" size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t("portfolio.addProject")}
+                </Button>
+              )}
             </div>
             {projects.map((project) => (
               <TabsContent
@@ -380,6 +400,7 @@ export function PortfolioTabs({
               >
                 <Suspense fallback={<div>{t("portfolio.loadingProject")}</div>}>
                   <ExistingPortfolioProjectCard
+                    showButtons={showButtons}
                     form={form}
                     handlePendingFilesUpdate={handlePendingFilesUpdate}
                     project={project}

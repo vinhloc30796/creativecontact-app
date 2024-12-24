@@ -1,6 +1,6 @@
 "use server";
 
-import { authUsers } from "@/drizzle/schema/user";
+import { authUsers, userInfos } from "@/drizzle/schema/user";
 import { db } from "@/lib/db";
 import { createClient } from "@/utils/supabase/server";
 import { eq, isNotNull } from "drizzle-orm";
@@ -106,6 +106,18 @@ export async function getUserId(email: string): Promise<string | null> {
     .select()
     .from(authUsers)
     .where(eq(authUsers.email, email))
+    .limit(1);
+
+  return result[0]?.id ?? null;
+}
+
+export async function getUserIdByUsername(
+  userName: string,
+): Promise<string | null> {
+  const result = await db
+    .select()
+    .from(userInfos)
+    .where(eq(userInfos.userName, userName))
     .limit(1);
 
   return result[0]?.id ?? null;
