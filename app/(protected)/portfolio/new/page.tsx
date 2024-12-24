@@ -3,7 +3,7 @@ import { UserHeader } from '@/components/wrappers/UserHeader';
 import { getServerAuth } from '@/hooks/useServerAuth';
 import React, { Suspense } from 'react'
 import { BackButton } from '../../profile/BackButton';
-import CreatePortfolioForm from '@/components/portfolio/CreateProfoiloForm';
+import CreatePortfolioForm from '@/components/portfolio/CreatePortfolioForm';
 import { UploadMediaProvider } from '@/components/portfolio/UploadFile';
 import { redirect } from 'next/navigation';
 

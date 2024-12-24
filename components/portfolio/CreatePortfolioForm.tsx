@@ -115,12 +115,6 @@ export default function CreatePortfolioForm({ lang }: PortfolioCreatePageProps) 
           </div>
         </div>
       </div>
-      <Button
-        variant="ghost"
-        className='fixed bottom-4 right-4 z-50 flex gap-2 rounded-full items-center hidden lg:inline hover:underline'
-        onClick={scrollToTop}>
-        go to top
-      </Button>
     </div >
   )
 }

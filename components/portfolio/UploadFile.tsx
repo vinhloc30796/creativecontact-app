@@ -70,7 +70,7 @@ export function UploadMediaProvider({ children }: { children: React.ReactNode })
     setFiles((prevFiles) => prevFiles.filter(file => file.id !== fileId));
   }
 
-  const updateDecription = (fileId: string, description: string) => {
+  const updateDescription = (fileId: string, description: string) => {
     setFiles((prevFiles) => prevFiles.map(file => {
       if (file.id === fileId) {
         return { ...file, description }
@@ -87,7 +87,7 @@ export function UploadMediaProvider({ children }: { children: React.ReactNode })
       getfiles: () => files,
       addFiles,
       setThumbnail,
-      updateDecription,
+      updateDecription: updateDescription,
       removeFile,
       getDataUsage
     }}>
