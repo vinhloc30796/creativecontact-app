@@ -184,7 +184,7 @@ export default function PortfolioEditForm({
 
   return (
     <FormProvider {...form}>
-      <div className="flex flex-row space-x-8">
+      <div className="flex flex-col lg:flex-row space-x-8">
         <Card className="w-full" style={{ flex: 7 }}>
           <CardHeader>
             <CardTitle>{isNew ? t("newProject") : t("editProject")}</CardTitle>
@@ -201,11 +201,11 @@ export default function PortfolioEditForm({
                   artworks={
                     artwork?.artworks
                       ? [
-                          {
-                            ...artwork.artworks,
-                            description: artwork.artworks.description || "",
-                          },
-                        ]
+                        {
+                          ...artwork.artworks,
+                          description: artwork.artworks.description || "",
+                        },
+                      ]
                       : []
                   }
                 />

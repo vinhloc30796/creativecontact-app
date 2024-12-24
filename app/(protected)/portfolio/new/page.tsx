@@ -1,10 +1,11 @@
-import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { LoadingUserHeader } from "@/components/wrappers/LoadingUserHeader";
-import { UserHeader } from "@/components/wrappers/UserHeader";
-import { getServerAuth } from "@/hooks/useServerAuth";
-import { Suspense } from "react";
-import { BackButton } from "../../profile/BackButton";
-import Wrapper from "./wrapper.component";
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import { UserHeader } from '@/components/wrappers/UserHeader';
+import { getServerAuth } from '@/hooks/useServerAuth';
+import React, { Suspense } from 'react'
+import { BackButton } from '../../profile/BackButton';
+import CreatePortfolioForm from '@/components/portfolio/CreatePortfolioForm';
+import { UploadMediaProvider } from '@/components/portfolio/UploadFile';
+import { redirect } from 'next/navigation';
 
 interface PortfolioCreatePageProps {
   params: Promise<{}>;
@@ -13,31 +14,28 @@ interface PortfolioCreatePageProps {
   }>;
 }
 
-export default async function PortfolioCreatePage(
-  props: PortfolioCreatePageProps,
-) {
+export default async function PortfolioCreatePage(props: PortfolioCreatePageProps) {
   const { isLoggedIn } = await getServerAuth();
-  const lang = (await props.searchParams).lang || "en";
-  const project = {
-    portfolioArtworks: {
-      id: "new",
-    },
-    artworks: null,
-  };
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const lang = searchParams.lang || "en";
+  if (!isLoggedIn) {
+    redirect("/login");
+  }
   return (
-    <BackgroundDiv className="min-h-screen w-full">
-      <Suspense fallback={<LoadingUserHeader />}>
-        <UserHeader
-          lang={lang}
-          isLoggedIn={isLoggedIn}
-          className="fixed left-0 right-0 top-0 z-30 bg-background/80 backdrop-blur-sm"
-        />
-      </Suspense>
-      <main className="flex min-h-screen w-screen flex-grow flex-col px-2 pt-10 lg:pt-32">
+    <BackgroundDiv className='w-full min-h-screen'>
+      <UserHeader
+        lang={lang}
+        isLoggedIn={isLoggedIn}
+        className="bg-background/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-30"
+      />
+      <main className='min-h-screen w-screen pt-10 lg:pt-32 px-2 lg:px-8 flex flex-col'>
         <div className="container mx-auto mb-4">
           <BackButton />
         </div>
-        <Wrapper />
+        <UploadMediaProvider>
+          <CreatePortfolioForm lang={lang} />
+        </UploadMediaProvider>
       </main>
     </BackgroundDiv>
   );

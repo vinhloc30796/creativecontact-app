@@ -1,18 +1,22 @@
 // File: app/providers.tsx
 "use client";
 
+// Components
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+// React Query
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// Next
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-// import { IntlProvider } from "react-intl";
+import React, { Suspense, useEffect, useState } from "react";
+// I18n
 import { Loading } from "@/components/Loading";
 import { I18nProvider } from "@/lib/i18n/i18nProvider";
 import { languages } from "@/lib/i18n/settings";
+// Posthog
+import SuspendedPostHogPageView from "@/components/analytics/PostHogPageView";
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
-import { Suspense } from "react";
 
 
 export async function generateStaticParams() {
@@ -58,7 +62,7 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined = undefined
 
-function getQueryClient() {
+export function getQueryClient() {
   if (isServer) {
     return makeQueryClient()
   } else {
@@ -93,6 +97,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <Suspense fallback={<Loading />}>
           <SearchParamsProvider>
             <PosthogProvider>
+              <SuspendedPostHogPageView />
               {children}
             </PosthogProvider>
             <Toaster visibleToasts={9} closeButton={true} />
