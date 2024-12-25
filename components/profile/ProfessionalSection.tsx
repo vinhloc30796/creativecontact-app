@@ -35,6 +35,13 @@ interface IndustryComboboxProps {
   onChange: (value: Industry) => void;
 }
 
+interface Skill {
+  id: any;
+  skillId: string;
+  skillName: string;
+  numberOfPeople: number;
+}
+
 function IndustryCombobox({ value, onChange }: IndustryComboboxProps) {
   const [open, setOpen] = useState(false);
 
@@ -134,6 +141,67 @@ function ExperienceCombobox({ value, onChange }: ExperienceComboboxProps) {
   );
 }
 
+interface SkillComboboxProps {
+  selectedSkills?: string[];
+  skills?: Skill[];
+  value?: Skill | null;
+  onChange?: (value: Skill) => void;
+}
+
+function SkillCombobox({
+  selectedSkills,
+  skills,
+  value,
+  onChange,
+}: SkillComboboxProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          className="w-full justify-between"
+        >
+          {value ? value.skillName : "Select Skill"}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+        <Command>
+          <CommandInput placeholder="Search skill..." />
+          <CommandList>
+            <CommandEmpty>No skill found</CommandEmpty>
+            <CommandGroup>
+              {skills?.map((skill) => (
+                <CommandItem
+                  key={skill.id}
+                  value={skill.skillId}
+                  onSelect={() => {
+                    onChange?.(skill);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedSkills?.includes(skill.skillName)
+                        ? "opacity-100"
+                        : "opacity-0",
+                    )}
+                  />
+                  {skill.skillName}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 interface ProfessionalSectionProps {
   userData: UserData;
   lang?: string;
@@ -144,31 +212,78 @@ export function ProfessionalSection({
   lang = "en",
 }: ProfessionalSectionProps) {
   const { t } = useTranslation(lang, "ProfilePage");
-  const [selectedIndustryExperiences, setSelectedIndustryExperiences] = useState(
-    (userData.industryExperiences || []).map(ie => ({
-      ...ie,
-      id: ie.id || crypto.randomUUID()
-    }))
-  );
+  const [selectedIndustryExperiences, setSelectedIndustryExperiences] =
+    useState(
+      (userData.industryExperiences || []).map((ie) => ({
+        ...ie,
+        id: ie.id || crypto.randomUUID(),
+      })),
+    );
   const [isAdding, setIsAdding] = useState(false);
   const [newIndustry, setNewIndustry] = useState<Industry | null>(null);
   const [newExperience, setNewExperience] = useState<ExperienceLevel | null>(
     null,
   );
+  const [newSkill, setNewSkill] = useState<Skill | null>(null);
   const { setFieldDirty, setFormData } = useFormState();
+
+  const [selectedSkills, setSelectedSkills] = useState<
+    {
+      skillId: string;
+      skillName: string;
+      numberOfPeople: number;
+    }[]
+  >(
+    userData.userSkills.map((skill) => ({
+      skillId: skill.skillId,
+      skillName: skill.skillName,
+      numberOfPeople: skill.numberOfPeople,
+    })) || [],
+  );
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await fetch("/api/skills");
+        if (!response.ok) {
+          throw new Error("Failed to fetch skills");
+        }
+        const data = await response.json();
+        setSkills(data);
+      } catch (error: any) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSkills();
+  }, []);
 
   useEffect(() => {
     const industryExperiencesChanged =
       JSON.stringify(selectedIndustryExperiences) !==
       JSON.stringify(userData.industryExperiences || []);
 
+    const selectedSkillsIds = selectedSkills.map((s) => s.skillId);
+
     setFieldDirty("professional", industryExperiencesChanged);
+    const userSkillsIds = (userData.userSkills || []).map((s) => s.skillId);
+    setFieldDirty(
+      "professional",
+      selectedSkillsIds.join(",") !== userSkillsIds.join(","),
+    );
 
     setFormData("professional", {
       industryExperiences: selectedIndustryExperiences,
+      userSkills: { skills: selectedSkillsIds },
     });
   }, [
     selectedIndustryExperiences,
+    selectedSkills,
     userData.industryExperiences,
     setFieldDirty,
     setFormData,
@@ -177,8 +292,8 @@ export function ProfessionalSection({
   const addIndustryExperience = () => {
     if (newIndustry && newExperience) {
       const newId = crypto.randomUUID();
-      console.log('Adding new item with ID:', newId);
-      
+      console.log("Adding new item with ID:", newId);
+
       setSelectedIndustryExperiences((current) => [
         ...current,
         {
@@ -195,17 +310,44 @@ export function ProfessionalSection({
   };
 
   const deleteIndustryExperience = (idToDelete: string) => {
-    console.log('Deleting item with ID:', idToDelete);
-    
+    console.log("Deleting item with ID:", idToDelete);
+
     setSelectedIndustryExperiences((current) => {
-      console.log('Current items:', current);
-      
+      console.log("Current items:", current);
+
       return current.filter((ie) => {
-        console.log('Comparing:', ie.id, idToDelete);
+        console.log("Comparing:", ie.id, idToDelete);
         return ie.id !== idToDelete;
       });
     });
   };
+
+  const addSkill = () => {
+    if (newSkill) {
+      console.log("Adding new skill:", newSkill);
+      setSelectedSkills((current) => {
+        const updatedSkills = [
+          ...current,
+          {
+            skillId: newSkill.id,
+            skillName: newSkill.skillName,
+            numberOfPeople: newSkill.numberOfPeople,
+          },
+        ];
+        console.log("Updated skills:", updatedSkills);
+        return updatedSkills;
+      });
+      setNewSkill(null);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <Card id="professional">
@@ -226,7 +368,7 @@ export function ProfessionalSection({
                   leftColor="bg-primary"
                   rightColor="bg-primary/80"
                   onDelete={() => {
-                    console.log('Deleting badge with ID:', ie.id);
+                    console.log("Deleting badge with ID:", ie.id);
                     deleteIndustryExperience(ie.id);
                   }}
                 />
@@ -267,6 +409,39 @@ export function ProfessionalSection({
                 </Button>
               </div>
             )}
+          </div>
+          <div className="space-y-2">
+            <Label>{t("ProfessionalSection.skills")}</Label>
+            <div className="flex flex-wrap gap-2">
+              {selectedSkills.map((skill) => (
+                <ComboBadge
+                  key={skill.skillId}
+                  data-id={skill.skillId}
+                  leftContent={skill.skillName}
+                  rightContent={skill.numberOfPeople}
+                  leftColor="bg-primary"
+                  rightColor="bg-primary/80"
+                  onDelete={() => {
+                    setSelectedSkills((prevSelectedSkills) =>
+                      prevSelectedSkills.filter(
+                        (s) => s.skillId !== skill.skillId,
+                      ),
+                    );
+                  }}
+                />
+              ))}
+            </div>
+            <div className="mt-2 flex gap-2">
+              <SkillCombobox
+                selectedSkills={selectedSkills.map((s) => s.skillName)}
+                skills={skills}
+                value={newSkill}
+                onChange={setNewSkill}
+              />
+              <Button onClick={addSkill} disabled={!newSkill}>
+                Add Skill
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

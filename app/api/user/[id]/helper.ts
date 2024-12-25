@@ -4,6 +4,8 @@ import {
   userInfos,
   userIndustryExperience,
 } from "@/drizzle/schema/user";
+
+import { skills, userSkills } from "@/drizzle/schema/skills";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
@@ -52,7 +54,17 @@ export async function fetchUserData(userId: string) {
   if (industryExperiences.length === 0) {
     console.warn(`No industry experiences found for user with ID ${userId}`);
   }
-  
+
+  const skillsData = await db
+    .select({
+      skillId: userSkills.skillId,
+      skillName: skills.skillName,
+      numberOfPeople: skills.numberOfPeople,
+    })
+    .from(userSkills)
+    .leftJoin(skills, eq(userSkills.skillId, skills.id))
+    .where(eq(userSkills.userId, userId));
+
   // Transform the data to match the UserData interface
   return {
     id: userData.id,
@@ -70,6 +82,7 @@ export async function fetchUserData(userId: string) {
     occupation: userData.occupation || "",
     about: userData.about || "",
     industryExperiences: industryExperiences,
+    userSkills: skillsData,
     instagramHandle: userData.instagramHandle,
     facebookHandle: userData.facebookHandle,
     profilePicture: userData.profilePicture,

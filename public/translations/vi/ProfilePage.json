@@ -75,5 +75,25 @@
     "errorLoadingProjects": "Lỗi Tải Dự án",
     "tryAgainLater": "Đã xảy ra lỗi khi tải dự án của bạn. Vui lòng thử lại sau.",
     "retry": "Thử lại"
+  },
+  "dialogDeleteContact": {
+    "title": "Xóa Liên hệ",
+    "description": "Bạn có chắc muốn xóa liên hệ nây?",
+    "cancel": "Hủy",
+    "delete": "Xóa Liên hệ"
+  },
+  "deleteContactResult": {
+    "success": "Xóa liên hệ thành công.",
+    "failure": "Xóa liên hệ thất bại."
+  },
+  "dialogDeletePortfolio": {
+    "title": "Xóa Portfolio",
+    "description": "Bạn có chắc muốn xóa Portfolio nây?",
+    "cancel": "Hủy",
+    "delete": "Xóa"
+  },
+  "deletePortfolioResult": {
+    "success": "Xóa Portfolio thành công.",
+    "failure": "Xóa Portfolio thất bại."
   }
 }

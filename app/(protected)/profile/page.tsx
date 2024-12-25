@@ -13,8 +13,8 @@ import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { UserHeader } from "@/components/wrappers/UserHeader";
 
 // Hook imports
-import { useServerAuth } from "@/hooks/useServerAuth";
-import { useTranslation } from "@/lib/i18n/init-server";
+import { getServerAuth } from "@/hooks/useServerAuth";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
 
@@ -27,28 +27,27 @@ import { ErrorProfileCard } from "./ErrorProfileCard";
 import ProfilePageTabs from "./ProfilePageTabs";
 
 interface ProfilePageProps {
-  params: {};
-  searchParams: {
+  params: Promise<{}>;
+  searchParams: Promise<{
     lang: string;
-  };
+  }>;
 }
 
-export default async function ProfilePage({
-  params,
-  searchParams,
-}: ProfilePageProps) {
+export default async function ProfilePage(props: ProfilePageProps) {
+  const searchParams = await props.searchParams;
   const lang = searchParams.lang || "en";
-  const { t } = await useTranslation(lang, ["ProfilePage", "ContactList"]);
-  const { user, isLoggedIn, isAnonymous } = await useServerAuth();
+  const params = await props.params;
+  const { t } = await getServerTranslation(lang, ["ProfilePage", "ContactList"]);
+  const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   // Early return for anonymous users
   if (!isLoggedIn || !user?.id) {
     return (
-      <AnonymousProfilePage
+      (<AnonymousProfilePage
         lang={lang}
         isLoggedIn={isLoggedIn}
-        errorMessage={cookies().get("error_message")?.value}
-      />
+        errorMessage={(await cookies()).get("error_message")?.value}
+      />)
     );
   }
 

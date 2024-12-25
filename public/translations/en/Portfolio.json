@@ -9,6 +9,14 @@
   "cancel": "Cancel",
   "create": "Create",
   "save": "Save",
+  "publish": "Publish",
+  "projectName": "Project Name",
+  "projectDescription": "Project Description",
+  "addCoOwner": "Add Co-Owner",
+  "toast":{
+    "success": "project created!",
+    "error": "Error creating project" 
+  },
   "form": {
     "submit": {
       "create": "Create Project",

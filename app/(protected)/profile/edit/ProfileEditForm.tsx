@@ -10,6 +10,7 @@ import { AboutSection } from "@/components/profile/AboutSection";
 import { BasicInfoSection } from "@/components/profile/BasicInfoSection";
 import { ContactSection } from "@/components/profile/ContactSection";
 import { useTranslation } from "@/lib/i18n/init-client";
+import { User } from "lucide-react";
 
 interface ProfileEditFormProps {
   userData: UserData;
@@ -31,7 +32,10 @@ export function ProfileEditForm({
         ...formData.contact,
         ...formData.professional,
       });
-
+      await UserService.updateUserSkills(
+        userData.id,
+        formData.professional.userSkills,
+      );
       router.push("/profile");
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -41,16 +45,20 @@ export function ProfileEditForm({
   const sections: Section[] = [
     { id: "basic", label: t("navigation.basicInfo"), iconName: "user" },
     { id: "about", label: t("navigation.about"), iconName: "userCircle" },
-    { id: "professional", label: t("navigation.professional"), iconName: "briefcase", },
+    {
+      id: "professional",
+      label: t("navigation.professional"),
+      iconName: "briefcase",
+    },
     { id: "contact", label: t("navigation.contact"), iconName: "mail" },
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 h-full">
+    <div className="flex h-full flex-col gap-8 lg:flex-row">
       <div className="lg:w-1/3 lg:overflow-y-auto">
         <FormStateNav sections={sections} onSubmit={handleSubmit} />
       </div>
-      <div className="space-y-8 lg:w-2/3 lg:overflow-y-auto pb-8">
+      <div className="space-y-8 pb-8 lg:w-2/3 lg:overflow-y-auto">
         <BasicInfoSection userData={userData} lang={lang} />
         <AboutSection userData={userData} lang={lang} />
         <ProfessionalSection userData={userData} lang={lang} />

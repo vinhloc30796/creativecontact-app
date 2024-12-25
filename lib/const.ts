@@ -1,0 +1,2 @@
+const USER_DATA_SIZE = 1024 * 1024 * 25;
+export { USER_DATA_SIZE };
