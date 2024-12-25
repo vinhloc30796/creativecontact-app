@@ -1,3 +1,4 @@
+import { addNewSkills } from "@/app/actions/skills/addNewSkills";
 import { updateUserSkills } from "@/app/actions/skills/updateUserSkills";
 import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
 import { type AboutInfoData } from "@/app/form-schemas/about-info";
@@ -57,5 +58,9 @@ export class UserService {
 
   static async updateUserSkills(userId: string, skills: { skills: string[] }) {
     return await updateUserSkills(userId, skills);
+  }
+
+  static async addNewSkills(skillNames: string[]) {
+    return await addNewSkills(skillNames);
   }
 }

@@ -226,6 +226,7 @@ export function ProfessionalSection({
     null,
   );
   const [newSkill, setNewSkill] = useState<Skill | null>(null);
+  const [userInputSkill, setUserInputSkill] = useState<string>("");
   const { setFieldDirty, setFormData } = useFormState();
 
   const [selectedSkills, setSelectedSkills] = useState<
@@ -253,7 +254,10 @@ export function ProfessionalSection({
           throw new Error("Failed to fetch skills");
         }
         const data = await response.json();
-        setSkills(data);
+        const sortedSkills = data.sort((a: Skill, b: Skill) =>
+          a.numberOfPeople > b.numberOfPeople ? -1 : 1,
+        );
+        setSkills(sortedSkills);
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -281,6 +285,9 @@ export function ProfessionalSection({
     setFormData("professional", {
       industryExperiences: selectedIndustryExperiences,
       userSkills: { skills: selectedSkillsIds },
+      newSkill: {
+        skills: userInputSkill,
+      },
     });
   }, [
     selectedIndustryExperiences,
@@ -325,6 +332,14 @@ export function ProfessionalSection({
 
   const addSkill = () => {
     if (newSkill) {
+      // Check if the skill already exists
+      const existingSkill = selectedSkills.find(
+        (s) => s.skillId === newSkill.id,
+      );
+      if (existingSkill) {
+        console.log("Skill already exists:", newSkill);
+        return;
+      }
       console.log("Adding new skill:", newSkill);
       setSelectedSkills((current) => {
         const updatedSkills = [
@@ -339,6 +354,24 @@ export function ProfessionalSection({
         return updatedSkills;
       });
       setNewSkill(null);
+    }
+  };
+
+  const addUserInputSkill = () => {
+    if (userInputSkill) {
+      const newSkillId = crypto.randomUUID();
+      const newSkill = {
+        skillId: newSkillId,
+        skillName: userInputSkill,
+        numberOfPeople: 0,
+      };
+      console.log("Adding user input skill:", newSkill);
+      setSelectedSkills((current) => {
+        const updatedSkills = [...current, newSkill];
+        console.log("Updated skills with user input:", updatedSkills);
+        return updatedSkills;
+      });
+      setUserInputSkill(""); // Clear the input field
     }
   };
 
@@ -441,6 +474,18 @@ export function ProfessionalSection({
               />
               <Button onClick={addSkill} disabled={!newSkill}>
                 Add Skill
+              </Button>
+            </div>
+            <div className="mt-2 flex gap-2">
+              <input
+                type="text"
+                value={userInputSkill}
+                onChange={(e) => setUserInputSkill(e.target.value)}
+                placeholder="Enter new skill"
+                className="flex-1 rounded border p-2"
+              />
+              <Button onClick={addUserInputSkill} disabled={!userInputSkill}>
+                Add User Input Skill
               </Button>
             </div>
           </div>
