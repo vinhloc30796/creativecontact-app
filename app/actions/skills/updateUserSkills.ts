@@ -28,14 +28,13 @@ export async function updateUserSkills(
 
       // Insert new user skills
       if (skillsInfo.skills.length > 0) {
-        await tx.insert(userSkills).values(
-          skillsInfo.skills.map((skill) => {
-            return {
-              userId: userId,
-              skillId: skill,
-            };
-          }),
-        );
+        for (const skill of skillsInfo.skills) {
+          await tx.insert(userSkills).values({
+            id: crypto.randomUUID(),
+            userId: userId,
+            skillId: skill,
+          });
+        }
       }
 
       return { success: true };

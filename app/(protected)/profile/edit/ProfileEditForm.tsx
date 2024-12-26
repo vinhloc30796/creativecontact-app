@@ -26,17 +26,20 @@ export function ProfileEditForm({
 
   const handleSubmit = async (formData: Record<string, any>) => {
     try {
+      console.log("Form data:", formData.professional);
       await UserService.updateUserInfo(userData.id, {
         ...formData.basic,
         ...formData.about,
         ...formData.contact,
         ...formData.professional,
       });
+
+      await UserService.addNewSkills(formData.professional.userNewSkills);
       await UserService.updateUserSkills(
         userData.id,
         formData.professional.userSkills,
       );
-      await UserService.addNewSkills(formData.professional.newSkills);
+
       router.push("/profile");
     } catch (error) {
       console.error("Error saving profile:", error);

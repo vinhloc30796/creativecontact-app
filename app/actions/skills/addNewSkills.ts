@@ -1,19 +1,19 @@
 "use server";
 
-import { skills } from "@/drizzle/schema/skills";
+import { Skill, skills } from "@/drizzle/schema/skills";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 
 export async function addNewSkills(
-  skillNames: string[],
+  newSkills: Skill[],
   validateSkillsInfo: boolean = true,
 ) {
-  console.log("Received skillNames:", skillNames);
+  console.log("Received new skills:", newSkills);
 
   // Validate skills info
   if (validateSkillsInfo) {
-    if (!skillNames || skillNames.length === 0) {
-      console.error("Invalid skills info:", skillNames);
+    if (!newSkills || newSkills.length === 0) {
+      console.error("Invalid skills info:", newSkills);
       return { success: false, error: "Invalid skills info" };
     }
   }
@@ -23,7 +23,8 @@ export async function addNewSkills(
     const result = await db.transaction(async (tx) => {
       const addedSkills = [];
 
-      for (const skillName of skillNames) {
+      for (const skill of newSkills) {
+        const skillName = skill.skillName.trim();
         // Check if the skill already exists
         const existingSkillArray = await tx
           .select({ skillName: skills.skillName })
@@ -36,16 +37,17 @@ export async function addNewSkills(
 
         if (!existingSkill) {
           // Add the new skill
-          const newSkill = await tx.insert(skills).values({
+          await tx.insert(skills).values({
+            id: skill.id,
             skillName: skillName,
             numberOfPeople: 0,
           });
 
-          addedSkills.push(newSkill);
+          addedSkills.push(skill.id);
         }
       }
 
-      return { success: true, addedSkills };
+      return { success: true, data: addedSkills };
     });
 
     console.log("addNewSkills result:", result);

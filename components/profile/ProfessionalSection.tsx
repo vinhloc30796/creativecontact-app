@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
+import { set } from "date-fns";
 
 interface IndustryComboboxProps {
   value: Industry | null;
@@ -227,6 +228,7 @@ export function ProfessionalSection({
   );
   const [newSkill, setNewSkill] = useState<Skill | null>(null);
   const [userInputSkill, setUserInputSkill] = useState<string>("");
+  const [userNewSkills, setUserNewSkills] = useState<Skill[] | null>(null);
   const { setFieldDirty, setFormData } = useFormState();
 
   const [selectedSkills, setSelectedSkills] = useState<
@@ -281,13 +283,11 @@ export function ProfessionalSection({
       "professional",
       selectedSkillsIds.join(",") !== userSkillsIds.join(","),
     );
-
+    const userNewSkillsIds = (userNewSkills || []).map((s) => s.skillId);
     setFormData("professional", {
       industryExperiences: selectedIndustryExperiences,
-      userSkills: { skills: selectedSkillsIds },
-      newSkill: {
-        skills: userInputSkill,
-      },
+      userSkills: { skills: selectedSkillsIds.concat(userNewSkillsIds) },
+      userNewSkills: userNewSkills,
     });
   }, [
     selectedIndustryExperiences,
@@ -359,13 +359,25 @@ export function ProfessionalSection({
 
   const addUserInputSkill = () => {
     if (userInputSkill) {
+      // Check if the skill already exists in the selectedSkills array
+      if (selectedSkills.some((skill) => skill.skillName === userInputSkill)) {
+        console.error("Skill already selected:", userInputSkill);
+        return;
+      }
+
       const newSkillId = crypto.randomUUID();
       const newSkill = {
+        id: newSkillId,
         skillId: newSkillId,
         skillName: userInputSkill,
         numberOfPeople: 0,
       };
       console.log("Adding user input skill:", newSkill);
+      setUserNewSkills((current) => {
+        const updatedSkills = [...(current || []), newSkill];
+        console.log("New skills with user input:", updatedSkills);
+        return updatedSkills;
+      });
       setSelectedSkills((current) => {
         const updatedSkills = [...current, newSkill];
         console.log("Updated skills with user input:", updatedSkills);
