@@ -42,22 +42,26 @@ interface ProfilePageProps {
 export default async function ProfilePage(props: ProfilePageProps) {
   const searchParams = await props.searchParams;
   const lang = searchParams.lang || "en";
-  const { t } = await getServerTranslation(lang, ["ProfilePage", "ContactList"]);
+  const { t } = await getServerTranslation(lang, [
+    "ProfilePage",
+    "ContactList",
+  ]);
   const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   // Early return for anonymous users
   if (!isLoggedIn || !user?.id) {
     return (
-      (<AnonymousProfilePage
+      <AnonymousProfilePage
         lang={lang}
         isLoggedIn={isLoggedIn}
         errorMessage={(await cookies()).get("error_message")?.value}
-      />)
+      />
     );
   }
 
   // Get user data synchronously as it's needed for the layout
   const userData = await fetchUserData(user.id);
+  console.log("userData", userData);
 
   // Create the promise but don't await it
   const portfolioArtworksPromise = fetchUserPortfolioArtworksWithDetails(

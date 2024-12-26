@@ -286,7 +286,7 @@ export function ProfessionalSection({
     const userNewSkillsIds = (userNewSkills || []).map((s) => s.skillId);
     setFormData("professional", {
       industryExperiences: selectedIndustryExperiences,
-      userSkills: { skills: selectedSkillsIds.concat(userNewSkillsIds) },
+      userSkills: { skills: selectedSkillsIds },
       userNewSkills: userNewSkills,
     });
   }, [

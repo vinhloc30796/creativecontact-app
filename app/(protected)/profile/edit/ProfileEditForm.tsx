@@ -26,7 +26,6 @@ export function ProfileEditForm({
 
   const handleSubmit = async (formData: Record<string, any>) => {
     try {
-      console.log("Form data:", formData.professional);
       await UserService.updateUserInfo(userData.id, {
         ...formData.basic,
         ...formData.about,
