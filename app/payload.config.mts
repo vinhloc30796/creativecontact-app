@@ -1,0 +1,30 @@
+import sharp from 'sharp'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { buildConfig } from 'payload'
+export default buildConfig({
+  // If you'd like to use Rich Text, pass your editor here
+  editor: lexicalEditor(),
+  // Routing
+  routes: {
+    admin: '/payload-cms/admin',
+    api: '/payload-cms/api',
+  },
+  // Define and configure your collections in this array
+  collections: [],
+  // Your Payload secret - should be a complex and secure string, unguessable
+  secret: process.env.PAYLOAD_SECRET || '',
+  // Configure Postgres database connection
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URL || '',
+    },
+    schemaName: 'payload',
+    migrationDir: 'supabase/migrations',
+  }),
+  // If you want to resize images, crop, set focal point, etc.
+  // make sure to install it and pass it to the config.
+  // This is optional - if you don't need to do these things,
+  // you don't need it!
+  sharp,
+})

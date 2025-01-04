@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { withPayload } from '@payloadcms/next/withPayload';
 
 const imageHost = process.env.NEXT_PUBLIC_SUPABASE_URL || '127.0.0.1:54321';
 console.log('[next.config.mjs] imageHost:', imageHost);
@@ -40,6 +41,9 @@ const nextConfig: NextConfig = {
     locales: ['en', 'vi'],
     defaultLocale: 'en',
   },
+  experimental: {
+    reactCompiler: false
+  }
 };
 
-export default nextConfig;
+export default withPayload(nextConfig);

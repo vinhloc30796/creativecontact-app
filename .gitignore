@@ -37,3 +37,6 @@ next-env.d.ts
 
 # react-email
 .react-email
+
+# log
+code2prompt.log
