@@ -1,6 +1,10 @@
-# Print diff, two choices: either staged, or main..HEAD
-# if diff, log to diff-staged.log
-# if main, log to diff-main.log
+# Default: List the commands in the justfile
+[group('default')]
+default:
+    @just --list
+
+# Print diff, two choices: either staged, or main..HEAD; if diff, log to diff-staged.log; if main, log to diff-main.log
+[group('git')]
 diff choice="staged":
     #!/usr/bin/env bash
     if [ "{{choice}}" = "staged" ]; then
@@ -14,5 +18,12 @@ diff choice="staged":
         exit 1
     fi
 
+# Connect to the database
+[group('db')]
 db:
     psql postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+# Print out the tree of the project, ignoring files mentioned in .gitignore
+[group('tree')]
+tree:
+    tree -I 'node_modules|dist|build|out|target|target-*'
