@@ -1,5 +1,6 @@
 import { Staff } from '@/app/collections/staff'
-import { postgresAdapter } from '@payloadcms/db-postgres'
+// import { postgresAdapter } from '@payloadcms/db-postgres'
+import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
@@ -23,7 +24,7 @@ export default buildConfig({
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || '',
   // Configure Postgres database connection
-  db: postgresAdapter({
+  db: vercelPostgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },

@@ -21,11 +21,11 @@ export async function middleware(req: NextRequest) {
   try {
     // Handle staff access
     const staffResponse = await handleStaffAccess(req);
-    if (staffResponse && staffResponse !== NextResponse.next() && 
-        (staffResponse.headers.get("x-middleware-rewrite") || staffResponse.headers.get("Location"))) {
+    if (staffResponse && staffResponse !== NextResponse.next() &&
+      (staffResponse.headers.get("x-middleware-rewrite") || staffResponse.headers.get("Location"))) {
       return staffResponse;
     }
-    
+
     // Handle i18n
     // const i18nResponse = await handleI18n(req);
     // if (i18nResponse !== NextResponse.next()) {

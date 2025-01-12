@@ -1,14 +1,16 @@
-import { createClient } from "@/utils/supabase/server";
+import { signOutStaff } from "@/app/actions/auth/staff";
 import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
-export async function POST(request: Request) {
-  const supabase = await createClient();
+export async function POST() {
+  const result = await signOutStaff();
 
-  // Sign out the user
-  await supabase.auth.signOut();
+  if (!result.success) {
+    console.error('/staff/signout: error', result.error)
+    return NextResponse.json({ error: result.error }, { status: 500 });
+  }
 
-  // Redirect to the login page after sign out
-  const method = "GET";
-  const url = new URL("/staff/login", request.url);
-  return NextResponse.redirect(url, { status: 303, statusText: "See Other", headers: { Location: url.toString() } });
+  // Handle successful logout
+  console.debug('/staff/signout: redirecting to /staff/login')
+  redirect('/staff/login');
 }

@@ -8,7 +8,7 @@ export async function handleStaffAccess(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createClient(req);
 
-  const {data: { user }} = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   const pathname = req.nextUrl.pathname;
   // Staff password

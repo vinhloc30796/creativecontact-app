@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     if (!result.success || !result.data) {
       console.error("Check-in failed:", result.error || "No data returned");
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: result.error || "Check-in failed",
         errorCode: result.errorCode
       }, { status: 400 });

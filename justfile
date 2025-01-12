@@ -23,7 +23,25 @@ diff choice="staged":
 db:
     psql postgresql://postgres:postgres@127.0.0.1:54322/postgres
 
-# Print out the tree of the project, ignoring files mentioned in .gitignore
-[group('tree')]
-tree:
-    tree -I 'node_modules|dist|build|out|target|target-*'
+# Add the directory tree to .notes/directory_structure.md, prefixed by datetime, dynamically accounting for whatever's in .gitignore
+[group('notes')]
+tree directory=".":
+    #!/usr/bin/env bash
+    # Convert .gitignore patterns to tree exclude pattern
+    ignore_patterns=$(grep -v '^#' .gitignore | \
+                        grep -v '^$' | \
+                        sed 's/\*\*\///' | \
+                        sed 's/\/\*\*/\*/' | \
+                        sed 's/^\///' | \
+                        tr '\n' '|' | \
+                        sed 's/|$//')
+
+    # Add timestamp header
+    echo "Generated on $(date '+%Y-%m-%d %H:%M:%S')" > .notes/directory_structure.md
+
+    # If .gitignore exists and has patterns, run tree with exclusions
+    if [ -f .gitignore ] && [ ! -z "$ignore_patterns" ]; then
+        tree -I "$ignore_patterns" -- {{directory}} >> .notes/directory_structure.md
+    else
+        tree -- {{directory}} >> .notes/directory_structure.md
+    fi
