@@ -1,4 +1,8 @@
 import { CollectionConfig, IncomingAuthType } from 'payload'
+import { anyone } from './access/anyone';
+import { admins } from './access/admins';
+import { adminsAndUser } from './access/adminAndUser';
+import { checkRole } from './access/checkRole';
 
 const SHOULD_VERIFY = process.env.NODE_ENV === 'production'
 export const cookiePolicy = {
@@ -25,18 +29,13 @@ export const Staff: CollectionConfig = {
     group: 'Admin',
   },
   // Access control - admins have full access, users can only read their own data
+
   access: {
-    read: ({ req: { user } }) => {
-      if (user?.roles?.includes('admin')) return true
-      return {
-        id: {
-          equals: user?.id
-        }
-      }
-    },
-    create: ({ req: { user } }) => user?.roles?.includes('admin'),
-    update: ({ req: { user } }) => user?.roles?.includes('admin'),
-    delete: ({ req: { user } }) => user?.roles?.includes('admin'),
+    read: adminsAndUser,
+    create: anyone,
+    update: adminsAndUser,
+    delete: admins,
+    admin: ({ req: { user } }) => checkRole(['admin'], user || undefined),
   },
   // Collection fields defining staff member data structure
   fields: [
@@ -51,7 +50,7 @@ export const Staff: CollectionConfig = {
       type: 'select',
       hasMany: true,
       required: true,
-      defaultValue: ['check-in'],
+      defaultValue: ['check-in', 'content-creator'],
       options: [
         {
           label: 'Admin',
@@ -61,6 +60,10 @@ export const Staff: CollectionConfig = {
           label: 'Check-in Staff',
           value: 'check-in',
         },
+        {
+          label: 'Content Creator',
+          value: 'content-creator',
+        }
       ],
     },
     {
