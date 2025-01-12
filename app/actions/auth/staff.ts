@@ -3,9 +3,10 @@
 import { headers, cookies } from "next/headers";
 import { usePayload } from "@/hooks/usePayload";
 import { cookiePolicy } from "@/app/collections/staff";
-import { staffSignupInputSchema } from "@/app/staff/signup/types";
+import { StaffCleanSignupInput } from "@/app/staff/signup/types";
 import { z } from "zod";
 import { AuthResult, StaffUser } from "./types";
+import { prevalidateStaff } from "./prevalidateStaff";
 
 // Define input schema
 const loginInputSchema = z.object({
@@ -194,43 +195,29 @@ export async function logoutStaff(): Promise<AuthResult<StaffUser>> {
 }
 
 export async function signupStaff(
-  prevState: AuthResult<StaffUser>,
-  formData: FormData,
+  initialState: AuthResult<StaffUser>,
+  data: StaffCleanSignupInput,
 ): Promise<AuthResult<StaffUser>> {
   try {
-    console.debug("[signupStaff] Starting signup process...");
-
-    // Validate input
-    const parsed = staffSignupInputSchema.safeParse({
-      email: formData.get("email"),
-      password: formData.get("password"),
-      confirmPassword: formData.get("confirmPassword"),
-      name: formData.get("name"),
-    });
-
-    if (!parsed.success) {
-      console.error("[signupStaff] Validation failed:", parsed.error);
+    // Validate staff secret first
+    const validationResult = await prevalidateStaff(data.staffSecret)
+    if (validationResult.error) {
       return {
         data: null,
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid input data",
-        },
-      };
+        error: validationResult.error
+      }
     }
 
-    console.debug(
-      "[signupStaff] Input validation successful, creating staff member...",
-    );
+    console.debug("[signupStaff] Starting signup process...");
 
     // Create staff member
     const payload = await usePayload();
     const newStaff = await payload.create({
       collection: "staff",
       data: {
-        email: parsed.data.email,
-        password: parsed.data.password,
-        name: parsed.data.name,
+        email: data.email,
+        password: data.password,
+        name: data.name,
         // Default roles
         roles: ["check-in", "content-creator"],
         active: true,
@@ -264,10 +251,21 @@ export async function signupStaff(
       error: null,
     };
   } catch (error) {
-    console.error("[signupStaff] error:", error);
+    const data = error instanceof Error && 'data' in error ? error.data : null;
+    const cause = error instanceof Error ? error.cause : null;
+    console.error("[signupStaff] error:", error, 'with data:', data, 'and cause:', cause);
 
-    // Handle duplicate email error specifically
-    if (error instanceof Error && error.message.includes("duplicate key")) {
+    // Check if email already exists in either cause or data
+    const isEmailAlreadyRegistered = (obj: any) => obj &&
+      typeof obj === 'object' &&
+      'errors' in obj &&
+      Array.isArray(obj.errors) &&
+      obj.errors.some((e: { path: string, message: string }) =>
+        e.path === 'email' && e.message.includes('already registered')
+      );
+
+    const duplicateEmailExists = isEmailAlreadyRegistered(cause) || isEmailAlreadyRegistered(data);
+    if (duplicateEmailExists) {
       return {
         data: null,
         error: {

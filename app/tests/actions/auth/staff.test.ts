@@ -125,21 +125,27 @@ describe('signupStaff', () => {
     vi.mocked(usePayload).mockResolvedValue({
       create: vi.fn().mockResolvedValue(mockNewStaff)
     } as any)
+
+    // Mock prevalidateStaff to succeed
+    vi.mock('@/app/actions/auth/prevalidateStaff', () => ({
+      prevalidateStaff: vi.fn().mockResolvedValue({ error: null })
+    }))
   })
 
   it('should successfully create a new staff member', async () => {
     // Arrange
-    const formData = new FormData()
-    formData.append('email', 'newstaff@example.com')
-    formData.append('password', 'securepassword123')
-    formData.append('confirmPassword', 'securepassword123')
-    formData.append('name', 'New Staff')
+    const signupData = {
+      email: 'newstaff@example.com',
+      password: 'securepassword123',
+      name: 'New Staff',
+      staffSecret: 'valid-secret'
+    }
 
     // Act
     const result = await signupStaff({
       data: null,
       error: null
-    }, formData)
+    }, signupData)
 
     // Assert
     expect(result.data).toEqual({
@@ -167,22 +173,41 @@ describe('signupStaff', () => {
 
   it('should handle duplicate email error', async () => {
     // Arrange
-    const formData = new FormData()
-    formData.append('email', 'existing@example.com')
-    formData.append('password', 'password123')
-    formData.append('confirmPassword', 'password123')
-    formData.append('name', 'Duplicate Staff')
+    const signupData = {
+      email: 'existing@example.com',
+      password: 'password123',
+      name: 'Duplicate Staff',
+      staffSecret: 'valid-secret'
+    }
 
     // Mock usePayload to throw duplicate key error
+    const errorData = {
+      collection: 'staff',
+      errors: [
+        {
+          message: 'A user with the given email is already registered.',
+          path: 'email'
+        }
+      ]
+    }
+    const duplicateEmailError = new Error('ValidationError: The following field is invalid: email')
+    Object.assign(duplicateEmailError, {
+      data: errorData,
+      cause: errorData,
+      isOperational: true,
+      isPublic: false,
+      status: 400,
+    })
+
     vi.mocked(usePayload).mockResolvedValue({
-      create: vi.fn().mockRejectedValue(new Error('duplicate key value violates unique constraint'))
+      create: vi.fn().mockRejectedValue(duplicateEmailError)
     } as any)
 
     // Act
     const result = await signupStaff({
       data: null,
       error: null
-    }, formData)
+    }, signupData)
 
     // Assert
     expect(result.data).toBeNull()

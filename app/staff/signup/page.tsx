@@ -46,20 +46,21 @@ export default function SignupPage() {
     console.debug('[SignupPage] Form submitted with data:', data)
 
     try {
-      const formData = new FormData()
-      formData.append('email', data.email)
-      formData.append('password', data.password)
-      formData.append('confirmPassword', data.confirmPassword)
-      formData.append('name', data.name || '')
-
-      const result = await signupStaff(initialState, formData)
+      const result = await signupStaff(initialState, data)
 
       if (result.error) {
         console.error('[SignupPage] Signup failed:', result.error)
-        form.setError('root', {
-          type: 'manual',
-          message: result.error.message
-        })
+        if (result.error.code === 'DUPLICATE_EMAIL') {
+          form.setError('email', {
+            type: 'manual',
+            message: result.error.message
+          })
+        } else {
+          form.setError('root', {
+            type: 'manual',
+            message: result.error.message
+          })
+        }
       } else {
         router.push('/staff/login')
       }
@@ -103,6 +104,24 @@ export default function SignupPage() {
             <CardContent className="p-6 bg-slate-100">
               <FormField
                 control={form.control}
+                name="staffSecret"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Staff Secret</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Ask Creative Contact team (or you won't get to sign up)"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </FormControl>
+                    {form.formState.touchedFields.staffSecret && <FormMessage />}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -110,12 +129,13 @@ export default function SignupPage() {
                     <FormControl>
                       <Input
                         type="email"
+                        placeholder="john.doe@example.com"
                         autoComplete="email"
                         disabled={isLoading}
                         {...field}
                       />
                     </FormControl>
-                    {form.formState.touchedFields.email && <FormMessage />}
+                    {(form.formState.touchedFields.email || form.formState.errors.email) && <FormMessage />}
                   </FormItem>
                 )}
               />
@@ -128,6 +148,7 @@ export default function SignupPage() {
                     <FormControl>
                       <Input
                         type="text"
+                        placeholder="John Doe"
                         autoComplete="name"
                         disabled={isLoading}
                         {...field}
@@ -146,6 +167,7 @@ export default function SignupPage() {
                     <FormControl>
                       <Input
                         type="password"
+                        placeholder="Create a strong password (min. 8 characters)"
                         autoComplete="new-password"
                         disabled={isLoading}
                         {...field}
@@ -164,6 +186,7 @@ export default function SignupPage() {
                     <FormControl>
                       <Input
                         type="password"
+                        placeholder="Re-enter your password"
                         autoComplete="new-password"
                         disabled={isLoading}
                         {...field}
@@ -173,6 +196,7 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
+
             </CardContent>
             <CardFooter className="flex flex-col">
               <div className="flex justify-between w-full">
