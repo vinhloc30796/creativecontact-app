@@ -1,81 +1,100 @@
 'use server'
 
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import { loginOperation } from 'payload'
+import { cookies, headers } from 'next/headers'
+import { z } from 'zod'
 import { usePayload } from '@/hooks/usePayload'
-import { headers } from 'next/headers'
 
-type LoginResult = Awaited<ReturnType<typeof loginOperation>>
+// Define input schema
+const loginInputSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1)
+})
 
-export type StaffLoginResult = {
-  success: boolean
-  error?: string
-  user?: LoginResult['user']
-  redirect?: string
+// Define consistent return type
+export interface AuthResult<T = unknown> {
+  data: T | null
+  error: {
+    code: string
+    message: string
+  } | null
 }
 
-export type StaffLogoutResult = {
-  success: boolean
-  error?: string
+export interface StaffUser {
+  id: string
+  email: string
+  role?: string
+  collection: string
+  createdAt: string
+  updatedAt: string
 }
 
-export type StaffVerifyResult = {
-  success: boolean
-  error?: string
-  user?: LoginResult['user']
-  redirect?: string
-}
-
-export async function authenticateStaff(
-  prevState: StaffLoginResult,
+export async function loginStaff(
+  prevState: AuthResult<StaffUser>,
   formData: FormData
-): Promise<StaffLoginResult> {
+): Promise<AuthResult<StaffUser>> {
   try {
-    // Extract credentials
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    // Validate input
+    const parsed = loginInputSchema.safeParse({
+      email: formData.get('email'),
+      password: formData.get('password')
+    })
 
-    if (!email || !password) {
+    if (!parsed || !parsed.success) {
       return {
-        success: false,
-        error: 'Email and password are required'
+        data: null,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid email or password format'
+        }
       }
     }
 
+    const { email, password } = parsed.data
     const payload = await usePayload()
 
     // Authenticate with Payload
-    const { user } = await payload.login({
+    const { user, token } = await payload.login({
       collection: 'staff',
       data: { email, password },
     })
 
-    // Set additional staff access cookie
+    console.debug('[loginStaff] user authenticated:', user, ' with token:', token)
+
+    // Set staff auth cookie
     const cookieStore = await cookies()
     cookieStore.set('payloadStaffAuth', 'true', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
+      maxAge: 60 * 60 * 24 * 7 // 1 week
     })
+    console.debug('[loginStaff] payloadStaffAuth cookie set:', cookieStore.get('payloadStaffAuth'))
 
     return {
-      success: true,
-      user,
-      redirect: '/staff/checkin'
+      data: {
+        id: user.id,
+        email: user.email,
+        collection: user.collection,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      } as StaffUser,
+      error: null
     }
 
   } catch (error) {
-    console.error('[authenticateStaff] error:', error)
+    console.error('[loginStaff] error:', error)
     return {
-      success: false,
-      error: 'Invalid credentials'
+      data: null,
+      error: {
+        code: 'AUTH_ERROR',
+        message: 'Invalid credentials'
+      }
     }
   }
 }
 
-export async function verifyStaffAuth(): Promise<StaffVerifyResult> {
+export async function verifyStaffAuth(): Promise<AuthResult<StaffUser>> {
   try {
     const payload = await usePayload()
     const cookieStore = await cookies()
@@ -87,38 +106,44 @@ export async function verifyStaffAuth(): Promise<StaffVerifyResult> {
     if (!user) {
       console.warn('[verifyStaffAuth] user not found')
       return {
-        success: false,
-        error: 'Authentication required',
-        redirect: '/staff/login'
+        data: null,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'Authentication required'
+        }
       }
     }
 
     if (!user.email) {
       console.warn('[verifyStaffAuth] user email missing')
       return {
-        success: false,
-        error: 'Staff email is required for check-in functionality',
-        redirect: '/staff/login'
+        data: null,
+        error: {
+          code: 'AUTH_ERROR',
+          message: 'Staff email is required for check-in functionality'
+        }
       }
     }
 
     console.info('[verifyStaffAuth] user verified:', user.email)
     return {
-      success: true,
-      user
+      data: user as StaffUser,
+      error: null
     }
 
   } catch (error) {
     console.error('[verifyStaffAuth] error:', error)
     return {
-      success: false,
-      error: 'Authentication failed',
-      redirect: '/staff/login'
+      data: null,
+      error: {
+        code: 'AUTH_ERROR',
+        message: 'Authentication failed'
+      }
     }
   }
 }
 
-export async function signOutStaff(): Promise<StaffLogoutResult> {
+export async function logoutStaff(): Promise<AuthResult<StaffUser>> {
   try {
     const baseURL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const logoutURL = `${baseURL}/payload-cms/api/staff/logout`
@@ -138,16 +163,22 @@ export async function signOutStaff(): Promise<StaffLogoutResult> {
     }
 
     // Clear the payloadStaffAuth cookie
-    console.debug('[signOutStaff] POST-ed successfully to Payload CMS /logout, next: clearing payloadStaffAuth and payload-token cookies')
+    console.debug('[logoutStaff] POST-ed successfully to Payload CMS /logout, next: clearing payloadStaffAuth and payload-token cookies')
     const cookieStore = await cookies()
     cookieStore.delete('payload-token') // remove the token cookie
 
-    return { success: true }
+    return {
+      data: null,
+      error: null
+    }
   } catch (error) {
     console.error('Staff logout error:', error)
     return {
-      success: false,
-      error: 'Failed to sign out'
+      data: null,
+      error: {
+        code: 'AUTH_ERROR',
+        message: 'Failed to sign out'
+      }
     }
   }
 }

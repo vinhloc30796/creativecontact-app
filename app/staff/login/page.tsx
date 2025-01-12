@@ -2,9 +2,9 @@
 
 "use client"
 
-import React, { useActionState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
@@ -19,8 +19,8 @@ import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
 import { AlertCircle } from 'lucide-react'
 
 // Auth
-import { authenticateStaff } from '@/app/actions/auth/staff'
-import type { StaffLoginResult } from '@/app/actions/auth/staff'
+import { loginStaff } from '@/app/actions/auth/staff'
+import type { AuthResult, StaffUser } from '@/app/actions/auth/staff'
 
 // Schema
 const loginSchema = z.object({
@@ -30,16 +30,13 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-const initialState: StaffLoginResult = {
-  success: false,
-  error: undefined,
-  user: undefined,
-  redirect: undefined,
+const initialState: AuthResult<StaffUser> = {
+  data: null,
+  error: null
 }
 
 export default function LoginPage() {
   const router = useRouter()
-  const [state, formAction] = useActionState(authenticateStaff, initialState)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -50,12 +47,23 @@ export default function LoginPage() {
     mode: 'onChange',
   })
 
-  // Handle successful login redirect
-  React.useEffect(() => {
-    if (state.success && state.redirect) {
-      router.push(state.redirect)
+  const { handleSubmit, formState: { errors } } = form
+
+  const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
+    console.debug('[LoginPage] Form submitted with data:', data)
+
+    const formData = new FormData()
+    formData.append('email', data.email)
+    formData.append('password', data.password)
+
+    const result = await loginStaff(initialState, formData)
+
+    if (result.error) {
+      console.error('[LoginPage] Login failed:', result.error)
+    } else {
+      router.push('/staff/checkin')
     }
-  }, [state.success, state.redirect, router])
+  }
 
   const handleSignupClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -63,18 +71,22 @@ export default function LoginPage() {
   }
 
   const getFormErrors = () => {
-    const errors = form.formState.errors
-    if (Object.keys(errors).length === 0 && !form.formState.isValid) {
-      return 'Please fill out all fields'
+    if (!form.formState.isValid) {
+      return Object.values(form.formState.errors)
+        .map(error => error?.message)
+        .filter(Boolean)
+        .join(', ') || 'Please fill out all fields'
     }
-    return Object.values(errors).map(error => error.message).join(', ')
+    return null
   }
+
+  console.debug('[LoginPage] Current state:', form.formState)
 
   return (
     <BackgroundDiv>
       <Card className="w-full max-w-md">
         <Form {...form}>
-          <form action={formAction} className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-center">Staff: Login</CardTitle>
               <CardDescription className="text-muted-foreground text-center">
@@ -135,10 +147,10 @@ export default function LoginPage() {
                 </TooltipProvider>
                 <Button onClick={handleSignupClick} variant="outline">Sign up</Button>
               </div>
-              {state.error && (
+              {getFormErrors() && (
                 <Alert variant="destructive" className="mt-6">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{state.error}</AlertDescription>
+                  <AlertDescription>{getFormErrors()}</AlertDescription>
                 </Alert>
               )}
             </CardFooter>

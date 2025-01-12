@@ -1,22 +1,24 @@
-import { CollectionConfig } from 'payload'
+import { CollectionConfig, IncomingAuthType } from 'payload'
 
 const SHOULD_VERIFY = process.env.NODE_ENV === 'production'
+const cookiePolicy = {
+  secure: SHOULD_VERIFY,
+  sameSite: 'Lax',
+  domain: process.env.COOKIE_DOMAIN,
+}
+const authPolicy = {
+  tokenExpiration: 7 * 24 * 60 * 60, // 1 week
+  verify: SHOULD_VERIFY,
+  maxLoginAttempts: 5,
+  lockTime: 600 * 1000, // 10 minutes
+  cookies: cookiePolicy,
+} as IncomingAuthType;
 
 // Staff collection configuration for authentication and access control
 export const Staff: CollectionConfig = {
   slug: 'staff',
   // Authentication settings with secure defaults
-  auth: {
-    tokenExpiration: 7 * 24 * 60 * 60, // 1 week
-    verify: SHOULD_VERIFY,
-    maxLoginAttempts: 5,
-    lockTime: 600 * 1000, // 10 minutes
-    cookies: {
-      secure: SHOULD_VERIFY,
-      sameSite: 'Lax',
-      domain: process.env.COOKIE_DOMAIN,
-    },
-  },
+  auth: authPolicy,
   // Admin panel display settings
   admin: {
     useAsTitle: 'email',

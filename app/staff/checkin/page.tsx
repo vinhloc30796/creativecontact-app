@@ -8,24 +8,21 @@ export default async function Page() {
   const result = await verifyStaffAuth()
 
   // Handle authentication failure
-  if (!result.success) {
-    if (result.redirect) {
-      redirect(result.redirect)
-    }
-
+  if (result.error) {
+    console.error('Error verifying staff authentication:', result)
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Authentication Error</AlertTitle>
         <AlertDescription>
-          {result.error || 'Please log in to access this page'}
+          {result.error.message}
         </AlertDescription>
       </Alert>
     )
   }
 
-  // Handle missing email (should not happen if auth is successful)
-  if (!result.user?.email) {
+  // Handle missing data (should not happen if auth is successful)
+  if (!result.data?.email) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
@@ -38,5 +35,5 @@ export default async function Page() {
   }
 
   // Render checkin page with verified user email
-  return <CheckinPage userEmail={result.user.email} />
+  return <CheckinPage userEmail={result.data.email} />
 }

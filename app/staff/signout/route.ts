@@ -1,11 +1,11 @@
-import { signOutStaff } from "@/app/actions/auth/staff";
+import { logoutStaff } from "@/app/actions/auth/staff";
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 
 export async function POST() {
-  const result = await signOutStaff();
+  const result = await logoutStaff();
 
-  if (!result.success) {
+  if (result.error) {
     console.error('/staff/signout: error', result.error)
     return NextResponse.json({ error: result.error }, { status: 500 });
   }
