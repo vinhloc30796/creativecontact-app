@@ -20,7 +20,7 @@ import { AlertCircle } from 'lucide-react'
 
 // Auth
 import { loginStaff } from '@/app/actions/auth/staff'
-import type { AuthResult, StaffUser } from '@/app/actions/auth/staff'
+import type { AuthResult, StaffUser } from '@/app/actions/auth/types'
 
 // Schema
 const loginSchema = z.object({

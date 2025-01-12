@@ -18,8 +18,8 @@ import { AlertCircle } from 'lucide-react'
 
 // Auth & Types
 import { signupStaff } from '@/app/actions/auth/staff'
-import type { AuthResult, StaffUser } from '@/app/actions/auth/staff'
-import { staffSignupInputSchema, type StaffSignupInput } from './type'
+import type { AuthResult, StaffUser } from '@/app/actions/auth/types'
+import { staffSignupInputSchema, type StaffSignupInput } from './types'
 
 const initialState: AuthResult<StaffUser> = {
   data: null,

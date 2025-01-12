@@ -5,30 +5,13 @@ import { usePayload } from "@/hooks/usePayload";
 import { cookiePolicy } from "@/app/collections/staff";
 import { staffSignupInputSchema } from "@/app/staff/signup/types";
 import { z } from "zod";
+import { AuthResult, StaffUser } from "./types";
 
 // Define input schema
 const loginInputSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
 });
-
-// Define consistent return type
-export interface AuthResult<T = unknown> {
-  data: T | null;
-  error: {
-    code: string;
-    message: string;
-  } | null;
-}
-
-export interface StaffUser {
-  id: string;
-  email: string;
-  role?: string;
-  collection: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export async function loginStaff(
   prevState: AuthResult<StaffUser>,
@@ -215,7 +198,7 @@ export async function signupStaff(
   formData: FormData,
 ): Promise<AuthResult<StaffUser>> {
   try {
-    console.debug('[signupStaff] Starting signup process...');
+    console.debug("[signupStaff] Starting signup process...");
 
     // Validate input
     const parsed = staffSignupInputSchema.safeParse({
@@ -226,7 +209,7 @@ export async function signupStaff(
     });
 
     if (!parsed.success) {
-      console.error('[signupStaff] Validation failed:', parsed.error);
+      console.error("[signupStaff] Validation failed:", parsed.error);
       return {
         data: null,
         error: {
@@ -236,7 +219,9 @@ export async function signupStaff(
       };
     }
 
-    console.debug('[signupStaff] Input validation successful, creating staff member...');
+    console.debug(
+      "[signupStaff] Input validation successful, creating staff member...",
+    );
 
     // Create staff member
     const payload = await usePayload();
@@ -253,7 +238,7 @@ export async function signupStaff(
     });
 
     if (!newStaff) {
-      console.error('[signupStaff] Failed to create staff member');
+      console.error("[signupStaff] Failed to create staff member");
       return {
         data: null,
         error: {
@@ -263,7 +248,10 @@ export async function signupStaff(
       };
     }
 
-    console.debug('[signupStaff] Staff member created successfully:', newStaff.id);
+    console.debug(
+      "[signupStaff] Staff member created successfully:",
+      newStaff.id,
+    );
 
     return {
       data: {
