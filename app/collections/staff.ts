@@ -1,12 +1,12 @@
 import { CollectionConfig, IncomingAuthType } from 'payload'
 
 const SHOULD_VERIFY = process.env.NODE_ENV === 'production'
-const cookiePolicy = {
+export const cookiePolicy = {
   secure: SHOULD_VERIFY,
   sameSite: 'Lax',
   domain: process.env.COOKIE_DOMAIN,
 }
-const authPolicy = {
+export const authPolicy = {
   tokenExpiration: 7 * 24 * 60 * 60, // 1 week
   verify: SHOULD_VERIFY,
   maxLoginAttempts: 5,

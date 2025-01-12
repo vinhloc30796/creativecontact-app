@@ -8,6 +8,7 @@
     "email:build": "email build",
     "build": "next build",
     "test": "next test",
+    "test:unit": "vitest",
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node -r esbuild-register db/migrate.ts",
@@ -98,6 +99,8 @@
     "@jest/globals": "^29.7.0",
     "@svgr/webpack": "^8.1.0",
     "@tanstack/eslint-plugin-query": "^5.62.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.10.1",
     "@types/pg": "^8.11.10",
     "@types/qrcode": "^1.5.5",
@@ -113,7 +116,10 @@
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwindcss": "^3.4.16",
-    "typescript": "^5.7.2"
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.2",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^2.1.8"
   },
   "overrides": {
     "@types/react": "19.0.1",

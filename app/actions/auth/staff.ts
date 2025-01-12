@@ -1,8 +1,9 @@
 'use server'
 
-import { cookies, headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
 import { z } from 'zod'
 import { usePayload } from '@/hooks/usePayload'
+import { cookiePolicy } from '@/app/collections/staff'
 
 // Define input schema
 const loginInputSchema = z.object({
@@ -60,16 +61,33 @@ export async function loginStaff(
 
     console.debug('[loginStaff] user authenticated:', user, ' with token:', token)
 
+    if (!user || !token) {
+      console.error('[loginStaff] user or token not found')
+      return {
+        data: null,
+        error: {
+          code: 'AUTH_ERROR',
+          message: 'Invalid credentials'
+        }
+      }
+    }
+
     // Set staff auth cookie
     const cookieStore = await cookies()
     cookieStore.set('payloadStaffAuth', 'true', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: cookiePolicy.secure as boolean,
+      sameSite: cookiePolicy.sameSite as 'lax' | 'strict' | 'none',
       path: '/',
       maxAge: 60 * 60 * 24 * 7 // 1 week
     })
-    console.debug('[loginStaff] payloadStaffAuth cookie set:', cookieStore.get('payloadStaffAuth'))
+    cookieStore.set('payload-token', token, {
+      httpOnly: true,
+      secure: cookiePolicy.secure as boolean,
+      sameSite: cookiePolicy.sameSite as 'lax' | 'strict' | 'none',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7 // 1 week
+    })
 
     return {
       data: {
