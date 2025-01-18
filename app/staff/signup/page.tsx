@@ -55,6 +55,11 @@ export default function SignupPage() {
             type: 'manual',
             message: result.error.message
           })
+        } else if (result.error.code === 'FAILED_TO_PREVALIDATE') {
+          form.setError('staffSecret', {
+            type: 'manual',
+            message: result.error.message
+          })
         } else {
           form.setError('root', {
             type: 'manual',

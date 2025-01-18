@@ -26,8 +26,8 @@ export async function prevalidateStaff(password: string): Promise<AuthResult> {
   return {
     data: false,
     error: {
-      code: "INVALID_PASSWORD",
-      message: "Invalid password",
+      code: "FAILED_TO_PREVALIDATE",
+      message: "Failed to prevalidate staff - double check STAFF_PASSWORD",
     },
   };
 }
