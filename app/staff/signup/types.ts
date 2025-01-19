@@ -2,10 +2,10 @@ import { z } from "zod";
 
 export const staffSignupInputSchema = z
   .object({
-    email: z.string().email("Invalid email address"),
+    email: z.string().min(1, "Email is required").email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string(),
-    name: z.string().optional(),
+    confirmPassword: z.string().min(8, "Please confirm your password"),
+    name: z.string().optional().default(''),
     staffSecret: z.string().min(1, "Staff secret is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {

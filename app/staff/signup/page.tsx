@@ -29,6 +29,7 @@ const initialState: AuthResult<StaffUser> = {
 export default function SignupPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState(false)
+  const [isFormReady, setIsFormReady] = React.useState(false)
 
   const form = useForm<StaffSignupInput>({
     resolver: zodResolver(staffSignupInputSchema),
@@ -37,9 +38,14 @@ export default function SignupPage() {
       password: '',
       confirmPassword: '',
       name: '',
+      staffSecret: '',
     },
     mode: 'onChange',
   })
+
+  React.useEffect(() => {
+    setIsFormReady(true)
+  }, [])
 
   const onSubmit = async (data: StaffSignupInput) => {
     setIsLoading(true)
@@ -93,6 +99,25 @@ export default function SignupPage() {
         .join(', ') || 'Please fill out all required fields'
     }
     return null
+  }
+
+  if (!isFormReady) {
+    return (
+      <BackgroundDiv>
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">Loading...</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 bg-slate-100">
+            <div className="space-y-4">
+              <div className="h-10 bg-gray-200 animate-pulse rounded" />
+              <div className="h-10 bg-gray-200 animate-pulse rounded" />
+              <div className="h-10 bg-gray-200 animate-pulse rounded" />
+            </div>
+          </CardContent>
+        </Card>
+      </BackgroundDiv>
+    )
   }
 
   return (
