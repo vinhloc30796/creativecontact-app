@@ -37,6 +37,8 @@ const initialState: AuthResult<StaffUser> = {
 
 export default function LoginPage() {
   const router = useRouter()
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [authError, setAuthError] = React.useState<string | null>(null)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -50,18 +52,29 @@ export default function LoginPage() {
   const { handleSubmit, formState: { errors } } = form
 
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
+    setIsLoading(true)
+    setAuthError(null)
     console.debug('[LoginPage] Form submitted with data:', data)
 
     const formData = new FormData()
     formData.append('email', data.email)
     formData.append('password', data.password)
 
-    const result = await loginStaff(initialState, formData)
+    try {
+      const result = await loginStaff(initialState, formData)
 
-    if (result.error) {
-      console.error('[LoginPage] Login failed:', result.error)
-    } else {
-      router.push('/staff/checkin')
+      if (result.error) {
+        console.error('[LoginPage] Login failed:', result.error)
+        setAuthError(result.error.message)
+        form.setFocus('email')
+      } else {
+        router.push('/staff/checkin')
+      }
+    } catch (error) {
+      console.error('[LoginPage] Unexpected error:', error)
+      setAuthError('An unexpected error occurred. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -137,7 +150,12 @@ export default function LoginPage() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="inline-block">
-                        <Button type="submit" disabled={!form.formState.isValid}>Log in</Button>
+                        <Button
+                          type="submit"
+                          disabled={!form.formState.isValid || isLoading}
+                        >
+                          {isLoading ? 'Logging in...' : 'Log in'}
+                        </Button>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -145,12 +163,20 @@ export default function LoginPage() {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <Button onClick={handleSignupClick} variant="outline">Sign up</Button>
+                <Button
+                  onClick={handleSignupClick}
+                  variant="outline"
+                  disabled={isLoading}
+                >
+                  Sign up
+                </Button>
               </div>
-              {getFormErrors() && (
+              {(getFormErrors() || authError) && (
                 <Alert variant="destructive" className="mt-6">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{getFormErrors()}</AlertDescription>
+                  <AlertDescription>
+                    {authError || getFormErrors()}
+                  </AlertDescription>
                 </Alert>
               )}
             </CardFooter>
