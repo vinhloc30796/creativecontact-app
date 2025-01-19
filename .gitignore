@@ -41,3 +41,6 @@ next-env.d.ts
 
 # log
 code2prompt.log
+
+# diffs
+*.diff

@@ -8,11 +8,11 @@ default:
 diff choice="staged":
     #!/usr/bin/env bash
     if [ "{{choice}}" = "staged" ]; then
-        git diff --staged > diff-staged.log
-        echo "Diff logged to diff-staged.log"
+        git diff --staged --output=diff-staged.diff
+        echo "Diff logged to diff-staged.diff"
     elif [ "{{choice}}" = "main" ]; then
-        git diff main..HEAD > diff-main.log
-        echo "Diff logged to diff-main.log"
+        git diff main..HEAD --output=diff-main.diff
+        echo "Diff logged to diff-main.diff"
     else
         echo "Invalid choice. Use 'staged' or 'main'."
         exit 1
