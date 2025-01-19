@@ -25,7 +25,7 @@ import type { AuthResult, StaffUser } from '@/app/actions/auth/types'
 // Schema
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+  password: z.string().min(1, 'Password is required').min(8, 'Password must be at least 8 characters')
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -38,7 +38,7 @@ const initialState: AuthResult<StaffUser> = {
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState(false)
-  const [authError, setAuthError] = React.useState<string | null>(null)
+  const [formError, setFormError] = React.useState<string | null>(null)
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -46,14 +46,22 @@ export default function LoginPage() {
       email: '',
       password: '',
     },
-    mode: 'onChange',
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
   })
 
   const { handleSubmit, formState: { errors } } = form
 
+  React.useEffect(() => {
+    const subscription = form.watch(() => {
+      if (formError) setFormError(null)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, formError])
+
   const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
     setIsLoading(true)
-    setAuthError(null)
+    setFormError(null)
     console.debug('[LoginPage] Form submitted with data:', data)
 
     const formData = new FormData()
@@ -65,14 +73,14 @@ export default function LoginPage() {
 
       if (result.error) {
         console.error('[LoginPage] Login failed:', result.error)
-        setAuthError(result.error.message)
+        setFormError(result.error.message)
         form.setFocus('email')
       } else {
         router.push('/staff/checkin')
       }
     } catch (error) {
       console.error('[LoginPage] Unexpected error:', error)
-      setAuthError('An unexpected error occurred. Please try again.')
+      setFormError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -88,7 +96,7 @@ export default function LoginPage() {
       return Object.values(form.formState.errors)
         .map(error => error?.message)
         .filter(Boolean)
-        .join(', ') || 'Please fill out all fields'
+        .join(', ')
     }
     return null
   }
@@ -171,12 +179,10 @@ export default function LoginPage() {
                   Sign up
                 </Button>
               </div>
-              {(getFormErrors() || authError) && (
+              {formError && (
                 <Alert variant="destructive" className="mt-6">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    {authError || getFormErrors()}
-                  </AlertDescription>
+                  <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
             </CardFooter>

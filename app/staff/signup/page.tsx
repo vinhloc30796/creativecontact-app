@@ -30,6 +30,7 @@ export default function SignupPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState(false)
   const [isFormReady, setIsFormReady] = React.useState(false)
+  const [formError, setFormError] = React.useState<string | null>(null)
 
   const form = useForm<StaffSignupInput>({
     resolver: zodResolver(staffSignupInputSchema),
@@ -40,12 +41,20 @@ export default function SignupPage() {
       name: '',
       staffSecret: '',
     },
-    mode: 'onChange',
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
   })
 
   React.useEffect(() => {
     setIsFormReady(true)
   }, [])
+
+  React.useEffect(() => {
+    const subscription = form.watch(() => {
+      if (formError) setFormError(null)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, formError])
 
   const onSubmit = async (data: StaffSignupInput) => {
     setIsLoading(true)
@@ -67,20 +76,14 @@ export default function SignupPage() {
             message: result.error.message
           })
         } else {
-          form.setError('root', {
-            type: 'manual',
-            message: result.error.message
-          })
+          setFormError('An unexpected error occurred. Please try again.')
         }
       } else {
         router.push('/staff/login')
       }
     } catch (error) {
       console.error('[SignupPage] Unexpected error:', error)
-      form.setError('root', {
-        type: 'manual',
-        message: 'An unexpected error occurred. Please try again.'
-      })
+      setFormError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -165,7 +168,7 @@ export default function SignupPage() {
                         {...field}
                       />
                     </FormControl>
-                    {(form.formState.touchedFields.email || form.formState.errors.email) && <FormMessage />}
+                    {form.formState.touchedFields.email && <FormMessage />}
                   </FormItem>
                 )}
               />
@@ -255,10 +258,10 @@ export default function SignupPage() {
                   Back to Login
                 </Button>
               </div>
-              {form.formState.errors.root && (
+              {formError && (
                 <Alert variant="destructive" className="mt-6">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
+                  <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
             </CardFooter>

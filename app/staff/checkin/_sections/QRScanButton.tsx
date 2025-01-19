@@ -38,7 +38,7 @@ const QRScanButton = () => {
     setIsOpen(false);
     resetState();
   }, [resetState]);
-  
+
   const handleScan = (result: QrScanner.ScanResult) => {
     if (scannerRef.current) {
       scannerRef.current.stop();
@@ -256,13 +256,13 @@ const QRScanButton = () => {
               <>
                 <p className="text-green-500">{checkinStatus}</p>
                 <div className="grid grid-cols-2 gap-2">
-                <p className="font-medium">Name:</p>
-                <p>{checkinData.name}</p>
-                <p className="font-medium">Email:</p>
-                <p>{checkinData.email}</p>
-                <p className="font-medium">Phone:</p>
-                <p>{checkinData.phone}</p>
-              </div>
+                  <p className="font-medium">Name:</p>
+                  <p>{checkinData.name}</p>
+                  <p className="font-medium">Email:</p>
+                  <p>{checkinData.email}</p>
+                  <p className="font-medium">Phone:</p>
+                  <p>{checkinData.phone}</p>
+                </div>
                 <Button onClick={handleClose}>Close</Button>
               </>
             ) : registrationDetails ? (

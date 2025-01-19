@@ -33,19 +33,17 @@ export default async function CheckinPage({ userEmail, error }: CheckinPageProps
           </div>
         </CardHeader>
 
-        {/* Error handling section */}
-        {error && (
+        {/* Only show error if it exists and is not already shown in form */}
+        {error && !document.querySelector('[data-error-shown="true"]') && (
           <div className="p-4 border-b" role="alert" aria-live="polite">
-            <Alert variant="destructive">
+            <Alert variant="destructive" data-error-shown="true">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>
-                Oops!&nbsp;
                 {error.code === 'AUTH_ERROR' && 'You\'re not logged in!'}
                 {error.code === 'MISSING_EMAIL' && 'We couldn\'t find your account.'}
                 {error.code === 'UNKNOWN_ERROR' && 'Something went wrong.'}
               </AlertTitle>
               <AlertDescription>
-                {/* Map error codes to friendly messages */}
                 {error.code === 'AUTH_ERROR' && 'Please log in again to continue.'}
                 {error.code === 'MISSING_EMAIL' && 'Please make sure you are logged in with your staff account.'}
                 {!error.code && error.message}
