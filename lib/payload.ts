@@ -1,6 +1,6 @@
-import { getPayloadHMR } from "@payloadcms/next/utilities"
-import type { Payload } from 'payload'
 import config from '@payload-config'
+import type { Payload } from 'payload'
+import { getPayload } from 'payload'
 
 /**
  * Initializes a Payload CMS instance for server-side operations.
@@ -14,7 +14,7 @@ import config from '@payload-config'
  * @returns Promise<Payload> A Payload CMS instance
  */
 export const getCustomPayload = async (): Promise<Payload> => {
-  const payload = await getPayloadHMR({
+  const payload = await getPayload({
     config: config // Ensure config is properly exported as a promise
   })
 

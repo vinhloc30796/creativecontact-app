@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
+
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { verifyStaffAuth } from '@/app/actions/auth/staff'

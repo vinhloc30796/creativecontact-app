@@ -46,7 +46,7 @@ function getRandomSize() {
 // Main EventPage component
 export default async function EventPage(props: EventPageProps) {
   console.log("[EventPage] Starting component execution");
-  
+
   try {
     console.log("[EventPage] About to await props.params and props.searchParams");
     const params = await props.params;
@@ -56,7 +56,7 @@ export default async function EventPage(props: EventPageProps) {
 
     const lang = searchParams.lang || "en";
     console.log("[EventPage] Language set to:", lang);
-    
+
     const { t } = await getServerTranslation(lang, "EventPage");
     console.log("[EventPage] Translation loaded");
 
@@ -128,9 +128,8 @@ export default async function EventPage(props: EventPageProps) {
               {shuffledArtworks.map((artwork, index) => (
                 <div
                   key={artwork.id}
-                  className={`flex ${
-                    index % 2 === 0 ? "justify-start" : "justify-end"
-                  } mt-2 pb-[40vh] sm:pb-[25vh]`}
+                  className={`flex ${index % 2 === 0 ? "justify-start" : "justify-end"
+                    } mt-2 pb-[40vh] sm:pb-[25vh]`}
                 >
                   <ArtworkCard
                     eventSlug={eventSlug}
