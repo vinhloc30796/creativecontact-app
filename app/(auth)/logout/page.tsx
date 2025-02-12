@@ -55,7 +55,7 @@ export default function LogoutPage(props: LogoutPageProps) {
       }
     }, 100);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [logoutMutation]);
 
   if (logoutMutation.status === "pending") {
     return (

@@ -1,12 +1,14 @@
 "use server";
 
-import { headers, cookies } from "next/headers";
-import { usePayload } from "@/hooks/usePayload";
 import { cookiePolicy } from "@/app/collections/staff";
 import { StaffCleanSignupInput } from "@/app/staff/signup/types";
+import { getCustomPayload } from "@/lib/payload";
+import { cookies } from "next/headers";
 import { z } from "zod";
-import { AuthResult, StaffUser } from "./types";
 import { prevalidateStaff } from "./prevalidateStaff";
+import { AuthResult, StaffUser } from "./types";
+
+const payload = await getCustomPayload()
 
 // Define input schema
 const loginInputSchema = z.object({
@@ -36,7 +38,6 @@ export async function loginStaff(
     }
 
     const { email, password } = parsed.data;
-    const payload = await usePayload();
 
     // Authenticate with Payload
     const { user, token } = await payload.login({
@@ -103,7 +104,7 @@ export async function loginStaff(
 
 export async function verifyStaffAuth(): Promise<AuthResult<StaffUser>> {
   try {
-    const payload = await usePayload();
+
     const cookieStore = await cookies();
     const authHeaders = new Headers({ cookie: cookieStore.toString() });
 
@@ -152,48 +153,6 @@ export async function verifyStaffAuth(): Promise<AuthResult<StaffUser>> {
   }
 }
 
-export async function logoutStaff(): Promise<AuthResult<StaffUser>> {
-  try {
-    const baseURL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const logoutURL = `${baseURL}/payload-cms/api/staff/logout`;
-
-    const requestHeaders = await headers();
-    const res = await fetch(logoutURL, {
-      method: "POST",
-      credentials: "include",
-      headers: new Headers({
-        "Content-Type": "application/json",
-        cookie: requestHeaders.get("cookie") || "",
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Logout request failed", { cause: res });
-    }
-
-    // Clear the payloadStaffAuth cookie
-    console.debug(
-      "[logoutStaff] POST-ed successfully to Payload CMS /logout, next: clearing payloadStaffAuth and payload-token cookies",
-    );
-    const cookieStore = await cookies();
-    cookieStore.delete("payload-token"); // remove the token cookie
-
-    return {
-      data: null,
-      error: null,
-    };
-  } catch (error) {
-    console.error("Staff logout error:", error);
-    return {
-      data: null,
-      error: {
-        code: "AUTH_ERROR",
-        message: "Failed to sign out",
-      },
-    };
-  }
-}
-
 export async function signupStaff(
   initialState: AuthResult<StaffUser>,
   data: StaffCleanSignupInput,
@@ -211,7 +170,6 @@ export async function signupStaff(
     console.debug("[signupStaff] Starting signup process...");
 
     // Create staff member
-    const payload = await usePayload();
     const newStaff = await payload.create({
       collection: "staff",
       data: {

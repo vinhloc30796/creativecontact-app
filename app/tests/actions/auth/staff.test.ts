@@ -1,5 +1,5 @@
 import { loginStaff, signupStaff } from '@/app/actions/auth/staff'
-import { usePayload } from '@/hooks/usePayload'
+import { getCustomPayload } from '@/lib/payload'
 import { cookies } from 'next/headers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -36,7 +36,7 @@ describe('loginStaff', () => {
     vi.clearAllMocks()
 
     // Mock usePayload implementation
-    vi.mocked(usePayload).mockResolvedValue({
+    vi.mocked(getCustomPayload).mockResolvedValue({
       login: vi.fn().mockResolvedValue({
         user: mockUser,
         token: mockToken
@@ -96,7 +96,7 @@ describe('loginStaff', () => {
     )
 
     // Verify Payload login was called with correct parameters
-    const payload = await usePayload()
+    const payload = await getCustomPayload()
     expect(payload.login).toHaveBeenCalledWith({
       collection: 'staff',
       data: {
@@ -122,7 +122,7 @@ describe('signupStaff', () => {
     vi.clearAllMocks()
 
     // Mock usePayload implementation for signup
-    vi.mocked(usePayload).mockResolvedValue({
+    vi.mocked(getCustomPayload).mockResolvedValue({
       create: vi.fn().mockResolvedValue(mockNewStaff)
     } as any)
 
@@ -158,7 +158,7 @@ describe('signupStaff', () => {
     expect(result.error).toBeNull()
 
     // Verify Payload create was called with correct parameters
-    const payload = await usePayload()
+    const payload = await getCustomPayload()
     expect(payload.create).toHaveBeenCalledWith({
       collection: 'staff',
       data: {
@@ -199,7 +199,7 @@ describe('signupStaff', () => {
       status: 400,
     })
 
-    vi.mocked(usePayload).mockResolvedValue({
+    vi.mocked(getCustomPayload).mockResolvedValue({
       create: vi.fn().mockRejectedValue(duplicateEmailError)
     } as any)
 

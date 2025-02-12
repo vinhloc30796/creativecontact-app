@@ -20,7 +20,7 @@
     "paths": {
       "@/*": ["./*"],
       "drizzle-orm": ["./node_modules/drizzle-orm"],
-      "@payload-config": ["./app/payload.config.mts"]
+      "@payload-config": ["./app/payload.config.ts"]
     },
     "target": "ES2017"
   },
@@ -29,7 +29,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "./app/payload.config.mts"
+    "./app/payload.config.ts"
   ],
   "exclude": ["node_modules"]
 }

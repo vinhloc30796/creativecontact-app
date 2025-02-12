@@ -25,10 +25,10 @@ importers:
         version: 10.2.0(react@19.0.0)
       '@payloadcms/db-postgres':
         specifier: ^3.14.0
-        version: 3.14.0(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(react@19.0.0)
+        version: 3.14.0(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(postgres@3.4.5)(react@19.0.0)
       '@payloadcms/db-vercel-postgres':
         specifier: ^3.14.0
-        version: 3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(react@19.0.0)
+        version: 3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(postgres@3.4.5)(react@19.0.0)
       '@payloadcms/live-preview-react':
         specifier: ^3.14.0
         version: 3.14.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -139,7 +139,7 @@ importers:
         version: 16.4.7
       drizzle-orm:
         specifier: ^0.37.0
-        version: 0.37.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.13.1)(react@19.0.0)
+        version: 0.37.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.13.1)(postgres@3.4.5)(react@19.0.0)
       embla-carousel-react:
         specifier: ^8.5.1
         version: 8.5.1(react@19.0.0)
@@ -188,6 +188,9 @@ importers:
       pg:
         specifier: ^8.13.1
         version: 8.13.1
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.5
       posthog-js:
         specifier: ^1.194.5
         version: 1.194.5
@@ -6209,6 +6212,10 @@ packages:
   postgres-range@1.1.4:
     resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
+  postgres@3.4.5:
+    resolution: {integrity: sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg==}
+    engines: {node: '>=12'}
+
   posthog-js@1.194.5:
     resolution: {integrity: sha512-bYa20TkwzkDsr2y3iCiJNto/bthkYkmHZopIOXzFEw7KeB581Y1WueaOry5MFHEwnpZuomqEmcMQGBAoWvv8VA==}
 
@@ -9515,13 +9522,13 @@ snapshots:
       '@parcel/watcher-win32-x64': 2.5.0
     optional: true
 
-  '@payloadcms/db-postgres@3.14.0(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(react@19.0.0)':
+  '@payloadcms/db-postgres@3.14.0(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(postgres@3.4.5)(react@19.0.0)':
     dependencies:
-      '@payloadcms/drizzle': 3.14.0(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(react@19.0.0)
+      '@payloadcms/drizzle': 3.14.0(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)
       '@types/pg': 8.10.2
       console-table-printer: 2.12.1
       drizzle-kit: 0.28.0
-      drizzle-orm: 0.36.1(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(react@19.0.0)
+      drizzle-orm: 0.36.1(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)
       payload: 3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5)
       pg: 8.11.3
       prompts: 2.4.2
@@ -9558,13 +9565,13 @@ snapshots:
       - sqlite3
       - supports-color
 
-  '@payloadcms/db-vercel-postgres@3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(react@19.0.0)':
+  '@payloadcms/db-vercel-postgres@3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(postgres@3.4.5)(react@19.0.0)':
     dependencies:
-      '@payloadcms/drizzle': 3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(react@19.0.0)
+      '@payloadcms/drizzle': 3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)
       '@vercel/postgres': 0.9.0
       console-table-printer: 2.12.1
       drizzle-kit: 0.28.0
-      drizzle-orm: 0.36.1(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(react@19.0.0)
+      drizzle-orm: 0.36.1(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)
       payload: 3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5)
       pg: 8.11.3
       prompts: 2.4.2
@@ -9601,10 +9608,10 @@ snapshots:
       - sqlite3
       - supports-color
 
-  '@payloadcms/drizzle@3.14.0(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(react@19.0.0)':
+  '@payloadcms/drizzle@3.14.0(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)':
     dependencies:
       console-table-printer: 2.12.1
-      drizzle-orm: 0.36.1(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(react@19.0.0)
+      drizzle-orm: 0.36.1(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)
       payload: 3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5)
       prompts: 2.4.2
       to-snake-case: 1.0.0
@@ -9640,10 +9647,10 @@ snapshots:
       - sql.js
       - sqlite3
 
-  '@payloadcms/drizzle@3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(react@19.0.0)':
+  '@payloadcms/drizzle@3.14.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(payload@3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5))(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)':
     dependencies:
       console-table-printer: 2.12.1
-      drizzle-orm: 0.36.1(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(react@19.0.0)
+      drizzle-orm: 0.36.1(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(postgres@3.4.5)(react@19.0.0)
       payload: 3.14.0(bufferutil@4.0.9)(graphql@16.10.0)(monaco-editor@0.52.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.2)(utf-8-validate@6.0.5)
       prompts: 2.4.2
       to-snake-case: 1.0.0
@@ -11751,28 +11758,31 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.36.1(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(react@19.0.0):
+  drizzle-orm@0.36.1(@types/pg@8.10.2)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(postgres@3.4.5)(react@19.0.0):
     optionalDependencies:
       '@types/pg': 8.10.2
       '@types/react': 19.0.1
       '@vercel/postgres': 0.9.0
       pg: 8.11.3
+      postgres: 3.4.5
       react: 19.0.0
 
-  drizzle-orm@0.36.1(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(react@19.0.0):
+  drizzle-orm@0.36.1(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.11.3)(postgres@3.4.5)(react@19.0.0):
     optionalDependencies:
       '@types/pg': 8.11.10
       '@types/react': 19.0.1
       '@vercel/postgres': 0.9.0
       pg: 8.11.3
+      postgres: 3.4.5
       react: 19.0.0
 
-  drizzle-orm@0.37.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.13.1)(react@19.0.0):
+  drizzle-orm@0.37.0(@types/pg@8.11.10)(@types/react@19.0.1)(@vercel/postgres@0.9.0)(pg@8.13.1)(postgres@3.4.5)(react@19.0.0):
     optionalDependencies:
       '@types/pg': 8.11.10
       '@types/react': 19.0.1
       '@vercel/postgres': 0.9.0
       pg: 8.13.1
+      postgres: 3.4.5
       react: 19.0.0
 
   dunder-proto@1.0.0:
@@ -14105,6 +14115,8 @@ snapshots:
   postgres-interval@3.0.0: {}
 
   postgres-range@1.1.4: {}
+
+  postgres@3.4.5: {}
 
   posthog-js@1.194.5:
     dependencies:

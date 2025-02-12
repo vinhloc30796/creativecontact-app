@@ -10,8 +10,9 @@ interface QRCodeWithHoverProps {
 const QRCodeWithHover: React.FC<QRCodeWithHoverProps> = ({ qrCode, onSave }) => {
   return (
     <div className="relative group">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={qrCode} alt="Registration QR Code" className="w-48 h-48" />
-      <div 
+      <div
         className="absolute inset-0 bg-primary/80 bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
         onClick={onSave}
       >

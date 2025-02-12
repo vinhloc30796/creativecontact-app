@@ -1,8 +1,8 @@
-import { logoutStaff } from "@/app/actions/auth/staff";
+import { logoutStaff } from "@/app/actions/auth/logoutStaff";
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 
-export async function POST() {
+export const POST = async () => {
   const result = await logoutStaff();
 
   if (result.error) {
