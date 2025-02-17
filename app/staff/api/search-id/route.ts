@@ -5,24 +5,7 @@
  * It's protected by Payload authentication - only staff members can access it.
  *
  * Example usage with curl:
- * ```bash
- * # First get a token by logging into Payload admin
- * # Then use that token in the Authorization header
  *
- * curl -X POST \
- *   http://localhost:3000/staff/api/search-id \
- *   -H 'Content-Type: application/json' \
- *   -H 'Authorization: Bearer YOUR_PAYLOAD_TOKEN' \
- *   -d '{"id": "123e4567-e89b-12d3-a456-426614174000"}'
- * ```
- *
- * Responses:
- * - 200: Registration found (returns registration data)
- * - 400: Invalid UUID format
- * - 401: Not authenticated
- * - 404: Registration not found
- * - 500: Server error
- */
 
 import { eventRegistrations } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
