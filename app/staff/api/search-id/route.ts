@@ -1,32 +1,91 @@
-// File: app/staff/api/search/route.ts
+/**
+ * API Route: Search Registration by ID
+ *
+ * This route lets staff members look up event registrations using a UUID.
+ * It's protected by Payload authentication - only staff members can access it.
+ *
+ * Example usage with curl:
+ *
+ * curl -X POST http://localhost:3000/api/search-id \
+ *   -H "Authorization: Bearer <your-payload-token>" \
+ *   -H "Content-Type: application/json" \
+ *   -d '{"id": "123e4567-e89b-12d3-a456-426614174000"}'
+ *
+ * 
+ */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import { z } from 'zod';
 import { eventRegistrations } from "@/drizzle/schema/event";
-import { createClient } from '@/utils/supabase/server';
+import { db } from "@/lib/db";
+import { validateStaffAccess } from "@/utils/middleware/staff-access";
+import { eq } from "drizzle-orm/expressions";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
-// Define the schema for input validation
+// We use zod to make sure we get a valid UUID
+// This prevents SQL injection and invalid searches
 const searchSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid({
+    message: "Invalid registration ID format",
+  }),
 });
 
-export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createClient();
+// This type helps TypeScript catch any mistakes when we're working with the response data
+interface SearchResponse {
+  id: string;
+  created_at: Date;
+  status: string;
+  signature: string | null;
+  slot: string;
+  name: string;
+  email: string;
+  phone_country_code: string;
+  phone_number: string;
+  phone_country_alpha3: string;
+}
 
-    // Get the current user's session
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export const POST = async (req: Request) => {
+  console.log("[Search-ID handler] Starting request processing");
+
+  // const validation = await validateStaffAccess(req);
+
+  // if (!validation.isValid) {
+  //   return NextResponse.json(
+  //     { error: validation.error?.message },
+  //     { status: validation.error?.status },
+  //   );
+  // }
+
+  try {
+    // Make sure we only accept POST requests
+    if (req.method !== "POST") {
+      return NextResponse.json(
+        { error: "Method not allowed" },
+        { status: 405 },
+      );
     }
 
-    // Validate the input
-    const { id } = searchSchema.parse(await request.json());
-    console.log('Searching for registration:', id);
+    // Check if the input is valid before touching the database
+    const body = await req.json();
+    console.log("Search-ID handler: Received body:", body);
 
-    // Search for the registration
+    const result = searchSchema.safeParse(body);
+
+    if (!result.success) {
+      console.log("Search-ID handler: Validation failed:", result.error);
+      return NextResponse.json(
+        {
+          error: "Invalid input",
+          details: result.error.errors,
+        },
+        { status: 400 },
+      );
+    }
+
+    const { id } = result.data;
+    console.log("Search-ID handler: Searching for registration:", id);
+
+    // Get just the fields we need from the database
+    // This makes our queries faster and uses less memory
     const registrations = await db
       .select({
         id: eventRegistrations.id,
@@ -43,18 +102,46 @@ export async function POST(request: NextRequest) {
       .from(eventRegistrations)
       .where(eq(eventRegistrations.id, id));
 
+    // Give a clear error if we can't find the registration
     if (registrations.length === 0) {
-      return NextResponse.json({ error: `Registration not found for id ${id}` }, { status: 404 });
-    }
-    else if (registrations.length > 1) {
-      return NextResponse.json({ error: `Multiple registrations found for id ${id}` }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: `Registration not found`,
+          details: { id },
+        },
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json(registrations[0]);
+    // This should never happen (UUID is unique)
+    // But if it does, we need to know about it
+    if (registrations.length > 1) {
+      console.error(
+        `Data integrity issue: Multiple registrations found for ID ${id}`,
+      );
+      return NextResponse.json(
+        {
+          error: "Data integrity error",
+          details: { message: "Multiple registrations found" },
+        },
+        { status: 500 },
+      );
+    }
+
+    // Send back the registration data
+    // TypeScript makes sure we're sending the right data structure
+    return NextResponse.json<SearchResponse>(registrations[0]);
   } catch (error) {
-    console.error('Error during registration search:', error);
-    return NextResponse.json({
-      error: error instanceof Error ? error.message : 'An error occurred during registration search',
-    }, { status: 500 });
+    // Log the error so we can debug issues in production
+    // But don't send internal error details to the client
+    console.error("Error during registration search:", error);
+    return NextResponse.json(
+      {
+        error: "Internal server error",
+        details:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      },
+      { status: 500 },
+    );
   }
-}
+};

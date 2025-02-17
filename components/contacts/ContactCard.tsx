@@ -44,6 +44,7 @@ export function ContactCard({
     <Card className="flex flex-col h-full">
       <CardHeader className="p-0 overflow-hidden">
         <div className="relative w-full h-48">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={contactImage}
             alt={`${name}'s profile`}

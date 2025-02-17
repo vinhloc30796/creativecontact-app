@@ -111,6 +111,7 @@ export function ProfileCard({
     <Card className="flex h-fit flex-col overflow-auto">
       <CardHeader className="flex flex-col items-center">
         <div className="mb-4 h-24 w-24 overflow-hidden rounded-lg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={profilePictureUrl}
             alt={`${name}'s profile picture`}
@@ -132,6 +133,7 @@ export function ProfileCard({
             {t("openToCollab")}
           </Badge>
           <Badge variant="secondary" className="flex items-center">
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image className="mr-1 h-3 w-3" />
             {portfolioArtworks.length} {t("artworks")}
           </Badge>

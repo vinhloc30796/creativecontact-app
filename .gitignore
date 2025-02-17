@@ -24,6 +24,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
 
 # local env files
 .env*.local
@@ -37,3 +38,9 @@ next-env.d.ts
 
 # react-email
 .react-email
+
+# log
+code2prompt.log
+
+# diffs
+*.diff

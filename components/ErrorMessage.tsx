@@ -8,7 +8,7 @@ export function ErrorMessage({ errorMessage }: { errorMessage: string }) {
     if (errorMessage) {
       toast.error(errorMessage);
     }
-  }, []);
+  }, [errorMessage]);
 
   return null;
 }

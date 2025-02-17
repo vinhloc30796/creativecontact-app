@@ -11,7 +11,7 @@ import {
   portfolioArtworks,
 } from "@/drizzle/schema/portfolio";
 import { db } from "@/lib/db";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 import { eq, and } from "drizzle-orm";
 
 export async function fetchUserPortfolioArtworks(
@@ -37,9 +37,9 @@ export async function fetchUserPortfolioArtworksWithDetails(
     .where(
       artworkId
         ? and(
-            eq(portfolioArtworks.userId, userId),
-            eq(portfolioArtworks.id, artworkId),
-          )
+          eq(portfolioArtworks.userId, userId),
+          eq(portfolioArtworks.id, artworkId),
+        )
         : eq(portfolioArtworks.userId, userId),
     )
     .innerJoin(artworks, eq(portfolioArtworks.artworkId, artworks.id));
@@ -65,6 +65,7 @@ export async function calculateUserDataUsage(userId: string) {
 
   for (const result of results) {
     const artworkId = result.portfolioArtworks;
+    const supabase = await createClient();
     const query = supabase.storage.from("artwork_assets").list(artworkId);
     const { data, error } = await query;
     console.log("Data: ", data);

@@ -286,6 +286,7 @@ export function ProfessionalSection({
     selectedIndustryExperiences,
     selectedSkills,
     userData.industryExperiences,
+    userData.userSkills,
     setFieldDirty,
     setFormData,
   ]);

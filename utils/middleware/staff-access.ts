@@ -1,59 +1,95 @@
-// File: utils/staff-access.ts
+import { getCustomPayload } from '@/lib/payload';
+import { NextResponse } from 'next/server';
+import { User } from 'payload';
 
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/custom-middleware";
-import { PASSWORD_COOKIE_NAME, STAFF_PASSWORD } from "@/app/staff-access/const";
+const payload = await getCustomPayload()
 
-export async function handleStaffAccess(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createClient(req);
+export async function validateStaffAccess(request: Request): Promise<{
+  isValid: boolean;
+  user?: User;
+  error?: { message: string; status: number };
+}> {
+  try {
+    const cookies = request.headers.get('cookie');
+    const token = cookies?.match(/payload-token=([^;]+)/)?.[1];
 
-  const {data: { user }} = await supabase.auth.getUser();
+    if (!token) {
+      return {
+        isValid: false,
+        error: { message: 'Unauthorized - No token provided', status: 401 }
+      };
+    }
 
-  const pathname = req.nextUrl.pathname;
-  // Staff password
-  const isPasswordPage = pathname === "/staff-access/password";
-  // Staff pages
-  const isStaffRoute = pathname.startsWith("/staff/");
-  // Return early if it's not a staff route
-  if (!isStaffRoute) {
-    return NextResponse.next();
+    try {
+      const { user } = await payload.auth({
+        headers: new Headers({ cookie: `payload-token=${token}` })
+      });
+
+      if (!user || !user.active) {
+        return {
+          isValid: false,
+          error: { message: 'Unauthorized - Invalid or inactive user', status: 401 }
+        };
+      }
+
+      const hasStaffRole = user.roles?.some((role: string) =>
+        ['admin', 'check-in', 'content-creator'].includes(role)
+      );
+
+      if (!hasStaffRole) {
+        return {
+          isValid: false,
+          error: { message: 'Forbidden - Insufficient permissions', status: 403 }
+        };
+      }
+
+      return {
+        isValid: true,
+        user: {
+          ...user,
+          id: String(user.id)
+        }
+      };
+
+    } catch (tokenError) {
+      console.error('Token verification failed:', tokenError);
+      return {
+        isValid: false,
+        error: { message: 'Unauthorized - Invalid token', status: 401 }
+      };
+    }
+
+  } catch (error) {
+    console.error('Staff API protection error:', error);
+    return {
+      isValid: false,
+      error: { message: 'Internal server error', status: 500 }
+    };
   }
-  const isLoginPage = pathname === "/staff/login";
-  const isSignOutPage = pathname === "/staff/signout";
-  const isSignUpPage = pathname === "/staff/signup";
-  const isLoginCallback = pathname === "/staff/login-callback";
+}
 
-  // Check for password cookie
-  const passwordCookie = req.cookies.get(PASSWORD_COOKIE_NAME);
-  const hasValidPasswordCookie = passwordCookie?.value === STAFF_PASSWORD;
+export function protectStaffAPI(
+  handler: (
+    request: Request,
+    context: { params: { [key: string]: string | string[] } }
+  ) => Promise<NextResponse>
+) {
+  return async (
+    request: Request,
+    context: { params: { [key: string]: string | string[] } }
+  ) => {
+    const validation = await validateStaffAccess(request);
 
-  console.debug(
-    `Password cookie (querying ${PASSWORD_COOKIE_NAME}): ${passwordCookie?.value};`,
-    `Expected STAFF_PASSWORD: ${STAFF_PASSWORD};`,
-    "User:", user,
-    "with Request URL:", pathname,
-  );
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: validation.error?.message },
+        { status: validation.error?.status }
+      );
+    }
 
-  // 1. Block access to /staff/* routes if no valid password cookie
-  if (isStaffRoute && !hasValidPasswordCookie) {
-    console.log(`Invalid cookie: Redirecting from ${pathname} to /staff-access/password`)
-    return NextResponse.redirect(new URL("/staff-access/password", req.url));
-  }
-
-  // 2. Allow access to /staff/* routes if valid password cookie
-  if (isStaffRoute && hasValidPasswordCookie) {
-    return res;
-  }
-
-  // 3. Redirect /staff-access/password to /staff/login if valid cookie
-  if (isPasswordPage && hasValidPasswordCookie) {
-    console.log(
-      "Valid cookie: Redirecting from /staff-access/password to /staff/login",
+    return handler(
+      Object.assign(request, { user: validation.user }),
+      context
     );
-    return NextResponse.redirect(new URL("/staff/login", req.url));
-  }
-
-  // For all other cases, proceed with the request
-  return res;
+  };
 }

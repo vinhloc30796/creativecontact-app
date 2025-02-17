@@ -24,7 +24,7 @@ export function I18nProvider({ children, lng, fallbackLng = 'en' }: I18nProvider
       i18n.changeLanguage(fallbackLng)
     }
     setMounted(true)
-  }, [lng, searchParams])
+  }, [lng, fallbackLng, searchParams])
 
   if (!mounted) return null
 

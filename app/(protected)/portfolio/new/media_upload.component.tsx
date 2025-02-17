@@ -17,7 +17,7 @@ export function MediaUploadComponent(props: MediaUploadComponentProps) {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     addFiles(acceptedFiles)
     return [...fileUploads, ...acceptedFiles]
-  }, [])
+  }, [addFiles, fileUploads])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

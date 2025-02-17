@@ -2,79 +2,112 @@
 
 "use client"
 
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { login } from './actions';
-import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import React from 'react'
+import { useRouter } from 'next/navigation'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
+// UI Components
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
+import { AlertCircle } from 'lucide-react'
+
+// Auth
+import { loginStaff } from '@/app/actions/auth/staff'
+import type { AuthResult, StaffUser } from '@/app/actions/auth/types'
+
+// Schema
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
+  password: z.string().min(1, 'Password is required').min(8, 'Password must be at least 8 characters')
+})
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>
+
+const initialState: AuthResult<StaffUser> = {
+  data: null,
+  error: null
+}
 
 export default function LoginPage() {
-  let [loginError, setLoginError] = React.useState<string | null>(null);
+  const router = useRouter()
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [formError, setFormError] = React.useState<string | null>(null)
 
-  const router = useRouter();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
     },
-    mode: 'onChange',
-  });
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+  })
 
-  const onSubmit = async (data: LoginFormValues) => {
-    const formData = new FormData();
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    console.log("Attempting login for email:", data.email);
-    const result = await login(formData).then(
-      res => {
-        if (res.error) {
-          console.error('Error logging in:', res.error);
-          setLoginError(res.error);
-          return { success: false, error: res.error };
-        } else console.log("Login successful")
+  const { handleSubmit, formState: { errors } } = form
+
+  React.useEffect(() => {
+    const subscription = form.watch(() => {
+      if (formError) setFormError(null)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, formError])
+
+  const onSubmit: SubmitHandler<LoginFormValues> = async (data) => {
+    setIsLoading(true)
+    setFormError(null)
+    console.debug('[LoginPage] Form submitted with data:', data)
+
+    const formData = new FormData()
+    formData.append('email', data.email)
+    formData.append('password', data.password)
+
+    try {
+      const result = await loginStaff(initialState, formData)
+
+      if (result.error) {
+        console.error('[LoginPage] Login failed:', result.error)
+        setFormError(result.error.message)
+        form.setFocus('email')
+      } else {
+        router.push('/staff/checkin')
       }
-    ).catch(err => {
-      console.error('Error logging in:', err);
-      setLoginError('An unexpected error occurred. Please try again later.');
-      return { success: false, error: 'An unexpected error occurred. Please try again later.' };
-    });
-  };
+    } catch (error) {
+      console.error('[LoginPage] Unexpected error:', error)
+      setFormError('An unexpected error occurred. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleSignupClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push('/staff/signup');
-  };
+    e.preventDefault()
+    router.push('/staff/signup')
+  }
 
   const getFormErrors = () => {
-    const errors = form.formState.errors;
-    if (Object.keys(errors).length === 0 && !form.formState.isValid) {
-      return 'Please fill out all fields';
+    if (!form.formState.isValid) {
+      return Object.values(form.formState.errors)
+        .map(error => error?.message)
+        .filter(Boolean)
+        .join(', ')
     }
-    return Object.values(errors).map(error => error.message).join(', ');
-  };
+    return null
+  }
+
+  console.debug('[LoginPage] Current state:', form.formState)
 
   return (
     <BackgroundDiv>
       <Card className="w-full max-w-md">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-center">Staff: Login</CardTitle>
               <CardDescription className="text-muted-foreground text-center">
@@ -91,9 +124,9 @@ export default function LoginPage() {
                     <FormControl>
                       <Input
                         type="email"
-                        // Autocomplete attribute
                         autoComplete="username"
                         {...field}
+                        name="email"
                       />
                     </FormControl>
                     {form.formState.touchedFields.email && <FormMessage />}
@@ -109,9 +142,9 @@ export default function LoginPage() {
                     <FormControl>
                       <Input
                         type="password"
-                        // Autocomplete attribute
                         autoComplete="current-password"
                         {...field}
+                        name="password"
                       />
                     </FormControl>
                     {form.formState.touchedFields.password && <FormMessage />}
@@ -125,7 +158,12 @@ export default function LoginPage() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="inline-block">
-                        <Button type="submit" disabled={!form.formState.isValid}>Log in</Button>
+                        <Button
+                          type="submit"
+                          disabled={!form.formState.isValid || isLoading}
+                        >
+                          {isLoading ? 'Logging in...' : 'Log in'}
+                        </Button>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -133,17 +171,24 @@ export default function LoginPage() {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <Button onClick={handleSignupClick} variant="outline">Sign up</Button>
+                <Button
+                  onClick={handleSignupClick}
+                  variant="outline"
+                  disabled={isLoading}
+                >
+                  Sign up
+                </Button>
               </div>
-              {loginError && <Alert variant="destructive" className="mt-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{loginError}</AlertDescription>
-              </Alert>
-              }
+              {formError && (
+                <Alert variant="destructive" className="mt-6">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{formError}</AlertDescription>
+                </Alert>
+              )}
             </CardFooter>
           </form>
         </Form>
       </Card>
     </BackgroundDiv>
-  );
+  )
 }

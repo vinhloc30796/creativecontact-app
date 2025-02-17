@@ -130,7 +130,7 @@ export default function PortfolioEditForm({
       }));
       form.setValue("coartists", coartists);
     }
-  }, [artworkCredits]);
+  }, [artworkCredits, form]);
 
   console.log("Artwork credits:", artworkCredits);
 
@@ -201,11 +201,11 @@ export default function PortfolioEditForm({
                   artworks={
                     artwork?.artworks
                       ? [
-                          {
-                            ...artwork.artworks,
-                            description: artwork.artworks.description || "",
-                          },
-                        ]
+                        {
+                          ...artwork.artworks,
+                          description: artwork.artworks.description || "",
+                        },
+                      ]
                       : []
                   }
                 />
