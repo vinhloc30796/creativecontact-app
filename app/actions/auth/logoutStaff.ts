@@ -4,7 +4,12 @@ import { AuthResult, StaffUser } from "./types";
 
 export async function logoutStaff(): Promise<AuthResult<StaffUser>> {
     try {
-        const baseURL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        const baseURL = process.env.NODE_ENV === 'production'
+          ? process.env.NEXT_PUBLIC_APP_URL
+          : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_APP_URL) {
+          throw new Error('NEXT_PUBLIC_APP_URL is required in production');
+        }
         const logoutURL = `${baseURL}/payload-cms/api/staff/logout`;
 
         const requestHeaders = await headers();
