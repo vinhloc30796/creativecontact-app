@@ -7,4 +7,4 @@ import type { User } from 'payload'
  * @returns true if user has any of the specified roles, false otherwise
  */
 export const checkRole = (allRoles: User['roles'] = [], user: User | undefined): boolean =>
-  Boolean(user?.roles?.some(role => allRoles.includes(role)))
+  Boolean(user?.roles?.some((role: string) => allRoles.includes(role)))
