@@ -6,6 +6,13 @@
  *
  * Example usage with curl:
  *
+ * curl -X POST http://localhost:3000/api/search-id \
+ *   -H "Authorization: Bearer <your-payload-token>" \
+ *   -H "Content-Type: application/json" \
+ *   -d '{"id": "123e4567-e89b-12d3-a456-426614174000"}'
+ *
+ * 
+ */
 
 import { eventRegistrations } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
