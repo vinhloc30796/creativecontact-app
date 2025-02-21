@@ -1,6 +1,6 @@
 "use server";
 
-import { cookiePolicy } from "@/app/collections/staff";
+import { cookiePolicy } from "@/app/collections/Staffs";
 import { StaffCleanSignupInput } from "@/app/staff/signup/types";
 import { getCustomPayload } from "@/lib/payload";
 import { cookies } from "next/headers";
@@ -41,7 +41,7 @@ export async function loginStaff(
 
     // Authenticate with Payload
     const { user, token } = await payload.login({
-      collection: "staff",
+      collection: "staffs",
       data: { email, password },
     });
 
@@ -171,7 +171,7 @@ export async function signupStaff(
 
     // Create staff member
     const newStaff = await payload.create({
-      collection: "staff",
+      collection: "staffs",
       data: {
         email: data.email,
         password: data.password,
@@ -202,7 +202,7 @@ export async function signupStaff(
       data: {
         id: newStaff.id,
         email: newStaff.email,
-        collection: newStaff.collection,
+        collection: "staffs",
         createdAt: newStaff.createdAt,
         updatedAt: newStaff.updatedAt,
       } as StaffUser,

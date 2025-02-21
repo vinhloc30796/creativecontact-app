@@ -19,8 +19,8 @@ export const authPolicy = {
 } as IncomingAuthType;
 
 // Staff collection configuration for authentication and access control
-export const Staff: CollectionConfig = {
-  slug: 'staff',
+export const Staffs: CollectionConfig = {
+  slug: 'staffs',
   // Authentication settings with secure defaults
   auth: authPolicy,
   // Admin panel display settings
@@ -100,10 +100,10 @@ export const Staff: CollectionConfig = {
       async ({ req, user }) => {
         try {
           await req.payload.update({
-            collection: 'staff',
+            collection: 'staffs',
             id: user.id,
             data: {
-              lastLogin: new Date(),
+              lastLogin: new Date().toISOString(),
             }
           })
         } catch (err) {
