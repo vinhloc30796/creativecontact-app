@@ -121,7 +121,7 @@ export interface Post {
   image?: (number | null) | Media;
   useVideo?: boolean | null;
   videoUrl?: string | null;
-  lexicalContent?: {
+  content?: {
     root: {
       type: string;
       children: {
@@ -254,7 +254,7 @@ export interface PostsSelect<T extends boolean = true> {
   image?: T;
   useVideo?: T;
   videoUrl?: T;
-  lexicalContent?: T;
+  content?: T;
   relatedPosts?: T;
   slug?: T;
   authors?: T;

@@ -13,7 +13,10 @@
     "lint": "next lint",
     "db:migrate": "node -r esbuild-register db/migrate.ts",
     "extract": "formatjs extract app/**/*.{ts,tsx,jsx,js} --ignore='**/*.d.ts' --out-file ./extracted/en.json",
-    "generate:types": "payload generate:types"
+    "generate:types": "payload generate:types",
+    "generate:importMap": "payload generate:importMap",
+    "generate:importMap:help": "payload generate:importMap --help",
+    "check:types": "tsc --noEmit"
   },
   "dependencies": {
     "@designbycode/tailwindcss-text-shadow": "^2.2.1",
@@ -24,7 +27,7 @@
     "@payloadcms/live-preview-react": "^3.14.0",
     "@payloadcms/next": "^3.14.0",
     "@payloadcms/richtext-lexical": "^3.14.0",
-    "@payloadcms/storage-s3": "^3.24.0",
+    "@payloadcms/storage-s3": "^3.14.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-collapsible": "^1.1.1",

@@ -10,6 +10,8 @@ import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv"
 import { Badge } from "@/components/ui/badge"
 import { Post } from "@/payload-types"
 import { Staff } from "@/payload-types"
+import { RichText } from '@payloadcms/richtext-lexical/react'
+import { H1, P, Lead } from "@/components/ui/typography"
 
 async function BlogPostsList() {
   const payload = await getCustomPayload()
@@ -27,10 +29,10 @@ async function BlogPostsList() {
   if (!posts.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <h2 className="text-2xl font-bold mb-4">No posts found</h2>
-        <p className="text-muted-foreground mb-6">
+        <H1 size="2">No posts found</H1>
+        <P className="mb-6">
           It looks like there are no blog posts published yet.
-        </p>
+        </P>
         <Button asChild>
           <Link href="/">Return Home</Link>
         </Button>
@@ -55,9 +57,9 @@ async function BlogPostsList() {
           </CardHeader>
           <CardContent className="flex-1 p-6">
             <CardTitle className="mb-4">{post.title}</CardTitle>
-            <p className="text-muted-foreground line-clamp-3">
+            <P className="text-muted-foreground line-clamp-3">
               {post.excerpt || 'No excerpt available'}
-            </p>
+            </P>
           </CardContent>
           <CardFooter className="flex justify-between items-center p-6">
             <div className="space-y-2">
@@ -72,9 +74,9 @@ async function BlogPostsList() {
                   <Badge variant="secondary">Unknown Author</Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <P className="text-xs text-muted-foreground">
                 {format(new Date(post.publishedOn), 'MMM dd, yyyy')}
-              </p>
+              </P>
             </div>
             <Button asChild variant="outline">
               <Link href={`/blog/${post.slug}`}>Read more</Link>
@@ -112,10 +114,10 @@ export default function BlogPage() {
     <BackgroundDiv eventSlug="hoantat-2024" shouldCenter={false}>
       <div className="container py-12">
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Blog</h1>
-          <p className="text-lg text-muted-foreground">
+          <H1>Blog</H1>
+          <Lead>
             Latest news and updates from our team
-          </p>
+          </Lead>
         </div>
 
         <Suspense fallback={<LoadingSkeleton />}>

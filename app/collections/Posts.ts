@@ -10,6 +10,12 @@ import { slugField } from '@/app/fields/slug'
 import { formatPreviewURL } from '@/lib/formatPreviewUrl'
 import { admins } from './access/admins'
 import { publishedOnly } from './access/publishedOnly'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import {
+  HeadingFeature,
+  LinkFeature,
+  ParagraphFeature,
+} from '@payloadcms/richtext-lexical'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -68,8 +74,9 @@ export const Posts: CollectionConfig = {
       label: 'Video URL',
     },
     {
-      name: 'lexicalContent',
+      name: 'content',
       type: 'richText',
+      editor: lexicalEditor(),
     },
     {
       name: 'relatedPosts',

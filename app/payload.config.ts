@@ -1,12 +1,11 @@
-import { Staffs } from '@/app/collections/Staffs'
 import { Media } from '@/app/collections/Media'
 import { Posts } from '@/app/collections/Posts'
+import { Staffs } from '@/app/collections/Staffs'
 import { postgresAdapter } from '@payloadcms/db-postgres'
-// import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { buildConfig, SanitizedConfig } from 'payload'
 import sharp from 'sharp'
-import { s3Storage } from '@payloadcms/storage-s3'
 
 const payloadSecret = process.env.PAYLOAD_SECRET!
 const databaseUrl = process.env.DATABASE_URL!
@@ -15,10 +14,11 @@ console.log('[payload.config.ts] payloadSecret:', payloadSecret, 'databaseUrl:',
 const payloadConfig: Promise<SanitizedConfig> = buildConfig({
   // If you'd like to use Rich Text, pass your editor here
   editor: lexicalEditor(),
+  // Root
   // Routing
   routes: {
-    admin: '/payload-cms/admin',
-    api: '/payload-cms/api',
+    admin: '/payload-admin',
+    api: '/payload-api',
   },
   // Define and configure your collections in this array
   collections: [
