@@ -8,7 +8,7 @@ export interface AuthResult<T = unknown> {
 }
 
 export interface StaffUser {
-  id: string;
+  id: number | string;
   email: string;
   role?: string;
   collection: string;

@@ -2,248 +2,371 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-	:root {
-		--background: 0, 0%, 100%;
-		--foreground: 11.25, 50%, 6.27%;
-
-		--primary: 11.93, 86.1%, 63.33%;
-		--primary-foreground: 0, 0%, 100%;
-
-		--card: 0, 0%, 100%;
-		--card-foreground: 11.25, 50%, 6.27%;
-
-		--popover: 0, 0%, 100%;
-		--popover-foreground: 11.25, 50%, 6.27%;
-
-		--secondary: 12.5, 85.71%, 94.51%;
-		--secondary-foreground: 0, 0%, 0%;
-
-		--muted: 11.25, 88.89%, 96.47%;
-		--muted-foreground: 0, 0%, 40%;
-
-		--accent: 11.25, 88.89%, 96.47%;
-		--accent-foreground: 11.93, 86.1%, 63.33%;
-
-		--destructive: 0, 84.2%, 60.2%;
-		--destructive-foreground: 210, 40%, 98%;
-
-		--border: 0, 0%, 90.2%;
-		--input: 0, 0%, 90.2%;
-		--ring: 11.93, 86.1%, 63.33%;
-
-		--radius: 0.1rem;
-	}
-	.dark {
-		--primary: 11.93, 86.1%, 63.33%;
-		--primary-foreground: 0, 0%, 100%;
-
-		--card: 0, 0%, 0%;
-		--card-foreground: 12.5, 85.71%, 94.51%;
-
-		--popover: 0, 0%, 0%;
-		--popover-foreground: 12.5, 85.71%, 94.51%;
-
-		--secondary: 12.63, 50.44%, 22.16%;
-		--secondary-foreground: 0, 0%, 100%;
-
-		--muted: 0, 0%, 9.8%;
-		--muted-foreground: 0, 0%, 50.2%;
-
-		--accent: 12.63, 50.44%, 22.16%;
-		--accent-foreground: 12.5, 85.71%, 94.51%;
-
-		--destructive: 0, 84.2%, 60.2%;
-		--destructive-foreground: 210, 40%, 98%;
-
-		--border: 0, 0%, 14.9%;
-		--input: 0, 0%, 14.9%;
-		--ring: 11.93, 86.1%, 63.33%;
-
-		--radius: 0.1rem;
-	}
-
-	/* https://coolors.co/e4aac2-551b33-75cf54-db0058-c98e36 */
-	/* https://www.realtimecolors.com/?colors=e4aac2-551b33-75cf54-db0058-c98e36&fonts=Plus%20Jakarta%20Sans-Plus%20Jakarta%20Sans */
-	[data-theme="trungthu-archive-2024"] {
-		--background: 335, 52%, 88%;
-		--foreground: 325, 52%, 9%;
-
-		--card: 335, 52%, 88%;
-		--card-foreground: 325, 52%, 9%;
-
-		--popover: 335, 52%, 88%;
-		--popover-foreground: 325, 52%, 9%;
-
-		--primary: 336, 100%, 57%; /* #ff257c */
-		--primary-50: 334.29, 100.0%, 97.25%; /* #fff1f7 */
-		--primary-100: 336.67, 100.0%, 92.94%; /* #ffdbe9 */
-		--primary-200: 336.16, 100.0%, 85.69%; /* #ffb6d3 */
-		--primary-300: 335.78, 100.0%, 78.63%; /* #ff92be */
-		--primary-400: 336.0, 100.0%, 71.57%; /* #ff6ea8 */
-		--primary-500: 335.93, 100.0%, 64.31%; /* #ff4992 */
-		--primary-600: 336.14, 100.0%, 49.8%; /* #fe0065 */
-		--primary-700: 336.11, 100.0%, 42.35%; /* #d80056 */
-		--primary-800: 336.07, 100.0%, 34.9%; /* #b20047 */
-		--primary-900: 336.0, 89.0%, 22.45%; /* #6a062f */
-		--primary-1000: 0, 51.0%, 7%; /* #1c0909 */
-		--primary-foreground: 334.29, 100.0%, 97.25%;
-
-		--secondary: 356.59, 92.63%, 37.25%; /* #b70711 */
-		--secondary-50: 351.0, 100.0%, 96.08%; /* #ffebee */
-		--secondary-100: 346.67, 100.0%, 89.41%; /* #ffc9d5 */
-		--secondary-200: 343.15, 100.0%, 82.55%; /* #ffa6bf */
-		--secondary-300: 341.13, 100.0%, 75.69%; /* #ff83aa */
-		--secondary-400: 340.0, 100.0%, 68.82%; /* #ff6095 */
-		--secondary-500: 339.28, 100.0%, 61.96%; /* #ff3d80 */
-		--secondary-600: 338.12, 100.0%, 50.0%; /* #ff005d */
-		--secondary-700: 336.11, 100.0%, 42.35%; /* #d80056 */
-        --secondary-800: 336.07, 100.0%, 34.9%; /* #b20047 */
-        --secondary-900: 336.0, 100.0%, 27.45%; /* #8c0038 */
-        --secondary-1000: 335.88, 100.0%, 20.0%; /* #660029 */
-		--secondary-foreground: 346.67, 100.0%, 89.41%;
-
-		--muted: 329.07, 51.32%, 37.06%; /* #8F2E60 */
-		--muted-50: 340.0, 10.34%, 94.31%; /* #F2EFF0 */
-		--muted-100: 340.0, 16.67%, 92.94%; /* #F0EAEC */
-		--muted-200: 335.29, 32.08%, 89.61%; /* #EDDCE3 */
-		--muted-300: 336.92, 37.14%, 86.27%; /* #E9CFD9 */
-		--muted-400: 336.36, 37.08%, 82.55%; /* #E3C2CF */
-		--muted-500: 335.12, 36.28%, 77.84%; /* #DBB2C3 */
-		--muted-600: 335.29, 35.66%, 71.96%; /* #D19EB3 */
-		--muted-700: 334.29, 34.81%, 64.51%; /* #C485A0 */
-		--muted-800: 329.07, 51.32%, 37.06%; /* #8F2E60 */
-		--muted-900: 327.84, 62.58%, 30.39%; /* #7E1D51 */
-		--muted-1000: 329.69, 47.78%, 39.8%; /* #963566 */
-		--muted-foreground: 329, 52%, 55%; /* #8F2E60 */
-
-		--accent: 103.9, 56.16%, 42.94%; /* #51AB30 */
-		--accent-50: 102.86, 16.28%, 91.57%; /* #e8ede6 */
-		--accent-100: 106.67, 28.12%, 87.45%; /* #dae8d6 */
-		--accent-200: 107.14, 31.82%, 82.75%; /* #cbe1c5 */
-		--accent-300: 106.83, 35.04%, 77.06%; /* #b9d9b0 */
-		--accent-400: 106.67, 35.06%, 69.8%; /* #a3cd97 */
-		--accent-500: 106.67, 35.29%, 60.0%; /* #85bd75 */
-		--accent-600: 105.44, 44.21%, 45.69%; /* #5aa841 */
-		--accent-700: 103.9, 56.16%, 42.94%; /* #51ab30 */
-		--accent-800: 104.42, 50.0%, 40.78%; /* #4f9c34 */
-		--accent-900: 103.64, 100.0%, 21.57%; /* #1e6e00 */
-		--accent-1000: 105.88, 39.53%, 16.86%; /* #223c1a */
-		--accent-foreground: 325, 52%, 9%;
-
-		--destructive: 0, 85%, 60%;
-		--destructive-foreground: 325, 52%, 9%;
-
-		--border: 325.85, 52.0%, 75.49%;
-		--input: 325.85, 52.0%, 75.49%;
-		--ring: 87, 86%, 40%;
-		
-		--radius: 0.1rem;
-	  }
-	
-	/* https://coolors.co/f3f1f2-010101-dea3a5-f86134-283bdd */
-	/* https://www.realtimecolors.com/?colors=010101-F3F1F2-F86134-283BDD-dea3a5&fonts=Plus%20Jakarta%20Sans-Plus%20Jakarta%20Sans */
-	[data-theme="early-access-2024"] {
-		--background: 330, 8%, 95%;
-		--foreground: 0, 0%, 0%;
-		
-		--card: 330, 8%, 95%;
-		--card-foreground: 0, 0%, 0%;
-		
-		--popover: 330, 8%, 95%;
-		--popover-foreground: 0, 0%, 0%;
-		
-		--primary: 14, 93%, 59%;
-		--primary-foreground: 0, 0%, 0%;
-		--secondary: 358, 47%, 75%;
-		--secondary-foreground: 0, 0%, 0%;
-		
-		--muted: 330, 8%, 20%;
-		--muted-foreground: 0, 0%, 70%;
-		
-		--accent: 234, 73%, 51%;
-		--accent-foreground: 330, 8%, 95%;
-		
-		--destructive: 0, 85%, 60%;
-		--destructive-foreground: 0, 0%, 0%;
-		
-		--border: 330, 8%, 20%;
-		--input: 330, 8%, 20%;
-		--ring: 234, 73%, 40%;
-		
-		--radius: 0.1rem;
-	}
+/* See 
+  - https://github.com/payloadcms/payload/issues/8878 for issue discussion
+  - https://payloadcms.com/docs/admin/customizing-css for detailed info "Specificity Rules"
+  All Payload CSS is encapsulated inside CSS layers 'payload-default'. Any custom css will now have the highest possible specificity.
+  We have also provided a layer 'payload' if you want to use layers and ensure that your styles are applied after payload.
+  To override existing styles in a way that the previous rules of specificity would be respected you can use the default layer like so
+*/
+@layer payload-default {
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
 }
 
 @layer base {
-	* {
-		@apply border-border;
-	}
-	body {
-		@apply bg-background text-foreground;
-	}
+  :root {
+    --background: 0, 0%, 100%;
+    --foreground: 11.25, 50%, 6.27%;
+
+    --primary: 11.93, 86.1%, 63.33%;
+    --primary-foreground: 0, 0%, 100%;
+
+    --card: 0, 0%, 100%;
+    --card-foreground: 11.25, 50%, 6.27%;
+
+    --popover: 0, 0%, 100%;
+    --popover-foreground: 11.25, 50%, 6.27%;
+
+    --secondary: 12.5, 85.71%, 94.51%;
+    --secondary-foreground: 0, 0%, 0%;
+
+    --muted: 11.25, 88.89%, 96.47%;
+    --muted-foreground: 0, 0%, 40%;
+
+    --accent: 11.25, 88.89%, 96.47%;
+    --accent-foreground: 11.93, 86.1%, 63.33%;
+
+    --destructive: 0, 84.2%, 60.2%;
+    --destructive-foreground: 210, 40%, 98%;
+
+    --border: 0, 0%, 90.2%;
+    --input: 0, 0%, 90.2%;
+    --ring: 11.93, 86.1%, 63.33%;
+
+    --radius: 0.1rem;
+  }
+  .dark {
+    --primary: 11.93, 86.1%, 63.33%;
+    --primary-foreground: 0, 0%, 100%;
+
+    --card: 0, 0%, 0%;
+    --card-foreground: 12.5, 85.71%, 94.51%;
+
+    --popover: 0, 0%, 0%;
+    --popover-foreground: 12.5, 85.71%, 94.51%;
+
+    --secondary: 12.63, 50.44%, 22.16%;
+    --secondary-foreground: 0, 0%, 100%;
+
+    --muted: 0, 0%, 9.8%;
+    --muted-foreground: 0, 0%, 50.2%;
+
+    --accent: 12.63, 50.44%, 22.16%;
+    --accent-foreground: 12.5, 85.71%, 94.51%;
+
+    --destructive: 0, 84.2%, 60.2%;
+    --destructive-foreground: 210, 40%, 98%;
+
+    --border: 0, 0%, 14.9%;
+    --input: 0, 0%, 14.9%;
+    --ring: 11.93, 86.1%, 63.33%;
+
+    --radius: 0.1rem;
+  }
+
+  /* https://coolors.co/e4aac2-551b33-75cf54-db0058-c98e36 */
+  /* https://www.realtimecolors.com/?colors=e4aac2-551b33-75cf54-db0058-c98e36&fonts=Plus%20Jakarta%20Sans-Plus%20Jakarta%20Sans */
+  [data-theme="trungthu-archive-2024"] {
+    --background: 335, 52%, 88%;
+    --foreground: 325, 52%, 9%;
+
+    --card: 335, 52%, 88%;
+    --card-foreground: 325, 52%, 9%;
+
+    --popover: 335, 52%, 88%;
+    --popover-foreground: 325, 52%, 9%;
+
+    --primary: 336, 100%, 57%; /* #ff257c */
+    --primary-50: 334.29, 100%, 97.25%; /* #fff1f7 */
+    --primary-100: 336.67, 100%, 92.94%; /* #ffdbe9 */
+    --primary-200: 336.16, 100%, 85.69%; /* #ffb6d3 */
+    --primary-300: 335.78, 100%, 78.63%; /* #ff92be */
+    --primary-400: 336, 100%, 71.57%; /* #ff6ea8 */
+    --primary-500: 335.93, 100%, 64.31%; /* #ff4992 */
+    --primary-600: 336.14, 100%, 49.8%; /* #fe0065 */
+    --primary-700: 336.11, 100%, 42.35%; /* #d80056 */
+    --primary-800: 336.07, 100%, 34.9%; /* #b20047 */
+    --primary-900: 336, 89%, 22.45%; /* #6a062f */
+    --primary-1000: 0, 51%, 7%; /* #1c0909 */
+    --primary-foreground: 334.29, 100%, 97.25%;
+
+    --secondary: 356.59, 92.63%, 37.25%; /* #b70711 */
+    --secondary-50: 351, 100%, 96.08%; /* #ffebee */
+    --secondary-100: 346.67, 100%, 89.41%; /* #ffc9d5 */
+    --secondary-200: 343.15, 100%, 82.55%; /* #ffa6bf */
+    --secondary-300: 341.13, 100%, 75.69%; /* #ff83aa */
+    --secondary-400: 340, 100%, 68.82%; /* #ff6095 */
+    --secondary-500: 339.28, 100%, 61.96%; /* #ff3d80 */
+    --secondary-600: 338.12, 100%, 50%; /* #ff005d */
+    --secondary-700: 336.11, 100%, 42.35%; /* #d80056 */
+    --secondary-800: 336.07, 100%, 34.9%; /* #b20047 */
+    --secondary-900: 336, 100%, 27.45%; /* #8c0038 */
+    --secondary-1000: 335.88, 100%, 20%; /* #660029 */
+    --secondary-foreground: 346.67, 100%, 89.41%;
+
+    --muted: 329.07, 51.32%, 37.06%; /* #8F2E60 */
+    --muted-50: 340, 10.34%, 94.31%; /* #F2EFF0 */
+    --muted-100: 340, 16.67%, 92.94%; /* #F0EAEC */
+    --muted-200: 335.29, 32.08%, 89.61%; /* #EDDCE3 */
+    --muted-300: 336.92, 37.14%, 86.27%; /* #E9CFD9 */
+    --muted-400: 336.36, 37.08%, 82.55%; /* #E3C2CF */
+    --muted-500: 335.12, 36.28%, 77.84%; /* #DBB2C3 */
+    --muted-600: 335.29, 35.66%, 71.96%; /* #D19EB3 */
+    --muted-700: 334.29, 34.81%, 64.51%; /* #C485A0 */
+    --muted-800: 329.07, 51.32%, 37.06%; /* #8F2E60 */
+    --muted-900: 327.84, 62.58%, 30.39%; /* #7E1D51 */
+    --muted-1000: 329.69, 47.78%, 39.8%; /* #963566 */
+    --muted-foreground: 329, 52%, 55%; /* #8F2E60 */
+
+    --accent: 103.9, 56.16%, 42.94%; /* #51AB30 */
+    --accent-50: 102.86, 16.28%, 91.57%; /* #e8ede6 */
+    --accent-100: 106.67, 28.12%, 87.45%; /* #dae8d6 */
+    --accent-200: 107.14, 31.82%, 82.75%; /* #cbe1c5 */
+    --accent-300: 106.83, 35.04%, 77.06%; /* #b9d9b0 */
+    --accent-400: 106.67, 35.06%, 69.8%; /* #a3cd97 */
+    --accent-500: 106.67, 35.29%, 60%; /* #85bd75 */
+    --accent-600: 105.44, 44.21%, 45.69%; /* #5aa841 */
+    --accent-700: 103.9, 56.16%, 42.94%; /* #51ab30 */
+    --accent-800: 104.42, 50%, 40.78%; /* #4f9c34 */
+    --accent-900: 103.64, 100%, 21.57%; /* #1e6e00 */
+    --accent-1000: 105.88, 39.53%, 16.86%; /* #223c1a */
+    --accent-foreground: 325, 52%, 9%;
+
+    --destructive: 0, 85%, 60%;
+    --destructive-foreground: 325, 52%, 9%;
+
+    --border: 325.85, 52%, 75.49%;
+    --input: 325.85, 52%, 75.49%;
+    --ring: 87, 86%, 40%;
+
+    --radius: 0.1rem;
+  }
+
+  /* https://coolors.co/f3f1f2-010101-dea3a5-f86134-283bdd */
+  /* https://www.realtimecolors.com/?colors=010101-F3F1F2-F86134-283BDD-dea3a5&fonts=Plus%20Jakarta%20Sans-Plus%20Jakarta%20Sans */
+  [data-theme="early-access-2024"] {
+    --background: 330, 8%, 95%;
+    --foreground: 0, 0%, 0%;
+
+    --card: 330, 8%, 95%;
+    --card-foreground: 0, 0%, 0%;
+
+    --popover: 330, 8%, 95%;
+    --popover-foreground: 0, 0%, 0%;
+
+    --primary: 14, 93%, 59%;
+    --primary-foreground: 0, 0%, 0%;
+    --secondary: 358, 47%, 75%;
+    --secondary-foreground: 0, 0%, 0%;
+
+    --muted: 330, 8%, 20%;
+    --muted-foreground: 0, 0%, 70%;
+
+    --accent: 234, 73%, 51%;
+    --accent-foreground: 330, 8%, 95%;
+
+    --destructive: 0, 85%, 60%;
+    --destructive-foreground: 0, 0%, 0%;
+
+    --border: 330, 8%, 20%;
+    --input: 330, 8%, 20%;
+    --ring: 234, 73%, 40%;
+
+    --radius: 0.1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 /* Primary colors */
-.bg-primary-50 { background-color: hsla(var(--primary-50)); }
-.bg-primary-100 { background-color: hsla(var(--primary-100)); }
-.bg-primary-200 { background-color: hsla(var(--primary-200)); }
-.bg-primary-300 { background-color: hsla(var(--primary-300)); }
-.bg-primary-400 { background-color: hsla(var(--primary-400)); }
-.bg-primary-500 { background-color: hsla(var(--primary-500)); }
-.bg-primary-600 { background-color: hsla(var(--primary-600)); }
-.bg-primary-700 { background-color: hsla(var(--primary-700)); }
-.bg-primary-800 { background-color: hsla(var(--primary-800)); }
-.bg-primary-900 { background-color: hsla(var(--primary-900)); }
-.bg-primary-1000 { background-color: hsla(var(--primary-1000)); }
+.bg-primary-50 {
+  background-color: hsla(var(--primary-50));
+}
+.bg-primary-100 {
+  background-color: hsla(var(--primary-100));
+}
+.bg-primary-200 {
+  background-color: hsla(var(--primary-200));
+}
+.bg-primary-300 {
+  background-color: hsla(var(--primary-300));
+}
+.bg-primary-400 {
+  background-color: hsla(var(--primary-400));
+}
+.bg-primary-500 {
+  background-color: hsla(var(--primary-500));
+}
+.bg-primary-600 {
+  background-color: hsla(var(--primary-600));
+}
+.bg-primary-700 {
+  background-color: hsla(var(--primary-700));
+}
+.bg-primary-800 {
+  background-color: hsla(var(--primary-800));
+}
+.bg-primary-900 {
+  background-color: hsla(var(--primary-900));
+}
+.bg-primary-1000 {
+  background-color: hsla(var(--primary-1000));
+}
 
 /* Secondary colors */
-.bg-secondary-50 { background-color: hsla(var(--secondary-50)); }
-.bg-secondary-100 { background-color: hsla(var(--secondary-100)); }
-.bg-secondary-200 { background-color: hsla(var(--secondary-200)); }
-.bg-secondary-300 { background-color: hsla(var(--secondary-300)); }
-.bg-secondary-400 { background-color: hsla(var(--secondary-400)); }
-.bg-secondary-500 { background-color: hsla(var(--secondary-500)); }
-.bg-secondary-600 { background-color: hsla(var(--secondary-600)); }
-.bg-secondary-700 { background-color: hsla(var(--secondary-700)); }
-.bg-secondary-800 { background-color: hsla(var(--secondary-800)); }
-.bg-secondary-900 { background-color: hsla(var(--secondary-900)); }
-.bg-secondary-1000 { background-color: hsla(var(--secondary-1000)); }
+.bg-secondary-50 {
+  background-color: hsla(var(--secondary-50));
+}
+.bg-secondary-100 {
+  background-color: hsla(var(--secondary-100));
+}
+.bg-secondary-200 {
+  background-color: hsla(var(--secondary-200));
+}
+.bg-secondary-300 {
+  background-color: hsla(var(--secondary-300));
+}
+.bg-secondary-400 {
+  background-color: hsla(var(--secondary-400));
+}
+.bg-secondary-500 {
+  background-color: hsla(var(--secondary-500));
+}
+.bg-secondary-600 {
+  background-color: hsla(var(--secondary-600));
+}
+.bg-secondary-700 {
+  background-color: hsla(var(--secondary-700));
+}
+.bg-secondary-800 {
+  background-color: hsla(var(--secondary-800));
+}
+.bg-secondary-900 {
+  background-color: hsla(var(--secondary-900));
+}
+.bg-secondary-1000 {
+  background-color: hsla(var(--secondary-1000));
+}
 
 /* Accent colors */
-.bg-accent-50 { background-color: hsla(var(--accent-50)); }
-.bg-accent-100 { background-color: hsla(var(--accent-100)); }
-.bg-accent-200 { background-color: hsla(var(--accent-200)); }
-.bg-accent-300 { background-color: hsla(var(--accent-300)); }
-.bg-accent-400 { background-color: hsla(var(--accent-400)); }
-.bg-accent-500 { background-color: hsla(var(--accent-500)); }
-.bg-accent-600 { background-color: hsla(var(--accent-600)); }
-.bg-accent-700 { background-color: hsla(var(--accent-700)); }
-.bg-accent-800 { background-color: hsla(var(--accent-800)); }
-.bg-accent-900 { background-color: hsla(var(--accent-900)); }
-.bg-accent-1000 { background-color: hsla(var(--accent-1000)); }
+.bg-accent-50 {
+  background-color: hsla(var(--accent-50));
+}
+.bg-accent-100 {
+  background-color: hsla(var(--accent-100));
+}
+.bg-accent-200 {
+  background-color: hsla(var(--accent-200));
+}
+.bg-accent-300 {
+  background-color: hsla(var(--accent-300));
+}
+.bg-accent-400 {
+  background-color: hsla(var(--accent-400));
+}
+.bg-accent-500 {
+  background-color: hsla(var(--accent-500));
+}
+.bg-accent-600 {
+  background-color: hsla(var(--accent-600));
+}
+.bg-accent-700 {
+  background-color: hsla(var(--accent-700));
+}
+.bg-accent-800 {
+  background-color: hsla(var(--accent-800));
+}
+.bg-accent-900 {
+  background-color: hsla(var(--accent-900));
+}
+.bg-accent-1000 {
+  background-color: hsla(var(--accent-1000));
+}
 
 /* Success colors */
-.bg-success-50 { background-color: hsla(var(--success-50)); }
-.bg-success-100 { background-color: hsla(var(--success-100)); }
-.bg-success-200 { background-color: hsla(var(--success-200)); }
-.bg-success-300 { background-color: hsla(var(--success-300)); }
-.bg-success-400 { background-color: hsla(var(--success-400)); }
-.bg-success-500 { background-color: hsla(var(--success-500)); }
-.bg-success-600 { background-color: hsla(var(--success-600)); }
-.bg-success-700 { background-color: hsla(var(--success-700)); }
-.bg-success-800 { background-color: hsla(var(--success-800)); }
-.bg-success-900 { background-color: hsla(var(--success-900)); }
-.bg-success-1000 { background-color: hsla(var(--success-1000)); }
+.bg-success-50 {
+  background-color: hsla(var(--success-50));
+}
+.bg-success-100 {
+  background-color: hsla(var(--success-100));
+}
+.bg-success-200 {
+  background-color: hsla(var(--success-200));
+}
+.bg-success-300 {
+  background-color: hsla(var(--success-300));
+}
+.bg-success-400 {
+  background-color: hsla(var(--success-400));
+}
+.bg-success-500 {
+  background-color: hsla(var(--success-500));
+}
+.bg-success-600 {
+  background-color: hsla(var(--success-600));
+}
+.bg-success-700 {
+  background-color: hsla(var(--success-700));
+}
+.bg-success-800 {
+  background-color: hsla(var(--success-800));
+}
+.bg-success-900 {
+  background-color: hsla(var(--success-900));
+}
+.bg-success-1000 {
+  background-color: hsla(var(--success-1000));
+}
 
 /* Destructive colors */
-.bg-destructive-50 { background-color: hsla(var(--destructive-50)); }
-.bg-destructive-100 { background-color: hsla(var(--destructive-100)); }
-.bg-destructive-200 { background-color: hsla(var(--destructive-200)); }
-.bg-destructive-300 { background-color: hsla(var(--destructive-300)); }
-.bg-destructive-400 { background-color: hsla(var(--destructive-400)); }
-.bg-destructive-500 { background-color: hsla(var(--destructive-500)); }
-.bg-destructive-600 { background-color: hsla(var(--destructive-600)); }
-.bg-destructive-700 { background-color: hsla(var(--destructive-700)); }
-.bg-destructive-800 { background-color: hsla(var(--destructive-800)); }
-.bg-destructive-900 { background-color: hsla(var(--destructive-900)); }
-.bg-destructive-1000 { background-color: hsla(var(--destructive-1000)); }
+.bg-destructive-50 {
+  background-color: hsla(var(--destructive-50));
+}
+.bg-destructive-100 {
+  background-color: hsla(var(--destructive-100));
+}
+.bg-destructive-200 {
+  background-color: hsla(var(--destructive-200));
+}
+.bg-destructive-300 {
+  background-color: hsla(var(--destructive-300));
+}
+.bg-destructive-400 {
+  background-color: hsla(var(--destructive-400));
+}
+.bg-destructive-500 {
+  background-color: hsla(var(--destructive-500));
+}
+.bg-destructive-600 {
+  background-color: hsla(var(--destructive-600));
+}
+.bg-destructive-700 {
+  background-color: hsla(var(--destructive-700));
+}
+.bg-destructive-800 {
+  background-color: hsla(var(--destructive-800));
+}
+.bg-destructive-900 {
+  background-color: hsla(var(--destructive-900));
+}
+.bg-destructive-1000 {
+  background-color: hsla(var(--destructive-1000));
+}

@@ -82,6 +82,10 @@ file_size_limit = "50MiB"
 allowed_mime_types = ["image/png", "image/jpg", "image/jpeg", "image/gif", "image/svg+xml", "image/x-icon"]
 objects_path = "./seed-storage/profile-pictures"
 
+[storage.buckets.payload-cms-media]
+public = true
+file_size_limit = "50MiB"
+
 [auth]
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
