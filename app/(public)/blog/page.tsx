@@ -1,34 +1,40 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getCustomPayload } from "@/lib/payload"
-import { format } from "date-fns"
-import Image from "next/image"
-import Link from "next/link"
-import { Suspense } from "react"
-import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv"
-import { Badge } from "@/components/ui/badge"
-import { Post } from "@/payload-types"
-import { Staff } from "@/payload-types"
-import { RichText } from '@payloadcms/richtext-lexical/react'
-import { H1, P, Lead } from "@/components/ui/typography"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getCustomPayload } from "@/lib/payload/getCustomPayload";
+import { format } from "date-fns";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
+import { Badge } from "@/components/ui/badge";
+import { Post } from "@/payload-types";
+import { Staff } from "@/payload-types";
+import { RichText } from "@payloadcms/richtext-lexical/react";
+import { H1, P, Lead } from "@/components/ui/typography";
 
 async function BlogPostsList() {
-  const payload = await getCustomPayload()
+  const payload = await getCustomPayload();
   const { docs: posts } = await payload.find({
-    collection: 'posts',
+    collection: "posts",
     depth: 2,
     where: {
       _status: {
-        equals: 'published'
-      }
+        equals: "published",
+      },
     },
-    sort: '-publishedOn'
-  })
+    sort: "-publishedOn",
+  });
 
   if (!posts.length) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
         <H1 size="2">No posts found</H1>
         <P className="mb-6">
           It looks like there are no blog posts published yet.
@@ -37,19 +43,18 @@ async function BlogPostsList() {
           <Link href="/">Return Home</Link>
         </Button>
       </div>
-    )
+    );
   }
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {posts.map((post: Post
-      ) => (
-        <Card key={post.id} className="flex flex-col h-full">
-          <CardHeader className="p-0 relative aspect-video">
-            {post.image && typeof post.image === 'object' && post.image.url && (
+      {posts.map((post: Post) => (
+        <Card key={post.id} className="flex h-full flex-col">
+          <CardHeader className="relative aspect-video p-0">
+            {post.image && typeof post.image === "object" && post.image.url && (
               <Image
                 src={post.image.url}
-                alt={post.image.alt || ''}
+                alt={post.image.alt || ""}
                 fill
                 className="rounded-t-lg object-cover"
               />
@@ -57,17 +62,22 @@ async function BlogPostsList() {
           </CardHeader>
           <CardContent className="flex-1 p-6">
             <CardTitle className="mb-4">{post.title}</CardTitle>
-            <P className="text-muted-foreground line-clamp-3">
-              {post.excerpt || 'No excerpt available'}
+            <P className="line-clamp-3 text-muted-foreground">
+              {post.excerpt || "No excerpt available"}
             </P>
           </CardContent>
-          <CardFooter className="flex justify-between items-center p-6">
+          <CardFooter className="flex items-center justify-between p-6">
             <div className="space-y-2">
               <div className="flex flex-wrap gap-2">
                 {post.authors?.length > 0 ? (
                   post.authors.map((author: number | Staff) => (
-                    <Badge key={typeof author === 'object' ? author.id : author} variant="secondary">
-                      {typeof author === 'object' ? author.name : 'Unknown Author'}
+                    <Badge
+                      key={typeof author === "object" ? author.id : author}
+                      variant="secondary"
+                    >
+                      {typeof author === "object"
+                        ? author.name
+                        : "Unknown Author"}
                     </Badge>
                   ))
                 ) : (
@@ -75,7 +85,7 @@ async function BlogPostsList() {
                 )}
               </div>
               <P className="text-xs text-muted-foreground">
-                {format(new Date(post.publishedOn), 'MMM dd, yyyy')}
+                {format(new Date(post.publishedOn), "MMM dd, yyyy")}
               </P>
             </div>
             <Button asChild variant="outline">
@@ -85,7 +95,7 @@ async function BlogPostsList() {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 function LoadingSkeleton() {
@@ -95,18 +105,18 @@ function LoadingSkeleton() {
         <Card key={i}>
           <Skeleton className="aspect-video" />
           <CardContent className="p-6">
-            <Skeleton className="h-6 mb-4" />
-            <Skeleton className="h-4 mb-2" />
+            <Skeleton className="mb-4 h-6" />
+            <Skeleton className="mb-2 h-4" />
             <Skeleton className="h-4" />
           </CardContent>
           <CardFooter className="p-6">
             <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-10 w-24 ml-auto" />
+            <Skeleton className="ml-auto h-10 w-24" />
           </CardFooter>
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 export default function BlogPage() {
@@ -115,9 +125,7 @@ export default function BlogPage() {
       <div className="container py-12">
         <div className="mb-12 text-center">
           <H1>Blog</H1>
-          <Lead>
-            Latest news and updates from our team
-          </Lead>
+          <Lead>Latest news and updates from our team</Lead>
         </div>
 
         <Suspense fallback={<LoadingSkeleton />}>
@@ -125,6 +133,5 @@ export default function BlogPage() {
         </Suspense>
       </div>
     </BackgroundDiv>
-  )
+  );
 }
-

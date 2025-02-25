@@ -14,6 +14,7 @@ export interface Config {
     staffs: Staff;
     media: Media;
     posts: Post;
+    events: Event;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -23,6 +24,7 @@ export interface Config {
     staffs: StaffsSelect<false> | StaffsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -146,6 +148,191 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  slug?: string | null;
+  status: 'draft' | 'upcoming' | 'active' | 'past';
+  /**
+   * Brief summary of the event for preview cards (max 200 characters)
+   */
+  summary: string;
+  /**
+   * When does the event take place?
+   */
+  eventDate: string;
+  /**
+   * When does the event end? (Leave empty for single-day events)
+   */
+  endDate?: string | null;
+  /**
+   * Where will the event take place?
+   */
+  location: string;
+  /**
+   * Maximum number of attendees (leave empty for unlimited)
+   */
+  capacity?: number | null;
+  /**
+   * Main image used for event cards and headers
+   */
+  featuredImage: number | Media;
+  content: (
+    | {
+        heading: string;
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        /**
+         * Optional background image for this section
+         */
+        backgroundImage?: (number | null) | Media;
+        layout?: ('default' | 'wide' | 'fullWidth') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'EventDetails';
+      }
+    | {
+        name: string;
+        role?: string | null;
+        bio?: string | null;
+        description: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        /**
+         * Profile photo of the speaker
+         */
+        image: number | Media;
+        /**
+         * Social media links for this speaker
+         */
+        socialLinks?:
+          | {
+              platform: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'youtube' | 'website' | 'other';
+              url: string;
+              label?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        layout?: ('standard' | 'compact' | 'expanded') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'EventSpeaker';
+      }
+    | {
+        heading?: string | null;
+        /**
+         * Add all speakers for this section
+         */
+        speakers: {
+          name: string;
+          role?: string | null;
+          bio?: string | null;
+          image: number | Media;
+          socialLinks?:
+            | {
+                platform: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'youtube' | 'website' | 'other';
+                url: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[];
+        columns?: ('2' | '3' | '4') | null;
+        layout?: ('grid' | 'list' | 'carousel') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'EventSpeakers';
+      }
+    | {
+        heading?: string | null;
+        description?: string | null;
+        /**
+         * Add images to the gallery
+         */
+        images: {
+          image: number | Media;
+          caption?: string | null;
+          altText?: string | null;
+          id?: string | null;
+        }[];
+        layout?: ('grid' | 'masonry' | 'carousel' | 'fullwidth') | null;
+        columns?: ('2' | '3' | '4') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'EventGallery';
+      }
+    | {
+        heading?: string | null;
+        /**
+         * Add all contributors to this event
+         */
+        credits: {
+          name: string;
+          roles: {
+            role: string;
+            id?: string | null;
+          }[];
+          /**
+           * Optional social media link or website
+           */
+          social?: string | null;
+          id?: string | null;
+        }[];
+        layout?: ('standard' | 'compact' | 'detailed') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'EventCredits';
+      }
+  )[];
+  /**
+   * Tags to categorize this event
+   */
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Does this event require registration?
+   */
+  registrationRequired?: boolean | null;
+  /**
+   * External registration link (if any)
+   */
+  registrationLink?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -162,6 +349,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -262,6 +453,129 @@ export interface PostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  status?: T;
+  summary?: T;
+  eventDate?: T;
+  endDate?: T;
+  location?: T;
+  capacity?: T;
+  featuredImage?: T;
+  content?:
+    | T
+    | {
+        EventDetails?:
+          | T
+          | {
+              heading?: T;
+              richText?: T;
+              backgroundImage?: T;
+              layout?: T;
+              id?: T;
+              blockName?: T;
+            };
+        EventSpeaker?:
+          | T
+          | {
+              name?: T;
+              role?: T;
+              bio?: T;
+              description?: T;
+              image?: T;
+              socialLinks?:
+                | T
+                | {
+                    platform?: T;
+                    url?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              layout?: T;
+              id?: T;
+              blockName?: T;
+            };
+        EventSpeakers?:
+          | T
+          | {
+              heading?: T;
+              speakers?:
+                | T
+                | {
+                    name?: T;
+                    role?: T;
+                    bio?: T;
+                    image?: T;
+                    socialLinks?:
+                      | T
+                      | {
+                          platform?: T;
+                          url?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              columns?: T;
+              layout?: T;
+              id?: T;
+              blockName?: T;
+            };
+        EventGallery?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    caption?: T;
+                    altText?: T;
+                    id?: T;
+                  };
+              layout?: T;
+              columns?: T;
+              id?: T;
+              blockName?: T;
+            };
+        EventCredits?:
+          | T
+          | {
+              heading?: T;
+              credits?:
+                | T
+                | {
+                    name?: T;
+                    roles?:
+                      | T
+                      | {
+                          role?: T;
+                          id?: T;
+                        };
+                    social?: T;
+                    id?: T;
+                  };
+              layout?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  registrationRequired?: T;
+  registrationLink?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

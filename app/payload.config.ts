@@ -1,15 +1,21 @@
-import { Media } from '@/app/collections/Media'
-import { Posts } from '@/app/collections/Posts'
-import { Staffs } from '@/app/collections/Staffs'
-import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { s3Storage } from '@payloadcms/storage-s3'
-import { buildConfig, SanitizedConfig } from 'payload'
-import sharp from 'sharp'
+import { Events } from "@/app/collections/Events";
+import { Media } from "@/app/collections/Media";
+import { Posts } from "@/app/collections/Posts";
+import { Staffs } from "@/app/collections/Staffs";
+import { postgresAdapter } from "@payloadcms/db-postgres";
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { s3Storage } from "@payloadcms/storage-s3";
+import { buildConfig, SanitizedConfig } from "payload";
+import sharp from "sharp";
 
-const payloadSecret = process.env.PAYLOAD_SECRET!
-const databaseUrl = process.env.DATABASE_URL!
-console.log('[payload.config.ts] payloadSecret:', payloadSecret, 'databaseUrl:', databaseUrl)
+const payloadSecret = process.env.PAYLOAD_SECRET!;
+const databaseUrl = process.env.DATABASE_URL!;
+console.log(
+  "[payload.config.ts] payloadSecret:",
+  payloadSecret,
+  "databaseUrl:",
+  databaseUrl,
+);
 
 const payloadConfig: Promise<SanitizedConfig> = buildConfig({
   // If you'd like to use Rich Text, pass your editor here
@@ -17,18 +23,14 @@ const payloadConfig: Promise<SanitizedConfig> = buildConfig({
   // Root
   // Routing
   routes: {
-    admin: '/payload-admin',
-    api: '/payload-api',
+    admin: "/payload-admin",
+    api: "/payload-api",
   },
   // Define and configure your collections in this array
-  collections: [
-    Staffs,
-    Media,
-    Posts,
-  ],
+  collections: [Staffs, Media, Posts, Events],
   // Tells Payload which collection to use for authentication
   admin: {
-    user: 'staffs',
+    user: "staffs",
   },
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: payloadSecret,
@@ -38,8 +40,8 @@ const payloadConfig: Promise<SanitizedConfig> = buildConfig({
     pool: {
       connectionString: databaseUrl,
     },
-    schemaName: 'payload',
-    migrationDir: '../supabase/migrations',
+    schemaName: "payload",
+    migrationDir: "../supabase/migrations",
   }),
   // If you want to resize images, crop, set focal point, etc.
   // make sure to install it and pass it to the config.
@@ -52,18 +54,19 @@ const payloadConfig: Promise<SanitizedConfig> = buildConfig({
       collections: {
         media: true,
       },
-      bucket: process.env.S3_BUCKET || 'payload-cms-media',
+      bucket: process.env.S3_BUCKET || "payload-cms-media",
       config: {
         credentials: {
           accessKeyId: process.env.S3_ACCESS_KEY!,
           secretAccessKey: process.env.S3_SECRET_KEY!,
         },
-        region: process.env.S3_REGION || 'local',
-        endpoint: process.env.S3_ENDPOINT || 'http://127.0.0.1:54321/storage/v1/s3',
-        forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+        region: process.env.S3_REGION || "local",
+        endpoint:
+          process.env.S3_ENDPOINT || "http://127.0.0.1:54321/storage/v1/s3",
+        forcePathStyle: process.env.S3_FORCE_PATH_STYLE === "true",
       },
     }),
   ],
-})
+});
 
 export default payloadConfig;

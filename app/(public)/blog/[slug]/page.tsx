@@ -2,7 +2,7 @@ import { RichText } from "@/components/payload-cms/RichText";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { H1 } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { getCustomPayload } from "@/lib/payload";
+import { getCustomPayload } from "@/lib/payload/getCustomPayload";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -27,13 +27,13 @@ export async function generateMetadata({
       images:
         post?.image && typeof post.image === "object"
           ? [
-            {
-              url: post.image.url || "",
-              width: 1200,
-              height: 630,
-              alt: post.title,
-            },
-          ]
+              {
+                url: post.image.url || "",
+                width: 1200,
+                height: 630,
+                alt: post.title,
+              },
+            ]
           : [],
     },
   };
