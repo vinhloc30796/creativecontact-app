@@ -14,7 +14,7 @@ import {
   UsersIcon,
   CheckCircleIcon,
 } from "@/components/ui/icons";
-import { RenderBlocks } from "@/components/RenderBlocks";
+import { RenderBlocks } from "@/components/payload-cms/RenderBlocks";
 import { BlockTypes, getMediaUrl } from "@/lib/payload/payloadTypeAdapter";
 
 // Dynamic metadata based on event

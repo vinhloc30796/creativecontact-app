@@ -5,6 +5,7 @@ import { H2, P } from "@/components/ui/typography";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { RichText } from "@/components/payload-cms/RichText";
 import {
   BlockTypes,
   EventDetailsBlock,
@@ -85,21 +86,20 @@ function EventDetailsRenderer(block: EventDetailsBlock) {
       {!backgroundImage && <H2 className="mb-6">{heading}</H2>}
 
       <div className="prose prose-lg max-w-none">
-        {/* For simplicity, rendering as plain text here */}
-        <div>
-          {richText && typeof richText === "string" ? (
-            <P>{richText}</P>
-          ) : (
-            <P>Rich text content would be rendered here</P>
-          )}
-        </div>
+        {richText && typeof richText === "object" ? (
+          <RichText data={richText} enableGutter={false} />
+        ) : richText && typeof richText === "string" ? (
+          <P>{richText}</P>
+        ) : (
+          <P>No content available</P>
+        )}
       </div>
     </section>
   );
 }
 
 function EventSpeakerRenderer(block: EventSpeakerBlock) {
-  const { name, role, bio, image, socialLinks, layout } = block;
+  const { name, role, bio, description, image, socialLinks, layout } = block;
   const layoutValue = getOrDefault(layout, "standard");
 
   return (
@@ -142,11 +142,15 @@ function EventSpeakerRenderer(block: EventSpeakerBlock) {
           <H2>{name}</H2>
           {role && <P className="font-medium text-primary">{role}</P>}
 
-          {bio && (
+          {description && typeof description === "object" ? (
+            <div className="mt-4">
+              <RichText data={description} enableGutter={false} />
+            </div>
+          ) : bio ? (
             <div className="mt-4">
               <P>{bio}</P>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </section>
