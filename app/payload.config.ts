@@ -34,7 +34,7 @@ const payloadConfig: Promise<SanitizedConfig> = buildConfig({
       connectionString: databaseUrl,
     },
     schemaName: 'payload',
-    migrationDir: '../supabase/migrations',
+    migrationDir: 'supabase/payload-migrations',
   }),
   // If you want to resize images, crop, set focal point, etc.
   // make sure to install it and pass it to the config.

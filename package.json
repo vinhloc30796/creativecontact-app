@@ -13,7 +13,8 @@
     "lint": "next lint",
     "db:migrate": "node -r esbuild-register db/migrate.ts",
     "extract": "formatjs extract app/**/*.{ts,tsx,jsx,js} --ignore='**/*.d.ts' --out-file ./extracted/en.json",
-    "generate:types": "payload generate:types"
+    "generate:types": "payload generate:types",
+    "payload": "payload"
   },
   "dependencies": {
     "@designbycode/tailwindcss-text-shadow": "^2.2.1",
