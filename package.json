@@ -14,6 +14,7 @@
     "email": "email dev",
     "email:build": "email build",
     "extract": "formatjs extract app/**/*.{ts,tsx,jsx,js} --ignore='**/*.d.ts' --out-file ./extracted/en.json",
+    "payload": "payload",
     "payload:typegen": "payload generate:types",
     "payload:importMap": "payload generate:importMap",
     "payload:importMap:help": "payload generate:importMap --help",
