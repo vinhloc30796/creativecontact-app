@@ -14,7 +14,7 @@ jobs:
 
     env:
       # Add your Payload-specific environment variables here
-      DATABASE_URI: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
 
     steps:
