@@ -1,19 +1,19 @@
 "use server";
 
-import { cookiePolicy } from "@/app/collections/staff";
+import { cookiePolicy } from "@/app/collections/Staffs";
 import { StaffCleanSignupInput } from "@/app/staff/signup/types";
-import { getCustomPayload } from "@/lib/payload";
+import { getCustomPayload } from "@/lib/payload/getCustomPayload";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { prevalidateStaff } from "./prevalidateStaff";
 import { AuthResult, StaffUser } from "./types";
 
-const payload = await getCustomPayload()
+const payload = await getCustomPayload();
 
 // Define input schema
 const loginInputSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 export async function loginStaff(
@@ -41,7 +41,7 @@ export async function loginStaff(
 
     // Authenticate with Payload
     const { user, token } = await payload.login({
-      collection: "staff",
+      collection: "staffs",
       data: { email, password },
     });
 
@@ -104,7 +104,6 @@ export async function loginStaff(
 
 export async function verifyStaffAuth(): Promise<AuthResult<StaffUser>> {
   try {
-
     const cookieStore = await cookies();
     const authHeaders = new Headers({ cookie: cookieStore.toString() });
 
@@ -159,19 +158,19 @@ export async function signupStaff(
 ): Promise<AuthResult<StaffUser>> {
   try {
     // Validate staff secret first
-    const validationResult = await prevalidateStaff(data.staffSecret)
+    const validationResult = await prevalidateStaff(data.staffSecret);
     if (validationResult.error) {
       return {
         data: null,
-        error: validationResult.error
-      }
+        error: validationResult.error,
+      };
     }
 
     console.debug("[signupStaff] Starting signup process...");
 
     // Create staff member
     const newStaff = await payload.create({
-      collection: "staff",
+      collection: "staffs",
       data: {
         email: data.email,
         password: data.password,
@@ -202,27 +201,37 @@ export async function signupStaff(
       data: {
         id: newStaff.id,
         email: newStaff.email,
-        collection: newStaff.collection,
+        collection: "staffs",
         createdAt: newStaff.createdAt,
         updatedAt: newStaff.updatedAt,
       } as StaffUser,
       error: null,
     };
   } catch (error) {
-    const data = error instanceof Error && 'data' in error ? error.data : null;
+    const data = error instanceof Error && "data" in error ? error.data : null;
     const cause = error instanceof Error ? error.cause : null;
-    console.error("[signupStaff] error:", error, 'with data:', data, 'and cause:', cause);
+    console.error(
+      "[signupStaff] error:",
+      error,
+      "with data:",
+      data,
+      "and cause:",
+      cause,
+    );
 
     // Check if email already exists in either cause or data
-    const isEmailAlreadyRegistered = (obj: any) => obj &&
-      typeof obj === 'object' &&
-      'errors' in obj &&
+    const isEmailAlreadyRegistered = (obj: any) =>
+      obj &&
+      typeof obj === "object" &&
+      "errors" in obj &&
       Array.isArray(obj.errors) &&
-      obj.errors.some((e: { path: string, message: string }) =>
-        e.path === 'email' && e.message.includes('already registered')
+      obj.errors.some(
+        (e: { path: string; message: string }) =>
+          e.path === "email" && e.message.includes("already registered"),
       );
 
-    const duplicateEmailExists = isEmailAlreadyRegistered(cause) || isEmailAlreadyRegistered(data);
+    const duplicateEmailExists =
+      isEmailAlreadyRegistered(cause) || isEmailAlreadyRegistered(data);
     if (duplicateEmailExists) {
       return {
         data: null,

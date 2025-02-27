@@ -16,3 +16,6 @@
 *.env.test.local
 *.env.production.local
 *.env.development.local
+
+!/.github/workflows
+!package.json
