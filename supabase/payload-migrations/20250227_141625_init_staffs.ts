@@ -1,7 +1,8 @@
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+// import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+import { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`
+  await db.execute(`
    CREATE TYPE "payload"."enum_staff_roles" AS ENUM('admin', 'check-in', 'content-creator');
   CREATE TABLE IF NOT EXISTS "payload"."staff_roles" (
   	"order" integer NOT NULL,
@@ -119,7 +120,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.execute(sql`
+  await db.execute(`
    DROP TABLE "payload"."staff_roles" CASCADE;
   DROP TABLE "payload"."staff" CASCADE;
   DROP TABLE "payload"."payload_locked_documents" CASCADE;

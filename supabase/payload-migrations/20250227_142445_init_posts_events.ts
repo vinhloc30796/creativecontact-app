@@ -1,7 +1,7 @@
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+import { MigrateUpArgs, MigrateDownArgs, } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`
+  await db.execute(`
    CREATE TYPE "payload"."enum_posts_status" AS ENUM('draft', 'published');
   CREATE TYPE "payload"."enum__posts_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "payload"."enum_events_blocks_event_details_layout" AS ENUM('default', 'wide', 'fullWidth');
@@ -514,7 +514,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.execute(sql`
+  await db.execute(`
    ALTER TYPE "payload"."enum_staffs_roles" RENAME TO "enum_staff_roles";
   ALTER TABLE "payload"."media" DISABLE ROW LEVEL SECURITY;
   ALTER TABLE "payload"."posts" DISABLE ROW LEVEL SECURITY;

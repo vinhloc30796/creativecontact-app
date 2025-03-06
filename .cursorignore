@@ -20,3 +20,4 @@
 !.github/workflows
 !.github/PULL_REQUEST_TEMPLATE.md
 !package.json
+!vercel.json

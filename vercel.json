@@ -1,8 +1,9 @@
 {
-	"crons": [
-		{
-			"path": "/api/cron/cancel-expired-registrations",
-			"schedule": "0 0 * * *"
-		}
-	]
+  "buildCommand": "pnpm run payload:typegen && pnpm run build",
+  "crons": [
+    {
+      "path": "/api/cron/cancel-expired-registrations",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }
