@@ -32,6 +32,7 @@ import {
   P,
   Small
 } from "@/components/ui/typography";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -58,6 +59,7 @@ export default async function Page(props: Props) {
   const searchParams = await props.searchParams;
   const lang = searchParams.lang || "en";
   const currentEvent = await getCurrentEvent();
+  const { t } = await getServerTranslation(lang, "HomePage");
 
   if (inConstructPage) {
     return (
@@ -66,38 +68,6 @@ export default async function Page(props: Props) {
       </BackgroundDiv>
     );
   }
-
-  // Translations
-  const translations = {
-    en: {
-      title: "Connect –\n– creative people",
-      subtitle: "Platform for [creative people]\nto connect with [creative people]",
-      joinUs: "Join us and be a part of our network",
-      aboutCC: "ABOUT CC",
-      contactBook: "CONTACT BOOK",
-      event: "EVENT",
-      menu: "MENU",
-      ticker: `${currentEvent} IS HAPPENING RIGHT NOW`,
-      followUs: "Follow us",
-      languageTooltip: "Change language",
-      menuTooltip: "Open menu"
-    },
-    vi: {
-      title: "Kết nối –\n– người sáng tạo",
-      subtitle: "Nền tảng của [người sáng tạo]\nđể kết nối với [người sáng tạo]",
-      joinUs: "Tham gia và trở thành một phần của mạng lưới chúng tôi",
-      aboutCC: "VỀ CC",
-      contactBook: "DANH BẠ",
-      event: "SỰ KIỆN",
-      menu: "MENU",
-      ticker: `${currentEvent} ĐANG DIỄN RA NGAY LÚC NÀY`,
-      followUs: "Theo dõi chúng tôi",
-      languageTooltip: "Thay đổi ngôn ngữ",
-      menuTooltip: "Mở menu"
-    }
-  };
-
-  const t = translations[lang as keyof typeof translations];
 
   return (
     <BackgroundDiv shouldCenter={false} className="flex flex-col">
@@ -115,7 +85,7 @@ export default async function Page(props: Props) {
             className="text-sm text-foreground hover:text-yellow-400"
           >
             <Link href="/join" className="flex items-center gap-1">
-              {t.joinUs.split("of our network")[0]}
+              {t("joinUs").split("of our network")[0]}
               <Badge variant="outline" className="text-yellow-400 border-yellow-400">
                 →
               </Badge>
@@ -135,7 +105,7 @@ export default async function Page(props: Props) {
               className="font-bold whitespace-pre-line"
               size="default"
             >
-              {t.title}
+              {t("title")}
             </HeroTitle>
           </CardHeader>
 
@@ -167,7 +137,7 @@ export default async function Page(props: Props) {
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <P>{t.languageTooltip}</P>
+                    <P>{t("languageTooltip")}</P>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -182,7 +152,7 @@ export default async function Page(props: Props) {
                 size="lg"
               >
                 <Link href="/about">
-                  {t.aboutCC}
+                  {t("aboutCC")}
                 </Link>
               </Button>
               <Button
@@ -191,7 +161,7 @@ export default async function Page(props: Props) {
                 size="lg"
               >
                 <Link href="/contacts">
-                  {t.contactBook}
+                  {t("contactBook")}
                 </Link>
               </Button>
               <Button
@@ -201,7 +171,7 @@ export default async function Page(props: Props) {
                 size="lg"
               >
                 <Link href="/events">
-                  {t.event}
+                  {t("event")}
                 </Link>
               </Button>
 
@@ -215,30 +185,30 @@ export default async function Page(props: Props) {
                           className="bg-white/10 px-6 py-6 h-auto rounded-full text-sm text-foreground hover:bg-white/20 transition-colors"
                           size="lg"
                         >
-                          {t.menu}
+                          {t("menu")}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-black/80 border-white/20 text-foreground">
                         <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
                           <Link href="/about" className="w-full">
-                            {t.aboutCC}
+                            {t("aboutCC")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
                           <Link href="/contacts" className="w-full">
-                            {t.contactBook}
+                            {t("contactBook")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
                           <Link href="/events" className="w-full">
-                            {t.event}
+                            {t("event")}
                           </Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <P>{t.menuTooltip}</P>
+                    <P>{t("menuTooltip")}</P>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -246,14 +216,14 @@ export default async function Page(props: Props) {
 
             {/* Description text */}
             <Lead className="text-foreground/90 whitespace-pre-line text-xl md:text-2xl">
-              {t.subtitle}
+              {t("subtitle")}
             </Lead>
 
             <Separator className="bg-white/10" />
 
             {/* Social media links */}
             <div>
-              <Small className="text-foreground/70 mb-3 block">{t.followUs}</Small>
+              <Small className="text-foreground/70 mb-3 block">{t("followUs")}</Small>
               <div className="flex gap-4">
                 <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 p-0 hover:bg-white/10">
                   <a href="#" className="text-foreground hover:text-yellow-400 transition-colors">
@@ -280,7 +250,7 @@ export default async function Page(props: Props) {
       <footer className="w-full bg-yellow-400 text-black py-3 overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee">
           {Array(4).fill(0).map((_, i) => (
-            <span key={i} className="mx-4 text-base font-medium">{t.ticker}</span>
+            <span key={i} className="mx-4 text-base font-medium">{`${currentEvent} ${t("ticker")}`}</span>
           ))}
         </div>
       </footer>
