@@ -1,11 +1,11 @@
-name: Payload Migrations (Production)
+name: Database Migrations (Production)
 
 on:
   push:
     branches:
       - main
     paths:
-      - "supabase/payload-migrations/**"
+      - "supabase/**"
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Add your Payload-specific environment variables here
+      # Supabase environment variables
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.PRODUCTION_PROJECT_ID }}
+      # Payload environment variables
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
 
@@ -21,6 +25,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Supabase migration steps
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Run Supabase migrations for Production
+        if: env.ACT != 'true'
+        run: |
+          supabase link
+          supabase db push
+
+      - name: Reset Supabase database for Local
+        if: env.ACT == 'true'
+        run: |
+          supabase start
+          supabase db reset
+
+      # Payload migration steps
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -51,11 +74,11 @@ jobs:
       - name: Run Payload migrations
         run: pnpm payload migrate
 
-      # Optional: Add notification steps
+      # Notification steps
       - name: Notify on success
         if: success()
-        run: echo "Payload migrations completed successfully"
+        run: echo "Database migrations completed successfully"
 
       - name: Notify on failure
         if: failure()
-        run: echo "Payload migrations failed"
+        run: echo "Database migrations failed"
