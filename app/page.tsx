@@ -98,8 +98,8 @@ export default async function Page(props: Props) {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 px-4 md:px-6 py-12 w-full max-w-[1400px] mx-auto">
-        <Card className="w-full mx-auto bg-transparent border-none shadow-none">
+      <main className="flex-1 py-12 mx-12">
+        <Card className="w-full bg-transparent border-none shadow-none">
           <CardHeader className="px-0 pt-0 w-full">
             <HeroTitle
               className="font-bold whitespace-pre-line"

@@ -34,13 +34,13 @@ const headingVariants = cva(
 
 // Hero title variants for large, impactful page titles
 const heroTitleVariants = cva(
-  "font-bold tracking-tighter text-foreground w-[80%] max-w-[80vw]",
+  "font-bold tracking-tighter text-foreground",
   {
     variants: {
       size: {
-        default: "text-[clamp(2rem,9vw,8rem)] leading-[1.1]", // Min: 3rem (48px), Preferred: 8vw, Max: 6rem (96px)
-        medium: "text-[clamp(2rem,7vw,6rem)] leading-[1.1]", // Min: 2.5rem (40px), Preferred: 6vw, Max: 5rem (80px)
-        small: "text-[clamp(2rem,5vw,4rem)] leading-[1.2]", // Min: 2rem (32px), Preferred: 4vw, Max: 4rem (64px)
+        default: "text-[clamp(2rem,10vw,20rem)] md:text-[clamp(2rem,12vw,20rem)] leading-[1.1]",
+        medium: "text-[clamp(2rem,7vw,6rem)] md:text-[clamp(2rem,10vw,6rem)] leading-[1.1]",
+        small: "text-[clamp(2rem,5vw,4rem)] md:text-[clamp(2rem,7vw,4rem)] leading-[1.1]",
       },
       variant: {
         default: "text-foreground",
