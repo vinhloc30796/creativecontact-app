@@ -32,6 +32,30 @@ const headingVariants = cva(
   }
 )
 
+// Hero title variants for large, impactful page titles
+const heroTitleVariants = cva(
+  "font-bold tracking-tighter text-foreground w-[80%] max-w-[80vw]",
+  {
+    variants: {
+      size: {
+        default: "text-[clamp(2rem,9vw,8rem)] leading-[1.1]", // Min: 3rem (48px), Preferred: 8vw, Max: 6rem (96px)
+        medium: "text-[clamp(2rem,7vw,6rem)] leading-[1.1]", // Min: 2.5rem (40px), Preferred: 6vw, Max: 5rem (80px)
+        small: "text-[clamp(2rem,5vw,4rem)] leading-[1.2]", // Min: 2rem (32px), Preferred: 4vw, Max: 4rem (64px)
+      },
+      variant: {
+        default: "text-foreground",
+        muted: "text-muted-foreground",
+        accent: "text-primary",
+        contrast: "text-white", // High contrast for dark backgrounds
+      },
+    },
+    defaultVariants: {
+      size: "default",
+      variant: "default",
+    },
+  }
+)
+
 // Paragraph variants with slightly adjusted sizes
 // Making paragraphs only slightly larger than text-base
 const paragraphVariants = cva(
@@ -182,6 +206,27 @@ interface HeadingProps
   VariantProps<typeof headingVariants> {
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 }
+
+interface HeroTitleProps
+  extends React.HTMLAttributes<HTMLHeadingElement>,
+  VariantProps<typeof heroTitleVariants> {
+  as?: "h1" | "h2"
+}
+
+// HeroTitle component for large, impactful page titles
+const HeroTitle = React.forwardRef<HTMLHeadingElement, HeroTitleProps>(
+  ({ className, size, variant, as = "h1", ...props }, ref) => {
+    const Comp = as
+    return (
+      <Comp
+        className={cn(heroTitleVariants({ size, variant, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+HeroTitle.displayName = "HeroTitle"
 
 // H1 is reserved for page titles only
 const H1 = React.forwardRef<HTMLHeadingElement, HeadingProps>(
@@ -449,6 +494,7 @@ export {
   Large,
   Small,
   Caption,
+  HeroTitle,
   headingVariants,
   paragraphVariants,
   blockquoteVariants,
@@ -458,4 +504,5 @@ export {
   largeVariants,
   smallVariants,
   captionVariants,
+  heroTitleVariants,
 } 
