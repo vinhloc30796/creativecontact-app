@@ -96,20 +96,14 @@ export default async function Page(props: Props) {
       <div className="relative z-0 flex flex-1 flex-col">
         {/* Header section - takes up at most half the screen height */}
         <div className="flex h-[50vh] max-h-[50vh] flex-col justify-center px-12">
-          <div className="flex flex-col w-full">
+          <div className="flex w-full flex-col">
             <Link href="/events" className="w-fit self-start">
-              <HeroTitle
-                className="font-bold text-hover-border"
-                size="default"
-              >
+              <HeroTitle className="text-hover-border font-bold" size="default">
                 {t("titleContact")}
               </HeroTitle>
             </Link>
             <Link href="/contacts" className="w-fit self-end">
-              <HeroTitle
-                className="font-bold text-hover-border"
-                size="default"
-              >
+              <HeroTitle className="text-hover-border font-bold" size="default">
                 {t("titleCreatives")}
               </HeroTitle>
             </Link>
@@ -127,7 +121,7 @@ export default async function Page(props: Props) {
               items={[
                 { text: t("aboutCC"), href: "/about" },
                 { text: t("contactBook"), href: "/contacts" },
-                { text: t("event"), href: "/events" }
+                { text: t("event"), href: "/events" },
               ]}
               menuText={t("menu")}
             />
@@ -142,65 +136,44 @@ export default async function Page(props: Props) {
           </Lead>
 
           <Separator className="bg-white/10" />
-
-          {/* Social media links */}
-          <div>
-            <Small className="mb-3 block text-foreground/70">
-              {t("followUs")}
-            </Small>
-            <div className="flex gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-12 w-12 rounded-full p-0 hover:bg-white/10"
-              >
-                <a
-                  href="#"
-                  className="text-foreground transition-colors hover:text-yellow-400"
-                >
-                  <Facebook size={24} />
-                </a>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-12 w-12 rounded-full p-0 hover:bg-white/10"
-              >
-                <a
-                  href="#"
-                  className="text-foreground transition-colors hover:text-yellow-400"
-                >
-                  <Instagram size={24} />
-                </a>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-12 w-12 rounded-full p-0 hover:bg-white/10"
-              >
-                <a
-                  href="#"
-                  className="text-foreground transition-colors hover:text-yellow-400"
-                >
-                  <Linkedin size={24} />
-                </a>
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Event ticker at the bottom */}
-      <footer className="w-full overflow-hidden bg-yellow-400 py-3 text-black">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <span
-                key={i}
-                className="mx-4 text-base font-medium"
-              >{`${currentEvent} ${t("ticker")}`}</span>
-            ))}
+      <footer className="w-full overflow-hidden text-black">
+        {/* Social media links - positioned at bottom left above the footer */}
+        <div className="mb-8 ml-12 flex flex-col gap-y-8 py-4">
+          <a
+            href="https://www.facebook.com/creativecontact.vn"
+            className="text-foreground transition-colors hover:text-yellow-400"
+          >
+            <Facebook size={24} />
+          </a>
+          <a
+            href="https://instagram.com/creativecontact_vn"
+            className="text-foreground transition-colors hover:text-yellow-400"
+          >
+            <Instagram size={24} />
+          </a>
+          <a
+            href="https://www.linkedin.com/company/creativecontact-vn"
+            className="text-foreground transition-colors hover:text-yellow-400"
+          >
+            <Linkedin size={24} />
+          </a>
+        </div>
+        {/* Event ticker */}
+        <div className="flex h-[2em] flex-col justify-center gap-y-8 bg-yellow-400">
+          <div className="flex w-full animate-marquee whitespace-nowrap">
+            {Array(4)
+              .fill(0)
+              .map((_, i) => (
+                <span
+                  key={i}
+                  className="mx-4 text-base font-medium"
+                >{`${currentEvent} ${t("ticker")}`}</span>
+              ))}
+          </div>
         </div>
       </footer>
     </BackgroundDiv>
