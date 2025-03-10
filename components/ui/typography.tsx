@@ -38,7 +38,7 @@ const heroTitleVariants = cva(
   {
     variants: {
       size: {
-        default: "text-[clamp(2rem,10vw,20rem)] md:text-[clamp(2rem,12vw,20rem)] leading-[1.1]",
+        default: "text-[clamp(2rem,10vw,20rem)] md:text-[clamp(2rem,11.5vw,20rem)] leading-[1.1]",
         medium: "text-[clamp(2rem,7vw,6rem)] md:text-[clamp(2rem,10vw,6rem)] leading-[1.1]",
         small: "text-[clamp(2rem,5vw,4rem)] md:text-[clamp(2rem,7vw,4rem)] leading-[1.1]",
       },

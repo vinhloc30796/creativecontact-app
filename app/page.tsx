@@ -1,39 +1,24 @@
 import { EventSlot } from "@/app/types/EventSlot";
-import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
-import { eventSlots } from "@/drizzle/schema/event";
-import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import InConstruct from "@/components/InConstruction";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Facebook, Instagram, Linkedin, X } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  HeroTitle,
-  Lead,
-  P,
-  Small
-} from "@/components/ui/typography";
+import { HeroTitle, Lead, P, Small } from "@/components/ui/typography";
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
+import { eventSlots } from "@/drizzle/schema/event";
+import { db } from "@/lib/db";
 import { getServerTranslation } from "@/lib/i18n/init-server";
+import { eq } from "drizzle-orm";
+import { Facebook, Instagram, Linkedin, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { ClientNavMenu } from "../components/ClientNavMenu";
+import { TextIconBox } from "@/components/text-icon-box";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -71,12 +56,15 @@ export default async function Page(props: Props) {
   }
 
   return (
-    <BackgroundDiv shouldCenter={false} className="flex flex-col h-screen">
+    <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
       {/* Header with logo and join button */}
-      <header className="w-full p-4 flex justify-between items-center">
+      <header className="flex w-full items-center justify-between p-4">
         <div className="flex items-center gap-2">
-          <Link href="/" className="bg-yellow-400 rounded-full p-1 flex items-center justify-center h-12 w-12">
-            <span className="text-black font-bold text-xl">CC</span>
+          <Link
+            href="/"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+          >
+            <span className="text-xl font-bold text-black">CC</span>
           </Link>
         </div>
 
@@ -86,32 +74,33 @@ export default async function Page(props: Props) {
             asChild
             className="text-sm text-foreground hover:text-yellow-400"
           >
-            <Link href="/join" className="flex items-center gap-1">
-              {t("joinUs").split("of our network")[0]}
-              <Badge variant="outline" className="text-yellow-400 border-yellow-400">
-                →
-              </Badge>
-              <span className="text-yellow-400">
-                {lang === "en" ? "of our network" : "của mạng lưới chúng tôi"}
-              </span>
+            <Link href="/join">
+              <TextIconBox
+                title={t("joinUsLine1")}
+                subtitle={t("joinUsLine2")}
+                icon={
+                  <ArrowUpRight
+                    className="text-yellow-400"
+                    style={{ height: "125%", width: "125%" }}
+                  />
+                }
+                className="text-sm"
+              />
             </Link>
           </Button>
         </div>
       </header>
 
       {/* Main content split into two sections */}
-      <div className="flex flex-col flex-1 relative z-0">
+      <div className="relative z-0 flex flex-1 flex-col">
         {/* Header section - takes up at most half the screen height */}
-        <div className="h-[50vh] max-h-[50vh] flex flex-col justify-center px-12">
-          <HeroTitle
-            className="font-bold whitespace-pre-line"
-            size="default"
-          >
+        <div className="flex h-[50vh] max-h-[50vh] flex-col justify-center px-12">
+          <HeroTitle className="whitespace-pre-line font-bold" size="default">
             {t("title")}
           </HeroTitle>
 
           {/* Translation and navigation row moved below title */}
-          <div className="w-full flex justify-between items-center py-6">
+          <div className="flex w-full items-center justify-between py-6">
             {/* Language switcher on left */}
             <div className="flex gap-2">
               <TooltipProvider>
@@ -120,18 +109,18 @@ export default async function Page(props: Props) {
                     <div className="flex gap-2">
                       <Link
                         href="?lang=en"
-                        className={`px-3 py-1.5 rounded-full text-sm transition-colors ${lang === "en"
-                          ? "bg-white text-black font-medium"
-                          : "bg-white/10 text-foreground hover:bg-white/20"
+                        className={`rounded-full px-3 py-1.5 text-sm transition-colors ${lang === "en"
+                            ? "bg-white font-medium text-black"
+                            : "bg-white/10 text-foreground hover:bg-white/20"
                           }`}
                       >
                         EN
                       </Link>
                       <Link
                         href="?lang=vi"
-                        className={`px-3 py-1.5 rounded-full text-sm transition-colors ${lang === "vi"
-                          ? "bg-white text-black font-medium"
-                          : "bg-white/10 text-foreground hover:bg-white/20"
+                        className={`rounded-full px-3 py-1.5 text-sm transition-colors ${lang === "vi"
+                            ? "bg-white font-medium text-black"
+                            : "bg-white/10 text-foreground hover:bg-white/20"
                           }`}
                       >
                         VI
@@ -156,9 +145,9 @@ export default async function Page(props: Props) {
         </div>
 
         {/* Content section - fills the remaining space */}
-        <div className="flex-1 px-12 space-y-10 overflow-y-auto pb-12">
+        <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
           {/* Description text */}
-          <Lead className="text-foreground/90 whitespace-pre-line text-xl md:text-2xl">
+          <Lead className="whitespace-pre-line text-xl text-foreground/90 md:text-2xl">
             {t("subtitle")}
           </Lead>
 
@@ -166,20 +155,43 @@ export default async function Page(props: Props) {
 
           {/* Social media links */}
           <div>
-            <Small className="text-foreground/70 mb-3 block">{t("followUs")}</Small>
+            <Small className="mb-3 block text-foreground/70">
+              {t("followUs")}
+            </Small>
             <div className="flex gap-4">
-              <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 p-0 hover:bg-white/10">
-                <a href="#" className="text-foreground hover:text-yellow-400 transition-colors">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-12 w-12 rounded-full p-0 hover:bg-white/10"
+              >
+                <a
+                  href="#"
+                  className="text-foreground transition-colors hover:text-yellow-400"
+                >
                   <Facebook size={24} />
                 </a>
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 p-0 hover:bg-white/10">
-                <a href="#" className="text-foreground hover:text-yellow-400 transition-colors">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-12 w-12 rounded-full p-0 hover:bg-white/10"
+              >
+                <a
+                  href="#"
+                  className="text-foreground transition-colors hover:text-yellow-400"
+                >
                   <Instagram size={24} />
                 </a>
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-full h-12 w-12 p-0 hover:bg-white/10">
-                <a href="#" className="text-foreground hover:text-yellow-400 transition-colors">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-12 w-12 rounded-full p-0 hover:bg-white/10"
+              >
+                <a
+                  href="#"
+                  className="text-foreground transition-colors hover:text-yellow-400"
+                >
                   <Linkedin size={24} />
                 </a>
               </Button>
@@ -189,11 +201,16 @@ export default async function Page(props: Props) {
       </div>
 
       {/* Event ticker at the bottom */}
-      <footer className="w-full bg-yellow-400 text-black py-3 overflow-hidden">
-        <div className="flex whitespace-nowrap animate-marquee">
-          {Array(4).fill(0).map((_, i) => (
-            <span key={i} className="mx-4 text-base font-medium">{`${currentEvent} ${t("ticker")}`}</span>
-          ))}
+      <footer className="w-full overflow-hidden bg-yellow-400 py-3 text-black">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <span
+                key={i}
+                className="mx-4 text-base font-medium"
+              >{`${currentEvent} ${t("ticker")}`}</span>
+            ))}
         </div>
       </footer>
     </BackgroundDiv>
