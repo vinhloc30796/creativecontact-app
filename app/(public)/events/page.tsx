@@ -1,11 +1,13 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { Metadata } from "next";
 import { format } from "date-fns";
+import { ArrowUpRight } from "lucide-react";
+import { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
-import { fetchEvents } from "@/lib/payload/fetchEvents";
-import { H1, H2, P, Lead } from "@/components/ui/typography";
+import { ClientNavMenu } from "@/components/ClientNavMenu";
+import { TextIconBox } from "@/components/text-icon-box";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,13 +16,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
+  ArrowRightIcon,
   CalendarIcon,
   MapPinIcon,
-  ArrowRightIcon,
 } from "@/components/ui/icons";
+import { Separator } from "@/components/ui/separator";
+import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
+import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
+import { getServerTranslation } from "@/lib/i18n/init-server";
+import { fetchEvents } from "@/lib/payload/fetchEvents";
 
 export const metadata: Metadata = {
   title: "Events | Creative Contact",
@@ -29,6 +34,8 @@ export const metadata: Metadata = {
 };
 
 export default async function EventsPage() {
+  const { t } = await getServerTranslation("en", "HomePage");
+
   const events = await fetchEvents({
     sort: "eventDate",
     where: {
@@ -40,15 +47,76 @@ export default async function EventsPage() {
 
   if (!events || events.length === 0) {
     return (
-      <div className="container max-w-5xl py-16">
-        <H1>Events</H1>
-        <Lead className="mt-4">Stay tuned for upcoming events...</Lead>
-        <P className="mt-8">
-          We don&apos;t have any events scheduled at the moment. Check back soon
-          or follow us on social media to be the first to know when new events
-          are announced.
-        </P>
-      </div>
+      <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
+        {/* Header with logo and join button */}
+        <header className="flex w-full items-center justify-between p-4">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+            >
+              <span className="text-xl font-bold text-black">CC</span>
+            </Link>
+          </div>
+
+          <div className="flex items-center">
+            <Button
+              variant="link"
+              asChild
+              className="text-sm text-foreground hover:text-yellow-400"
+            >
+              <Link href="/join">
+                <TextIconBox
+                  title={t("joinUsLine1")}
+                  subtitle={t("joinUsLine2")}
+                  icon={
+                    <ArrowUpRight
+                      className="text-yellow-400"
+                      style={{ height: "125%", width: "125%" }}
+                    />
+                  }
+                  className="text-sm"
+                />
+              </Link>
+            </Button>
+          </div>
+        </header>
+
+        {/* Main content */}
+        <div className="relative z-0 flex flex-1 flex-col">
+          {/* Header section */}
+          <div className="flex h-[30vh] max-h-[30vh] flex-col justify-center px-12">
+            <HeroTitle className="whitespace-pre-line font-bold" size="medium">
+              Events
+            </HeroTitle>
+
+            {/* Navigation row */}
+            <div className="flex w-full items-center justify-end py-6">
+              <ClientNavMenu
+                items={[
+                  { text: t("aboutCC"), href: "/about" },
+                  { text: t("contactBook"), href: "/contacts" },
+                  { text: t("event"), href: "/events" },
+                ]}
+                menuText={t("menu")}
+              />
+            </div>
+          </div>
+
+          {/* Content section */}
+          <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
+            <Lead className="whitespace-pre-line text-xl text-foreground/90 md:text-2xl">
+              Stay tuned for upcoming events...
+            </Lead>
+            <Separator className="bg-white/10" />
+            <P className="mt-8">
+              We don&apos;t have any events scheduled at the moment. Check back
+              soon or follow us on social media to be the first to know when new
+              events are announced.
+            </P>
+          </div>
+        </div>
+      </BackgroundDiv>
     );
   }
 
@@ -60,45 +128,119 @@ export default async function EventsPage() {
   const pastEvents = events.filter((event: any) => event.status === "past");
 
   return (
-    <div className="container max-w-5xl py-16">
-      <H1>Events</H1>
-      <Lead className="mt-4">
-        Discover and join our creative workshops, meetups, and events.
-      </Lead>
+    <BackgroundDiv shouldCenter={false} className="flex min-h-screen flex-col">
+      {/* Header with logo and join button */}
+      <header className="flex w-full items-center justify-between p-4">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+          >
+            <span className="text-xl font-bold text-black">CC</span>
+          </Link>
+        </div>
 
-      {upcomingEvents.length > 0 && (
-        <div className="mt-12">
-          <H2>Upcoming Events</H2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.map((event: any) => (
-              <EventCard key={event.id} event={event} />
-            ))}
+        <div className="flex items-center">
+          <Button
+            variant="link"
+            asChild
+            className="text-sm text-foreground hover:text-yellow-400"
+          >
+            <Link href="/join">
+              <TextIconBox
+                title={t("joinUsLine1")}
+                subtitle={t("joinUsLine2")}
+                icon={
+                  <ArrowUpRight
+                    className="text-yellow-400"
+                    style={{ height: "125%", width: "125%" }}
+                  />
+                }
+                className="text-sm"
+              />
+            </Link>
+          </Button>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <div className="relative z-0 flex flex-1 flex-col">
+        {/* Header section */}
+        <div className="flex h-[30vh] max-h-[30vh] flex-col justify-center px-12">
+          <HeroTitle className="whitespace-pre-line font-bold" size="medium">
+            Events
+          </HeroTitle>
+
+          {/* Navigation row */}
+          <div className="flex w-full items-center justify-end py-6">
+            <ClientNavMenu
+              items={[
+                { text: t("aboutCC"), href: "/about" },
+                { text: t("contactBook"), href: "/contacts" },
+                { text: t("event"), href: "/events" },
+              ]}
+              menuText={t("menu")}
+            />
           </div>
         </div>
-      )}
 
-      {activeEvents.length > 0 && (
-        <div className="mt-12">
-          <H2>Happening Now</H2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {activeEvents.map((event: any) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        </div>
-      )}
+        {/* Content section */}
+        <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
+          <Lead className="whitespace-pre-line text-xl text-foreground/90 md:text-2xl">
+            Discover and join our creative workshops, meetups, and events.
+          </Lead>
 
-      {pastEvents.length > 0 && (
-        <div className="mt-12">
-          <H2>Past Events</H2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {pastEvents.map((event: any) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+          <Separator className="bg-white/10" />
+
+          {upcomingEvents.length > 0 && (
+            <div className="mt-12">
+              <H2 className="text-foreground/90">Upcoming Events</H2>
+              <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {upcomingEvents.map((event: any) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeEvents.length > 0 && (
+            <div className="mt-12">
+              <H2 className="text-foreground/90">Happening Now</H2>
+              <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {activeEvents.map((event: any) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {pastEvents.length > 0 && (
+            <div className="mt-12">
+              <H2 className="text-foreground/90">Past Events</H2>
+              <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {pastEvents.map((event: any) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+
+      {/* Event ticker at the bottom */}
+      <footer className="w-full overflow-hidden bg-yellow-400 py-3 text-black">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <span
+                key={i}
+                className="mx-4 text-base font-medium"
+              >{`Join our upcoming events • Creative Contact`}</span>
+            ))}
+        </div>
+      </footer>
+    </BackgroundDiv>
   );
 }
 
@@ -138,7 +280,7 @@ function EventCard({ event }: { event: Event }) {
     : "";
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden">
+    <Card className="flex h-full flex-col overflow-hidden border-0 bg-white/10 backdrop-blur-sm transition-all hover:bg-white/15">
       <div className="relative h-48 w-full">
         {event.featuredImage?.url ? (
           <Image
@@ -172,26 +314,32 @@ function EventCard({ event }: { event: Event }) {
       </div>
 
       <CardHeader>
-        <CardTitle className="line-clamp-2">{event.title}</CardTitle>
-        <CardDescription className="mt-1 flex items-center gap-1.5">
+        <CardTitle className="line-clamp-2 text-foreground">
+          {event.title}
+        </CardTitle>
+        <CardDescription className="mt-1 flex items-center gap-1.5 text-foreground/70">
           <CalendarIcon className="h-4 w-4" />
           <span>
             {formattedDate} {formattedTime && `at ${formattedTime}`}
           </span>
         </CardDescription>
-        <CardDescription className="flex items-center gap-1.5">
+        <CardDescription className="flex items-center gap-1.5 text-foreground/70">
           <MapPinIcon className="h-4 w-4" />
           <span>{event.location}</span>
         </CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1">
-        <P className="line-clamp-3 text-muted-foreground">{event.summary}</P>
+        <P className="line-clamp-3 text-foreground/80">{event.summary}</P>
 
         {event.tags && event.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1">
             {event.tags.map((tag, index) => (
-              <Badge key={index} variant="secondary" className="font-normal">
+              <Badge
+                key={index}
+                variant="secondary"
+                className="bg-white/10 font-normal text-foreground hover:bg-white/20"
+              >
                 {tag.tag}
               </Badge>
             ))}
@@ -200,7 +348,10 @@ function EventCard({ event }: { event: Event }) {
       </CardContent>
 
       <CardFooter className="pt-0">
-        <Button asChild className="w-full">
+        <Button
+          asChild
+          className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
+        >
           <Link href={`/events/${event.slug}`}>
             View Event <ArrowRightIcon className="ml-1.5 h-4 w-4" />
           </Link>
