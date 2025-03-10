@@ -65,7 +65,7 @@ export default async function EventsPage() {
               asChild
               className="text-sm text-foreground hover:text-yellow-400"
             >
-              <Link href="/join">
+              <Link href="/signup">
                 <TextIconBox
                   title={t("joinUsLine1")}
                   subtitle={t("joinUsLine2")}
@@ -146,7 +146,7 @@ export default async function EventsPage() {
             asChild
             className="text-sm text-foreground hover:text-yellow-400"
           >
-            <Link href="/join">
+            <Link href="/signup">
               <TextIconBox
                 title={t("joinUsLine1")}
                 subtitle={t("joinUsLine2")}

@@ -39,7 +39,7 @@ export default async function AboutPage() {
             asChild
             className="text-sm text-foreground hover:text-yellow-400"
           >
-            <Link href="/join">
+            <Link href="/signup">
               <TextIconBox
                 title={t("joinUsLine1")}
                 subtitle={t("joinUsLine2")}
@@ -219,7 +219,7 @@ export default async function AboutPage() {
               asChild
               className="mt-6 bg-yellow-400 text-black hover:bg-yellow-500"
             >
-              <Link href="/join">Become a Member</Link>
+              <Link href="/signup">Become a Member</Link>
             </Button>
           </div>
         </div>

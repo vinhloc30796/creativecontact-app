@@ -47,7 +47,7 @@ export default async function ContactsPage() {
             asChild
             className="text-sm text-foreground hover:text-yellow-400"
           >
-            <Link href="/join">
+            <Link href="/signup">
               <TextIconBox
                 title={t("joinUsLine1")}
                 subtitle={t("joinUsLine2")}
