@@ -20,7 +20,7 @@ const inConstructPage = false;
 
 async function getCurrentEvent(): Promise<string> {
   // @TODO: get the current event from the database
-  return "HOAN TAT 2";
+  return "[IN CONSTRUCTION]";
 }
 
 async function getEventSlots(event: string): Promise<EventSlot[]> {
@@ -157,7 +157,13 @@ export default async function Page(props: Props) {
           </a>
         </div>
         {/* Event ticker */}
-        <EventTicker eventName={currentEvent} tickerText={t("ticker")} />
+        <EventTicker
+          eventName={currentEvent}
+          tickerText={t("ticker")}
+          repetitions={6}
+          pauseOnHover={true}
+          direction="left"
+        />
       </footer>
     </BackgroundDiv>
   );

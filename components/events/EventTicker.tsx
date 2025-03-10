@@ -1,9 +1,14 @@
-import React from "react";
+"use client";
+
+import React, { useRef, useEffect, useState } from "react";
 
 interface EventTickerProps {
-    eventName: string;
-    tickerText: string;
-    repetitions?: number;
+  eventName: string;
+  tickerText: string;
+  repetitions?: number;
+  speed?: number;
+  pauseOnHover?: boolean;
+  direction?: "left" | "right";
 }
 
 /**
@@ -12,24 +17,107 @@ interface EventTickerProps {
  * @param eventName - The name of the current event
  * @param tickerText - Additional text to display after the event name
  * @param repetitions - Number of times to repeat the ticker text (default: 4)
+ * @param speed - Animation speed in seconds (default: 20)
+ * @param pauseOnHover - Whether to pause the animation on hover (default: true)
+ * @param direction - Direction of the marquee (default: "left")
  */
 export function EventTicker({
-    eventName,
-    tickerText,
-    repetitions = 4,
+  eventName,
+  tickerText,
+  repetitions = 4,
+  speed = 30,
+  pauseOnHover = true,
+  direction = "left",
 }: EventTickerProps) {
-    return (
-        <div className="flex h-[2em] flex-col justify-center gap-y-8 bg-yellow-400">
-            <div className="flex w-full animate-marquee whitespace-nowrap">
-                {Array(repetitions)
-                    .fill(0)
-                    .map((_, i) => (
-                        <span
-                            key={i}
-                            className="mx-4 text-base font-medium"
-                        >{`${eventName} ${tickerText}`}</span>
-                    ))}
-            </div>
+  const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentWidth, setContentWidth] = useState(0);
+
+  const fullText = `${eventName} ${tickerText}`;
+
+  // Measure content width on mount and window resize
+  useEffect(() => {
+    const updateWidth = () => {
+      if (contentRef.current) {
+        setContentWidth(contentRef.current.offsetWidth);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex h-[2em] overflow-hidden bg-yellow-400"
+      onMouseEnter={() => pauseOnHover && setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        // Ensure container has no extra space
+        width: '100%',
+      }}
+    >
+      <div
+        className="flex items-center"
+        style={{
+          // Create animation with dynamic width calculation
+          animation: isHovered ? 'none' : `scroll-${direction} ${speed}s linear infinite`,
+          // Define the animation inline for precise control
+          animationTimingFunction: 'linear',
+          animationIterationCount: 'infinite',
+          animationName: `scroll-${direction}`,
+          animationDuration: `${speed}s`,
+          animationPlayState: isHovered ? 'paused' : 'running',
+          // Double the width to ensure content fills the space
+          width: contentWidth > 0 ? `${contentWidth * 2}px` : 'auto',
+          // This ensures the animation is smooth
+          willChange: 'transform',
+        }}
+      >
+        {/* First copy of content */}
+        <div ref={contentRef} className="flex whitespace-nowrap">
+          {Array(repetitions)
+            .fill(0)
+            .map((_, i) => (
+              <span
+                key={`first-${i}`}
+                className="mx-4 text-base font-medium"
+              >
+                {fullText}
+              </span>
+            ))}
         </div>
-    );
+
+        {/* Second copy of content */}
+        <div className="flex whitespace-nowrap">
+          {Array(repetitions)
+            .fill(0)
+            .map((_, i) => (
+              <span
+                key={`second-${i}`}
+                className="mx-4 text-base font-medium"
+              >
+                {fullText}
+              </span>
+            ))}
+        </div>
+      </div>
+
+      {/* CSS for the animation */}
+      <style jsx>{`
+        @keyframes scroll-left {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        
+        @keyframes scroll-right {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
+    </div>
+  );
 } 
