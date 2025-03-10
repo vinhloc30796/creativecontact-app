@@ -42,7 +42,7 @@ export function ClientNavMenu({ items, activeIndex, activePath, menuText }: Clie
                 key={`nav-item-${index}`}
                 variant={variant === "primary" ? "default" : "ghost"}
                 asChild
-                className={`px-4 py-1.5 h-auto rounded-full text-sm transition-colors ${variant === "primary"
+                className={`px-4 py-1.5 h-auto rounded-full text-base transition-colors ${variant === "primary"
                   ? "bg-yellow-400 text-black font-medium hover:bg-yellow-500"
                   : "bg-white/10 text-foreground hover:bg-white/20"
                   }`}
@@ -58,7 +58,7 @@ export function ClientNavMenu({ items, activeIndex, activePath, menuText }: Clie
       <Button
         variant="ghost"
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`px-4 py-1.5 h-auto rounded-full text-sm transition-colors flex items-center gap-2 ${activeItemIndex === -1 && isExpanded
+        className={`px-4 py-1.5 h-auto rounded-full text-base transition-colors flex items-center gap-2 ${activeItemIndex === -1 && isExpanded
           ? "bg-yellow-400 text-black font-medium hover:bg-yellow-500"
           : "bg-white/10 text-foreground hover:bg-white/20"
           }`}

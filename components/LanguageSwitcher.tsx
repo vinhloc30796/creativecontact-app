@@ -14,7 +14,7 @@ export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
         {currentLang === "en" && <div className="h-5 w-5 bg-yellow-400"></div>}
         <Link
           href="?lang=en"
-          className={`text-lg font-medium transition-colors ${currentLang === "en"
+          className={`text-base font-medium transition-colors ${currentLang === "en"
             ? "text-black"
             : "text-gray-400 hover:text-gray-600"
             }`}
@@ -26,7 +26,7 @@ export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
         {currentLang === "vi" && <div className="h-5 w-5 bg-yellow-400"></div>}
         <Link
           href="?lang=vi"
-          className={`text-lg font-medium transition-colors ${currentLang === "vi"
+          className={`text-base font-medium transition-colors ${currentLang === "vi"
             ? "text-black"
             : "text-gray-400 hover:text-gray-600"
             }`}
