@@ -1,25 +1,19 @@
 import { EventSlot } from "@/app/types/EventSlot";
 import InConstruct from "@/components/InConstruction";
-import { Badge } from "@/components/ui/badge";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { EventTicker } from "@/components/events/EventTicker";
+import { TextIconBox } from "@/components/text-icon-box";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { HeroTitle, Lead, P, Small } from "@/components/ui/typography";
+import { HeroTitle, Lead } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { eventSlots } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { eq } from "drizzle-orm";
-import { Facebook, Instagram, Linkedin, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Facebook, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { ClientNavMenu } from "../components/ClientNavMenu";
-import { TextIconBox } from "@/components/text-icon-box";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -163,18 +157,7 @@ export default async function Page(props: Props) {
           </a>
         </div>
         {/* Event ticker */}
-        <div className="flex h-[2em] flex-col justify-center gap-y-8 bg-yellow-400">
-          <div className="flex w-full animate-marquee whitespace-nowrap">
-            {Array(4)
-              .fill(0)
-              .map((_, i) => (
-                <span
-                  key={i}
-                  className="mx-4 text-base font-medium"
-                >{`${currentEvent} ${t("ticker")}`}</span>
-              ))}
-          </div>
-        </div>
+        <EventTicker eventName={currentEvent} tickerText={t("ticker")} />
       </footer>
     </BackgroundDiv>
   );
