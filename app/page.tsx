@@ -96,8 +96,8 @@ export default async function Page(props: Props) {
       <div className="relative z-0 flex flex-1 flex-col">
         {/* Header section - takes up at most half the screen height */}
         <div className="flex h-[50vh] max-h-[50vh] flex-col justify-center px-12">
-          <div className="flex flex-col">
-            <Link href="/events" className="w-fit">
+          <div className="flex flex-col w-full">
+            <Link href="/events" className="w-fit self-start">
               <HeroTitle
                 className="font-bold text-hover-border"
                 size="default"
@@ -105,7 +105,7 @@ export default async function Page(props: Props) {
                 {t("titleContact")}
               </HeroTitle>
             </Link>
-            <Link href="/contacts" className="w-fit">
+            <Link href="/contacts" className="w-fit self-end">
               <HeroTitle
                 className="font-bold text-hover-border"
                 size="default"
