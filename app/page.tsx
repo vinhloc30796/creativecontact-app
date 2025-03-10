@@ -98,7 +98,7 @@ export default async function Page(props: Props) {
           <div className="flex flex-col">
             <Link href="/events" className="w-fit">
               <HeroTitle
-                className="font-bold transition-colors duration-300 ease-in-out hover:text-yellow-400"
+                className="font-bold text-hover-border"
                 size="default"
               >
                 {t("titleContact")}
@@ -106,7 +106,7 @@ export default async function Page(props: Props) {
             </Link>
             <Link href="/contacts" className="w-fit">
               <HeroTitle
-                className="font-bold transition-colors duration-300 ease-in-out hover:text-yellow-400"
+                className="font-bold text-hover-border"
                 size="default"
               >
                 {t("titleCreatives")}

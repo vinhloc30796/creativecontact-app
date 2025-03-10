@@ -48,10 +48,18 @@ const heroTitleVariants = cva(
         accent: "text-primary",
         contrast: "text-white", // High contrast for dark backgrounds
       },
+      // Add a new bordered property to enable text borders
+      bordered: {
+        none: "",
+        outline: "-webkit-text-stroke: 2px currentColor", // Uses current text color for outline
+        shadow: "text-shadow: -1px -1px 0 currentColor, 1px -1px 0 currentColor, -1px 1px 0 currentColor, 1px 1px 0 currentColor", // Text shadow outline
+        black: "-webkit-text-stroke: 2px black", // Black outline, text color set separately
+      },
     },
     defaultVariants: {
       size: "default",
       variant: "default",
+      bordered: "none",
     },
   }
 )
@@ -215,11 +223,11 @@ interface HeroTitleProps
 
 // HeroTitle component for large, impactful page titles
 const HeroTitle = React.forwardRef<HTMLHeadingElement, HeroTitleProps>(
-  ({ className, size, variant, as = "h1", ...props }, ref) => {
+  ({ className, size, variant, bordered, as = "h1", ...props }, ref) => {
     const Comp = as
     return (
       <Comp
-        className={cn(heroTitleVariants({ size, variant, className }))}
+        className={cn(heroTitleVariants({ size, variant, bordered, className }))}
         ref={ref}
         {...props}
       />

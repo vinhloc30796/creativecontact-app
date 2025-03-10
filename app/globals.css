@@ -15,6 +15,18 @@
   @tailwind utilities;
 }
 
+/* Custom text border hover effect */
+@layer components {
+  .text-hover-border {
+    @apply text-black transition-all duration-300 ease-in-out;
+  }
+
+  .text-hover-border:hover {
+    @apply text-yellow-400;
+    -webkit-text-stroke: 0.03em black;
+  }
+}
+
 @layer base {
   :root {
     --background: 0, 0%, 100%;
