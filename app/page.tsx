@@ -19,6 +19,7 @@ import { Facebook, Instagram, Linkedin, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { ClientNavMenu } from "../components/ClientNavMenu";
 import { TextIconBox } from "@/components/text-icon-box";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -118,35 +119,7 @@ export default async function Page(props: Props) {
           <div className="flex w-full items-center justify-between py-6">
             {/* Language switcher on left */}
             <div className="flex gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex gap-2">
-                      <Link
-                        href="?lang=en"
-                        className={`rounded-full px-3 py-1.5 text-sm transition-colors ${lang === "en"
-                          ? "bg-white font-medium text-black"
-                          : "bg-white/10 text-foreground hover:bg-white/20"
-                          }`}
-                      >
-                        EN
-                      </Link>
-                      <Link
-                        href="?lang=vi"
-                        className={`rounded-full px-3 py-1.5 text-sm transition-colors ${lang === "vi"
-                          ? "bg-white font-medium text-black"
-                          : "bg-white/10 text-foreground hover:bg-white/20"
-                          }`}
-                      >
-                        VI
-                      </Link>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <P>{t("languageTooltip")}</P>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <LanguageSwitcher currentLang={lang} />
             </div>
 
             {/* Navigation menu items on right */}
