@@ -110,8 +110,8 @@ export default async function Page(props: Props) {
                       <Link
                         href="?lang=en"
                         className={`rounded-full px-3 py-1.5 text-sm transition-colors ${lang === "en"
-                            ? "bg-white font-medium text-black"
-                            : "bg-white/10 text-foreground hover:bg-white/20"
+                          ? "bg-white font-medium text-black"
+                          : "bg-white/10 text-foreground hover:bg-white/20"
                           }`}
                       >
                         EN
@@ -119,8 +119,8 @@ export default async function Page(props: Props) {
                       <Link
                         href="?lang=vi"
                         className={`rounded-full px-3 py-1.5 text-sm transition-colors ${lang === "vi"
-                            ? "bg-white font-medium text-black"
-                            : "bg-white/10 text-foreground hover:bg-white/20"
+                          ? "bg-white font-medium text-black"
+                          : "bg-white/10 text-foreground hover:bg-white/20"
                           }`}
                       >
                         VI
@@ -136,9 +136,11 @@ export default async function Page(props: Props) {
 
             {/* Navigation menu items on right */}
             <ClientNavMenu
-              aboutText={t("aboutCC")}
-              contactBookText={t("contactBook")}
-              eventText={t("event")}
+              items={[
+                { text: t("aboutCC"), href: "/about" },
+                { text: t("contactBook"), href: "/contacts" },
+                { text: t("event"), href: "/events" }
+              ]}
               menuText={t("menu")}
             />
           </div>
