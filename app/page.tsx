@@ -6,7 +6,7 @@ import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import InConstruct from "@/components/InConstruction";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Instagram, Linkedin, X } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -33,6 +33,7 @@ import {
   Small
 } from "@/components/ui/typography";
 import { getServerTranslation } from "@/lib/i18n/init-server";
+import { ClientNavMenu } from "../components/ClientNavMenu";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -145,34 +146,12 @@ export default async function Page(props: Props) {
             </div>
 
             {/* Navigation menu items on right */}
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                asChild
-                className="bg-white/10 px-4 py-1.5 h-auto rounded-full text-sm text-foreground hover:bg-white/20 transition-colors"
-              >
-                <Link href="/about">
-                  {t("aboutCC")}
-                </Link>
-              </Button>
-              <Button
-                asChild
-                className="bg-yellow-400 px-4 py-1.5 h-auto rounded-full text-sm text-black font-medium hover:bg-yellow-500 transition-colors"
-              >
-                <Link href="/contacts">
-                  {t("contactBook")}
-                </Link>
-              </Button>
-              <Button
-                variant="ghost"
-                asChild
-                className="bg-white/10 px-4 py-1.5 h-auto rounded-full text-sm text-foreground hover:bg-white/20 transition-colors"
-              >
-                <Link href="/events">
-                  {t("event")}
-                </Link>
-              </Button>
-            </div>
+            <ClientNavMenu
+              aboutText={t("aboutCC")}
+              contactBookText={t("contactBook")}
+              eventText={t("event")}
+              menuText={t("menu")}
+            />
           </div>
         </div>
 
