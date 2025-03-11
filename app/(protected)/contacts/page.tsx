@@ -1,9 +1,5 @@
-import { ArrowUpRight } from "lucide-react";
-import { Metadata } from "next";
-import Link from "next/link";
-import { JSX, SVGProps } from "react";
-
 import { ClientNavMenu } from "@/components/ClientNavMenu";
+import { ConstructionIcon } from "@/components/icons/ConstructionIcon";
 import { TextIconBox } from "@/components/text-icon-box";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +14,9 @@ import { Separator } from "@/components/ui/separator";
 import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { getServerTranslation } from "@/lib/i18n/init-server";
+import { ArrowUpRight } from "lucide-react";
+import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Contact Book | Creative Contact",
@@ -202,34 +201,5 @@ function ContactCard({ name, role, location, tags }: ContactCardProps) {
         </Button>
       </CardFooter>
     </Card>
-  );
-}
-
-// Construction icon component
-function ConstructionIcon(
-  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>,
-) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="6" width="20" height="8" rx="1" />
-      <path d="M17 14v7" />
-      <path d="M7 14v7" />
-      <path d="M17 3v3" />
-      <path d="M7 3v3" />
-      <path d="M10 14 2.3 6.3" />
-      <path d="m14 6 7.7 7.7" />
-      <path d="m8 6 8 8" />
-    </svg>
   );
 }
