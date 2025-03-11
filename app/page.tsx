@@ -15,6 +15,7 @@ import { ArrowUpRight, Facebook, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { ClientNavMenu } from "../components/ClientNavMenu";
 import { HoverableCreativesTitle } from "@/components/contacts/HoverableCreativesTitle";
+import { HoverableContactTitle, HomepageEventOverlay } from "@/components/contacts/HoverableContactTitle";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -93,9 +94,11 @@ export default async function Page(props: Props) {
         <div className="flex h-[50vh] max-h-[50vh] flex-col justify-center px-12">
           <div className="flex w-full flex-col">
             <Link href="/events" className="w-fit self-start">
-              <HeroTitle className="text-hover-border font-bold" size="default">
-                {t("titleContact")}
-              </HeroTitle>
+              <HoverableContactTitle>
+                <HeroTitle className="text-hover-border font-bold" size="default">
+                  {t("titleContact")}
+                </HeroTitle>
+              </HoverableContactTitle>
             </Link>
             <div className="w-fit self-end">
               <HoverableCreativesTitle>
@@ -173,3 +176,25 @@ export default async function Page(props: Props) {
     </BackgroundDiv>
   );
 }
+
+// Example of using HomepageEventOverlay directly:
+// 
+// ```tsx
+// "use client";
+// 
+// import { useState } from "react";
+// import { HomepageEventOverlay } from "@/components/contacts/HoverableContactTitle";
+// 
+// export function EventOverlayExample() {
+//   const [isVisible, setIsVisible] = useState(false);
+//   
+//   return (
+//     <div>
+//       <button onClick={() => setIsVisible(!isVisible)}>
+//         Toggle Overlay
+//       </button>
+//       <HomepageEventOverlay isVisible={isVisible} className="bg-blue-500/30" />
+//     </div>
+//   );
+// }
+// ```
