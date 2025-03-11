@@ -311,8 +311,8 @@ export function HoverableCreativesTitle({
   positionCalculator = stackVertically,
   postAppearanceAnimation = {
     type: PostAppearanceAnimationType.FLOAT_UP,
-    speed: 50, // 50px per second
-    delay: 500 // Start floating after 500ms
+    speed: 120, // 50px per second
+    delay: 120 // Start floating after 500ms
   }
 }: HoverableCreativesTitleProps) {
   const [isHovering, setIsHovering] = useState(false);
