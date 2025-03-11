@@ -122,7 +122,7 @@ export function stackVertically(
   verticalGapPercent: number = 2,
   horizontalGapPercent: number = 5,
   topMarginPercent: number = 2,
-  horizontalMarginPercent: number = 2
+  horizontalMarginPercent: number = 5,
 ): Position[] {
   const positions: Position[] = [];
 
@@ -155,12 +155,18 @@ export function stackVertically(
     const assumedViewportWidth = 1200; // pixels
     const itemWidthPercent = (item.width / assumedViewportWidth) * 100;
 
+    // Ensure the item width doesn't exceed available space
+    const safeItemWidthPercent = Math.min(itemWidthPercent, availableWidth);
+
+    // Calculate the maximum left position to ensure the item stays within viewport
+    const maxLeftPosition = 100 - horizontalMarginPercent - safeItemWidthPercent;
+
     // Generate a random position that doesn't overlap with the previous item
     let leftPercent: number;
 
     if (prevItemRange === null) {
       // For the first item, place it randomly within the available space
-      const maxLeft = availableWidth - itemWidthPercent;
+      const maxLeft = availableWidth - safeItemWidthPercent;
       leftPercent = horizontalMarginPercent + (Math.random() * maxLeft);
     } else {
       // For subsequent items, ensure no horizontal overlap with the previous item
@@ -169,38 +175,41 @@ export function stackVertically(
       // Determine available spaces to the left and right of the previous item
       // Include the horizontal gap in calculations to ensure minimum distance
       const leftSpaceWidth = prevLeft - horizontalMarginPercent - horizontalGapPercent;
-      const rightSpaceWidth = (100 - horizontalMarginPercent) - prevRight - horizontalGapPercent;
+      const rightSpaceWidth = maxLeftPosition - prevRight - horizontalGapPercent;
 
-      if (leftSpaceWidth >= itemWidthPercent && rightSpaceWidth >= itemWidthPercent) {
+      if (leftSpaceWidth >= safeItemWidthPercent && rightSpaceWidth >= safeItemWidthPercent) {
         // If there's enough space on both sides, randomly choose one side
         if (Math.random() < 0.5) {
           // Place to the left of the previous item (with gap)
-          leftPercent = horizontalMarginPercent + (Math.random() * (leftSpaceWidth - itemWidthPercent));
+          leftPercent = horizontalMarginPercent + (Math.random() * (leftSpaceWidth - safeItemWidthPercent));
         } else {
           // Place to the right of the previous item (with gap)
-          leftPercent = prevRight + horizontalGapPercent + (Math.random() * (rightSpaceWidth - itemWidthPercent));
+          leftPercent = prevRight + horizontalGapPercent + (Math.random() * (rightSpaceWidth - safeItemWidthPercent));
         }
-      } else if (leftSpaceWidth >= itemWidthPercent) {
+      } else if (leftSpaceWidth >= safeItemWidthPercent) {
         // Only enough space on the left (with gap)
-        leftPercent = horizontalMarginPercent + (Math.random() * (leftSpaceWidth - itemWidthPercent));
-      } else if (rightSpaceWidth >= itemWidthPercent) {
+        leftPercent = horizontalMarginPercent + (Math.random() * (leftSpaceWidth - safeItemWidthPercent));
+      } else if (rightSpaceWidth >= safeItemWidthPercent) {
         // Only enough space on the right (with gap)
-        leftPercent = prevRight + horizontalGapPercent + (Math.random() * (rightSpaceWidth - itemWidthPercent));
+        leftPercent = prevRight + horizontalGapPercent + (Math.random() * (rightSpaceWidth - safeItemWidthPercent));
       } else {
         // Not enough space on either side with the required gap
         // Try to find the best position that maximizes the gap
         if (leftSpaceWidth + horizontalGapPercent > rightSpaceWidth + horizontalGapPercent) {
           // More space on the left
-          leftPercent = horizontalMarginPercent + (Math.random() * Math.max(0, prevLeft - horizontalMarginPercent - itemWidthPercent));
+          leftPercent = horizontalMarginPercent + (Math.random() * Math.max(0, prevLeft - horizontalMarginPercent - safeItemWidthPercent));
         } else {
           // More space on the right
-          leftPercent = prevRight + (Math.random() * Math.max(0, 100 - horizontalMarginPercent - prevRight - itemWidthPercent));
+          leftPercent = prevRight + (Math.random() * Math.max(0, maxLeftPosition - prevRight));
         }
       }
     }
 
+    // Ensure the item stays within viewport boundaries
+    leftPercent = Math.max(horizontalMarginPercent, Math.min(leftPercent, maxLeftPosition));
+
     // Update the previous item's range for the next iteration
-    prevItemRange = [leftPercent, leftPercent + itemWidthPercent];
+    prevItemRange = [leftPercent, leftPercent + safeItemWidthPercent];
 
     positions.push({
       top,
@@ -215,7 +224,10 @@ export function stackVertically(
 interface HoverableCreativesTitleProps {
   children: ReactNode;
   count?: number;
-  positionCalculator?: (items: ContactPictureMetadata[], context?: any) => Position[];
+  positionCalculator?: (
+    items: ContactPictureMetadata[],
+    ...args: any[]
+  ) => Position[];
 }
 
 export function HoverableCreativesTitle({
