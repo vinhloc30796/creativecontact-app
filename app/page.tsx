@@ -14,6 +14,7 @@ import { eq } from "drizzle-orm";
 import { ArrowUpRight, Facebook, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { ClientNavMenu } from "../components/ClientNavMenu";
+import { HoverableCreativesTitle } from "@/components/contacts/HoverableCreativesTitle";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -96,11 +97,15 @@ export default async function Page(props: Props) {
                 {t("titleContact")}
               </HeroTitle>
             </Link>
-            <Link href="/contacts" className="w-fit self-end">
-              <HeroTitle className="text-hover-border font-bold" size="default">
-                {t("titleCreatives")}
-              </HeroTitle>
-            </Link>
+            <div className="w-fit self-end">
+              <HoverableCreativesTitle>
+                <Link href="/contacts">
+                  <HeroTitle className="text-hover-border font-bold" size="default">
+                    {t("titleCreatives")}
+                  </HeroTitle>
+                </Link>
+              </HoverableCreativesTitle>
+            </div>
           </div>
 
           {/* Translation and navigation row moved below title */}
