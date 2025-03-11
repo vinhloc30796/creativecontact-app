@@ -94,7 +94,18 @@ export default async function Page(props: Props) {
         <div className="flex h-[50vh] max-h-[50vh] flex-col justify-center px-12">
           <div className="flex w-full flex-col">
             <Link href="/events" className="w-fit self-start">
-              <HoverableContactTitle>
+              <HoverableContactTitle
+                events={[
+                  { title: "Workshop", datetime: "May 15, 2024 • 14:00" },
+                  { title: "Exhibition", datetime: "May 20, 2024 • 18:30" },
+                  { title: "Networking", datetime: "June 5, 2024 • 19:00" },
+                  { title: "Boardgames", datetime: "July 6, 2025 • 22:00" },
+                  { title: "Workshop #2", datetime: "July 10, 2025 • 14:00" },
+                  { title: "Networking #2", datetime: "Aug 12, 2024 • 19:00" },
+                  { title: "Exhibition #2", datetime: "Sep 12, 2024 • 19:00" },
+                  { title: "Boardgames #2", datetime: "Oct 12, 2024 • 19:00" },
+                ]}
+              >
                 <HeroTitle className="text-hover-border font-bold" size="default">
                   {t("titleContact")}
                 </HeroTitle>
