@@ -3,6 +3,8 @@
 import React, { useState, ReactNode, useRef } from "react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { H4, Small } from "@/components/ui/typography";
 
 /**
  * Event interface for the HomepageEventOverlay component
@@ -13,9 +15,96 @@ export interface EventItem {
 }
 
 /**
+ * Interface for image placeholder metadata
+ */
+export interface ImagePlaceholderMetadata {
+  width: number;
+  height: number;
+  url?: string;
+}
+
+/**
+ * Generates random dimensions for image placeholders
+ * 
+ * @param count Number of image placeholders to generate
+ * @returns Array of image placeholder metadata
+ */
+export function getRandomImagePlaceholders(count: number = 3): ImagePlaceholderMetadata[] {
+  // Generate a list of random dimensions for image placeholders
+  // Random count between 2-5 if not specified
+  const actualCount = count || Math.floor(Math.random() * 4) + 2;
+
+  return Array.from({ length: actualCount }, () => ({
+    // Random width & height between 200-280px
+    width: Math.floor(Math.random() * 80) + 200,
+    height: Math.floor(Math.random() * 80) + 200,
+    url: Math.random() > 0.5
+      ? `https://example.com/image/${Math.random().toString(36).substring(2, 8)}`
+      : undefined,
+  }));
+}
+
+/**
+ * ImagePlaceholder Component
+ * 
+ * A component that displays an image placeholder with random dimensions.
+ */
+export function ImagePlaceholder({
+  width,
+  height,
+  url,
+  className,
+}: ImagePlaceholderMetadata & { className?: string }) {
+  return (
+    <Card
+      className={cn("flex-shrink-0 overflow-hidden", className)}
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
+      <CardHeader className="flex-shrink-0 bg-yellow-400 p-2">
+        <CardTitle className="text-sm">[IN CONSTRUCTION]</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-grow bg-gray-100 p-0">
+        {/* Empty content area representing an image placeholder */}
+      </CardContent>
+      <CardFooter className="flex-shrink-0 p-2">
+        <button
+          onClick={() => url && window.open(url, '_blank')}
+          className="text-xs text-blue-500 hover:underline cursor-pointer"
+        >
+          View details
+        </button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+/**
+ * CardText Component
+ * 
+ * A component that displays the event title and datetime in a card.
+ */
+export function EventTextCard({ event }: { event: EventItem }) {
+  return (
+    <div className="flex-shrink-0 min-w-48 pt-0 mt-0">
+      <div className="flex-grow">
+        <H4>{event.title}</H4>
+      </div>
+      <div className="pt-0 mt-auto">
+        <Small>
+          {typeof event.datetime === 'string'
+            ? event.datetime
+            : format(event.datetime, 'MMM dd, yyyy • HH:mm')}
+        </Small>
+      </div>
+    </div>
+  );
+}
+
+/**
  * HomepageEventCard Component
  * 
- * A component that displays an event card with title and datetime.
+ * A component that displays an event with text and image placeholders as separate cards
+ * at the same level within a div container.
  * 
  * @example
  * <HomepageEventCard 
@@ -23,18 +112,24 @@ export interface EventItem {
  * />
  */
 export function HomepageEventCard({ event }: { event: EventItem }) {
+  // Generate 2-5 random image placeholders
+  const randomCount = Math.floor(Math.random() * 4) + 2;
+  const imagePlaceholders = getRandomImagePlaceholders(randomCount);
+
   return (
-    <Card className="h-full min-w-48 flex flex-col">
-      <CardHeader className="flex-grow">
-        <CardTitle className="text-lg">{event.title}</CardTitle>
-      </CardHeader>
-      <CardFooter className="pt-0 mt-auto">
-        <p className="text-sm text-muted-foreground">
-          {typeof event.datetime === 'string'
-            ? event.datetime
-            : format(event.datetime, 'MMM dd, yyyy • HH:mm')}
-        </p>
-      </CardFooter>
+    <Card className="flex flex-row gap-4 h-full w-fit p-4 bg-transparent border-none shadow-none">
+      {/* Text Card */}
+      <EventTextCard event={event} />
+
+      {/* Image placeholder cards */}
+      {imagePlaceholders.map((placeholder, index) => (
+        <ImagePlaceholder
+          key={index}
+          width={placeholder.width}
+          height={placeholder.height}
+          url={placeholder.url}
+        />
+      ))}
     </Card>
   );
 }
@@ -48,13 +143,14 @@ export function HomepageEventCard({ event }: { event: EventItem }) {
  * @example
  * <HomepageEventOverlay 
  *   isVisible={true} 
- *   className="bg-black/50"
+ *   className="bg-transparent"
  *   events={[{ title: "Workshop", datetime: new Date() }]} 
  * />
  */
 export function HomepageEventOverlay({
   isVisible,
-  className = "bg-black/50",
+  className = "bg-black/10",
+  // className = "bg-transparent",
   events = []
 }: {
   isVisible: boolean;
@@ -110,6 +206,7 @@ interface HoverableContactTitleProps {
 export function HoverableContactTitle({
   children,
   overlayClassName = "bg-black/50", // Default semi-transparent black overlay
+  // overlayClassName = "bg-transparent", // Default transparent overlay
   events = []
 }: HoverableContactTitleProps) {
   const [isHovering, setIsHovering] = useState(false);
