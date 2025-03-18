@@ -15,7 +15,7 @@ import { ArrowUpRight, Facebook, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { ClientNavMenu } from "../components/ClientNavMenu";
 import { HoverableCreativesTitle } from "@/components/contacts/HoverableCreativesTitle";
-import { HoverableContactTitle, HomepageEventOverlay } from "@/components/contacts/HoverableContactTitle";
+import { HoverableContactTitle } from "@/components/contacts/HoverableContactTitle";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -90,27 +90,23 @@ export default async function Page(props: Props) {
 
       {/* Main content split into two sections */}
       <div className="relative z-0 flex flex-1 flex-col">
-        {/* Header section - takes up at most half the screen height */}
+        {/* Hero section - takes up at most half the screen height */}
         <div className="flex h-[50vh] max-h-[50vh] flex-col justify-center px-12">
           <div className="flex w-full flex-col">
-            <Link href="/events" className="w-fit self-start">
-              <HoverableContactTitle
-                events={[
-                  { title: "Workshop", datetime: "May 15, 2024 • 14:00" },
-                  { title: "Exhibition", datetime: "May 20, 2024 • 18:30" },
-                  { title: "Networking", datetime: "June 5, 2024 • 19:00" },
-                  { title: "Boardgames", datetime: "July 6, 2025 • 22:00" },
-                  { title: "Workshop #2", datetime: "July 10, 2025 • 14:00" },
-                  { title: "Networking #2", datetime: "Aug 12, 2024 • 19:00" },
-                  { title: "Exhibition #2", datetime: "Sep 12, 2024 • 19:00" },
-                  { title: "Boardgames #2", datetime: "Oct 12, 2024 • 19:00" },
-                ]}
-              >
-                <HeroTitle className="text-hover-border font-bold" size="default">
-                  {t("titleContact")}
-                </HeroTitle>
-              </HoverableContactTitle>
-            </Link>
+            <HoverableContactTitle
+              titleText={t("titleContact")}
+              events={[
+                { title: "Workshop", datetime: "May 15, 2024 • 14:00" },
+                { title: "Exhibition", datetime: "May 20, 2024 • 18:30" },
+                { title: "Networking", datetime: "June 5, 2024 • 19:00" },
+                { title: "Boardgames", datetime: "July 6, 2025 • 22:00" },
+                { title: "Workshop #2", datetime: "July 10, 2025 • 14:00" },
+                { title: "Networking #2", datetime: "Aug 12, 2024 • 19:00" },
+                { title: "Exhibition #2", datetime: "Sep 12, 2024 • 19:00" },
+                { title: "Boardgames #2", datetime: "Oct 12, 2024 • 19:00" },
+              ]}
+              contentId="subtitle-content"
+            />
             <div className="w-fit self-end">
               <HoverableCreativesTitle>
                 <Link href="/contacts">
@@ -144,16 +140,17 @@ export default async function Page(props: Props) {
         {/* Content section - fills the remaining space */}
         <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
           {/* Description text */}
-          <Lead className="whitespace-pre-line text-xl text-foreground/90 md:text-2xl">
+          <Lead
+            id="subtitle-content"
+            className="whitespace-pre-line text-xl text-foreground/90 mt-4 md:text-2xl"
+          >
             {t("subtitle")}
           </Lead>
-
-          <Separator className="bg-white/10" />
         </div>
       </div>
 
       {/* Event ticker at the bottom */}
-      <footer className="w-full overflow-hidden text-black">
+      <footer className="w-full overflow-hidden text-black relative z-50">
         {/* Social media links - positioned at bottom left above the footer */}
         <div className="mb-8 ml-12 flex flex-col gap-y-8 py-4">
           <a
@@ -187,25 +184,3 @@ export default async function Page(props: Props) {
     </BackgroundDiv>
   );
 }
-
-// Example of using HomepageEventOverlay directly:
-// 
-// ```tsx
-// "use client";
-// 
-// import { useState } from "react";
-// import { HomepageEventOverlay } from "@/components/contacts/HoverableContactTitle";
-// 
-// export function EventOverlayExample() {
-//   const [isVisible, setIsVisible] = useState(false);
-//   
-//   return (
-//     <div>
-//       <button onClick={() => setIsVisible(!isVisible)}>
-//         Toggle Overlay
-//       </button>
-//       <HomepageEventOverlay isVisible={isVisible} className="bg-blue-500/30" />
-//     </div>
-//   );
-// }
-// ```

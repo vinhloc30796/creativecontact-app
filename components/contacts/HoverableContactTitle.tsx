@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, ReactNode, useRef } from "react";
+import React, { useState, ReactNode, useRef, useEffect } from "react";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { H4, Small } from "@/components/ui/typography";
+import Link from "next/link";
+import { HeroTitle } from "../ui/typography";
 
 /**
  * Event interface for the HomepageEventOverlay component
@@ -139,18 +141,10 @@ export function HomepageEventCard({ event }: { event: EventItem }) {
  * 
  * A component that displays a blank overlay covering the content section of the homepage,
  * with a horizontal list of events if provided.
- * 
- * @example
- * <HomepageEventOverlay 
- *   isVisible={true} 
- *   className="bg-transparent"
- *   events={[{ title: "Workshop", datetime: new Date() }]} 
- * />
  */
 export function HomepageEventOverlay({
   isVisible,
-  className = "bg-black/10",
-  // className = "bg-transparent",
+  className = "bg-none",
   events = []
 }: {
   isVisible: boolean;
@@ -164,19 +158,19 @@ export function HomepageEventOverlay({
   return (
     <div
       ref={overlayRef}
-      // mb-[2em] is to account for the footer height
-      className={`fixed inset-0 px-20 z-10 pointer-events-none animate-fadeIn mb-[2em] ${className} overflow-x-hidden`}
+      className={`fixed z-10 px-20 animate-fadeIn ${className}`}
       style={{
-        // Position the overlay to cover only the content section
-        // It will start below the header section and end before the footer
-        top: "55vh", // Start from the middle of the viewport (where content section begins)
-        bottom: "0",
+        // Position to cover from content start to ticker
+        top: "55vh",
+        bottom: "0", // Extend all the way to the bottom of the viewport
         left: "0",
-        right: "0"
+        right: "0",
+        // Ensure it's displayed over content but under social icons
+        zIndex: 40
       }}
     >
       {events.length > 0 && (
-        <div className="flex flex-row h-full gap-24 px-4 py-6">
+        <div className="flex flex-row h-full gap-24 px-4 py-6 overflow-x-auto">
           {events.map((event, index) => (
             <HomepageEventCard key={index} event={event} />
           ))}
@@ -187,47 +181,87 @@ export function HomepageEventOverlay({
 }
 
 interface HoverableContactTitleProps {
-  children: ReactNode;
+  children?: ReactNode;
+  titleText?: string;
   overlayClassName?: string;
   events?: EventItem[];
+  contentRef?: React.RefObject<HTMLElement | null>;
+  contentId?: string;
+  href?: string;
 }
 
 /**
  * HoverableContactTitle Component
  * 
- * A component that displays a title which, when hovered, shows a blank overlay
- * that covers the content section of the page. Can optionally display a list of events.
- * 
- * @example
- * <HoverableContactTitle events={[{ title: "Workshop", datetime: new Date() }]}>
- *   <h2>Contact Title</h2>
- * </HoverableContactTitle>
+ * A component that displays a title which, when hovered:
+ * 1. Shows an overlay covering the content area
+ * 2. Hides the element with the provided contentId or subtitle-content by default
  */
 export function HoverableContactTitle({
   children,
-  overlayClassName = "bg-black/50", // Default semi-transparent black overlay
-  // overlayClassName = "bg-transparent", // Default transparent overlay
-  events = []
+  titleText,
+  overlayClassName = "bg-none",
+  events = [],
+  contentRef,
+  contentId = "subtitle-content",
+  href = "/events"
 }: HoverableContactTitleProps) {
   const [isHovering, setIsHovering] = useState(false);
+  const autoDetectedRef = useRef<HTMLElement | null>(null);
+  const effectiveRef = contentRef || autoDetectedRef;
+
+  // Find element by ID if contentRef is not provided
+  useEffect(() => {
+    if (!contentRef) {
+      const element = document.getElementById(contentId);
+      if (element) {
+        autoDetectedRef.current = element as HTMLElement;
+      }
+    }
+  }, [contentRef, contentId]);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
+    // Hide the content when hovering
+    if (effectiveRef?.current) {
+      effectiveRef.current.style.visibility = "hidden";
+    }
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
+    // Show the content when not hovering
+    if (effectiveRef?.current) {
+      effectiveRef.current.style.visibility = "visible";
+    }
   };
 
-  return (
-    <div className="relative">
+  // If titleText is provided, render with Link, otherwise use children
+  const content = titleText ? (
+    <Link href={href} className="w-fit self-start">
       <div
         className="w-fit"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {children}
+        <HeroTitle className="text-hover-border font-bold" size="default">
+          {titleText}
+        </HeroTitle>
       </div>
+    </Link>
+  ) : (
+    <div
+      className="w-fit"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+    </div>
+  );
+
+  return (
+    <div className="relative">
+      {content}
 
       <HomepageEventOverlay
         isVisible={isHovering}
