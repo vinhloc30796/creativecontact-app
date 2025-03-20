@@ -24,6 +24,11 @@ export const woff2PlusJakartaSansLink = "https://fonts.gstatic.com/s/plusjakarta
 export const googlePlusJakartaSansLink = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap";
 export const googlePlusJakartaSansBoldLink = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700&display=swap";
 
+// Bricolage Grotesque font links
+export const woff2BricolageGrotesqueLink = "https://fonts.gstatic.com/s/bricolagegrotesque/v5/3y9U6DJNw6lFZ3mQo77se0sFwdRk-bY.woff2";
+export const googleBricolageGrotesqueLink = "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque&display=swap";
+export const googleBricolageGrotesqueBoldLink = "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&display=swap";
+
 export const theme = {
   content: [
     './emails/**/*.{js,jsx,ts,tsx}',
@@ -33,6 +38,7 @@ export const theme = {
     extend: {
       fontFamily: {
         sans: ['Plus Jakarta Sans', 'Century Gothic', 'Arial', 'Helvetica', 'sans-serif'],
+        bricolage: ['Bricolage Grotesque', 'Arial', 'Helvetica', 'sans-serif'],
       },
       spacing: {
         '1': '4px',
@@ -80,4 +86,8 @@ export const theme = {
     animation: false,
     // You may need to disable other features as well
   },
+  // Required by TailwindConfig type
+  separator: ':',
+  safelist: [],
+  experimental: {}
 };

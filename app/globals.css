@@ -14,6 +14,10 @@
     var(--font-plus-jakarta-sans), Plus Jakarta Sans, Century Gothic, Arial,
     Helvetica, sans-serif;
 
+  --font-bricolage-grotesque:
+    var(--font-bricolage-grotesque), Bricolage Grotesque, Arial, Helvetica,
+    sans-serif;
+
   --color-border: hsla(var(--border), 1);
   --color-input: hsla(var(--input), 1);
   --color-ring: hsla(var(--ring), 1);
@@ -141,7 +145,7 @@
   --color-cc-fuchsia-neutral-base_black: hsla(0, 51.35%, 7.25%, 1);
 
   --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-md: calc(var(--radius) - 10px);
   --radius-sm: calc(var(--radius) - 4px);
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -231,14 +235,33 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
-
 /* Custom text border hover effect */
 @utility text-hover-border {
   @apply text-black transition-all duration-300 ease-in-out;
 
   &:hover {
     @apply text-sunglow;
-    -webkit-text-stroke: 0.03em black;
+    -webkit-text-stroke: 0.06em black;
+    paint-order: stroke fill;
+  }
+}
+
+/* Fix for text stroke rendering */
+@utility fix-stroke {
+  paint-order: stroke fill;
+}
+
+/* Custom text border hover effect */
+@utility text-hover-explode {
+  @apply text-black transition-all duration-300 ease-in-out;
+
+  &:hover {
+    @apply text-sunglow;
+    text-shadow:
+      -3rem 0 black,
+      0 3rem black,
+      3rem 0 black,
+      0 -3rem black;
   }
 }
 

@@ -34,7 +34,7 @@ const headingVariants = cva(
 
 // Hero title variants for large, impactful page titles
 const heroTitleVariants = cva(
-  "font-bold tracking-tighter text-foreground",
+  "font-bricolage-grotesque font-bold tracking-tighter text-foreground",
   {
     variants: {
       size: {

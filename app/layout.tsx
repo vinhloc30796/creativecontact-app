@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import React, { Suspense } from 'react'
-import { plusJakartaSans } from './fonts'
+import { plusJakartaSans, bricolageGrotesque } from './fonts'
 import './globals.css'
 import Providers from './providers'
 
@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html className={`${plusJakartaSans.variable} font-sans`} suppressHydrationWarning>
+    <html className={`${plusJakartaSans.variable} ${bricolageGrotesque.variable} font-sans`} suppressHydrationWarning>
       <head />
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
         <Providers>
