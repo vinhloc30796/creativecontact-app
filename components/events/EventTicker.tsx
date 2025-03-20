@@ -49,6 +49,28 @@ export function EventTicker({
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
+  // Create the animation style dynamically
+  const getAnimationStyle = () => {
+    // Base styles that apply in both states
+    const baseStyles = {
+      // Double the width to ensure content fills the space
+      width: contentWidth > 0 ? `${contentWidth * 2}px` : 'auto',
+      // This ensures the animation is smooth
+      willChange: 'transform',
+      // Individual animation properties
+      animationName: `scroll-${direction}`,
+      animationDuration: `${speed}s`,
+      animationTimingFunction: 'linear',
+      animationIterationCount: 'infinite',
+    };
+
+    // Just update the play state when hovered, preserving position
+    return {
+      ...baseStyles,
+      animationPlayState: isHovered && pauseOnHover ? 'paused' : 'running',
+    };
+  };
+
   return (
     <div
       ref={containerRef}
@@ -62,20 +84,7 @@ export function EventTicker({
     >
       <div
         className="flex items-center"
-        style={{
-          // Create animation with dynamic width calculation
-          animation: isHovered ? 'none' : `scroll-${direction} ${speed}s linear infinite`,
-          // Define the animation inline for precise control
-          animationTimingFunction: 'linear',
-          animationIterationCount: 'infinite',
-          animationName: `scroll-${direction}`,
-          animationDuration: `${speed}s`,
-          animationPlayState: isHovered ? 'paused' : 'running',
-          // Double the width to ensure content fills the space
-          width: contentWidth > 0 ? `${contentWidth * 2}px` : 'auto',
-          // This ensures the animation is smooth
-          willChange: 'transform',
-        }}
+        style={getAnimationStyle()}
       >
         {/* First copy of content */}
         <div ref={contentRef} className="flex whitespace-nowrap">
