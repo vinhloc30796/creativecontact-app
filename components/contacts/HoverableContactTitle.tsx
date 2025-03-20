@@ -13,13 +13,13 @@ import { HeroTitle } from "../ui/typography";
  */
 export interface EventItem {
   title: string;
-  datetime: Date | string;
+  datetime: Date;
 }
 
 /**
  * Interface for image placeholder metadata
  */
-export interface ImagePlaceholderMetadata {
+export interface EventImagePlaceholderMetadata {
   width: number;
   height: number;
   url?: string;
@@ -31,7 +31,7 @@ export interface ImagePlaceholderMetadata {
  * @param count Number of image placeholders to generate
  * @returns Array of image placeholder metadata
  */
-export function getRandomImagePlaceholders(count: number = 3): ImagePlaceholderMetadata[] {
+export function getRandomImagePlaceholders(count: number = 3): EventImagePlaceholderMetadata[] {
   // Generate a list of random dimensions for image placeholders
   // Random count between 2-5 if not specified
   const actualCount = count || Math.floor(Math.random() * 4) + 2;
@@ -51,12 +51,12 @@ export function getRandomImagePlaceholders(count: number = 3): ImagePlaceholderM
  * 
  * A component that displays an image placeholder with random dimensions.
  */
-export function ImagePlaceholder({
+export function EventImagePlaceholder({
   width,
   height,
   url,
   className,
-}: ImagePlaceholderMetadata & { className?: string }) {
+}: EventImagePlaceholderMetadata & { className?: string }) {
   return (
     <Card
       className={cn("flex-shrink-0 overflow-hidden", className)}
@@ -81,21 +81,19 @@ export function ImagePlaceholder({
 }
 
 /**
- * CardText Component
+ * AnnualEventTextCard Component
  * 
- * A component that displays the event title and datetime in a card.
+ * A component that displays annual event information including year and event count.
  */
-export function EventTextCard({ event }: { event: EventItem }) {
+export function AnnualEventTextCard({ year, eventCount }: { year: string | number, eventCount: number }) {
   return (
     <div className="flex-shrink-0 min-w-48 pt-0 mt-0">
       <div className="flex-grow">
-        <H4>{event.title}</H4>
+        <H4 className="text-5xl font-bold">{year}</H4>
       </div>
       <div className="pt-0 mt-auto">
-        <Small>
-          {typeof event.datetime === 'string'
-            ? event.datetime
-            : format(event.datetime, 'MMM dd, yyyy • HH:mm')}
+        <Small className="text-gray-500">
+          {eventCount} {eventCount === 1 ? 'event' : 'events'}
         </Small>
       </div>
     </div>
@@ -110,22 +108,31 @@ export function EventTextCard({ event }: { event: EventItem }) {
  * 
  * @example
  * <HomepageEventCard 
- *   event={{ title: "Workshop", datetime: new Date() }}
+ *   year="2023"
+ *   eventCount={5}
  * />
  */
-export function HomepageEventCard({ event }: { event: EventItem }) {
+export function HomepageEventCard({
+  year,
+  eventCount,
+  event
+}: {
+  year: string | number,
+  eventCount: number,
+  event?: EventItem  // Optional event item for displaying additional details
+}) {
   // Generate 2-5 random image placeholders
   const randomCount = Math.floor(Math.random() * 4) + 2;
   const imagePlaceholders = getRandomImagePlaceholders(randomCount);
 
   return (
     <Card className="flex flex-row gap-4 h-full w-fit p-4 bg-transparent border-none shadow-none">
-      {/* Text Card */}
-      <EventTextCard event={event} />
+      {/* Annual Event Text Card */}
+      <AnnualEventTextCard year={year} eventCount={eventCount} />
 
       {/* Image placeholder cards */}
       {imagePlaceholders.map((placeholder, index) => (
-        <ImagePlaceholder
+        <EventImagePlaceholder
           key={index}
           width={placeholder.width}
           height={placeholder.height}
@@ -145,7 +152,7 @@ export function HomepageEventCard({ event }: { event: EventItem }) {
 export function HomepageEventOverlay({
   isVisible,
   className = "bg-none",
-  events = []
+  events = [],
 }: {
   isVisible: boolean;
   className?: string;
@@ -154,6 +161,27 @@ export function HomepageEventOverlay({
   const overlayRef = useRef<HTMLDivElement>(null);
 
   if (!isVisible) return null;
+
+  // Group events by year
+  const eventsByYear = events.reduce<Record<string, EventItem[]>>((acc, event) => {
+    // Extract year from Date object
+    const year = event.datetime.getFullYear().toString();
+
+    if (!acc[year]) {
+      acc[year] = [];
+    }
+
+    acc[year].push(event);
+    return acc;
+  }, {});
+
+  // Convert grouped events to array for rendering
+  const yearGroups = Object.entries(eventsByYear)
+    .sort((a, b) => b[0].localeCompare(a[0])) // Sort by year descending
+    .map(([year, yearEvents]) => ({
+      year,
+      eventCount: yearEvents.length,
+    }));
 
   return (
     <div
@@ -171,8 +199,12 @@ export function HomepageEventOverlay({
     >
       {events.length > 0 && (
         <div className="flex flex-row h-full gap-24 px-4 py-6 overflow-x-auto">
-          {events.map((event, index) => (
-            <HomepageEventCard key={index} event={event} />
+          {yearGroups.map((yearGroup, index) => (
+            <HomepageEventCard
+              key={index}
+              year={yearGroup.year}
+              eventCount={yearGroup.eventCount}
+            />
           ))}
         </div>
       )}

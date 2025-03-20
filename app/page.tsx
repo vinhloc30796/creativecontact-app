@@ -96,14 +96,14 @@ export default async function Page(props: Props) {
             <HoverableContactTitle
               titleText={t("titleContact")}
               events={[
-                { title: "Workshop", datetime: "May 15, 2024 • 14:00" },
-                { title: "Exhibition", datetime: "May 20, 2024 • 18:30" },
-                { title: "Networking", datetime: "June 5, 2024 • 19:00" },
-                { title: "Boardgames", datetime: "July 6, 2025 • 22:00" },
-                { title: "Workshop #2", datetime: "July 10, 2025 • 14:00" },
-                { title: "Networking #2", datetime: "Aug 12, 2024 • 19:00" },
-                { title: "Exhibition #2", datetime: "Sep 12, 2024 • 19:00" },
-                { title: "Boardgames #2", datetime: "Oct 12, 2024 • 19:00" },
+                { title: "Workshop", datetime: new Date(2024, 4, 15, 14, 0) },
+                { title: "Exhibition", datetime: new Date(2024, 4, 20, 18, 30) },
+                { title: "Networking", datetime: new Date(2024, 5, 5, 19, 0) },
+                { title: "Boardgames", datetime: new Date(2025, 6, 6, 22, 0) },
+                { title: "Workshop #2", datetime: new Date(2025, 6, 10, 14, 0) },
+                { title: "Networking #2", datetime: new Date(2024, 7, 12, 19, 0) },
+                { title: "Exhibition #2", datetime: new Date(2024, 8, 12, 19, 0) },
+                { title: "Boardgames #2", datetime: new Date(2024, 9, 12, 19, 0) },
               ]}
               contentId="subtitle-content"
             />
