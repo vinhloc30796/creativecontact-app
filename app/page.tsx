@@ -162,7 +162,7 @@ export default async function Page(props: Props) {
       {/* Event ticker at the bottom */}
       <footer className="w-full overflow-hidden text-black relative z-50">
         {/* Social media links - positioned at bottom left above the footer */}
-        <div className="mb-8 ml-12 flex flex-col gap-y-8 py-4">
+        <div className="mb-8 ml-12 flex flex-col gap-y-8 py-4 w-fit">
           <a
             href="https://www.facebook.com/creativecontact.vn"
             className="text-foreground transition-colors hover:text-yellow-400"
