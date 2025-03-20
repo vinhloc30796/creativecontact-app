@@ -53,7 +53,7 @@ export default async function EventsPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
             >
               <span className="text-xl font-bold text-black">CC</span>
             </Link>
@@ -63,7 +63,7 @@ export default async function EventsPage() {
             <Button
               variant="link"
               asChild
-              className="text-sm text-foreground hover:text-yellow-400"
+              className="text-sm text-foreground hover:text-sunglow"
             >
               <Link href="/signup">
                 <TextIconBox
@@ -71,7 +71,7 @@ export default async function EventsPage() {
                   subtitle={t("joinUsLine2")}
                   icon={
                     <ArrowUpRight
-                      className="text-yellow-400"
+                      className="text-sunglow"
                       style={{ height: "125%", width: "125%" }}
                     />
                   }
@@ -134,7 +134,7 @@ export default async function EventsPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
           >
             <span className="text-xl font-bold text-black">CC</span>
           </Link>
@@ -144,7 +144,7 @@ export default async function EventsPage() {
           <Button
             variant="link"
             asChild
-            className="text-sm text-foreground hover:text-yellow-400"
+            className="text-sm text-foreground hover:text-sunglow"
           >
             <Link href="/signup">
               <TextIconBox
@@ -152,7 +152,7 @@ export default async function EventsPage() {
                 subtitle={t("joinUsLine2")}
                 icon={
                   <ArrowUpRight
-                    className="text-yellow-400"
+                    className="text-sunglow"
                     style={{ height: "125%", width: "125%" }}
                   />
                 }
@@ -228,7 +228,7 @@ export default async function EventsPage() {
       </div>
 
       {/* Event ticker at the bottom */}
-      <footer className="w-full overflow-hidden bg-yellow-400 py-3 text-black">
+      <footer className="w-full overflow-hidden bg-sunglow py-3 text-black">
         <div className="flex animate-marquee whitespace-nowrap">
           {Array(4)
             .fill(0)
@@ -350,7 +350,7 @@ function EventCard({ event }: { event: Event }) {
       <CardFooter className="pt-0">
         <Button
           asChild
-          className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
+          className="w-full bg-sunglow text-black hover:bg-yellow-500"
         >
           <Link href={`/events/${event.slug}`}>
             View Event <ArrowRightIcon className="ml-1.5 h-4 w-4" />

@@ -27,7 +27,7 @@ export default async function AboutPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
           >
             <span className="text-xl font-bold text-black">CC</span>
           </Link>
@@ -37,7 +37,7 @@ export default async function AboutPage() {
           <Button
             variant="link"
             asChild
-            className="text-sm text-foreground hover:text-yellow-400"
+            className="text-sm text-foreground hover:text-sunglow"
           >
             <Link href="/signup">
               <TextIconBox
@@ -45,7 +45,7 @@ export default async function AboutPage() {
                 subtitle={t("joinUsLine2")}
                 icon={
                   <ArrowUpRight
-                    className="text-yellow-400"
+                    className="text-sunglow"
                     style={{ height: "125%", width: "125%" }}
                   />
                 }
@@ -108,7 +108,7 @@ export default async function AboutPage() {
                 </P>
               </div>
               <div className="relative h-64 w-full overflow-hidden rounded-lg md:h-auto">
-                <div className="absolute inset-0 bg-linear-to-r from-yellow-400/20 to-purple-500/20" />
+                <div className="absolute inset-0 bg-linear-to-r from-sunglow/20 to-purple-500/20" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
                     Creative Vision
@@ -123,8 +123,8 @@ export default async function AboutPage() {
             <H2 className="text-foreground/90">Our Values</H2>
             <div className="mt-6 grid gap-6 md:grid-cols-3">
               <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20">
-                  <span className="text-xl font-bold text-yellow-400">01</span>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sunglow/20">
+                  <span className="text-xl font-bold text-sunglow">01</span>
                 </div>
                 <h3 className="mb-2 text-xl font-semibold text-foreground">
                   Collaboration
@@ -136,8 +136,8 @@ export default async function AboutPage() {
               </div>
 
               <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20">
-                  <span className="text-xl font-bold text-yellow-400">02</span>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sunglow/20">
+                  <span className="text-xl font-bold text-sunglow">02</span>
                 </div>
                 <h3 className="mb-2 text-xl font-semibold text-foreground">
                   Inclusivity
@@ -149,8 +149,8 @@ export default async function AboutPage() {
               </div>
 
               <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20">
-                  <span className="text-xl font-bold text-yellow-400">03</span>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sunglow/20">
+                  <span className="text-xl font-bold text-sunglow">03</span>
                 </div>
                 <h3 className="mb-2 text-xl font-semibold text-foreground">
                   Innovation
@@ -183,7 +183,7 @@ export default async function AboutPage() {
                   className="relative rounded-lg border border-white/10 bg-white/5 p-6 text-center backdrop-blur-xs"
                 >
                   {/* Construction banner */}
-                  <div className="absolute left-0 right-0 top-0 flex items-center justify-center gap-2 rounded-t-lg bg-yellow-400 px-2 py-1">
+                  <div className="absolute left-0 right-0 top-0 flex items-center justify-center gap-2 rounded-t-lg bg-sunglow px-2 py-1">
                     <ConstructionIcon className="h-5 w-5 text-black" />
                     <span className="text-xs font-medium text-black">
                       Under Construction
@@ -208,7 +208,7 @@ export default async function AboutPage() {
           </div>
 
           {/* Join Us CTA */}
-          <div className="mt-16 rounded-lg bg-linear-to-r from-yellow-400/20 to-purple-500/20 p-8 text-center backdrop-blur-xs">
+          <div className="mt-16 rounded-lg bg-linear-to-r from-sunglow/20 to-purple-500/20 p-8 text-center backdrop-blur-xs">
             <H2 className="text-foreground">Join Our Creative Community</H2>
             <P className="mx-auto mt-4 max-w-2xl text-foreground/80">
               Whether you're an established professional or just starting your
@@ -217,7 +217,7 @@ export default async function AboutPage() {
             </P>
             <Button
               asChild
-              className="mt-6 bg-yellow-400 text-black hover:bg-yellow-500"
+              className="mt-6 bg-sunglow text-black hover:bg-yellow-500"
             >
               <Link href="/signup">Become a Member</Link>
             </Button>
@@ -226,7 +226,7 @@ export default async function AboutPage() {
       </div>
 
       {/* Footer ticker */}
-      <footer className="w-full overflow-hidden bg-yellow-400 py-3 text-black">
+      <footer className="w-full overflow-hidden bg-sunglow py-3 text-black">
         <div className="flex animate-marquee whitespace-nowrap">
           {Array(4)
             .fill(0)

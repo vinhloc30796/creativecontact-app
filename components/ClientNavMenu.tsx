@@ -43,7 +43,7 @@ export function ClientNavMenu({ items, activeIndex, activePath, menuText }: Clie
                 variant={variant === "primary" ? "default" : "ghost"}
                 asChild
                 className={`px-4 py-1.5 h-auto rounded-full text-base transition-colors flex items-center gap-2 border border-black ${variant === "primary"
-                  ? "bg-yellow-400 text-black font-medium hover:bg-yellow-500"
+                  ? "bg-sunglow text-black font-medium hover:bg-yellow-500"
                   : "bg-white/10 text-foreground hover:bg-white/20"
                   }`}
               >
@@ -60,7 +60,7 @@ export function ClientNavMenu({ items, activeIndex, activePath, menuText }: Clie
         variant="ghost"
         onClick={() => setIsExpanded(!isExpanded)}
         className={`px-4 py-1.5 h-auto rounded-full text-base transition-colors flex items-center gap-2 border border-black ${activeItemIndex === -1 && isExpanded
-          ? "bg-yellow-400 text-black font-medium hover:bg-yellow-500"
+          ? "bg-sunglow text-black font-medium hover:bg-yellow-500"
           : "bg-white/10 text-foreground hover:bg-white/20"
           }`}
       >

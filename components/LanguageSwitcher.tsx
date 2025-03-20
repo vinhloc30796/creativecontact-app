@@ -11,7 +11,7 @@ export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        {currentLang === "en" && <div className="h-5 w-5 bg-yellow-400"></div>}
+        {currentLang === "en" && <div className="h-5 w-5 bg-sunglow"></div>}
         <Link
           href="?lang=en"
           className={`text-base font-medium transition-colors ${currentLang === "en"
@@ -23,7 +23,7 @@ export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
         </Link>
       </div>
       <div className="flex items-center gap-2">
-        {currentLang === "vi" && <div className="h-5 w-5 bg-yellow-400"></div>}
+        {currentLang === "vi" && <div className="h-5 w-5 bg-sunglow"></div>}
         <Link
           href="?lang=vi"
           className={`text-base font-medium transition-colors ${currentLang === "vi"

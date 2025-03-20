@@ -67,7 +67,7 @@ export function EventImagePlaceholder({
       className={cn("shrink-0 overflow-hidden", className)}
       style={{ width: `${width}px`, height: `${height}px` }}
     >
-      <CardHeader className="shrink-0 bg-yellow-400 p-2">
+      <CardHeader className="shrink-0 bg-sunglow p-2">
         <CardTitle className="text-sm">[IN CONSTRUCTION]</CardTitle>
       </CardHeader>
       <CardContent className="grow bg-gray-100 p-0">

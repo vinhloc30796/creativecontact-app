@@ -34,7 +34,7 @@ export default async function ContactsPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
           >
             <span className="text-xl font-bold text-black">CC</span>
           </Link>
@@ -44,7 +44,7 @@ export default async function ContactsPage() {
           <Button
             variant="link"
             asChild
-            className="text-sm text-foreground hover:text-yellow-400"
+            className="text-sm text-foreground hover:text-sunglow"
           >
             <Link href="/signup">
               <TextIconBox
@@ -52,7 +52,7 @@ export default async function ContactsPage() {
                 subtitle={t("joinUsLine2")}
                 icon={
                   <ArrowUpRight
-                    className="text-yellow-400"
+                    className="text-sunglow"
                     style={{ height: "125%", width: "125%" }}
                   />
                 }
@@ -134,7 +134,7 @@ export default async function ContactsPage() {
       </div>
 
       {/* Footer ticker */}
-      <footer className="w-full overflow-hidden bg-yellow-400 py-3 text-black">
+      <footer className="w-full overflow-hidden bg-sunglow py-3 text-black">
         <div className="flex animate-marquee whitespace-nowrap">
           {Array(4)
             .fill(0)
@@ -161,7 +161,7 @@ function ContactCard({ name, role, location, tags }: ContactCardProps) {
   return (
     <Card className="relative flex h-full flex-col overflow-hidden border-0 bg-white/10 backdrop-blur-xs transition-all hover:bg-white/15">
       {/* Construction banner */}
-      <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 bg-yellow-400 px-2 py-1">
+      <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 bg-sunglow px-2 py-1">
         <ConstructionIcon className="h-5 w-5 text-black" />
         <span className="text-xs font-medium text-black">
           Under Construction

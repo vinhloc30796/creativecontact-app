@@ -5,6 +5,11 @@
 @custom-variant dark (&:is([data-theme="trungthu-archive-2024"] *));
 
 @theme {
+  --color-sunglow: #ffe12d;
+  --color-midnight: #121063;
+  --color-tahiti: #3ab7bf;
+  --color-bermuda: #78dcca;
+
   --font-sans:
     var(--font-plus-jakarta-sans), Plus Jakarta Sans, Century Gothic, Arial,
     Helvetica, sans-serif;
@@ -232,7 +237,7 @@
   @apply text-black transition-all duration-300 ease-in-out;
 
   &:hover {
-    @apply text-yellow-400;
+    @apply text-sunglow;
     -webkit-text-stroke: 0.03em black;
   }
 }
@@ -601,4 +606,18 @@
 }
 .bg-destructive-1000 {
   background-color: hsla(var(--destructive-1000));
+}
+
+/* Custom colors */
+.bg-sunglow {
+  background-color: var(--color-sunglow);
+}
+.bg-midnight {
+  background-color: var(--color-midnight);
+}
+.bg-tahiti {
+  background-color: var(--color-tahiti);
+}
+.bg-bermuda {
+  background-color: var(--color-bermuda);
 }

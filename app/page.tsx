@@ -59,7 +59,7 @@ export default async function Page(props: Props) {
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 p-1"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
           >
             <span className="text-xl font-bold text-black">CC</span>
           </Link>
@@ -69,7 +69,7 @@ export default async function Page(props: Props) {
           <Button
             variant="link"
             asChild
-            className="text-sm text-foreground hover:text-yellow-400"
+            className="text-sm text-foreground hover:text-sunglow"
           >
             <Link href="/signup">
               <TextIconBox
@@ -77,7 +77,7 @@ export default async function Page(props: Props) {
                 subtitle={t("joinUsLine2")}
                 icon={
                   <ArrowUpRight
-                    className="text-yellow-400"
+                    className="text-sunglow"
                     style={{ height: "125%", width: "125%" }}
                   />
                 }
@@ -165,19 +165,19 @@ export default async function Page(props: Props) {
         <div className="mb-8 ml-12 flex flex-col gap-y-8 py-4 w-fit">
           <a
             href="https://www.facebook.com/creativecontact.vn"
-            className="text-foreground transition-colors hover:text-yellow-400"
+            className="text-foreground transition-colors hover:text-sunglow"
           >
             <Facebook size={24} />
           </a>
           <a
             href="https://instagram.com/creativecontact_vn"
-            className="text-foreground transition-colors hover:text-yellow-400"
+            className="text-foreground transition-colors hover:text-sunglow"
           >
             <Instagram size={24} />
           </a>
           <a
             href="https://www.linkedin.com/company/creativecontact-vn"
-            className="text-foreground transition-colors hover:text-yellow-400"
+            className="text-foreground transition-colors hover:text-sunglow"
           >
             <Linkedin size={24} />
           </a>

@@ -74,7 +74,7 @@ export function EventTicker({
   return (
     <div
       ref={containerRef}
-      className="relative flex h-[2em] overflow-hidden bg-yellow-400"
+      className="relative flex h-[2em] overflow-hidden bg-sunglow"
       onMouseEnter={() => pauseOnHover && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
