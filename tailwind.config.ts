@@ -194,6 +194,10 @@ const config = {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        "scrollX": {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-100%)' }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -201,6 +205,7 @@ const config = {
         "marquee": "marquee 25s linear infinite",
         "marquee-reverse": "marquee-reverse 25s linear infinite",
         "fadeIn": "fadeIn 0.3s ease-out forwards",
+        "scroll-x": "scrollX 30s linear infinite",
       },
     },
   },

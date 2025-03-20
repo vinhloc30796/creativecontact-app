@@ -9,6 +9,14 @@ import Link from "next/link";
 import { HeroTitle } from "../ui/typography";
 
 /**
+ * Add Tailwind animation for auto-scrolling events from right to left
+ * 
+ * Added to tailwind.config.ts:
+ * - Under theme.extend.animation: 'scroll-x': 'scrollX 30s linear infinite'
+ * - Under theme.extend.keyframes: scrollX with translateX(0) to translateX(-100%)
+ */
+
+/**
  * Event interface for the HomepageEventOverlay component
  */
 export interface EventItem {
@@ -32,11 +40,8 @@ export interface EventImagePlaceholderMetadata {
  * @returns Array of image placeholder metadata
  */
 export function getRandomImagePlaceholders(count: number = 3): EventImagePlaceholderMetadata[] {
-  // Generate a list of random dimensions for image placeholders
-  // Random count between 2-5 if not specified
-  const actualCount = count || Math.floor(Math.random() * 4) + 2;
-
-  return Array.from({ length: actualCount }, () => ({
+  // Always use the specified count, no randomization
+  return Array.from({ length: count }, () => ({
     // Random width & height between 200-280px
     width: Math.floor(Math.random() * 80) + 200,
     height: Math.floor(Math.random() * 80) + 200,
@@ -121,9 +126,8 @@ export function HomepageEventCard({
   eventCount: number,
   event?: EventItem  // Optional event item for displaying additional details
 }) {
-  // Generate 2-5 random image placeholders
-  const randomCount = Math.floor(Math.random() * 4) + 2;
-  const imagePlaceholders = getRandomImagePlaceholders(randomCount);
+  // Generate exactly eventCount image placeholders
+  const imagePlaceholders = getRandomImagePlaceholders(eventCount);
 
   return (
     <Card className="flex flex-row gap-4 h-full w-fit p-4 bg-transparent border-none shadow-none">
@@ -198,14 +202,16 @@ export function HomepageEventOverlay({
       }}
     >
       {events.length > 0 && (
-        <div className="flex flex-row h-full gap-24 px-4 py-6 overflow-x-auto">
-          {yearGroups.map((yearGroup, index) => (
-            <HomepageEventCard
-              key={index}
-              year={yearGroup.year}
-              eventCount={yearGroup.eventCount}
-            />
-          ))}
+        <div className="w-full">
+          <div className="flex flex-row h-full gap-24 px-4 py-6 animate-scroll-x whitespace-nowrap">
+            {yearGroups.map((yearGroup, index) => (
+              <HomepageEventCard
+                key={index}
+                year={yearGroup.year}
+                eventCount={yearGroup.eventCount}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

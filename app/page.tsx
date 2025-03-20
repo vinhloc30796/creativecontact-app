@@ -96,14 +96,24 @@ export default async function Page(props: Props) {
             <HoverableContactTitle
               titleText={t("titleContact")}
               events={[
+                // 2023 events (chronological order)
+                { title: "Launch Party", datetime: new Date(2023, 2, 15, 19, 0) },
+                { title: "Spring Workshop", datetime: new Date(2023, 3, 10, 14, 0) },
+                { title: "Art Exhibition", datetime: new Date(2023, 5, 22, 18, 0) },
+                { title: "Summer Meetup", datetime: new Date(2023, 6, 18, 16, 30) },
+                { title: "Creative Hackathon", datetime: new Date(2023, 8, 5, 9, 0) },
+                { title: "Fall Showcase", datetime: new Date(2023, 9, 28, 17, 0) },
+                { title: "Year-End Celebration", datetime: new Date(2023, 11, 15, 20, 0) },
+                // 2024 events (chronological order)
                 { title: "Workshop", datetime: new Date(2024, 4, 15, 14, 0) },
                 { title: "Exhibition", datetime: new Date(2024, 4, 20, 18, 30) },
                 { title: "Networking", datetime: new Date(2024, 5, 5, 19, 0) },
-                { title: "Boardgames", datetime: new Date(2025, 6, 6, 22, 0) },
-                { title: "Workshop #2", datetime: new Date(2025, 6, 10, 14, 0) },
                 { title: "Networking #2", datetime: new Date(2024, 7, 12, 19, 0) },
                 { title: "Exhibition #2", datetime: new Date(2024, 8, 12, 19, 0) },
                 { title: "Boardgames #2", datetime: new Date(2024, 9, 12, 19, 0) },
+                // 2025 events (chronological order)
+                { title: "Boardgames", datetime: new Date(2025, 6, 6, 22, 0) },
+                { title: "Workshop #2", datetime: new Date(2025, 6, 10, 14, 0) },
               ]}
               contentId="subtitle-content"
             />
