@@ -280,7 +280,7 @@ function EventCard({ event }: { event: Event }) {
     : "";
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden border-0 bg-white/10 backdrop-blur-sm transition-all hover:bg-white/15">
+    <Card className="flex h-full flex-col overflow-hidden border-0 bg-white/10 backdrop-blur-xs transition-all hover:bg-white/15">
       <div className="relative h-48 w-full">
         {event.featuredImage?.url ? (
           <Image

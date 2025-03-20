@@ -99,7 +99,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   }
 
   return (
-    <Card className="container mb-4 max-h-full w-full flex-grow justify-between gap-4 px-4 md:mx-auto lg:flex">
+    <Card className="container mb-4 max-h-full w-full grow justify-between gap-4 px-4 md:mx-auto lg:flex">
       <div className="position-absolute grow">
         <CardHeader>
           <FormProvider {...artworkForm}>

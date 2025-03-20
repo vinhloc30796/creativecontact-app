@@ -1,6 +1,241 @@
-@tailwind base;
-@tailwind components;
+@layer theme, components, base, utilities;
+@import "tailwindcss";
 @tailwind utilities;
+
+@custom-variant dark (&:is([data-theme="trungthu-archive-2024"] *));
+
+@theme {
+  --font-sans:
+    var(--font-plus-jakarta-sans), Plus Jakarta Sans, Century Gothic, Arial,
+    Helvetica, sans-serif;
+
+  --color-border: hsla(var(--border), 1);
+  --color-input: hsla(var(--input), 1);
+  --color-ring: hsla(var(--ring), 1);
+  --color-background: hsla(var(--background), 1);
+  --color-foreground: hsla(var(--foreground), 1);
+
+  --color-primary-50: hsla(var(--primary-50), 1);
+  --color-primary-100: hsla(var(--primary-100), 1);
+  --color-primary-200: hsla(var(--primary-200), 1);
+  --color-primary-300: hsla(var(--primary-300), 1);
+  --color-primary-400: hsla(var(--primary-400), 1);
+  --color-primary-500: hsla(var(--primary-500), 1);
+  --color-primary-600: hsla(var(--primary-600), 1);
+  --color-primary-700: hsla(var(--primary-700), 1);
+  --color-primary-800: hsla(var(--primary-800), 1);
+  --color-primary-900: hsla(var(--primary-900), 1);
+  --color-primary-1000: hsla(var(--primary-1000), 1);
+  --color-primary: hsla(var(--primary), 1);
+  --color-primary-foreground: hsla(var(--primary-foreground), 1);
+
+  --color-secondary-50: hsla(var(--secondary-50), 1);
+  --color-secondary-100: hsla(var(--secondary-100), 1);
+  --color-secondary-200: hsla(var(--secondary-200), 1);
+  --color-secondary-300: hsla(var(--secondary-300), 1);
+  --color-secondary-400: hsla(var(--secondary-400), 1);
+  --color-secondary-500: hsla(var(--secondary-500), 1);
+  --color-secondary-600: hsla(var(--secondary-600), 1);
+  --color-secondary-700: hsla(var(--secondary-700), 1);
+  --color-secondary-800: hsla(var(--secondary-800), 1);
+  --color-secondary-900: hsla(var(--secondary-900), 1);
+  --color-secondary-1000: hsla(var(--secondary-1000), 1);
+  --color-secondary: hsla(var(--secondary), 1);
+  --color-secondary-foreground: hsla(var(--secondary-foreground), 1);
+
+  --color-destructive: hsla(var(--destructive), 1);
+  --color-destructive-foreground: hsla(var(--destructive-foreground), 1);
+
+  --color-muted: hsla(var(--muted), 1);
+  --color-muted-foreground: hsla(var(--muted-foreground), 1);
+
+  --color-accent-50: hsla(var(--accent-50), 1);
+  --color-accent-100: hsla(var(--accent-100), 1);
+  --color-accent-200: hsla(var(--accent-200), 1);
+  --color-accent-300: hsla(var(--accent-300), 1);
+  --color-accent-400: hsla(var(--accent-400), 1);
+  --color-accent-500: hsla(var(--accent-500), 1);
+  --color-accent-600: hsla(var(--accent-600), 1);
+  --color-accent-700: hsla(var(--accent-700), 1);
+  --color-accent-800: hsla(var(--accent-800), 1);
+  --color-accent-900: hsla(var(--accent-900), 1);
+  --color-accent-1000: hsla(var(--accent-1000), 1);
+  --color-accent: hsla(var(--accent), 1);
+  --color-accent-foreground: hsla(var(--accent-foreground), 1);
+
+  --color-popover: hsla(var(--popover), 1);
+  --color-popover-foreground: hsla(var(--popover-foreground), 1);
+
+  --color-card: hsla(var(--card), 1);
+  --color-card-foreground: hsla(var(--card-foreground), 1);
+
+  --color-cc-rose-50: hsla(334.29, 100%, 97.25%, 1);
+  --color-cc-rose-100: hsla(336.67, 100%, 92.94%, 1);
+  --color-cc-rose-200: hsla(336.16, 100%, 85.69%, 1);
+  --color-cc-rose-300: hsla(335.78, 100%, 78.63%, 1);
+  --color-cc-rose-400: hsla(336, 100%, 71.57%, 1);
+  --color-cc-rose-500: hsla(335.93, 100%, 64.31%, 1);
+  --color-cc-rose-600: hsla(336.14, 100%, 49.8%, 1);
+  --color-cc-rose-700: hsla(336.11, 100%, 42.35%, 1);
+  --color-cc-rose-800: hsla(336.07, 100%, 34.9%, 1);
+  --color-cc-rose-900: hsla(336, 100%, 27.45%, 1);
+  --color-cc-rose-1000: hsla(335.88, 100%, 20%, 1);
+  --color-cc-rose: hsla(336.06, 100%, 57.25%, 1);
+
+  --color-cc-kelly-50: hsla(102.86, 16.28, 91.57);
+  --color-cc-kelly-100: hsla(106.67, 28.12, 87.45);
+  --color-cc-kelly-200: hsla(107.14, 31.82, 82.75);
+  --color-cc-kelly-300: hsla(106.83, 35.04, 77.06);
+  --color-cc-kelly-400: hsla(106.67, 35.06, 69.8);
+  --color-cc-kelly-500: hsla(106.67, 35.29, 60);
+  --color-cc-kelly-600: hsla(105.44, 44.21, 45.69);
+  --color-cc-kelly-700: hsla(103.9, 56.16, 42.94);
+  --color-cc-kelly-800: hsla(104.42, 50, 40.78);
+  --color-cc-kelly-900: hsla(103.64, 100, 21.57);
+  --color-cc-kelly-1000: hsla(105.88, 39.53, 16.86);
+  --color-cc-kelly: hsla(103.9, 56.16, 42.94);
+
+  --color-cc-lime-50: hsla(90, 18.18, 91.37);
+  --color-cc-lime-100: hsla(92.73, 44, 85.29);
+  --color-cc-lime-200: hsla(91.7, 49.53, 79.02);
+  --color-cc-lime-300: hsla(91.82, 47.14, 72.55);
+  --color-cc-lime-400: hsla(91.2, 42.37, 65.29);
+  --color-cc-lime-500: hsla(90, 37.84, 56.47);
+  --color-cc-lime-600: hsla(88.33, 48.21, 43.92);
+  --color-cc-lime-700: hsla(87.24, 70.37, 57.65);
+  --color-cc-lime-800: hsla(84.75, 71.08, 48.82);
+  --color-cc-lime-900: hsla(85.33, 70.31, 25.1);
+  --color-cc-lime-1000: hsla(89.19, 38.95, 18.63);
+  --color-cc-lime: hsla(87.11, 85.57, 61.96);
+
+  --color-cc-cornell-red-50: hsla(351, 100%, 96.08%, 1);
+  --color-cc-cornell-red-100: hsla(346.67, 100%, 89.41%, 1);
+  --color-cc-cornell-red-200: hsla(343.15, 100%, 82.55%, 1);
+  --color-cc-cornell-red-300: hsla(341.13, 100%, 75.69%, 1);
+  --color-cc-cornell-red-400: hsla(340, 100%, 68.82%, 1);
+  --color-cc-cornell-red-500: hsla(339.28, 100%, 61.96%, 1);
+  --color-cc-cornell-red-600: hsla(338.12, 100%, 50%, 1);
+  --color-cc-cornell-red-700: hsla(336.11, 100%, 42.35%, 1);
+  --color-cc-cornell-red-800: hsla(336.07, 100%, 34.9%, 1);
+  --color-cc-cornell-red-900: hsla(336, 100%, 27.45%, 1);
+  --color-cc-cornell-red-1000: hsla(335.88, 100%, 20%, 1);
+  --color-cc-cornell-red: hsla(356.59, 92.63%, 37.25%, 1);
+
+  --color-cc-fuchsia-neutral-100: hsla(325.33, 52.94%, 83.33%, 1);
+  --color-cc-fuchsia-neutral-200: hsla(325.85, 52%, 75.49%, 1);
+  --color-cc-fuchsia-neutral-300: hsla(325.81, 52.44%, 67.84%, 1);
+  --color-cc-fuchsia-neutral-400: hsla(326.6, 51.96%, 60%, 1);
+  --color-cc-fuchsia-neutral-500: hsla(326.88, 51.44%, 52.35%, 1);
+  --color-cc-fuchsia-neutral-600: hsla(327.97, 51.75%, 44.71%, 1);
+  --color-cc-fuchsia-neutral-700: hsla(329.07, 51.32%, 37.06%, 1);
+  --color-cc-fuchsia-neutral-800: hsla(331.17, 51.68%, 29.22%, 1);
+  --color-cc-fuchsia-neutral-900: hsla(334.74, 51.35%, 21.76%, 1);
+  --color-cc-fuchsia-neutral-1000: hsla(340.54, 50.68%, 14.31%, 1);
+  --color-cc-fuchsia-neutral: hsla(325, 52.17%, 90.98%, 1);
+  --color-cc-fuchsia-neutral-base_white: hsla(325, 52.17%, 90.98%, 1);
+  --color-cc-fuchsia-neutral-base_black: hsla(0, 51.35%, 7.25%, 1);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-marquee: marquee 25s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 25s linear infinite;
+  --animate-fade-in: fadeIn 0.3s ease-out forwards;
+  --animate-scroll-x: scrollX 30s linear infinite;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes marquee-reverse {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes scrollX {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+/* Custom text border hover effect */
+@utility text-hover-border {
+  @apply text-black transition-all duration-300 ease-in-out;
+
+  &:hover {
+    @apply text-yellow-400;
+    -webkit-text-stroke: 0.03em black;
+  }
+}
 
 /* See 
   - https://github.com/payloadcms/payload/issues/8878 for issue discussion
@@ -10,21 +245,6 @@
   To override existing styles in a way that the previous rules of specificity would be respected you can use the default layer like so
 */
 @layer payload-default {
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-}
-
-/* Custom text border hover effect */
-@layer components {
-  .text-hover-border {
-    @apply text-black transition-all duration-300 ease-in-out;
-  }
-
-  .text-hover-border:hover {
-    @apply text-yellow-400;
-    -webkit-text-stroke: 0.03em black;
-  }
 }
 
 @layer base {

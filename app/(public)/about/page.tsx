@@ -108,7 +108,7 @@ export default async function AboutPage() {
                 </P>
               </div>
               <div className="relative h-64 w-full overflow-hidden rounded-lg md:h-auto">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-purple-500/20" />
+                <div className="absolute inset-0 bg-linear-to-r from-yellow-400/20 to-purple-500/20" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
                     Creative Vision
@@ -122,7 +122,7 @@ export default async function AboutPage() {
           <div className="mt-16">
             <H2 className="text-foreground/90">Our Values</H2>
             <div className="mt-6 grid gap-6 md:grid-cols-3">
-              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-sm">
+              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20">
                   <span className="text-xl font-bold text-yellow-400">01</span>
                 </div>
@@ -135,7 +135,7 @@ export default async function AboutPage() {
                 </P>
               </div>
 
-              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-sm">
+              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20">
                   <span className="text-xl font-bold text-yellow-400">02</span>
                 </div>
@@ -148,7 +148,7 @@ export default async function AboutPage() {
                 </P>
               </div>
 
-              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-sm">
+              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20">
                   <span className="text-xl font-bold text-yellow-400">03</span>
                 </div>
@@ -180,7 +180,7 @@ export default async function AboutPage() {
               ].map((member, i) => (
                 <div
                   key={i}
-                  className="relative rounded-lg border border-white/10 bg-white/5 p-6 text-center backdrop-blur-sm"
+                  className="relative rounded-lg border border-white/10 bg-white/5 p-6 text-center backdrop-blur-xs"
                 >
                   {/* Construction banner */}
                   <div className="absolute left-0 right-0 top-0 flex items-center justify-center gap-2 rounded-t-lg bg-yellow-400 px-2 py-1">
@@ -208,7 +208,7 @@ export default async function AboutPage() {
           </div>
 
           {/* Join Us CTA */}
-          <div className="mt-16 rounded-lg bg-gradient-to-r from-yellow-400/20 to-purple-500/20 p-8 text-center backdrop-blur-sm">
+          <div className="mt-16 rounded-lg bg-linear-to-r from-yellow-400/20 to-purple-500/20 p-8 text-center backdrop-blur-xs">
             <H2 className="text-foreground">Join Our Creative Community</H2>
             <P className="mx-auto mt-4 max-w-2xl text-foreground/80">
               Whether you're an established professional or just starting your

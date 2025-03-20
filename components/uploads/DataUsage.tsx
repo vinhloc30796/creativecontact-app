@@ -24,7 +24,7 @@ export default function DataUsage({ dataUsage }: DataUsageProps) {
   return (
     <div className="flex flex-col">
       <div className="items-left mt-4 flex flex-col">
-        <p className="flex-grow text-sm text-muted-foreground">
+        <p className="grow text-sm text-muted-foreground">
           {formatSize(pendingSize)} of 25MB used
         </p>
       </div>

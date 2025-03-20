@@ -64,16 +64,16 @@ export function EventImagePlaceholder({
 }: EventImagePlaceholderMetadata & { className?: string }) {
   return (
     <Card
-      className={cn("flex-shrink-0 overflow-hidden", className)}
+      className={cn("shrink-0 overflow-hidden", className)}
       style={{ width: `${width}px`, height: `${height}px` }}
     >
-      <CardHeader className="flex-shrink-0 bg-yellow-400 p-2">
+      <CardHeader className="shrink-0 bg-yellow-400 p-2">
         <CardTitle className="text-sm">[IN CONSTRUCTION]</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow bg-gray-100 p-0">
+      <CardContent className="grow bg-gray-100 p-0">
         {/* Empty content area representing an image placeholder */}
       </CardContent>
-      <CardFooter className="flex-shrink-0 p-2">
+      <CardFooter className="shrink-0 p-2">
         <button
           onClick={() => url && window.open(url, '_blank')}
           className="text-xs text-blue-500 hover:underline cursor-pointer"
@@ -92,8 +92,8 @@ export function EventImagePlaceholder({
  */
 export function AnnualEventTextCard({ year, eventCount }: { year: string | number, eventCount: number }) {
   return (
-    <div className="flex-shrink-0 min-w-48 pt-0 mt-0">
-      <div className="flex-grow">
+    <div className="shrink-0 min-w-48 pt-0 mt-0">
+      <div className="grow">
         <H4 className="text-5xl font-bold">{year}</H4>
       </div>
       <div className="pt-0 mt-auto">

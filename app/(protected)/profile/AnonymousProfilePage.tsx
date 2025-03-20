@@ -33,10 +33,10 @@ export default async function AnonymousProfilePage({
           <UserHeader
             lang={lang}
             isLoggedIn={isLoggedIn}
-            className="bg-background/80 backdrop-blur-sm"
+            className="bg-background/80 backdrop-blur-xs"
           />
         </Suspense>
-        <main className="mt-10 w-full flex-grow justify-between lg:mt-20">
+        <main className="mt-10 w-full grow justify-between lg:mt-20">
           <Card className="min-w-xl mx-auto max-w-3xl">
             <CardHeader className="relative aspect-video border-b bg-accent-foreground text-accent-foreground">
               <Image

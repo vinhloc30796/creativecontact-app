@@ -42,10 +42,10 @@ export function SkeletonContactPicture({
       className={cn("flex flex-col overflow-hidden", className)}
       style={{ width: `${width}px`, height: `${height}px` }}
     >
-      <CardHeader className="flex-shrink-0 bg-yellow-400 p-4">
+      <CardHeader className="shrink-0 bg-yellow-400 p-4">
         <CardTitle className="text-lg">In Construction</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow overflow-hidden p-4 pt-4">
+      <CardContent className="grow overflow-hidden p-4 pt-4">
         <div className="relative h-full">
           <p
             className="line-clamp-none text-sm text-muted-foreground"
@@ -71,7 +71,7 @@ export function SkeletonContactPicture({
           />
         </div>
       </CardContent>
-      <CardFooter className="flex-shrink-0 p-4 pt-0">
+      <CardFooter className="shrink-0 p-4 pt-0">
         <Link
           href={
             url ||

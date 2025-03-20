@@ -50,7 +50,7 @@ export function ContactCard({
             alt={`${name}'s profile`}
             className={`w-full h-full object-cover ${isLoading ? 'animate-pulse' : ''}`}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
+          <div className="absolute inset-0 bg-linear-to-b from-transparent to-black opacity-50"></div>
           <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
             <CardTitle className="text-2xl font-bold flex items-center mb-2">
               <UserCircle className="mr-2 h-6 w-6" />
@@ -71,11 +71,11 @@ export function ContactCard({
         </div>
       </CardHeader>
 
-      <CardContent className="flex-grow p-4">
+      <CardContent className="grow p-4">
         <ul className="space-y-3">
           {userData.industryExperiences && userData.industryExperiences.length > 0 && (
             <li className="flex items-center">
-              <Briefcase className="mr-2 h-4 w-4 flex-shrink-0" />
+              <Briefcase className="mr-2 h-4 w-4 shrink-0" />
               <div className="flex flex-wrap gap-2">
                 {userData.industryExperiences.map((exp, index) => (
                   <ComboBadge
@@ -91,7 +91,7 @@ export function ContactCard({
           )}
           {userData.location && (
             <li className="flex items-center">
-              <MapPin className="mr-2 h-4 w-4 flex-shrink-0" />
+              <MapPin className="mr-2 h-4 w-4 shrink-0" />
               <span>{userData.location}</span>
             </li>
           )}

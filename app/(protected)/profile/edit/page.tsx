@@ -49,10 +49,10 @@ export default async function ProfileEditPage(props: ProfileEditPageProps) {
         <UserHeader
           lang={lang}
           isLoggedIn={isLoggedIn}
-          className="bg-background/80 backdrop-blur-sm"
+          className="bg-background/80 backdrop-blur-xs"
         />
 
-        <main className="relative z-20 mt-10 w-full flex-grow lg:mt-20">
+        <main className="relative z-20 mt-10 w-full grow lg:mt-20">
           <div className="container mx-auto mb-4 px-4">
             <BackButton />
           </div>

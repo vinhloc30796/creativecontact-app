@@ -202,7 +202,7 @@ function EventSpeakersRenderer(block: EventSpeakersBlock) {
         <div className="flex flex-col gap-6">
           {speakers.map((speaker, index) => (
             <div key={index} className="flex items-center gap-4 border-b p-4">
-              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full">
                 <Image
                   src={getMediaUrl(speaker.image)}
                   alt={speaker.name}

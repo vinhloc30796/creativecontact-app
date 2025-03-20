@@ -122,7 +122,7 @@ export default async function EventPage(props: EventPageProps) {
           </div>
 
           {/* Main content area */}
-          <main className="relative z-20 mt-10 w-full flex-grow justify-between lg:mt-20">
+          <main className="relative z-20 mt-10 w-full grow justify-between lg:mt-20">
             <div className="w-full px-4 sm:px-8 md:px-16">
               {/* Render artwork cards */}
               {shuffledArtworks.map((artwork, index) => (

@@ -159,7 +159,7 @@ interface ContactCardProps {
 
 function ContactCard({ name, role, location, tags }: ContactCardProps) {
   return (
-    <Card className="relative flex h-full flex-col overflow-hidden border-0 bg-white/10 backdrop-blur-sm transition-all hover:bg-white/15">
+    <Card className="relative flex h-full flex-col overflow-hidden border-0 bg-white/10 backdrop-blur-xs transition-all hover:bg-white/15">
       {/* Construction banner */}
       <div className="absolute left-0 right-0 top-0 z-10 flex items-center justify-center gap-2 bg-yellow-400 px-2 py-1">
         <ConstructionIcon className="h-5 w-5 text-black" />
