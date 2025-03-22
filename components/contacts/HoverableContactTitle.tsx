@@ -225,6 +225,7 @@ interface HoverableContactTitleProps {
   events?: EventItem[];
   contentRef?: React.RefObject<HTMLElement | null>;
   contentId?: string;
+  backgroundId?: string;
   href?: string;
 }
 
@@ -234,6 +235,7 @@ interface HoverableContactTitleProps {
  * A component that displays a title which, when hovered:
  * 1. Shows an overlay covering the content area
  * 2. Hides the element with the provided contentId or subtitle-content by default
+ * 3. Hides the background element if backgroundId is provided
  */
 export function HoverableContactTitle({
   children,
@@ -242,13 +244,15 @@ export function HoverableContactTitle({
   events = [],
   contentRef,
   contentId = "subtitle-content",
+  backgroundId = "floating-gradient-background",
   href = "/events"
 }: HoverableContactTitleProps) {
   const [isHovering, setIsHovering] = useState(false);
   const autoDetectedRef = useRef<HTMLElement | null>(null);
+  const backgroundRef = useRef<HTMLElement | null>(null);
   const effectiveRef = contentRef || autoDetectedRef;
 
-  // Find element by ID if contentRef is not provided
+  // Find elements by ID if refs are not provided
   useEffect(() => {
     if (!contentRef) {
       const element = document.getElementById(contentId);
@@ -256,13 +260,23 @@ export function HoverableContactTitle({
         autoDetectedRef.current = element as HTMLElement;
       }
     }
-  }, [contentRef, contentId]);
+
+    // Find background element
+    const bgElement = document.getElementById(backgroundId);
+    if (bgElement) {
+      backgroundRef.current = bgElement as HTMLElement;
+    }
+  }, [contentRef, contentId, backgroundId]);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
     // Hide the content when hovering
     if (effectiveRef?.current) {
       effectiveRef.current.style.visibility = "hidden";
+    }
+    // Hide the background when hovering
+    if (backgroundRef?.current) {
+      backgroundRef.current.style.visibility = "hidden";
     }
   };
 
@@ -271,6 +285,10 @@ export function HoverableContactTitle({
     // Show the content when not hovering
     if (effectiveRef?.current) {
       effectiveRef.current.style.visibility = "visible";
+    }
+    // Show the background when not hovering
+    if (backgroundRef?.current) {
+      backgroundRef.current.style.visibility = "visible";
     }
   };
 

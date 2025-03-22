@@ -17,6 +17,7 @@ import { ClientNavMenu } from "../components/ClientNavMenu";
 import { HoverableCreativesTitle } from "@/components/contacts/HoverableCreativesTitle";
 import { HoverableContactTitle } from "@/components/contacts/HoverableContactTitle";
 import CreativeContactLogo, { LogoVariant } from "@/components/branding/CreativeContactLogo";
+import { ThumbnailImage } from "@/components/ThumbnailImage";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -56,7 +57,7 @@ export default async function Page(props: Props) {
   return (
     <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
       {/* Header with logo and join button */}
-      <header className="flex w-full items-center justify-between py-4 pl-12 pr-2">
+      <header className="flex w-full items-center justify-between py-4 pl-12 pr-4">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center">
             <CreativeContactLogo
@@ -151,7 +152,7 @@ export default async function Page(props: Props) {
         </div>
 
         {/* Content section - fills the remaining space */}
-        <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
+        <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12" id="subtitle-content">
           {/* Description text */}
           <Lead
             id="subtitle-content"
@@ -159,6 +160,13 @@ export default async function Page(props: Props) {
           >
             {t("subtitle")}
           </Lead>
+          {/* Floating gradient background using ThumbnailImage component */}
+          <ThumbnailImage
+            width={320}
+            height={180}
+            interval={10000}
+            className="absolute bottom-0 right-12 z-40"
+          />
         </div>
       </div>
 
@@ -185,6 +193,9 @@ export default async function Page(props: Props) {
             <Linkedin size={24} />
           </a>
         </div>
+
+
+
         {/* Event ticker */}
         <EventTicker
           eventName={currentEvent}
