@@ -16,6 +16,7 @@ import Link from "next/link";
 import { ClientNavMenu } from "../components/ClientNavMenu";
 import { HoverableCreativesTitle } from "@/components/contacts/HoverableCreativesTitle";
 import { HoverableContactTitle } from "@/components/contacts/HoverableContactTitle";
+import CreativeContactLogo, { LogoVariant } from "@/components/branding/CreativeContactLogo";
 
 // show the in-construction page
 const inConstructPage = false;
@@ -55,17 +56,19 @@ export default async function Page(props: Props) {
   return (
     <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
       {/* Header with logo and join button */}
-      <header className="flex w-full items-center justify-between p-4">
+      <header className="flex w-full items-center justify-between py-4 pl-12 pr-2">
         <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
-          >
-            <span className="text-xl font-bold text-black">CC</span>
+          <Link href="/" className="flex items-center">
+            <CreativeContactLogo
+              variant={LogoVariant.FULL}
+              width={80}
+              height={50}
+              className="text-foreground hover:text-sunglow transition-colors"
+            />
           </Link>
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center justify-stretch p-0 m-0">
           <Button
             variant="link"
             asChild
