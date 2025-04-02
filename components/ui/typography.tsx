@@ -32,6 +32,38 @@ const headingVariants = cva(
   }
 )
 
+// Hero title variants for large, impactful page titles
+const heroTitleVariants = cva(
+  "font-bricolage-grotesque font-bold tracking-tighter text-foreground",
+  {
+    variants: {
+      size: {
+        default: "text-[clamp(2rem,10vw,20rem)] md:text-[clamp(2rem,11.5vw,20rem)] leading-[1.1]",
+        medium: "text-[clamp(2rem,7vw,6rem)] md:text-[clamp(2rem,10vw,6rem)] leading-[1.1]",
+        small: "text-[clamp(2rem,5vw,4rem)] md:text-[clamp(2rem,7vw,4rem)] leading-[1.1]",
+      },
+      variant: {
+        default: "text-foreground",
+        muted: "text-muted-foreground",
+        accent: "text-primary",
+        contrast: "text-white", // High contrast for dark backgrounds
+      },
+      // Add a new bordered property to enable text borders
+      bordered: {
+        none: "",
+        outline: "-webkit-text-stroke: 2px currentColor", // Uses current text color for outline
+        shadow: "text-shadow: -1px -1px 0 currentColor, 1px -1px 0 currentColor, -1px 1px 0 currentColor, 1px 1px 0 currentColor", // Text shadow outline
+        black: "-webkit-text-stroke: 2px black", // Black outline, text color set separately
+      },
+    },
+    defaultVariants: {
+      size: "default",
+      variant: "default",
+      bordered: "none",
+    },
+  }
+)
+
 // Paragraph variants with slightly adjusted sizes
 // Making paragraphs only slightly larger than text-base
 const paragraphVariants = cva(
@@ -182,6 +214,27 @@ interface HeadingProps
   VariantProps<typeof headingVariants> {
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 }
+
+interface HeroTitleProps
+  extends React.HTMLAttributes<HTMLHeadingElement>,
+  VariantProps<typeof heroTitleVariants> {
+  as?: "h1" | "h2"
+}
+
+// HeroTitle component for large, impactful page titles
+const HeroTitle = React.forwardRef<HTMLHeadingElement, HeroTitleProps>(
+  ({ className, size, variant, bordered, as = "h1", ...props }, ref) => {
+    const Comp = as
+    return (
+      <Comp
+        className={cn(heroTitleVariants({ size, variant, bordered, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+HeroTitle.displayName = "HeroTitle"
 
 // H1 is reserved for page titles only
 const H1 = React.forwardRef<HTMLHeadingElement, HeadingProps>(
@@ -449,6 +502,7 @@ export {
   Large,
   Small,
   Caption,
+  HeroTitle,
   headingVariants,
   paragraphVariants,
   blockquoteVariants,
@@ -458,4 +512,5 @@ export {
   largeVariants,
   smallVariants,
   captionVariants,
+  heroTitleVariants,
 } 

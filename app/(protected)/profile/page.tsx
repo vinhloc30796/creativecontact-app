@@ -70,9 +70,9 @@ export default async function ProfilePage(props: ProfilePageProps) {
         <UserHeader
           lang={lang}
           isLoggedIn={isLoggedIn}
-          className="bg-background/80 backdrop-blur-sm"
+          className="bg-background/80 backdrop-blur-xs"
         />
-        <main className="mt-10 w-full flex-grow justify-between lg:mt-20">
+        <main className="mt-10 w-full grow justify-between lg:mt-20">
           <div className="w-full px-4 sm:px-8 md:px-16">
             <div className="flex flex-col lg:flex-row">
               <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
@@ -148,3 +148,7 @@ export default async function ProfilePage(props: ProfilePageProps) {
     </BackgroundDiv>
   );
 }
+
+// Source: https://github.com/vercel/next.js/issues/74128
+// TODO: Attempt to remove now that we have Next 15.2
+export const dynamic = "force-dynamic";

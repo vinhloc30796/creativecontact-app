@@ -281,7 +281,7 @@ export default function PortfolioEditForm({
               </CardContent>
             </Card>
           </div>
-          <div className="flex-grow"></div>{" "}
+          <div className="grow"></div>{" "}
           {/* This div will take up the remaining space */}
           <div className="sticky bottom-0">
             <Card className="w-full">

@@ -30,10 +30,10 @@ export default async function PortfolioCreatePage(
         <UserHeader
           lang={lang}
           isLoggedIn={isLoggedIn}
-          className="fixed left-0 right-0 top-0 z-30 bg-background/80 backdrop-blur-sm"
+          className="fixed left-0 right-0 top-0 z-30 bg-background/80 backdrop-blur-xs"
         />
       </Suspense>
-      <main className="flex min-h-screen w-screen flex-grow flex-col px-2 pt-10 lg:pt-32">
+      <main className="flex min-h-screen w-screen grow flex-col px-2 pt-10 lg:pt-32">
         <div className="container mx-auto mb-4">
           <BackButton />
         </div>
@@ -42,3 +42,7 @@ export default async function PortfolioCreatePage(
     </BackgroundDiv>
   );
 }
+
+// Source: https://github.com/vercel/next.js/issues/74128
+// TODO: Attempt to remove now that we have Next 15.2
+export const dynamic = "force-dynamic";

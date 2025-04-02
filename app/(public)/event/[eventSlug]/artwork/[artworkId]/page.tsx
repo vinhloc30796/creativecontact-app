@@ -315,7 +315,7 @@ export default async function ArtworkPage(props: ArtworkPageProps) {
           </div>
 
           {/* Main content: scrollable always, but separate or together with artwork details depending on screen size */}
-          <main className="flex-grow lg:w-2/3 lg:overflow-y-auto">
+          <main className="grow lg:w-2/3 lg:overflow-y-auto">
             <Suspense fallback={<Loading />}>
               <div className="flex flex-col items-center gap-8 pb-8">
                 {assets.map(

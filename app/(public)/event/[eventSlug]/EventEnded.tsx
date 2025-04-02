@@ -25,7 +25,7 @@ export default function EventEnded({ eventName, eventSlug, lang = "en" }: EventE
     console.log("[EventEnded] About to render component");
     return (
       <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
-        <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center backdrop-blur-sm">
+        <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center backdrop-blur-xs">
           <Card className="min-w-[400px] bg-white">
             <CardHeader
               className="border-b relative w-full aspect-video">

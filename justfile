@@ -31,3 +31,38 @@ tree directory=".":
 [group('db')]
 db:
     psql postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+# Test GitHub Actions workflows locally using Act
+[group('github-actions')]
+act workflow="db-migrations" event="workflow_dispatch" secrets=".env.local" dryrun="true" job="":
+    #!/usr/bin/env bash
+    echo "Testing workflow: {{workflow}}.yml with event: {{event}}"
+    
+    # Create event file directory if it doesn't exist
+    mkdir -p .github/workflows/test-events
+    
+    # Create a basic event file if it doesn't exist
+    if [ ! -f ".github/workflows/test-events/{{workflow}}.{{event}}.json" ]; then
+        echo '{
+          "action": "{{event}}",
+          "inputs": {}
+        }' > .github/workflows/test-events/{{workflow}}.{{event}}.json
+        echo "Created event file: .github/workflows/test-events/{{workflow}}.{{event}}.json"
+    fi
+    
+    # Build the command with optional job parameter
+    CMD="act {{event}} -W .github/workflows/{{workflow}}.yml -e .github/workflows/test-events/{{workflow}}.{{event}}.json --secret-file {{secrets}}"
+    
+    # Add job parameter if specified
+    if [ -n "{{job}}" ]; then
+        CMD="$CMD -j {{job}}"
+    fi
+    
+    # Add dryrun flag if enabled
+    if [ "{{dryrun}}" = "true" ]; then
+        CMD="$CMD --dryrun"
+    fi
+    
+    # Execute the command
+    echo "Running: $CMD"
+    eval $CMD

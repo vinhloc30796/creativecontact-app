@@ -25,3 +25,7 @@ export default async function Page({ searchParams }: PageProps) {
   console.log(`Got ${eventSlots.length} event slots`);
   return <RegisterPage eventSlots={eventSlots} lang={lang} />;
 }
+
+// Source: https://github.com/vercel/next.js/issues/74128
+// TODO: Attempt to remove now that we have Next 15.2
+export const dynamic = "force-dynamic";

@@ -1,7 +1,5 @@
 // File: app/(protected)/profile/edit/page.tsx
 
-"use server";
-
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 // Components
@@ -49,10 +47,10 @@ export default async function ProfileEditPage(props: ProfileEditPageProps) {
         <UserHeader
           lang={lang}
           isLoggedIn={isLoggedIn}
-          className="bg-background/80 backdrop-blur-sm"
+          className="bg-background/80 backdrop-blur-xs"
         />
 
-        <main className="relative z-20 mt-10 w-full flex-grow lg:mt-20">
+        <main className="relative z-20 mt-10 w-full grow lg:mt-20">
           <div className="container mx-auto mb-4 px-4">
             <BackButton />
           </div>
@@ -64,3 +62,7 @@ export default async function ProfileEditPage(props: ProfileEditPageProps) {
     </BackgroundDiv>
   );
 }
+
+// Source: https://github.com/vercel/next.js/issues/74128
+// TODO: Attempt to remove now that we have Next 15.2
+export const dynamic = "force-dynamic";
