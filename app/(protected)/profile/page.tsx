@@ -148,3 +148,5 @@ export default async function ProfilePage(props: ProfilePageProps) {
     </BackgroundDiv>
   );
 }
+
+export const dynamic = "force-dynamic";

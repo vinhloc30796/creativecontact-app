@@ -42,3 +42,5 @@ export default async function PortfolioCreatePage(
     </BackgroundDiv>
   );
 }
+
+export const dynamic = "force-dynamic";

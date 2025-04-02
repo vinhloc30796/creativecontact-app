@@ -25,3 +25,5 @@ export default async function Page({ searchParams }: PageProps) {
   console.log(`Got ${eventSlots.length} event slots`);
   return <RegisterPage eventSlots={eventSlots} lang={lang} />;
 }
+
+export const dynamic = "force-dynamic";

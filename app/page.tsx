@@ -208,3 +208,5 @@ export default async function Page(props: Props) {
     </BackgroundDiv>
   );
 }
+
+export const dynamic = "force-dynamic";

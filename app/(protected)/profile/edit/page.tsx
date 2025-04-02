@@ -1,7 +1,5 @@
 // File: app/(protected)/profile/edit/page.tsx
 
-"use server";
-
 import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 // Components
@@ -64,3 +62,5 @@ export default async function ProfileEditPage(props: ProfileEditPageProps) {
     </BackgroundDiv>
   );
 }
+
+export const dynamic = "force-dynamic";
