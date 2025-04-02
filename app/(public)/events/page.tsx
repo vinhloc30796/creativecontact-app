@@ -26,6 +26,7 @@ import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { fetchEvents } from "@/lib/payload/fetchEvents";
+import { EventTicker } from "@/components/events/EventTicker";
 
 export const metadata: Metadata = {
   title: "Events | Creative Contact",
@@ -229,16 +230,13 @@ export default async function EventsPage() {
 
       {/* Event ticker at the bottom */}
       <footer className="w-full overflow-hidden bg-sunglow py-3 text-black">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <span
-                key={i}
-                className="mx-4 text-base font-medium"
-              >{`Join our upcoming events • Creative Contact`}</span>
-            ))}
-        </div>
+        <EventTicker
+          eventName=""
+          tickerText="Join our upcoming events • Creative Contact"
+          repetitions={4}
+          pauseOnHover={true}
+          direction="left"
+        />
       </footer>
     </BackgroundDiv>
   );
