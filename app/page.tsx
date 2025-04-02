@@ -209,4 +209,6 @@ export default async function Page(props: Props) {
   );
 }
 
+// Source: https://github.com/vercel/next.js/issues/74128
+// TODO: Attempt to remove now that we have Next 15.2
 export const dynamic = "force-dynamic";
