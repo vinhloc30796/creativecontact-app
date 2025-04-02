@@ -94,7 +94,7 @@ export default async function AboutPage() {
                 <P className="text-foreground/80">
                   Creative Contact was founded with a simple yet powerful
                   mission: to foster collaboration, innovation, and growth
-                  within Vietnam's creative community. We believe that by
+                  within Vietnam&apos;s creative community. We believe that by
                   connecting talented individuals across different disciplines,
                   we can create a thriving ecosystem where creativity
                   flourishes.
@@ -211,8 +211,8 @@ export default async function AboutPage() {
           <div className="mt-16 rounded-lg bg-linear-to-r from-sunglow/20 to-purple-500/20 p-8 text-center backdrop-blur-xs">
             <H2 className="text-foreground">Join Our Creative Community</H2>
             <P className="mx-auto mt-4 max-w-2xl text-foreground/80">
-              Whether you're an established professional or just starting your
-              creative journey, there's a place for you in our community.
+              Whether you&apos;re an established professional or just starting your
+              creative journey, there&apos;s a place for you in our community.
               Connect, collaborate, and grow with us.
             </P>
             <Button

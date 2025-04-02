@@ -1,5 +1,4 @@
 // import from tailwind.config.ts
-import config from '@/tailwind.config';
 const colors = {
   transparent: 'transparent',
   current: 'currentColor',
