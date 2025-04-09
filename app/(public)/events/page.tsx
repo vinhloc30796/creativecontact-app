@@ -27,6 +27,7 @@ import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { fetchEvents } from "@/lib/payload/fetchEvents";
 import { EventTicker } from "@/components/events/EventTicker";
+import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "Events | Creative Contact",
@@ -49,39 +50,7 @@ export default async function EventsPage() {
   if (!events || events.length === 0) {
     return (
       <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
-        {/* Header with logo and join button */}
-        <header className="flex w-full items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
-            >
-              <span className="text-xl font-bold text-black">CC</span>
-            </Link>
-          </div>
-
-          <div className="flex items-center">
-            <Button
-              variant="link"
-              asChild
-              className="text-sm text-foreground hover:text-sunglow"
-            >
-              <Link href="/signup">
-                <TextIconBox
-                  title={t("joinUsLine1")}
-                  subtitle={t("joinUsLine2")}
-                  icon={
-                    <ArrowUpRight
-                      className="text-sunglow"
-                      style={{ height: "125%", width: "125%" }}
-                    />
-                  }
-                  className="text-sm"
-                />
-              </Link>
-            </Button>
-          </div>
-        </header>
+        <Header t={t} />
 
         {/* Main content */}
         <div className="relative z-0 flex flex-1 flex-col">
@@ -131,38 +100,7 @@ export default async function EventsPage() {
   return (
     <BackgroundDiv shouldCenter={false} className="flex min-h-screen flex-col">
       {/* Header with logo and join button */}
-      <header className="flex w-full items-center justify-between p-4">
-        <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
-          >
-            <span className="text-xl font-bold text-black">CC</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center">
-          <Button
-            variant="link"
-            asChild
-            className="text-sm text-foreground hover:text-sunglow"
-          >
-            <Link href="/signup">
-              <TextIconBox
-                title={t("joinUsLine1")}
-                subtitle={t("joinUsLine2")}
-                icon={
-                  <ArrowUpRight
-                    className="text-sunglow"
-                    style={{ height: "125%", width: "125%" }}
-                  />
-                }
-                className="text-sm"
-              />
-            </Link>
-          </Button>
-        </div>
-      </header>
+      <Header t={t} />
 
       {/* Main content */}
       <div className="relative z-0 flex flex-1 flex-col">

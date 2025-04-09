@@ -1,27 +1,44 @@
-import { notFound } from "next/navigation";
-import Image from "next/image";
-import { Metadata } from "next";
-import { format } from "date-fns";
-import Link from "next/link";
-
+import { H1, H2 } from "@/components/ui/typography";
 import { fetchEventBySlug } from "@/lib/payload/fetchEvents";
-import { H1, H2, P, Lead } from "@/components/ui/typography";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  CalendarIcon,
-  MapPinIcon,
-  UsersIcon,
-  CheckCircleIcon,
-} from "@/components/ui/icons";
-import { RenderBlocks } from "@/components/payload-cms/RenderBlocks";
 import { BlockTypes, getMediaUrl } from "@/lib/payload/payloadTypeAdapter";
+import { Event } from "@/payload-types"; // Assuming Event type is defined
+import { format } from "date-fns";
+import { Metadata } from "next";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+// --- Component Imports from Homepage --- (Assuming paths are correct)
+import { ClientNavMenu } from "@/components/ClientNavMenu";
+import { Header } from "@/components/Header";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { RenderSingleBlock } from "@/components/payload-cms/RenderSingleBlock";
+import { getServerTranslation } from "@/lib/i18n/init-server";
+
+const FloatingActions = ({ currentLang }: { currentLang: string }) => {
+  // Assuming getServerTranslation can be used here or lang is passed down
+  // const { t } = await getServerTranslation(currentLang, "common"); // Example namespace
+  const t = (key: string) => key; // Placeholder translation
+
+  return (
+    <div className="fixed right-4 bottom-4 z-20 flex flex-col items-end gap-3 md:right-6 md:bottom-6">
+      <LanguageSwitcher currentLang={currentLang} />
+      <ClientNavMenu
+        items={[
+          { text: t("aboutCC"), href: "/about" },
+          { text: t("contactBook"), href: "/contacts" },
+          { text: t("events"), href: "/events" }, // Link back to events list
+          // Add other relevant links if needed
+        ]}
+        menuText={t("menu")} // Get menu text from translations
+      />
+    </div>
+  );
+};
 
 // Dynamic metadata based on event
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string }; // Removed Promise<> wrapper for clarity
 }): Promise<Metadata> {
   const { slug } = await params;
   const event = await fetchEventBySlug(slug);
@@ -40,19 +57,23 @@ export async function generateMetadata({
     description: event.summary || "Creative Contact Event",
     openGraph: mediaUrl
       ? {
-          images: [{ url: mediaUrl }],
-        }
+        images: [{ url: mediaUrl }],
+      }
       : undefined,
   };
 }
 
 export default async function EventPage({
   params,
+  searchParams, // Add searchParams to get language
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
+  searchParams?: { lang?: string }; // Make searchParams optional
 }) {
   const { slug } = await params;
-  const event = await fetchEventBySlug(slug);
+  const lang = searchParams?.lang || "en"; // Get lang from searchParams
+  const { t } = await getServerTranslation(lang, "HomePage");
+  const event: Event | null = await fetchEventBySlug(slug);
 
   if (!event) {
     return notFound();
@@ -83,133 +104,59 @@ export default async function EventPage({
     duration = formattedTime;
   }
 
+  const featuredImageUrl = getMediaUrl(event.featuredImage);
+
+  // Separate Credits block if it exists
+  const creditsBlock = event.content?.find(
+    (block) => block.blockType === "EventCredits",
+  );
+  const mainContentBlocks =
+    event.content?.filter((block) => block.blockType !== "EventCredits") || [];
+
   return (
-    <main className="min-h-screen">
-      {/* Hero section with featured image */}
-      <div className="relative h-[50vh] min-h-[400px] w-full">
-        {event.featuredImage ? (
-          <Image
-            src={getMediaUrl(event.featuredImage)}
-            alt={
-              (typeof event.featuredImage === "object" &&
-                event.featuredImage.alt) ||
-              event.title
-            }
-            fill
-            className="object-cover"
-            priority
-            quality={90}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-muted">
-            <p className="text-muted-foreground">No featured image available</p>
-          </div>
-        )}
+    <main className="bg-gray relative flex h-screen flex-col overflow-hidden">
+      {/* Fixed Header */}
+      <Header t={t} />
 
-        <div className="absolute inset-0 flex flex-col justify-end bg-black/40">
-          <div className="container max-w-5xl pb-12">
-            <Badge
-              variant={
-                event.status === "upcoming"
-                  ? "default"
-                  : event.status === "active"
-                    ? "success"
-                    : "outline"
-              }
-              className="mb-4"
-            >
-              {event.status === "upcoming"
-                ? "Upcoming"
-                : event.status === "active"
-                  ? "Happening now"
-                  : "Past event"}
-            </Badge>
-            <H1 className="mb-4 text-white">{event.title}</H1>
-            <div className="flex flex-col gap-4 text-white sm:flex-row sm:gap-8">
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-5 w-5" />
-                <span>{formattedDate}</span>
-              </div>
-              {duration && (
-                <div className="flex items-center gap-2">
-                  <span>{duration}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <MapPinIcon className="h-5 w-5" />
-                <span>{event.location}</span>
-              </div>
-              {event.capacity && (
-                <div className="flex items-center gap-2">
-                  <UsersIcon className="h-5 w-5" />
-                  <span>Capacity: {event.capacity}</span>
+      {/* Horizontally Scrolling Content Area */}
+      <div className="scrollbar-hide relative z-10 flex h-full my-4 gap-4 overflow-x-auto pl-4">
+        {/* 1. Metadata Card (Fixed Width) */}
+        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1">
+          <div className="bg-gray/40 flex h-full flex-col justify-between rounded-lg p-6 backdrop-blur-md">
+            <div>
+              <H1 className="mb-4 font-serif text-4xl md:text-5xl">
+                {event.title}
+              </H1>
+              {/* Placeholder for Credits */}
+              {creditsBlock && (
+                <div className="mt-6 border-t border-white/20 pt-4">
+                  <H2 className="mb-2 text-lg font-semibold">Credits</H2>
+                  {/* --- TODO: Implement EventCredits Block Rendering --- */}
+                  <pre className="overflow-auto rounded bg-white/10 p-2 text-xs">
+                    {JSON.stringify(creditsBlock, null, 2)}
+                  </pre>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="container max-w-5xl py-12">
-        {/* Summary */}
-        <div className="mb-12">
-          <Lead>{event.summary}</Lead>
-        </div>
-
-        {/* Tags */}
-        {event.tags && event.tags.length > 0 && (
-          <div className="mb-8 flex flex-wrap gap-2">
-            {event.tags.map((tag, index) => (
-              <Badge key={index} variant="outline">
-                {tag.tag || ""}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Registration button */}
-        {event.registrationRequired && event.status !== "past" && (
-          <div className="mb-12 flex flex-col items-center justify-between gap-4 rounded-lg bg-muted p-6 sm:flex-row">
-            <div className="flex items-center gap-3">
-              <CheckCircleIcon className="h-6 w-6 text-primary" />
-              <div>
-                <P className="font-medium">Registration required</P>
-                <P className="text-muted-foreground">
-                  Secure your spot for this event
-                </P>
-              </div>
+            <div className="text-sm">
+              <p>{event.location}</p>
+              {/* Add other relevant metadata if needed */}
             </div>
-
-            {event.registrationLink ? (
-              <Button size="lg" asChild>
-                <a
-                  href={event.registrationLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Register Now
-                </a>
-              </Button>
-            ) : (
-              <Button size="lg">Contact for Registration</Button>
-            )}
           </div>
-        )}
-
-        {/* Blocks Content */}
-        {event.content && event.content.length > 0 && (
-          <div className="prose prose-lg max-w-none">
-            <RenderBlocks blocks={event.content as unknown as BlockTypes[]} />
-          </div>
-        )}
-
-        {/* Back to events link */}
-        <div className="mt-16 border-t pt-8">
-          <Button variant="outline" asChild>
-            <Link href="/events">← Back to all events</Link>
-          </Button>
         </div>
+
+        {/* 2. Dynamic Content Blocks (Horizontal Scroll) */}
+        {mainContentBlocks.map((block, index) => (
+          <div
+            key={block.id || index} // Use block.id if available, otherwise index
+            className="h-full aspect-square flex-shrink-0 snap-start bg-black/10 p-6 pt-20 md:p-10 md:pt-24 rounded-xl"
+          >
+            <div className="bg-gray/40 flex h-full items-center justify-center rounded-lg p-6 backdrop-blur-md">
+              {/* Use RenderSingleBlock to render the correct component for this block */}
+              <RenderSingleBlock block={block as BlockTypes} />
+            </div>
+          </div>
+        ))}
       </div>
     </main>
   );

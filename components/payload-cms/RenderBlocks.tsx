@@ -19,6 +19,12 @@ import {
   getOrDefault,
 } from "@/lib/payload/payloadTypeAdapter";
 
+// Import all individual block components
+import { EventDetailsBlock as EventDetailsBlockComponent } from "@/components/payload-cms/blocks/EventDetailsBlock";
+// import { EventSpeakerBlock } from "@/components/blocks/EventSpeakerBlock";
+// import { EventGalleryBlock } from "@/components/blocks/EventGalleryBlock";
+// ... import other block components
+
 // Use the types from our adapter
 interface RenderBlocksProps {
   blocks: BlockTypes[];
@@ -31,7 +37,7 @@ export function RenderBlocks({ blocks }: RenderBlocksProps) {
         // Render different blocks based on their blockType
         switch (block.blockType) {
           case "EventDetails":
-            return <EventDetailsRenderer key={index} {...block} />;
+            return <EventDetailsBlockComponent key={index} data={block} />;
           case "EventSpeaker":
             return <EventSpeakerRenderer key={index} {...block} />;
           case "EventSpeakers":
