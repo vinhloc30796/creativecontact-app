@@ -155,3 +155,4 @@ export default async function EventPage({ params }) {
 ```
 
 By following this pattern, you can easily add new blocks or modify existing ones by creating/updating their respective components without changing the core rendering logic in `RenderBlocks`.
+

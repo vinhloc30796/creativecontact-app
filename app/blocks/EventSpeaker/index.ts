@@ -3,6 +3,7 @@ import richText from "../../fields/richText";
 
 export const EventSpeaker: Block = {
   slug: "EventSpeaker",
+  interfaceName: "EventSpeakerBlock",
   labels: {
     singular: "Event Speaker",
     plural: "Event Speakers",
@@ -34,6 +35,7 @@ export const EventSpeaker: Block = {
       },
     },
     {
+      interfaceName: "SocialLinks",
       name: "socialLinks",
       type: "array",
       admin: {

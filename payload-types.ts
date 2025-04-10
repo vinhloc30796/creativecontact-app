@@ -7,6 +7,20 @@
  */
 
 /**
+ * Social media links for this speaker
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SocialLinks".
+ */
+export type SocialLinks =
+  | {
+      platform: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'youtube' | 'website' | 'other';
+      url: string;
+      label?: string | null;
+      id?: string | null;
+    }[]
+  | null;
+/**
  * Supported timezones in IANA format.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -235,71 +249,8 @@ export interface Event {
    */
   featuredImage: number | Media;
   content: (
-    | {
-        heading: string;
-        richText: {
-          root: {
-            type: string;
-            children: {
-              type: string;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        /**
-         * Optional background image for this section
-         */
-        backgroundImage?: (number | null) | Media;
-        layout?: ('default' | 'wide' | 'fullWidth') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'EventDetails';
-      }
-    | {
-        name: string;
-        role?: string | null;
-        bio?: string | null;
-        description: {
-          root: {
-            type: string;
-            children: {
-              type: string;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        /**
-         * Profile photo of the speaker
-         */
-        image: number | Media;
-        /**
-         * Social media links for this speaker
-         */
-        socialLinks?:
-          | {
-              platform: 'instagram' | 'twitter' | 'linkedin' | 'facebook' | 'youtube' | 'website' | 'other';
-              url: string;
-              label?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        layout?: ('standard' | 'compact' | 'expanded') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'EventSpeaker';
-      }
+    | EventDetailsBlock
+    | EventSpeakerBlock
     | {
         heading?: string | null;
         /**
@@ -365,6 +316,37 @@ export interface Event {
         blockName?: string | null;
         blockType: 'EventCredits';
       }
+    | {
+        mediaBlockFields: {
+          settings?: {
+            /**
+             * Leave blank for system default
+             */
+            theme?: ('light' | 'dark') | null;
+            background?: ('solid' | 'transparent' | 'gradientUp' | 'gradientDown') | null;
+          };
+          position?: ('default' | 'wide') | null;
+          media: number | Media;
+          caption?: {
+            root: {
+              type: string;
+              children: {
+                type: string;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          } | null;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'mediaBlock';
+      }
   )[];
   /**
    * Tags to categorize this event
@@ -385,6 +367,69 @@ export interface Event {
   registrationLink?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventDetailsBlock".
+ */
+export interface EventDetailsBlock {
+  heading: string;
+  richText: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Optional background image for this section
+   */
+  backgroundImage?: (number | null) | Media;
+  layout?: ('default' | 'wide' | 'fullWidth') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'EventDetails';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventSpeakerBlock".
+ */
+export interface EventSpeakerBlock {
+  name: string;
+  role?: string | null;
+  bio?: string | null;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Profile photo of the speaker
+   */
+  image: number | Media;
+  socialLinks?: SocialLinks;
+  layout?: ('standard' | 'compact' | 'expanded') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'EventSpeaker';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -526,36 +571,8 @@ export interface EventsSelect<T extends boolean = true> {
   content?:
     | T
     | {
-        EventDetails?:
-          | T
-          | {
-              heading?: T;
-              richText?: T;
-              backgroundImage?: T;
-              layout?: T;
-              id?: T;
-              blockName?: T;
-            };
-        EventSpeaker?:
-          | T
-          | {
-              name?: T;
-              role?: T;
-              bio?: T;
-              description?: T;
-              image?: T;
-              socialLinks?:
-                | T
-                | {
-                    platform?: T;
-                    url?: T;
-                    label?: T;
-                    id?: T;
-                  };
-              layout?: T;
-              id?: T;
-              blockName?: T;
-            };
+        EventDetails?: T | EventDetailsBlockSelect<T>;
+        EventSpeaker?: T | EventSpeakerBlockSelect<T>;
         EventSpeakers?:
           | T
           | {
@@ -620,6 +637,25 @@ export interface EventsSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        mediaBlock?:
+          | T
+          | {
+              mediaBlockFields?:
+                | T
+                | {
+                    settings?:
+                      | T
+                      | {
+                          theme?: T;
+                          background?: T;
+                        };
+                    position?: T;
+                    media?: T;
+                    caption?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
       };
   tags?:
     | T
@@ -631,6 +667,43 @@ export interface EventsSelect<T extends boolean = true> {
   registrationLink?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventDetailsBlock_select".
+ */
+export interface EventDetailsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  richText?: T;
+  backgroundImage?: T;
+  layout?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventSpeakerBlock_select".
+ */
+export interface EventSpeakerBlockSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  bio?: T;
+  description?: T;
+  image?: T;
+  socialLinks?: T | SocialLinksSelect<T>;
+  layout?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SocialLinks_select".
+ */
+export interface SocialLinksSelect<T extends boolean = true> {
+  platform?: T;
+  url?: T;
+  label?: T;
+  id?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

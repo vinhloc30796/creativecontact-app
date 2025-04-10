@@ -12,6 +12,7 @@ import { EventSpeaker } from "../blocks/EventSpeaker";
 import { EventSpeakers } from "../blocks/EventSpeakers";
 import { EventGallery } from "../blocks/EventGallery";
 import { EventCredits } from "../blocks/EventCredits";
+import { MediaBlock } from "../blocks/Media";
 
 // Events collection to manage events displayed on the website
 export const Events: CollectionConfig = {
@@ -112,6 +113,7 @@ export const Events: CollectionConfig = {
         EventSpeakers,
         EventGallery,
         EventCredits,
+        MediaBlock,
         // Other blocks should be imported and added here
       ],
       required: true,

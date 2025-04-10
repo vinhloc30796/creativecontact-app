@@ -138,7 +138,81 @@ const seedDatabase = async () => {
         {
           blockType: "EventDetails",
           heading: "Party Details",
-          richText: createRichText("Detailed information about the launch party."),
+          richText: createRichText(
+            "Welcome to the official launch party! We\'ll have demos, Q&A sessions, and virtual networking rooms.",
+          ),
+          layout: "default",
+        },
+        {
+          blockType: "EventSpeaker",
+          name: "Payload Bot",
+          role: "Lead Developer",
+          image: mediaId, // Use seed image
+          description: createRichText(
+            "The mastermind behind the scenes, ready to answer your toughest questions.",
+          ),
+          socialLinks: [
+            { platform: "twitter", url: "https://twitter.com/payloadcms" },
+            { platform: "website", url: "https://payloadcms.com" },
+          ],
+          layout: "standard",
+        },
+        {
+          blockType: "EventGallery",
+          heading: "Party Moments (Preview)",
+          images: [
+            {
+              image: mediaId,
+              caption: "Setup",
+              altText: "Virtual stage setup",
+            },
+            {
+              image: mediaId, // Reuse image for example
+              caption: "Networking Area",
+              altText: "Virtual networking space",
+            },
+          ],
+          layout: "grid",
+          columns: "2",
+        },
+        {
+          blockType: "EventSpeakers",
+          heading: "More Speakers",
+          speakers: [
+            {
+              name: "Core Contributor A",
+              role: "Frontend Specialist",
+              image: mediaId,
+              bio: "Loves React and clean code.",
+            },
+            {
+              name: "Core Contributor B",
+              role: "Backend Guru",
+              image: mediaId, // Reuse image
+              bio: "Ensures everything runs smoothly.",
+              socialLinks: [
+                { platform: "linkedin", url: "#" },
+              ],
+            },
+          ],
+          layout: "grid",
+          columns: "2",
+        },
+        {
+          blockType: "EventCredits",
+          heading: "Event Team",
+          credits: [
+            {
+              name: "Marketing Team",
+              roles: [{ role: "Promotion" }, { role: "Social Media" }],
+            },
+            {
+              name: "Dev Team",
+              roles: [{ role: "Integration" }, { role: "Support" }],
+              social: "https://github.com/payloadcms",
+            },
+          ],
+          layout: "standard",
         },
       ],
       registrationRequired: true,

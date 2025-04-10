@@ -119,7 +119,7 @@ export default async function EventPage({
       <Header t={t} />
 
       {/* Horizontally Scrolling Content Area */}
-      <div className="scrollbar-hide relative z-10 flex h-full my-4 gap-4 overflow-x-auto pl-4">
+      <div className="relative z-10 flex h-full my-4 gap-4 overflow-x-auto pl-4 scrollbar-hide [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {/* 1. Metadata Card (Fixed Width) */}
         <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1">
           <div className="bg-gray/40 flex h-full flex-col justify-between rounded-lg p-6 backdrop-blur-md">
@@ -149,14 +149,15 @@ export default async function EventPage({
         {mainContentBlocks.map((block, index) => (
           <div
             key={block.id || index} // Use block.id if available, otherwise index
-            className="h-full aspect-square flex-shrink-0 snap-start bg-black/10 p-6 pt-20 md:p-10 md:pt-24 rounded-xl"
+            className="h-full aspect-square flex-shrink-0 snap-start bg-black/10 p-5 rounded-xl last:mr-4"
           >
-            <div className="bg-gray/40 flex h-full items-center justify-center rounded-lg p-6 backdrop-blur-md">
+            <div className="bg-gray/40 flex h-full rounded-lg p-6 backdrop-blur-md">
               {/* Use RenderSingleBlock to render the correct component for this block */}
               <RenderSingleBlock block={block as BlockTypes} />
             </div>
           </div>
         ))}
+        {/* Empty div for padding at the end */}
       </div>
     </main>
   );
