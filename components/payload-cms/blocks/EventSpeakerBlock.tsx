@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { type EventSpeakerBlock as EventSpeakerBlockType, type SocialLinks } from "@/payload-types"; // Assuming generated type from payload
+import { type EventSpeakerBlock as PayloadEventSpeakerBlockType, type SocialLinks } from "@/payload-types"; // Rename imported type
 import { RichText } from "@/components/payload-cms/RichText";
 import { H2, H3, P } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
@@ -15,11 +15,15 @@ import {
   Link as LinkIcon,
 } from "lucide-react"; // Import icons
 
-interface EventSpeakerBlockProps {
-  data: Omit<EventSpeakerBlockType, "id" | "blockType" | "blockName">;
+// Define the props based on the Payload type, but make description optional
+// Export the interface so it can be imported elsewhere
+export interface EventSpeakerBlockProps {
+  data: Omit<PayloadEventSpeakerBlockType, "id" | "blockType" | "blockName" | "description">
+  & { description?: PayloadEventSpeakerBlockType['description'] }; // Make description optional
 }
 
 // Define explicit type for the layout map
+// This doesn't need to be exported if only used internally
 interface LayoutMap {
   standard: string;
   compact: string;

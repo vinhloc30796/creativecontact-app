@@ -1,7 +1,8 @@
 import { H1, H2 } from "@/components/ui/typography";
 import { fetchEventBySlug } from "@/lib/payload/fetchEvents";
-import { BlockTypes, getMediaUrl } from "@/lib/payload/payloadTypeAdapter";
-import { Event } from "@/payload-types"; // Assuming Event type is defined
+import { BlockTypes, getMediaUrl, Media } from "@/lib/payload/payloadTypeAdapter";
+import { type EventSpeakerBlockProps } from "@/components/payload-cms/blocks/EventSpeakerBlock";
+import { Event, EventSpeakerBlock as PayloadEventSpeakerBlockType } from "@/payload-types";
 import { format } from "date-fns";
 import { Metadata } from "next";
 import Image from "next/image";
@@ -11,7 +12,9 @@ import { ClientNavMenu } from "@/components/ClientNavMenu";
 import { Header } from "@/components/Header";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { RenderSingleBlock } from "@/components/payload-cms/RenderSingleBlock";
+import { EventCreditsBlock } from "@/components/payload-cms/blocks/EventCreditsBlock";
 import { getServerTranslation } from "@/lib/i18n/init-server";
+import { cn } from "@/lib/utils";
 
 const FloatingActions = ({ currentLang }: { currentLang: string }) => {
   // Assuming getServerTranslation can be used here or lang is passed down
@@ -106,12 +109,67 @@ export default async function EventPage({
 
   const featuredImageUrl = getMediaUrl(event.featuredImage);
 
-  // Separate Credits block if it exists
+  // --- Flatten Content Blocks --- START ---
   const creditsBlock = event.content?.find(
-    (block) => block.blockType === "EventCredits",
+    (block): block is Extract<BlockTypes, { blockType: "EventCredits" }> => // Type guard
+      block.blockType === "EventCredits",
   );
-  const mainContentBlocks =
-    event.content?.filter((block) => block.blockType !== "EventCredits") || [];
+
+  // Use a more flexible type for the flattened array
+  const flatContentBlocks: Array<BlockTypes> = []; // Simplified type
+  event.content?.forEach((block, blockIndex) => { // Add blockIndex for key generation
+    if (block.blockType === "EventCredits") {
+      // Skip credits block here, rendered separately
+      return;
+    } else if (block.blockType === "EventSpeakers") {
+      // Flatten speakers into individual items
+      block.speakers?.forEach((speaker, speakerIndex) => { // Add speakerIndex for key generation
+        // Create a pseudo-block matching EventSpeakerBlockProps['data']
+        const speakerBlockData: EventSpeakerBlockProps['data'] = {
+          name: speaker.name,
+          role: speaker.role,
+          bio: speaker.bio,
+          description: undefined, // OK because EventSpeakerBlockProps makes it optional
+          image: speaker.image as Media,
+          socialLinks: speaker.socialLinks,
+          // layout is determined by EventSpeakerBlock itself or default
+        };
+        // Need to add back blockType and id for the main map key and RenderSingleBlock switch
+        flatContentBlocks.push({
+          id: speaker.id || `speaker-${blockIndex}-${speakerIndex}`, // Use indices for more robust key
+          blockType: "EventSpeaker", // Add blockType here
+          ...speakerBlockData,
+        } as BlockTypes); // Cast the final object for the array
+      });
+    } else if (block.blockType === "EventGallery") { // ADDED: Handle EventGalleryBlock
+      // Flatten gallery images into individual media blocks
+      block.images?.forEach((imgItem, imgIndex) => { // Add imgIndex for key generation
+        if (!imgItem.image) return; // Skip if image is missing
+
+        // Create a pseudo-block matching the structure expected by RenderSingleBlock for 'mediaBlock'
+        const mediaBlockData: Extract<BlockTypes, { blockType: 'mediaBlock' }> = {
+          id: imgItem.id || `gallery-img-${blockIndex}-${imgIndex}`, // Unique ID using indices
+          blockType: "mediaBlock",
+          blockName: `Gallery Image ${imgIndex + 1}`, // Optional: Add a block name
+          // These fields form the 'data' prop for MediaBlock component via RenderSingleBlock
+          mediaBlockFields: {
+            media: imgItem.image as Media, // Assert Media type
+            // Ensure caption is RichText or undefined
+            caption: typeof imgItem.caption === 'object' && imgItem.caption !== null
+              ? imgItem.caption
+              : undefined,
+            position: 'default', // Default position for individual items
+            // settings: block.settings, // Pass gallery-level settings if applicable/needed
+          }
+        };
+        flatContentBlocks.push(mediaBlockData as BlockTypes); // Add to flattened list
+      });
+    } else {
+      // Add other block types directly
+      flatContentBlocks.push(block);
+    }
+  });
+  // --- Flatten Content Blocks --- END ---
 
   return (
     <main className="bg-gray relative flex h-screen flex-col overflow-hidden">
@@ -127,14 +185,13 @@ export default async function EventPage({
               <H1 className="mb-4 font-serif text-4xl md:text-5xl">
                 {event.title}
               </H1>
-              {/* Placeholder for Credits */}
+              {/* Render Credits Block - Ensure data prop matches component */}
               {creditsBlock && (
                 <div className="mt-6 border-t border-white/20 pt-4">
-                  <H2 className="mb-2 text-lg font-semibold">Credits</H2>
-                  {/* --- TODO: Implement EventCredits Block Rendering --- */}
-                  <pre className="overflow-auto rounded bg-white/10 p-2 text-xs">
-                    {JSON.stringify(creditsBlock, null, 2)}
-                  </pre>
+                  <EventCreditsBlock
+                    data={creditsBlock} // Pass the full creditsBlock object
+                  // hideHeading={false} // Prop might not exist, remove if causing errors
+                  />
                 </div>
               )}
             </div>
@@ -145,16 +202,26 @@ export default async function EventPage({
           </div>
         </div>
 
-        {/* 2. Dynamic Content Blocks (Horizontal Scroll) */}
-        {mainContentBlocks.map((block, index) => (
+        {/* 2. Dynamic Content Blocks (Horizontal Scroll) - Use flattened blocks */}
+        {flatContentBlocks.map((block, index) => (
           <div
-            key={block.id || index} // Use block.id if available, otherwise index
-            className="h-full aspect-square flex-shrink-0 snap-start bg-black/10 p-5 rounded-xl last:mr-4"
+            key={block.id || `flat-block-${index}`} // Use block.id from flattened structure
+            // Conditionally adjust aspect ratio and padding based on block type
+            className={cn(
+              "h-full flex-shrink-0 snap-start rounded-xl last:mr-4",
+              block.blockType === "mediaBlock"
+                ? "aspect-video bg-transparent p-0" // Media blocks get video aspect, no padding/bg on outer
+                : "aspect-square bg-black/10 p-5", // Other blocks get square aspect, padding/bg on outer
+            )}
           >
-            <div className="bg-gray/40 flex h-full rounded-lg p-6 backdrop-blur-md">
-              {/* Use RenderSingleBlock to render the correct component for this block */}
-              <RenderSingleBlock block={block as BlockTypes} />
-            </div>
+            {/* Conditionally render the inner wrapper */}
+            {block.blockType === "mediaBlock" ? (
+              <RenderSingleBlock block={block} />
+            ) : (
+              <div className="bg-gray/40 h-full rounded-lg p-6 backdrop-blur-md">
+                <RenderSingleBlock block={block} />
+              </div>
+            )}
           </div>
         ))}
         {/* Empty div for padding at the end */}

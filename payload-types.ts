@@ -325,7 +325,7 @@ export interface Event {
             theme?: ('light' | 'dark') | null;
             background?: ('solid' | 'transparent' | 'gradientUp' | 'gradientDown') | null;
           };
-          position?: ('default' | 'wide') | null;
+          position?: ('default' | 'wide' | 'fullWidth') | null;
           media: number | Media;
           caption?: {
             root: {
