@@ -1,55 +1,42 @@
 "use client";
 
-import {
-  BlockTypes
-} from "@/lib/payload/payloadTypeAdapter";
-
-// Import all individual block components
-import { EventCreditsBlock as EventCreditsBlockComponent } from "@/components/payload-cms/blocks/EventCreditsBlock";
-import { EventDetailsBlock as EventDetailsBlockComponent } from "@/components/payload-cms/blocks/EventDetailsBlock";
-import { EventGalleryBlock as EventGalleryBlockComponent } from "@/components/payload-cms/blocks/EventGalleryBlock";
-import { EventSpeakerBlock as EventSpeakerBlockComponent } from "@/components/payload-cms/blocks/EventSpeakerBlock";
-import { EventSpeakersBlock as EventSpeakersBlockComponent } from "@/components/payload-cms/blocks/EventSpeakersBlock";
-import { MediaBlock as MediaBlockComponent } from "@/components/payload-cms/blocks/MediaBlock";
-// ... import other block components
+import { BlockTypes } from "@/lib/payload/payloadTypeAdapter";
+import { RenderSingleBlock } from "@/components/payload-cms/RenderSingleBlock";
+import { cn } from "@/lib/utils";
 
 // Use the types from our adapter
 interface RenderBlocksProps {
   blocks: BlockTypes[];
+  className?: string;
 }
 
-export function RenderBlocks({ blocks }: RenderBlocksProps) {
+export function RenderBlocks({ blocks, className }: RenderBlocksProps) {
   return (
-    <div className="flex flex-col gap-16">
-      {blocks.map((block, index) => {
-        // Render different blocks based on their blockType
-        switch (block.blockType) {
-          case "EventDetails":
-            return <EventDetailsBlockComponent key={index} data={block} />;
-          case "EventSpeaker":
-            return <EventSpeakerBlockComponent key={index} data={block} />;
-          case "EventSpeakers":
-            return <EventSpeakersBlockComponent key={index} data={block} />;
-          case "EventGallery":
-            return <EventGalleryBlockComponent key={index} data={block} />;
-          case "EventCredits":
-            return <EventCreditsBlockComponent key={index} data={block} />;
-          case "mediaBlock":
-            return <MediaBlockComponent key={index} data={block.mediaBlockFields} />;
-          default:
-            // For unrecognized blocks or debugging
-            return (
-              <div
-                key={index}
-                className="rounded-md border border-dashed border-gray-300 p-4"
-              >
-                <p className="text-muted-foreground">
-                  Unsupported block type: {(block as any).blockType}
-                </p>
-              </div>
-            );
-        }
-      })}
+    <div
+      className={cn(
+        "relative z-10 flex h-full gap-4 overflow-x-auto pl-4 scrollbar-hide [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+        className,
+      )}
+    >
+      {blocks.map((block, index) => (
+        <div
+          key={block.id || `flat-block-${index}`}
+          className={cn(
+            "h-full flex-shrink-0 snap-start rounded-xl last:mr-4",
+            block.blockType === "mediaBlock"
+              ? "aspect-video bg-transparent p-0"
+              : "aspect-square bg-black/10 p-5",
+          )}
+        >
+          {block.blockType === "mediaBlock" ? (
+            <RenderSingleBlock block={block} />
+          ) : (
+            <div className="bg-gray/40 h-full rounded-lg p-6 backdrop-blur-md">
+              <RenderSingleBlock block={block} />
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

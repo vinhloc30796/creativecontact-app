@@ -15,6 +15,7 @@ import { RenderSingleBlock } from "@/components/payload-cms/RenderSingleBlock";
 import { EventCreditsBlock } from "@/components/payload-cms/blocks/EventCreditsBlock";
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { cn } from "@/lib/utils";
+import { RenderBlocks } from "@/components/payload-cms/RenderBlocks";
 
 const FloatingActions = ({ currentLang }: { currentLang: string }) => {
   // Assuming getServerTranslation can be used here or lang is passed down
@@ -176,10 +177,11 @@ export default async function EventPage({
       {/* Fixed Header */}
       <Header t={t} />
 
-      {/* Horizontally Scrolling Content Area */}
-      <div className="relative z-10 flex h-full my-4 gap-4 overflow-x-auto pl-4 scrollbar-hide [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      {/* Horizontally Scrolling Content Area - Note: RenderBlocks now handles the inner scroll container */}
+      {/* The outer div here controls the height and relative positioning */}
+      <div className="relative z-10 flex h-full my-4 overflow-hidden">
         {/* 1. Metadata Card (Fixed Width) */}
-        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1">
+        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 pl-4"> {/* Added pl-4 here */}
           <div className="bg-gray/40 flex h-full flex-col justify-between rounded-lg p-6 backdrop-blur-md">
             <div>
               <H1 className="mb-4 font-serif text-4xl md:text-5xl">
@@ -190,7 +192,6 @@ export default async function EventPage({
                 <div className="mt-6 border-t border-white/20 pt-4">
                   <EventCreditsBlock
                     data={creditsBlock} // Pass the full creditsBlock object
-                  // hideHeading={false} // Prop might not exist, remove if causing errors
                   />
                 </div>
               )}
@@ -202,29 +203,11 @@ export default async function EventPage({
           </div>
         </div>
 
-        {/* 2. Dynamic Content Blocks (Horizontal Scroll) - Use flattened blocks */}
-        {flatContentBlocks.map((block, index) => (
-          <div
-            key={block.id || `flat-block-${index}`} // Use block.id from flattened structure
-            // Conditionally adjust aspect ratio and padding based on block type
-            className={cn(
-              "h-full flex-shrink-0 snap-start rounded-xl last:mr-4",
-              block.blockType === "mediaBlock"
-                ? "aspect-video bg-transparent p-0" // Media blocks get video aspect, no padding/bg on outer
-                : "aspect-square bg-black/10 p-5", // Other blocks get square aspect, padding/bg on outer
-            )}
-          >
-            {/* Conditionally render the inner wrapper */}
-            {block.blockType === "mediaBlock" ? (
-              <RenderSingleBlock block={block} />
-            ) : (
-              <div className="bg-gray/40 h-full rounded-lg p-6 backdrop-blur-md">
-                <RenderSingleBlock block={block} />
-              </div>
-            )}
-          </div>
-        ))}
-        {/* Empty div for padding at the end */}
+        {/* 2. Use RenderBlocks for dynamic content */}
+        {/* RenderBlocks now includes the horizontal scroll container styles */}
+        {/* Pass flatContentBlocks to the component */}
+        {/* Removed the gap-4 from the outer div as RenderBlocks handles it */}
+        <RenderBlocks blocks={flatContentBlocks} className="flex-grow" /> {/* Pass blocks and allow it to grow */}
       </div>
     </main>
   );
