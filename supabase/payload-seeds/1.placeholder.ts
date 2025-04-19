@@ -84,6 +84,42 @@ const seeds: any[] = [
         ],
         layout: "standard",
       },
+      {
+        blockType: "EventSpeakers",
+        heading: "Speakers Grid",
+        speakers: [
+          {
+            name: "Jane Doe",
+            role: "Developer Advocate",
+            bio: "Passionate about communities and coding.",
+            image: "",
+            socialLinks: [
+              { platform: "twitter", url: "https://twitter.com/janedoe" },
+            ],
+          },
+        ],
+        columns: "3",
+        layout: "grid",
+      },
+      {
+        blockType: "EventGallery",
+        heading: "Event Gallery",
+        description: "Check out our event highlights.",
+        images: [
+          {
+            image: "",
+            caption: "Kickoff",
+            altText: "Event kickoff session",
+          },
+          {
+            image: "",
+            caption: "Closing",
+            altText: "Event closing session",
+          },
+        ],
+        layout: "grid",
+        columns: "3",
+      },
     ],
   },
   {
@@ -133,6 +169,20 @@ export default async () => {
   });
   // Update the nested speaker image in the first seed
   seeds[0].content[1].image = mediaId;
+
+  // Auto-fill upload fields in placeholder content blocks
+  seeds[0].content.forEach((block: any) => {
+    if (block.blockType === "EventSpeakers" && Array.isArray(block.speakers)) {
+      block.speakers.forEach((s: any) => {
+        s.image = mediaId;
+      });
+    }
+    if (block.blockType === "EventGallery" && Array.isArray(block.images)) {
+      block.images.forEach((i: any) => {
+        i.image = mediaId;
+      });
+    }
+  });
 
   // Event seeds
   for (const data of seeds) {
