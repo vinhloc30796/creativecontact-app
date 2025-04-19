@@ -26,8 +26,8 @@ import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { fetchEvents } from "@/lib/payload/fetchEvents";
-import { EventTicker } from "@/components/events/EventTicker";
 import { Header } from "@/components/Header";
+import { FooterCTA } from "@/components/FooterCTA";
 
 export const metadata: Metadata = {
   title: "Events | Creative Contact",
@@ -86,6 +86,7 @@ export default async function EventsPage() {
             </P>
           </div>
         </div>
+        <FooterCTA />
       </BackgroundDiv>
     );
   }
@@ -166,16 +167,7 @@ export default async function EventsPage() {
         </div>
       </div>
 
-      {/* Event ticker at the bottom */}
-      <footer className="w-full overflow-hidden bg-sunglow py-3 text-black">
-        <EventTicker
-          eventName=""
-          tickerText="Join our upcoming events • Creative Contact"
-          repetitions={4}
-          pauseOnHover={true}
-          direction="left"
-        />
-      </footer>
+      <FooterCTA />
     </BackgroundDiv>
   );
 }
