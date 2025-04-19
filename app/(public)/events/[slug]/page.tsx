@@ -194,7 +194,7 @@ export default async function EventPage({
 
       {/* Horizontally Scrolling Content Area - Note: RenderBlocks now handles the inner scroll container */}
       {/* The outer div here controls the height and relative positioning */}
-      <div className="relative z-10 my-4 flex h-full overflow-hidden">
+      <div className="relative z-10 my-4 flex h-full overflow-x-auto snap-x snap-mandatory">
         {/* 1. Metadata Card (Fixed Width) */}
         <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 pl-4">
           {" "}
@@ -223,7 +223,7 @@ export default async function EventPage({
         {/* RenderBlocks now includes the horizontal scroll container styles */}
         {/* Pass flatContentBlocks to the component */}
         {/* Removed the gap-4 from the outer div as RenderBlocks handles it */}
-        <RenderBlocks blocks={flatContentBlocks} className="flex-grow" />{" "}
+        <RenderBlocks blocks={flatContentBlocks} className="flex-shrink-0 overflow-visible" />{" "}
         {/* Pass blocks and allow it to grow */}
       </div>
     </main>
