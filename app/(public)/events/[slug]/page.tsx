@@ -1,8 +1,15 @@
 import { H1, H2 } from "@/components/ui/typography";
 import { fetchEventBySlug } from "@/lib/payload/fetchEvents";
-import { BlockTypes, getMediaUrl, Media } from "@/lib/payload/payloadTypeAdapter";
+import {
+  BlockTypes,
+  getMediaUrl,
+  Media,
+} from "@/lib/payload/payloadTypeAdapter";
 import { type EventSpeakerBlockProps } from "@/components/payload-cms/blocks/EventSpeakerBlock";
-import { Event, EventSpeakerBlock as PayloadEventSpeakerBlockType } from "@/payload-types";
+import {
+  Event,
+  EventSpeakerBlock as PayloadEventSpeakerBlockType,
+} from "@/payload-types";
 import { format } from "date-fns";
 import { Metadata } from "next";
 import Image from "next/image";
@@ -61,8 +68,8 @@ export async function generateMetadata({
     description: event.summary || "Creative Contact Event",
     openGraph: mediaUrl
       ? {
-        images: [{ url: mediaUrl }],
-      }
+          images: [{ url: mediaUrl }],
+        }
       : undefined,
   };
 }
@@ -75,7 +82,7 @@ export default async function EventPage({
   searchParams?: { lang?: string }; // Make searchParams optional
 }) {
   const { slug } = await params;
-  const lang = searchParams?.lang || "en"; // Get lang from searchParams
+  const lang = (await searchParams?.lang) || "en"; // Get lang from searchParams
   const { t } = await getServerTranslation(lang, "HomePage");
   const event: Event | null = await fetchEventBySlug(slug);
 
@@ -112,21 +119,25 @@ export default async function EventPage({
 
   // --- Flatten Content Blocks --- START ---
   const creditsBlock = event.content?.find(
-    (block): block is Extract<BlockTypes, { blockType: "EventCredits" }> => // Type guard
+    (
+      block,
+    ): block is Extract<BlockTypes, { blockType: "EventCredits" }> => // Type guard
       block.blockType === "EventCredits",
   );
 
   // Use a more flexible type for the flattened array
   const flatContentBlocks: Array<BlockTypes> = []; // Simplified type
-  event.content?.forEach((block, blockIndex) => { // Add blockIndex for key generation
+  event.content?.forEach((block, blockIndex) => {
+    // Add blockIndex for key generation
     if (block.blockType === "EventCredits") {
       // Skip credits block here, rendered separately
       return;
     } else if (block.blockType === "EventSpeakers") {
       // Flatten speakers into individual items
-      block.speakers?.forEach((speaker, speakerIndex) => { // Add speakerIndex for key generation
+      block.speakers?.forEach((speaker, speakerIndex) => {
+        // Add speakerIndex for key generation
         // Create a pseudo-block matching EventSpeakerBlockProps['data']
-        const speakerBlockData: EventSpeakerBlockProps['data'] = {
+        const speakerBlockData: EventSpeakerBlockProps["data"] = {
           name: speaker.name,
           role: speaker.role,
           bio: speaker.bio,
@@ -142,27 +153,31 @@ export default async function EventPage({
           ...speakerBlockData,
         } as BlockTypes); // Cast the final object for the array
       });
-    } else if (block.blockType === "EventGallery") { // ADDED: Handle EventGalleryBlock
+    } else if (block.blockType === "EventGallery") {
+      // ADDED: Handle EventGalleryBlock
       // Flatten gallery images into individual media blocks
-      block.images?.forEach((imgItem, imgIndex) => { // Add imgIndex for key generation
+      block.images?.forEach((imgItem, imgIndex) => {
+        // Add imgIndex for key generation
         if (!imgItem.image) return; // Skip if image is missing
 
         // Create a pseudo-block matching the structure expected by RenderSingleBlock for 'mediaBlock'
-        const mediaBlockData: Extract<BlockTypes, { blockType: 'mediaBlock' }> = {
-          id: imgItem.id || `gallery-img-${blockIndex}-${imgIndex}`, // Unique ID using indices
-          blockType: "mediaBlock",
-          blockName: `Gallery Image ${imgIndex + 1}`, // Optional: Add a block name
-          // These fields form the 'data' prop for MediaBlock component via RenderSingleBlock
-          mediaBlockFields: {
-            media: imgItem.image as Media, // Assert Media type
-            // Ensure caption is RichText or undefined
-            caption: typeof imgItem.caption === 'object' && imgItem.caption !== null
-              ? imgItem.caption
-              : undefined,
-            position: 'default', // Default position for individual items
-            // settings: block.settings, // Pass gallery-level settings if applicable/needed
-          }
-        };
+        const mediaBlockData: Extract<BlockTypes, { blockType: "mediaBlock" }> =
+          {
+            id: imgItem.id || `gallery-img-${blockIndex}-${imgIndex}`, // Unique ID using indices
+            blockType: "mediaBlock",
+            blockName: `Gallery Image ${imgIndex + 1}`, // Optional: Add a block name
+            // These fields form the 'data' prop for MediaBlock component via RenderSingleBlock
+            mediaBlockFields: {
+              media: imgItem.image as Media, // Assert Media type
+              // Ensure caption is RichText or undefined
+              caption:
+                typeof imgItem.caption === "object" && imgItem.caption !== null
+                  ? imgItem.caption
+                  : undefined,
+              position: "default", // Default position for individual items
+              // settings: block.settings, // Pass gallery-level settings if applicable/needed
+            },
+          };
         flatContentBlocks.push(mediaBlockData as BlockTypes); // Add to flattened list
       });
     } else {
@@ -179,9 +194,11 @@ export default async function EventPage({
 
       {/* Horizontally Scrolling Content Area - Note: RenderBlocks now handles the inner scroll container */}
       {/* The outer div here controls the height and relative positioning */}
-      <div className="relative z-10 flex h-full my-4 overflow-hidden">
+      <div className="relative z-10 my-4 flex h-full overflow-hidden">
         {/* 1. Metadata Card (Fixed Width) */}
-        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 pl-4"> {/* Added pl-4 here */}
+        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 pl-4">
+          {" "}
+          {/* Added pl-4 here */}
           <div className="bg-gray/40 flex h-full flex-col justify-between rounded-lg p-6 backdrop-blur-md">
             <div>
               <H1 className="mb-4 font-serif text-4xl md:text-5xl">
@@ -202,12 +219,12 @@ export default async function EventPage({
             </div>
           </div>
         </div>
-
         {/* 2. Use RenderBlocks for dynamic content */}
         {/* RenderBlocks now includes the horizontal scroll container styles */}
         {/* Pass flatContentBlocks to the component */}
         {/* Removed the gap-4 from the outer div as RenderBlocks handles it */}
-        <RenderBlocks blocks={flatContentBlocks} className="flex-grow" /> {/* Pass blocks and allow it to grow */}
+        <RenderBlocks blocks={flatContentBlocks} className="flex-grow" />{" "}
+        {/* Pass blocks and allow it to grow */}
       </div>
     </main>
   );
