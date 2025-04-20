@@ -41,6 +41,7 @@ export default function EventSwimLane({
   }, []);
 
   // Determine alignment pattern based on row parity
+  // We alternate between top-bottom for event rows and bottom-top for odd rows
   const isEven = rowIndex % 2 === 0;
   const alignPattern = isEven
     ? (["start", "end", "start", "end"] as const)
@@ -48,7 +49,7 @@ export default function EventSwimLane({
 
   return (
     <div className="left-1/2 w-full border-t border-black py-8 first:border-t last:border-b">
-      <div className="grid grid-cols-5">
+      <div className="grid h-48 grid-cols-5">
         {/* Date always first, aligned top right */}
         <div className="flex items-start">
           <p className="text-sm uppercase">{formattedDate}</p>
@@ -61,13 +62,13 @@ export default function EventSwimLane({
             {key === "title" && (
               <Link
                 href={`/events/${slug}`}
-                className="font-bricolage hover:text-sunglow text-xl font-bold lg:text-2xl"
+                className="font-bricolage-grotesque hover:text-sunglow text-xl font-bold lg:text-2xl"
               >
                 {title}
               </Link>
             )}
             {key === "image" && thumbnailUrl && (
-              <div className="relative h-24 w-24">
+              <div className="relative h-full w-4/5">
                 <Image
                   src={thumbnailUrl}
                   alt={title}
