@@ -2,7 +2,13 @@
 
 import React, { useState, ReactNode, useRef, useEffect } from "react";
 import { format } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { H4, Small } from "@/components/ui/typography";
 import Link from "next/link";
@@ -10,7 +16,7 @@ import { HeroTitle } from "../ui/typography";
 
 /**
  * Add Tailwind animation for auto-scrolling events from right to left
- * 
+ *
  * Added to tailwind.config.ts:
  * - Under theme.extend.animation: 'scroll-x': 'scrollX 30s linear infinite'
  * - Under theme.extend.keyframes: scrollX with translateX(0) to translateX(-100%)
@@ -35,25 +41,28 @@ export interface EventImagePlaceholderMetadata {
 
 /**
  * Generates random dimensions for image placeholders
- * 
+ *
  * @param count Number of image placeholders to generate
  * @returns Array of image placeholder metadata
  */
-export function getRandomImagePlaceholders(count: number = 3): EventImagePlaceholderMetadata[] {
+export function getRandomImagePlaceholders(
+  count: number = 3,
+): EventImagePlaceholderMetadata[] {
   // Always use the specified count, no randomization
   return Array.from({ length: count }, () => ({
     // Random width & height between 200-280px
     width: Math.floor(Math.random() * 80) + 200,
     height: Math.floor(Math.random() * 80) + 200,
-    url: Math.random() > 0.5
-      ? `https://example.com/image/${Math.random().toString(36).substring(2, 8)}`
-      : undefined,
+    url:
+      Math.random() > 0.5
+        ? `https://example.com/image/${Math.random().toString(36).substring(2, 8)}`
+        : undefined,
   }));
 }
 
 /**
  * ImagePlaceholder Component
- * 
+ *
  * A component that displays an image placeholder with random dimensions.
  */
 export function EventImagePlaceholder({
@@ -67,7 +76,7 @@ export function EventImagePlaceholder({
       className={cn("shrink-0 overflow-hidden", className)}
       style={{ width: `${width}px`, height: `${height}px` }}
     >
-      <CardHeader className="shrink-0 bg-sunglow p-2">
+      <CardHeader className="bg-sunglow shrink-0 p-2">
         <CardTitle className="text-sm">[IN CONSTRUCTION]</CardTitle>
       </CardHeader>
       <CardContent className="grow bg-gray-100 p-0">
@@ -75,8 +84,8 @@ export function EventImagePlaceholder({
       </CardContent>
       <CardFooter className="shrink-0 p-2">
         <button
-          onClick={() => url && window.open(url, '_blank')}
-          className="text-xs text-blue-500 hover:underline cursor-pointer"
+          onClick={() => url && window.open(url, "_blank")}
+          className="cursor-pointer text-xs text-blue-500 hover:underline"
         >
           View details
         </button>
@@ -87,18 +96,24 @@ export function EventImagePlaceholder({
 
 /**
  * AnnualEventTextCard Component
- * 
+ *
  * A component that displays annual event information including year and event count.
  */
-export function AnnualEventTextCard({ year, eventCount }: { year: string | number, eventCount: number }) {
+export function AnnualEventTextCard({
+  year,
+  eventCount,
+}: {
+  year: string | number;
+  eventCount: number;
+}) {
   return (
-    <div className="shrink-0 min-w-48 pt-0 mt-0">
+    <div className="mt-0 min-w-48 shrink-0 pt-0">
       <div className="grow">
         <H4 className="text-5xl font-bold">{year}</H4>
       </div>
-      <div className="pt-0 mt-auto">
+      <div className="mt-auto pt-0">
         <Small className="text-gray-500">
-          {eventCount} {eventCount === 1 ? 'event' : 'events'}
+          {eventCount} {eventCount === 1 ? "event" : "events"}
         </Small>
       </div>
     </div>
@@ -107,12 +122,12 @@ export function AnnualEventTextCard({ year, eventCount }: { year: string | numbe
 
 /**
  * HomepageEventCard Component
- * 
+ *
  * A component that displays an event with text and image placeholders as separate cards
  * at the same level within a div container.
- * 
+ *
  * @example
- * <HomepageEventCard 
+ * <HomepageEventCard
  *   year="2023"
  *   eventCount={5}
  * />
@@ -120,17 +135,17 @@ export function AnnualEventTextCard({ year, eventCount }: { year: string | numbe
 export function HomepageEventCard({
   year,
   eventCount,
-  event
+  event,
 }: {
-  year: string | number,
-  eventCount: number,
-  event?: EventItem  // Optional event item for displaying additional details
+  year: string | number;
+  eventCount: number;
+  event?: EventItem; // Optional event item for displaying additional details
 }) {
   // Generate exactly eventCount image placeholders
   const imagePlaceholders = getRandomImagePlaceholders(eventCount);
 
   return (
-    <Card className="flex flex-row gap-4 h-full w-fit p-4 bg-transparent border-none shadow-none">
+    <Card className="flex h-full w-fit flex-row gap-4 border-none bg-transparent p-4 shadow-none">
       {/* Annual Event Text Card */}
       <AnnualEventTextCard year={year} eventCount={eventCount} />
 
@@ -149,7 +164,7 @@ export function HomepageEventCard({
 
 /**
  * HomepageEventOverlay Component
- * 
+ *
  * A component that displays a blank overlay covering the content section of the homepage,
  * with a horizontal list of events if provided.
  */
@@ -167,17 +182,20 @@ export function HomepageEventOverlay({
   if (!isVisible) return null;
 
   // Group events by year
-  const eventsByYear = events.reduce<Record<string, EventItem[]>>((acc, event) => {
-    // Extract year from Date object
-    const year = event.datetime.getFullYear().toString();
+  const eventsByYear = events.reduce<Record<string, EventItem[]>>(
+    (acc, event) => {
+      // Extract year from Date object
+      const year = event.datetime.getFullYear().toString();
 
-    if (!acc[year]) {
-      acc[year] = [];
-    }
+      if (!acc[year]) {
+        acc[year] = [];
+      }
 
-    acc[year].push(event);
-    return acc;
-  }, {});
+      acc[year].push(event);
+      return acc;
+    },
+    {},
+  );
 
   // Convert grouped events to array for rendering
   const yearGroups = Object.entries(eventsByYear)
@@ -190,7 +208,7 @@ export function HomepageEventOverlay({
   return (
     <div
       ref={overlayRef}
-      className={`fixed z-10 px-20 animate-fadeIn ${className}`}
+      className={`animate-fadeIn fixed z-10 px-20 ${className}`}
       style={{
         // Position to cover from content start to ticker
         top: "55vh",
@@ -198,12 +216,12 @@ export function HomepageEventOverlay({
         left: "0",
         right: "0",
         // Ensure it's displayed over content but under social icons
-        zIndex: 40
+        zIndex: 40,
       }}
     >
       {events.length > 0 && (
         <div className="w-full">
-          <div className="flex flex-row h-full gap-24 px-4 py-6 animate-scroll-x whitespace-nowrap">
+          <div className="animate-scroll-x flex h-full flex-row gap-24 px-4 py-6 whitespace-nowrap">
             {yearGroups.map((yearGroup, index) => (
               <HomepageEventCard
                 key={index}
@@ -231,7 +249,7 @@ interface HoverableContactTitleProps {
 
 /**
  * HoverableContactTitle Component
- * 
+ *
  * A component that displays a title which, when hovered:
  * 1. Shows an overlay covering the content area
  * 2. Hides the element with the provided contentId or subtitle-content by default
@@ -245,7 +263,7 @@ export function HoverableContactTitle({
   contentRef,
   contentId = "subtitle-content",
   backgroundId = "floating-gradient-background",
-  href = "/events"
+  href = "/events",
 }: HoverableContactTitleProps) {
   const [isHovering, setIsHovering] = useState(false);
   const autoDetectedRef = useRef<HTMLElement | null>(null);
@@ -300,7 +318,10 @@ export function HoverableContactTitle({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <HeroTitle className="text-hover-border font-bold" size="default">
+        <HeroTitle
+          className="text-hover-stroke-sunglow font-bold"
+          size="default"
+        >
           {titleText}
         </HeroTitle>
       </div>
@@ -326,4 +347,4 @@ export function HoverableContactTitle({
       />
     </div>
   );
-} 
+}

@@ -21,6 +21,7 @@ import {
   CalendarIcon,
   MapPinIcon,
 } from "@/components/ui/icons";
+import { PixelShadesIcon } from "@/components/icons/PixelShadesIcon";
 import { Separator } from "@/components/ui/separator";
 import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
@@ -57,7 +58,7 @@ export default async function EventsPage() {
         <div className="relative z-0 flex flex-1 flex-col">
           {/* Header section */}
           <div className="flex h-[30vh] max-h-[30vh] flex-col justify-center px-12">
-            <HeroTitle className="font-bold whitespace-pre-line" size="medium">
+            <HeroTitle className="font-bold whitespace-pre-line text-stroke-sunglow" size="medium">
               Events
             </HeroTitle>
 
@@ -101,7 +102,7 @@ export default async function EventsPage() {
       <div className="relative z-0 flex flex-1 flex-col">
         {/* Header section */}
         <div className="flex h-[30vh] max-h-[30vh] flex-col justify-center px-12">
-          <HeroTitle className="font-bold whitespace-pre-line" size="medium">
+          <HeroTitle className="font-bold whitespace-pre-line text-stroke-sunglow" size="medium">
             Events
           </HeroTitle>
 
@@ -125,7 +126,15 @@ export default async function EventsPage() {
 
           <Separator className="bg-white/10" />
 
-          <H2 className="text-foreground/90">Creative Events</H2>
+          <div className="flex items-center justify-between align-bottom">
+            <PixelShadesIcon className="text-foreground/90" />
+            <div className="flex flex-col items-end">
+              <H2 className="text-muted-foreground/90">
+                [&nbsp;&nbsp;{events.length}&nbsp;&nbsp;]
+              </H2>
+              <P className="text-muted-foreground/90">and more to come...</P>
+            </div>
+          </div>
           {/* Swim Lane Grid for Events */}
           <div className="mt-12">
             {events.map((event: any, rowIndex: number) => (
@@ -143,7 +152,6 @@ export default async function EventsPage() {
             ))}
           </div>
         </div>
-        s
       </div>
 
       <FooterCTA />

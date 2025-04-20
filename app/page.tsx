@@ -65,30 +65,69 @@ export default async function Page(props: Props) {
               titleText={t("titleContact")}
               events={[
                 // 2023 events (chronological order)
-                { title: "Launch Party", datetime: new Date(2023, 2, 15, 19, 0) },
-                { title: "Spring Workshop", datetime: new Date(2023, 3, 10, 14, 0) },
-                { title: "Art Exhibition", datetime: new Date(2023, 5, 22, 18, 0) },
-                { title: "Summer Meetup", datetime: new Date(2023, 6, 18, 16, 30) },
-                { title: "Creative Hackathon", datetime: new Date(2023, 8, 5, 9, 0) },
-                { title: "Fall Showcase", datetime: new Date(2023, 9, 28, 17, 0) },
-                { title: "Year-End Celebration", datetime: new Date(2023, 11, 15, 20, 0) },
+                {
+                  title: "Launch Party",
+                  datetime: new Date(2023, 2, 15, 19, 0),
+                },
+                {
+                  title: "Spring Workshop",
+                  datetime: new Date(2023, 3, 10, 14, 0),
+                },
+                {
+                  title: "Art Exhibition",
+                  datetime: new Date(2023, 5, 22, 18, 0),
+                },
+                {
+                  title: "Summer Meetup",
+                  datetime: new Date(2023, 6, 18, 16, 30),
+                },
+                {
+                  title: "Creative Hackathon",
+                  datetime: new Date(2023, 8, 5, 9, 0),
+                },
+                {
+                  title: "Fall Showcase",
+                  datetime: new Date(2023, 9, 28, 17, 0),
+                },
+                {
+                  title: "Year-End Celebration",
+                  datetime: new Date(2023, 11, 15, 20, 0),
+                },
                 // 2024 events (chronological order)
                 { title: "Workshop", datetime: new Date(2024, 4, 15, 14, 0) },
-                { title: "Exhibition", datetime: new Date(2024, 4, 20, 18, 30) },
+                {
+                  title: "Exhibition",
+                  datetime: new Date(2024, 4, 20, 18, 30),
+                },
                 { title: "Networking", datetime: new Date(2024, 5, 5, 19, 0) },
-                { title: "Networking #2", datetime: new Date(2024, 7, 12, 19, 0) },
-                { title: "Exhibition #2", datetime: new Date(2024, 8, 12, 19, 0) },
-                { title: "Boardgames #2", datetime: new Date(2024, 9, 12, 19, 0) },
+                {
+                  title: "Networking #2",
+                  datetime: new Date(2024, 7, 12, 19, 0),
+                },
+                {
+                  title: "Exhibition #2",
+                  datetime: new Date(2024, 8, 12, 19, 0),
+                },
+                {
+                  title: "Boardgames #2",
+                  datetime: new Date(2024, 9, 12, 19, 0),
+                },
                 // 2025 events (chronological order)
                 { title: "Boardgames", datetime: new Date(2025, 6, 6, 22, 0) },
-                { title: "Workshop #2", datetime: new Date(2025, 6, 10, 14, 0) },
+                {
+                  title: "Workshop #2",
+                  datetime: new Date(2025, 6, 10, 14, 0),
+                },
               ]}
               contentId="subtitle-content"
             />
             <div className="w-fit self-end">
               <HoverableCreativesTitle>
                 <Link href="/contacts">
-                  <HeroTitle className="text-hover-border font-bold" size="default">
+                  <HeroTitle
+                    className="text-hover-stroke-sunglow font-bold"
+                    size="default"
+                  >
                     {t("titleCreatives")}
                   </HeroTitle>
                 </Link>
@@ -116,11 +155,14 @@ export default async function Page(props: Props) {
         </div>
 
         {/* Content section - fills the remaining space */}
-        <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12" id="subtitle-content">
+        <div
+          className="flex-1 space-y-10 overflow-y-auto px-12 pb-12"
+          id="subtitle-content"
+        >
           {/* Description text */}
           <Lead
             id="subtitle-content"
-            className="whitespace-pre-line text-xl text-foreground/90 mt-4 md:text-2xl"
+            className="text-foreground/90 mt-4 text-xl whitespace-pre-line md:text-2xl"
           >
             {t("subtitle")}
           </Lead>
@@ -129,36 +171,34 @@ export default async function Page(props: Props) {
             width={320}
             height={180}
             interval={10000}
-            className="absolute bottom-0 right-12 z-40"
+            className="absolute right-12 bottom-0 z-40"
           />
         </div>
       </div>
 
       {/* Event ticker at the bottom */}
-      <footer className="w-full overflow-hidden text-black relative z-50">
+      <footer className="relative z-50 w-full overflow-hidden text-black">
         {/* Social media links - positioned at bottom left above the footer */}
-        <div className="mb-8 ml-12 flex flex-col gap-y-8 py-4 w-fit">
+        <div className="mb-8 ml-12 flex w-fit flex-col gap-y-8 py-4">
           <a
             href="https://www.facebook.com/creativecontact.vn"
-            className="text-foreground transition-colors hover:text-sunglow"
+            className="text-foreground hover:text-sunglow transition-colors"
           >
             <Facebook size={24} />
           </a>
           <a
             href="https://instagram.com/creativecontact_vn"
-            className="text-foreground transition-colors hover:text-sunglow"
+            className="text-foreground hover:text-sunglow transition-colors"
           >
             <Instagram size={24} />
           </a>
           <a
             href="https://www.linkedin.com/company/creativecontact-vn"
-            className="text-foreground transition-colors hover:text-sunglow"
+            className="text-foreground hover:text-sunglow transition-colors"
           >
             <Linkedin size={24} />
           </a>
         </div>
-
-
 
         {/* Event ticker */}
         <EventTicker
