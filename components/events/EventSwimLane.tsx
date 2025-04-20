@@ -48,7 +48,10 @@ export default function EventSwimLane({
     : (["end", "start", "end", "start"] as const);
 
   return (
-    <div className="left-1/2 w-full border-t border-black py-8 first:border-t last:border-b">
+    <Link
+      href={`/events/${slug}`}
+      className="group left-1/2 block w-full cursor-pointer border-t border-black py-8 first:border-t last:border-b hover:bg-white/10 hover:backdrop-blur-sm"
+    >
       <div className="grid h-48 grid-cols-5">
         {/* Date always first, aligned top right */}
         <div className="flex items-start">
@@ -60,12 +63,9 @@ export default function EventSwimLane({
             className={`flex items-${alignPattern[i]} justify-center`}
           >
             {key === "title" && (
-              <Link
-                href={`/events/${slug}`}
-                className="font-bricolage-grotesque hover:text-sunglow text-xl font-bold lg:text-2xl"
-              >
+              <span className="font-bricolage-grotesque group-hover:text-stroke-sunglow text-xl font-bold lg:text-2xl">
                 {title}
-              </Link>
+              </span>
             )}
             {key === "image" && thumbnailUrl && (
               <div className="relative h-full w-4/5">
@@ -88,6 +88,6 @@ export default function EventSwimLane({
           </div>
         ))}
       </div>
-    </div>
+    </Link>
   );
 }
