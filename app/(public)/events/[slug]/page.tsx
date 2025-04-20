@@ -23,27 +23,9 @@ import { EventCreditsBlock } from "@/components/payload-cms/blocks/EventCreditsB
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { cn } from "@/lib/utils";
 import { RenderBlocks } from "@/components/payload-cms/RenderBlocks";
+import { ClientFloatingActions } from "@/components/ClientFloatingActions";
 
-const FloatingActions = ({ currentLang }: { currentLang: string }) => {
-  // Assuming getServerTranslation can be used here or lang is passed down
-  // const { t } = await getServerTranslation(currentLang, "common"); // Example namespace
-  const t = (key: string) => key; // Placeholder translation
-
-  return (
-    <div className="fixed right-4 bottom-4 z-20 flex flex-col items-end gap-3 md:right-6 md:bottom-6">
-      <LanguageSwitcher currentLang={currentLang} />
-      <ClientNavMenu
-        items={[
-          { text: t("aboutCC"), href: "/about" },
-          { text: t("contactBook"), href: "/contacts" },
-          { text: t("events"), href: "/events" }, // Link back to events list
-          // Add other relevant links if needed
-        ]}
-        menuText={t("menu")} // Get menu text from translations
-      />
-    </div>
-  );
-};
+// server component
 
 // Dynamic metadata based on event
 export async function generateMetadata({
@@ -194,7 +176,10 @@ export default async function EventPage({
 
       {/* Horizontally Scrolling Content Area - Note: RenderBlocks now handles the inner scroll container */}
       {/* The outer div here controls the height and relative positioning */}
-      <div className="relative z-10 my-4 flex h-full snap-x snap-mandatory overflow-x-auto">
+      <div
+        id="event-scroll"
+        className="relative z-10 my-4 flex h-full snap-x snap-mandatory overflow-x-auto"
+      >
         {/* 1. Metadata Card (Fixed Width) */}
         <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 px-4">
           {" "}
@@ -228,6 +213,20 @@ export default async function EventPage({
           className="flex-shrink-0 overflow-visible"
         />{" "}
         {/* Pass blocks and allow it to grow */}
+      </div>
+      <div className="pointer-events-none absolute top-1/2 right-0 left-0 z-20 -translate-y-1/2 transform px-12">
+        <div className="pointer-events-auto">
+          <ClientFloatingActions
+            hideOnScroll
+            currentLang={lang}
+            items={[
+              { text: t("aboutCC"), href: "/about" },
+              { text: t("contactBook"), href: "/contacts" },
+              { text: t("events"), href: "/events" },
+            ]}
+            menuText={t("menu")}
+          />
+        </div>
       </div>
     </main>
   );

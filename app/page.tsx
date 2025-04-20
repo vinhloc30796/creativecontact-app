@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThumbnailImage } from "@/components/ThumbnailImage";
 import { HeroTitle, Lead } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
+import { ClientFloatingActions } from "@/components/ClientFloatingActions";
 import { eventSlots } from "@/drizzle/schema/event";
 import { db } from "@/lib/db";
 import { getServerTranslation } from "@/lib/i18n/init-server";
@@ -135,23 +136,17 @@ export default async function Page(props: Props) {
             </div>
           </div>
 
-          {/* Translation and navigation row moved below title */}
-          <div className="flex w-full items-center justify-between py-6">
-            {/* Language switcher on left */}
-            <div className="flex gap-2">
-              <LanguageSwitcher currentLang={lang} />
-            </div>
+          {/* Floating nav actions */}
+          <ClientFloatingActions
+            currentLang={lang}
+            items={[
+              { text: t("aboutCC"), href: "/about" },
+              { text: t("contactBook"), href: "/contacts" },
+              { text: t("event"), href: "/events" },
+            ]}
+            menuText={t("menu")}
+          />
 
-            {/* Navigation menu items on right */}
-            <ClientNavMenu
-              items={[
-                { text: t("aboutCC"), href: "/about" },
-                { text: t("contactBook"), href: "/contacts" },
-                { text: t("event"), href: "/events" },
-              ]}
-              menuText={t("menu")}
-            />
-          </div>
         </div>
 
         {/* Content section - fills the remaining space */}
