@@ -14,7 +14,7 @@ export function RenderBlocks({ blocks, className }: RenderBlocksProps) {
   return (
     <div
       className={cn(
-        "relative z-10 flex h-full gap-4 overflow-x-auto pl-4 scrollbar-hide [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+        "scrollbar-hide relative z-10 flex h-full gap-4 overflow-x-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         className,
       )}
     >

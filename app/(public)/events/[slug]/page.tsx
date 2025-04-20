@@ -196,27 +196,27 @@ export default async function EventPage({
       {/* The outer div here controls the height and relative positioning */}
       <div className="relative z-10 my-4 flex h-full snap-x snap-mandatory overflow-x-auto">
         {/* 1. Metadata Card (Fixed Width) */}
-        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 pl-4">
+        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 px-4">
           {" "}
           {/* Added pl-4 here */}
           <div className="bg-gray/40 flex h-full flex-col justify-between rounded-lg p-6 backdrop-blur-md">
-            <div>
-              <H1 className="mb-4 font-serif text-4xl md:text-5xl">
+            <div className="flex flex-col items-start justify-between">
+              <H1 className="font-bricolage-grotesque mb-4 text-4xl md:text-5xl">
                 {event.title}
               </H1>
-              {/* Render Credits Block - Ensure data prop matches component */}
-              {creditsBlock && (
-                <div className="mt-6 border-t border-white/20 pt-4">
-                  <EventCreditsBlock
-                    data={creditsBlock} // Pass the full creditsBlock object
-                  />
-                </div>
-              )}
+              <p>{event.location}</p>
             </div>
             <div className="text-sm">
-              <p>{event.location}</p>
               {/* Add other relevant metadata if needed */}
             </div>
+            {/* Render Credits Block - Ensure data prop matches component */}
+            {creditsBlock && (
+              <div className="mt-6 border-t border-white/20 pt-4">
+                <EventCreditsBlock
+                  data={creditsBlock} // Pass the full creditsBlock object
+                />
+              </div>
+            )}
           </div>
         </div>
         {/* 2. Use RenderBlocks for dynamic content */}

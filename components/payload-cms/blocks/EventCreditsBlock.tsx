@@ -1,6 +1,6 @@
 import React from "react";
 import { type Event } from "@/payload-types";
-import { H2, P } from "@/components/ui/typography";
+import { H1, H2, P } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 
 // Extract the specific block type from the Event content union type
@@ -10,7 +10,10 @@ type EventCreditsBlockType = Extract<
 >;
 
 interface EventCreditsBlockProps {
-  data: Omit<EventCreditsBlockType, "id" | "blockType" | "blockName" | "layout">;
+  data: Omit<
+    EventCreditsBlockType,
+    "id" | "blockType" | "blockName" | "layout"
+  >;
   /** Hide the main heading H2 element */
   hideHeading?: boolean;
 }
@@ -28,19 +31,20 @@ export const EventCreditsBlock: React.FC<EventCreditsBlockProps> = ({
   return (
     <section className="flex h-full w-full flex-col overflow-y-auto p-1">
       {!hideHeading && heading && (
-        <H2 className="mb-5 font-bricolage-grotesque text-4xl font-extrabold text-sunglow">
+        <H1 className="font-bricolage-grotesque text-sunglow mb-5 font-extrabold">
           {heading}
-        </H2>
+        </H1>
       )}
-      <div className="grid gap-1.5 flex-grow overflow-y-auto scrollbar-hide">
+      <div className="scrollbar-hide grid flex-grow gap-1.5 overflow-y-auto">
         {credits.map((credit, index) => (
-          <div key={credit.id || index} className="flex items-center gap-3 py-1">
-            <span className="text-lg font-semibold">
-              {credit.name}
-            </span>
+          <div
+            key={credit.id || index}
+            className="flex items-center gap-3 py-1"
+          >
+            <span className="text-lg font-semibold">{credit.name}</span>
             {credit.roles?.length > 0 && (
-              <span className="text-md font-normal text-muted-foreground">
-                {credit.roles.map(r => r.role).join(", ")}
+              <span className="text-md text-muted-foreground font-normal">
+                {credit.roles.map((r) => r.role).join(", ")}
               </span>
             )}
           </div>
@@ -50,4 +54,4 @@ export const EventCreditsBlock: React.FC<EventCreditsBlockProps> = ({
   );
 };
 
-export default EventCreditsBlock; 
+export default EventCreditsBlock;
