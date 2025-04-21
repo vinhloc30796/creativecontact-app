@@ -1,8 +1,9 @@
 import { Block } from "payload";
-import richText from "../../fields/richText";
+import richText from "@/app/fields/richText";
 
 export const EventDetails: Block = {
   slug: "EventDetails",
+  interfaceName: "EventDetailsBlock",
   labels: {
     singular: "Event Details",
     plural: "Event Details",

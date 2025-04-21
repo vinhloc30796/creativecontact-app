@@ -63,6 +63,7 @@ export type EventSpeakerBlock = EventBlock<"EventSpeaker">;
 export type EventSpeakersBlock = EventBlock<"EventSpeakers">;
 export type EventGalleryBlock = EventBlock<"EventGallery">;
 export type EventCreditsBlock = EventBlock<"EventCredits">;
+export type MediaBlock = EventBlock<"MediaBlock">;
 
 // Union type of all possible blocks - mirrors the content array type
 export type BlockTypes = PayloadEvent["content"][number];

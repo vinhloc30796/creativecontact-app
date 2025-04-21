@@ -4,7 +4,7 @@ import { fetchEvent } from "./helper";
 export async function GET(request: Request, props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   try {
-    const { slug } = params;
+    const { slug } = await params;
 
     // Fetch event data using helper function
     const eventData = await fetchEvent(slug);

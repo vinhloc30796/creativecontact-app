@@ -9,6 +9,9 @@ interface EventTickerProps {
   speed?: number;
   pauseOnHover?: boolean;
   direction?: "left" | "right";
+  variant?: "default" | "no-bg";
+  /** Tailwind classes for ticker text (overrides default) */
+  textClassName?: string;
 }
 
 /**
@@ -17,9 +20,10 @@ interface EventTickerProps {
  * @param eventName - The name of the current event
  * @param tickerText - Additional text to display after the event name
  * @param repetitions - Number of times to repeat the ticker text (default: 4)
- * @param speed - Animation speed in seconds (default: 20)
+ * @param speed - Animation speed in seconds (default: 30)
  * @param pauseOnHover - Whether to pause the animation on hover (default: true)
  * @param direction - Direction of the marquee (default: "left")
+ * @param variant - Variant of ticker: default has bg, no-bg is transparent (default: "default")
  */
 export function EventTicker({
   eventName,
@@ -28,6 +32,8 @@ export function EventTicker({
   speed = 30,
   pauseOnHover = true,
   direction = "left",
+  variant = "default",
+  textClassName,
 }: EventTickerProps) {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,6 +41,7 @@ export function EventTicker({
   const [contentWidth, setContentWidth] = useState(0);
 
   const fullText = `${eventName} ${tickerText}`;
+  const spanClassName = `mx-4 ${textClassName || 'text-base font-medium'}`;
 
   // Measure content width on mount and window resize
   useEffect(() => {
@@ -74,7 +81,11 @@ export function EventTicker({
   return (
     <div
       ref={containerRef}
-      className="relative flex h-[2em] overflow-hidden bg-sunglow"
+      className={
+        `relative flex h-[2em] overflow-hidden ${
+          variant === "default" ? "bg-sunglow" : ""
+        }`
+      }
       onMouseEnter={() => pauseOnHover && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -91,10 +102,7 @@ export function EventTicker({
           {Array(repetitions)
             .fill(0)
             .map((_, i) => (
-              <span
-                key={`first-${i}`}
-                className="mx-4 text-base font-medium"
-              >
+              <span key={`first-${i}`} className={spanClassName}>
                 {fullText}
               </span>
             ))}
@@ -105,10 +113,7 @@ export function EventTicker({
           {Array(repetitions)
             .fill(0)
             .map((_, i) => (
-              <span
-                key={`second-${i}`}
-                className="mx-4 text-base font-medium"
-              >
+              <span key={`second-${i}`} className={spanClassName}>
                 {fullText}
               </span>
             ))}

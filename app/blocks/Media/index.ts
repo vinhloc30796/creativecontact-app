@@ -21,6 +21,10 @@ export const MediaBlock: Block = {
               label: 'Wide',
               value: 'wide',
             },
+            {
+              label: 'Full Width',
+              value: 'fullWidth',
+            },
           ],
         },
         {

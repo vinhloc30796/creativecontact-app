@@ -17,7 +17,7 @@ export function payloadToDrizzleEvent(payloadEvent: Event) {
     created_at: new Date(),
     name: payloadEvent.title,
     slug: payloadEvent.slug || "",
-    created_by: "00000000-0000-0000-0000-000000000000", // Default admin user ID - replace with actual logic
+    created_by: null, // Default admin user ID - replace with actual logic
     time_end: payloadEvent.endDate ? new Date(payloadEvent.endDate) : null,
   };
 }

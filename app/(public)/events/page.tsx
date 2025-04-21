@@ -21,12 +21,15 @@ import {
   CalendarIcon,
   MapPinIcon,
 } from "@/components/ui/icons";
+import { PixelShadesIcon } from "@/components/icons/PixelShadesIcon";
 import { Separator } from "@/components/ui/separator";
 import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { fetchEvents } from "@/lib/payload/fetchEvents";
-import { EventTicker } from "@/components/events/EventTicker";
+import { Header } from "@/components/Header";
+import { FooterCTA } from "@/components/FooterCTA";
+import EventSwimLane from "@/components/events/EventSwimLane";
 
 export const metadata: Metadata = {
   title: "Events | Creative Contact",
@@ -49,45 +52,13 @@ export default async function EventsPage() {
   if (!events || events.length === 0) {
     return (
       <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
-        {/* Header with logo and join button */}
-        <header className="flex w-full items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
-            >
-              <span className="text-xl font-bold text-black">CC</span>
-            </Link>
-          </div>
-
-          <div className="flex items-center">
-            <Button
-              variant="link"
-              asChild
-              className="text-sm text-foreground hover:text-sunglow"
-            >
-              <Link href="/signup">
-                <TextIconBox
-                  title={t("joinUsLine1")}
-                  subtitle={t("joinUsLine2")}
-                  icon={
-                    <ArrowUpRight
-                      className="text-sunglow"
-                      style={{ height: "125%", width: "125%" }}
-                    />
-                  }
-                  className="text-sm"
-                />
-              </Link>
-            </Button>
-          </div>
-        </header>
+        <Header t={t} />
 
         {/* Main content */}
         <div className="relative z-0 flex flex-1 flex-col">
           {/* Header section */}
           <div className="flex h-[30vh] max-h-[30vh] flex-col justify-center px-12">
-            <HeroTitle className="whitespace-pre-line font-bold" size="medium">
+            <HeroTitle className="font-bold whitespace-pre-line text-stroke-sunglow" size="medium">
               Events
             </HeroTitle>
 
@@ -106,7 +77,7 @@ export default async function EventsPage() {
 
           {/* Content section */}
           <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
-            <Lead className="whitespace-pre-line text-xl text-foreground/90 md:text-2xl">
+            <Lead className="text-foreground/90 text-xl whitespace-pre-line md:text-2xl">
               Stay tuned for upcoming events...
             </Lead>
             <Separator className="bg-white/10" />
@@ -117,58 +88,21 @@ export default async function EventsPage() {
             </P>
           </div>
         </div>
+        <FooterCTA />
       </BackgroundDiv>
     );
   }
 
-  // Group events by status: 'upcoming' first, then 'active', then 'past'
-  const upcomingEvents = events.filter(
-    (event: any) => event.status === "upcoming",
-  );
-  const activeEvents = events.filter((event: any) => event.status === "active");
-  const pastEvents = events.filter((event: any) => event.status === "past");
-
   return (
     <BackgroundDiv shouldCenter={false} className="flex min-h-screen flex-col">
       {/* Header with logo and join button */}
-      <header className="flex w-full items-center justify-between p-4">
-        <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
-          >
-            <span className="text-xl font-bold text-black">CC</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center">
-          <Button
-            variant="link"
-            asChild
-            className="text-sm text-foreground hover:text-sunglow"
-          >
-            <Link href="/signup">
-              <TextIconBox
-                title={t("joinUsLine1")}
-                subtitle={t("joinUsLine2")}
-                icon={
-                  <ArrowUpRight
-                    className="text-sunglow"
-                    style={{ height: "125%", width: "125%" }}
-                  />
-                }
-                className="text-sm"
-              />
-            </Link>
-          </Button>
-        </div>
-      </header>
+      <Header t={t} />
 
       {/* Main content */}
       <div className="relative z-0 flex flex-1 flex-col">
         {/* Header section */}
         <div className="flex h-[30vh] max-h-[30vh] flex-col justify-center px-12">
-          <HeroTitle className="whitespace-pre-line font-bold" size="medium">
+          <HeroTitle className="font-bold whitespace-pre-line text-stroke-sunglow" size="medium">
             Events
           </HeroTitle>
 
@@ -184,60 +118,43 @@ export default async function EventsPage() {
             />
           </div>
         </div>
-
         {/* Content section */}
         <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
-          <Lead className="whitespace-pre-line text-xl text-foreground/90 md:text-2xl">
+          <Lead className="text-foreground/90 text-xl whitespace-pre-line md:text-2xl">
             Discover and join our creative workshops, meetups, and events.
           </Lead>
 
           <Separator className="bg-white/10" />
 
-          {upcomingEvents.length > 0 && (
-            <div className="mt-12">
-              <H2 className="text-foreground/90">Upcoming Events</H2>
-              <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {upcomingEvents.map((event: any) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </div>
+          <div className="flex items-center justify-between align-bottom">
+            <PixelShadesIcon className="text-foreground/90" />
+            <div className="flex flex-col items-end">
+              <H2 className="text-muted-foreground/90">
+                [&nbsp;&nbsp;{events.length}&nbsp;&nbsp;]
+              </H2>
+              <P className="text-muted-foreground/90">and more to come...</P>
             </div>
-          )}
-
-          {activeEvents.length > 0 && (
-            <div className="mt-12">
-              <H2 className="text-foreground/90">Happening Now</H2>
-              <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {activeEvents.map((event: any) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {pastEvents.length > 0 && (
-            <div className="mt-12">
-              <H2 className="text-foreground/90">Past Events</H2>
-              <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {pastEvents.map((event: any) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
+          {/* Swim Lane Grid for Events */}
+          <div className="mt-12">
+            {events.map((event: any, rowIndex: number) => (
+              <EventSwimLane
+                rowIndex={rowIndex}
+                key={event.id}
+                eventId={event.id}
+                thumbnailUrl={(event.featuredImage as any).url || ""}
+                title={event.title}
+                date={event.eventDate}
+                attendeeCount={event.capacity || 0}
+                type={event.tags?.[0]?.tag || ""}
+                slug={event.slug}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Event ticker at the bottom */}
-      <footer className="w-full overflow-hidden bg-sunglow py-3 text-black">
-        <EventTicker
-          eventName=""
-          tickerText="Join our upcoming events • Creative Contact"
-          repetitions={4}
-          pauseOnHover={true}
-          direction="left"
-        />
-      </footer>
+      <FooterCTA />
     </BackgroundDiv>
   );
 }
@@ -289,12 +206,12 @@ function EventCard({ event }: { event: Event }) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-muted">
+          <div className="bg-muted flex h-full w-full items-center justify-center">
             <p className="text-muted-foreground">No image available</p>
           </div>
         )}
         <Badge
-          className="absolute right-2 top-2"
+          className="absolute top-2 right-2"
           variant={
             event.status === "upcoming"
               ? "default"
@@ -312,23 +229,23 @@ function EventCard({ event }: { event: Event }) {
       </div>
 
       <CardHeader>
-        <CardTitle className="line-clamp-2 text-foreground">
+        <CardTitle className="text-foreground line-clamp-2">
           {event.title}
         </CardTitle>
-        <CardDescription className="mt-1 flex items-center gap-1.5 text-foreground/70">
+        <CardDescription className="text-foreground/70 mt-1 flex items-center gap-1.5">
           <CalendarIcon className="h-4 w-4" />
           <span>
             {formattedDate} {formattedTime && `at ${formattedTime}`}
           </span>
         </CardDescription>
-        <CardDescription className="flex items-center gap-1.5 text-foreground/70">
+        <CardDescription className="text-foreground/70 flex items-center gap-1.5">
           <MapPinIcon className="h-4 w-4" />
           <span>{event.location}</span>
         </CardDescription>
       </CardHeader>
 
       <CardContent className="flex-1">
-        <P className="line-clamp-3 text-foreground/80">{event.summary}</P>
+        <P className="text-foreground/80 line-clamp-3">{event.summary}</P>
 
         {event.tags && event.tags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1">
@@ -336,7 +253,7 @@ function EventCard({ event }: { event: Event }) {
               <Badge
                 key={index}
                 variant="secondary"
-                className="bg-white/10 font-normal text-foreground hover:bg-white/20"
+                className="text-foreground bg-white/10 font-normal hover:bg-white/20"
               >
                 {tag.tag}
               </Badge>
@@ -348,7 +265,7 @@ function EventCard({ event }: { event: Event }) {
       <CardFooter className="pt-0">
         <Button
           asChild
-          className="w-full bg-sunglow text-black hover:bg-yellow-500"
+          className="bg-sunglow w-full text-black hover:bg-yellow-500"
         >
           <Link href={`/events/${event.slug}`}>
             View Event <ArrowRightIcon className="ml-1.5 h-4 w-4" />

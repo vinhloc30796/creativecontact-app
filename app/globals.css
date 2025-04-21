@@ -236,13 +236,11 @@
   }
 }
 /* Custom text border hover effect */
-@utility text-hover-border {
+@utility text-hover-stroke-sunglow {
   @apply text-black transition-all duration-300 ease-in-out;
 
   &:hover {
-    @apply text-sunglow;
-    -webkit-text-stroke: 0.06em black;
-    paint-order: stroke fill;
+    @apply text-stroke-sunglow;
   }
 }
 
@@ -263,6 +261,13 @@
       3rem 0 black,
       0 -3rem black;
   }
+}
+
+/* Reusable stroked sunglow text */
+@utility text-stroke-sunglow {
+  @apply text-sunglow;
+  -webkit-text-stroke: 0.06em black;
+  paint-order: stroke fill;
 }
 
 /* See 

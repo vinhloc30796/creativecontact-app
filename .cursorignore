@@ -2,7 +2,6 @@
 /public/{*.jpg,*.png,*.svg,*.ico,*.webp}
 *.json
 *.lock
-*.md
 *.txt
 *.yml
 *.yaml
