@@ -31,7 +31,7 @@ import { ClientFloatingActions } from "@/components/ClientFloatingActions";
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string }; // Removed Promise<> wrapper for clarity
+  params: Promise<{ slug: string }>; // Removed Promise<> wrapper for clarity
 }): Promise<Metadata> {
   const { slug } = await params;
   const event = await fetchEventBySlug(slug);
@@ -60,10 +60,10 @@ export default async function EventPage({
   params,
   searchParams, // Add searchParams to get language
 }: {
-  params: { slug: string };
-  searchParams?: { lang?: string }; // Make searchParams optional
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ lang?: string }>; // Make searchParams optional
 }) {
-  const { slug } = await params;
+  const { slug } = await params; // Get slug from params
   const lang = (await searchParams)?.lang || "en"; // Get lang from searchParams
   const { t } = await getServerTranslation(lang, "HomePage");
   const event: Event | null = await fetchEventBySlug(slug);
