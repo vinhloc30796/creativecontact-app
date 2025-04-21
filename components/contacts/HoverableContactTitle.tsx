@@ -9,6 +9,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { H4, Small } from "@/components/ui/typography";
 import Link from "next/link";
@@ -28,6 +29,7 @@ import { HeroTitle } from "../ui/typography";
 export interface EventItem {
   title: string;
   datetime: Date;
+  [key: string]: any; // allow extra fields for real data
 }
 
 /**
@@ -95,6 +97,54 @@ export function EventImagePlaceholder({
 }
 
 /**
+ * EventImage Component
+ *
+ * A component that displays a real image.
+ */
+export function EventImage({
+  src,
+  alt,
+  width,
+  height,
+  className,
+}: {
+  src: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  className?: string;
+}) {
+  return (
+    <Card
+      className={cn("shrink-0 overflow-hidden", className)}
+      style={{
+        width: width ? `${width}px` : undefined,
+        height: height ? `${height}px` : undefined,
+      }}
+    >
+      {/* wrapper for Next.js Image fill */}
+      <div className="relative h-full w-full">
+        <Image src={src} alt={alt || ""} fill className="object-cover" />
+      </div>
+    </Card>
+  );
+}
+
+// Unified image type for HomepageEventCard
+interface PlaceholderItem {
+  isPlaceholder: true;
+  width: number;
+  height: number;
+  url?: string;
+}
+interface RealImageItem {
+  isPlaceholder: false;
+  src: string;
+  alt?: string;
+}
+type ImageToShow = PlaceholderItem | RealImageItem;
+
+/**
  * AnnualEventTextCard Component
  *
  * A component that displays annual event information including year and event count.
@@ -129,35 +179,78 @@ export function AnnualEventTextCard({
  * @example
  * <HomepageEventCard
  *   year="2023"
- *   eventCount={5}
+ *   events={[]}
  * />
  */
 export function HomepageEventCard({
   year,
-  eventCount,
-  event,
+  events,
 }: {
   year: string | number;
-  eventCount: number;
-  event?: EventItem; // Optional event item for displaying additional details
-}) {
-  // Generate exactly eventCount image placeholders
-  const imagePlaceholders = getRandomImagePlaceholders(eventCount);
+  events: EventItem[];
+}): React.JSX.Element {
+  const nRealEvents = events.filter(
+    (evt) => evt.isPlaceholder === false,
+  ).length;
+  const nMockEvents = events.length - nRealEvents;
+  console.log(
+    "[HomepageEventCard] received {} events, of which: {} real events, {} mock events",
+    events.length,
+    nRealEvents,
+    nMockEvents,
+  );
+  console.log("[HomepageEventCard] events: {}", events);
+  // Build typed image list
+  const eventCount = events.length;
+  const imagesToShow: ImageToShow[] = events.map((evt) => {
+    if (evt.isPlaceholder) {
+      return {
+        isPlaceholder: true,
+        width: evt.width,
+        height: evt.height,
+        url: evt.url,
+      };
+    }
+    if (evt.featuredImage?.url) {
+      return {
+        isPlaceholder: false,
+        src: evt.featuredImage.url,
+        alt: evt.featuredImage.alt || evt.title,
+      };
+    }
+    const p = getRandomImagePlaceholders(1)[0];
+    return {
+      isPlaceholder: true,
+      width: p.width,
+      height: p.height,
+      url: p.url,
+    };
+  });
 
   return (
     <Card className="flex h-full w-fit flex-row gap-4 border-none bg-transparent p-4 shadow-none">
-      {/* Annual Event Text Card */}
       <AnnualEventTextCard year={year} eventCount={eventCount} />
-
-      {/* Image placeholder cards */}
-      {imagePlaceholders.map((placeholder, index) => (
-        <EventImagePlaceholder
-          key={index}
-          width={placeholder.width}
-          height={placeholder.height}
-          url={placeholder.url}
-        />
-      ))}
+      {imagesToShow.map((img, index) => {
+        if (img.isPlaceholder) {
+          return (
+            <EventImagePlaceholder
+              key={index}
+              width={img.width}
+              height={img.height}
+              url={img.url}
+            />
+          );
+        }
+        return (
+          <EventImage
+            key={index}
+            src={img.src}
+            alt={img.alt}
+            width={200}
+            height={200}
+          />
+        );
+      })}
     </Card>
   );
 }
@@ -179,10 +272,17 @@ export function HomepageEventOverlay({
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
+  // Normalize events to handle both mock and real data
+  const normalizedEvents: EventItem[] = events.map((evt) => ({
+    ...evt,
+    datetime:
+      evt.datetime ?? (evt.eventDate ? new Date(evt.eventDate) : new Date()),
+  }));
+
   if (!isVisible) return null;
 
   // Group events by year
-  const eventsByYear = events.reduce<Record<string, EventItem[]>>(
+  const eventsByYear = normalizedEvents.reduce<Record<string, EventItem[]>>(
     (acc, event) => {
       // Extract year from Date object
       const year = event.datetime.getFullYear().toString();
@@ -203,6 +303,7 @@ export function HomepageEventOverlay({
     .map(([year, yearEvents]) => ({
       year,
       eventCount: yearEvents.length,
+      events: yearEvents,
     }));
 
   return (
@@ -219,14 +320,14 @@ export function HomepageEventOverlay({
         zIndex: 40,
       }}
     >
-      {events.length > 0 && (
+      {normalizedEvents.length > 0 && (
         <div className="w-full">
           <div className="animate-scroll-x flex h-full flex-row gap-24 px-4 py-6 whitespace-nowrap">
             {yearGroups.map((yearGroup, index) => (
               <HomepageEventCard
                 key={index}
                 year={yearGroup.year}
-                eventCount={yearGroup.eventCount}
+                events={yearGroup.events}
               />
             ))}
           </div>

@@ -15,6 +15,7 @@ import { getServerTranslation } from "@/lib/i18n/init-server";
 import { eq } from "drizzle-orm";
 import { Facebook, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
+import { fetchEvents } from "@/lib/payload/fetchEvents";
 import { ClientNavMenu } from "../components/ClientNavMenu";
 
 // show the in-construction page
@@ -33,11 +34,13 @@ async function getEventSlots(event: string): Promise<EventSlot[]> {
   console.debug(`Got ${results.length} event slots`);
   return results;
 }
+
 interface Props {
   searchParams: Promise<{
     lang?: string;
   }>;
 }
+
 export default async function Page(props: Props) {
   const searchParams = await props.searchParams;
   const lang = searchParams.lang || "en";
@@ -52,6 +55,103 @@ export default async function Page(props: Props) {
     );
   }
 
+  // Mock events: similar shape to payload events
+  const mockEvents = [
+    {
+      title: "Launch Party",
+      datetime: new Date(2023, 2, 15, 19, 0),
+      source: "mock",
+    },
+    {
+      title: "Spring Workshop",
+      datetime: new Date(2023, 3, 10, 14, 0),
+      source: "mock",
+    },
+    {
+      title: "Art Exhibition",
+      datetime: new Date(2023, 5, 22, 18, 0),
+      source: "mock",
+    },
+    {
+      title: "Summer Meetup",
+      datetime: new Date(2023, 6, 18, 16, 30),
+      source: "mock",
+    },
+    {
+      title: "Creative Hackathon",
+      datetime: new Date(2023, 8, 5, 9, 0),
+      source: "mock",
+    },
+    {
+      title: "Fall Showcase",
+      datetime: new Date(2023, 9, 28, 17, 0),
+      source: "mock",
+    },
+    {
+      title: "Year-End Celebration",
+      datetime: new Date(2023, 11, 15, 20, 0),
+      source: "mock",
+    },
+    {
+      title: "Workshop",
+      datetime: new Date(2024, 4, 15, 14, 0),
+      source: "mock",
+    },
+    {
+      title: "Exhibition",
+      datetime: new Date(2024, 4, 20, 18, 30),
+      source: "mock",
+    },
+    {
+      title: "Networking",
+      datetime: new Date(2024, 5, 5, 19, 0),
+      source: "mock",
+    },
+    {
+      title: "Networking #2",
+      datetime: new Date(2024, 7, 12, 19, 0),
+      source: "mock",
+    },
+    {
+      title: "Exhibition #2",
+      datetime: new Date(2024, 8, 12, 19, 0),
+      source: "mock",
+    },
+    {
+      title: "Boardgames #2",
+      datetime: new Date(2024, 9, 12, 19, 0),
+      source: "mock",
+    },
+    {
+      title: "Boardgames",
+      datetime: new Date(2025, 6, 6, 22, 0),
+      source: "mock",
+    },
+    {
+      title: "Workshop #2",
+      datetime: new Date(2025, 6, 10, 14, 0),
+      source: "mock",
+    },
+  ];
+
+  // Fetch real events from payload
+  const realEvents = await fetchEvents({
+    sort: "eventDate",
+    where: { status: { not_equals: "draft" } },
+  });
+
+  const combinedEvents = [
+    ...mockEvents.map((e: any) => ({
+      ...e,
+      isPlaceholder: true,
+    })),
+    ...realEvents.map((e: any) => ({
+      ...e,
+      datetime: new Date(e.eventDate),
+      isPlaceholder: false,
+    })),
+  ];
+
   return (
     <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
       {/* Header with logo and join button */}
@@ -64,62 +164,7 @@ export default async function Page(props: Props) {
           <div className="flex w-full flex-col">
             <HoverableContactTitle
               titleText={t("titleContact")}
-              events={[
-                // 2023 events (chronological order)
-                {
-                  title: "Launch Party",
-                  datetime: new Date(2023, 2, 15, 19, 0),
-                },
-                {
-                  title: "Spring Workshop",
-                  datetime: new Date(2023, 3, 10, 14, 0),
-                },
-                {
-                  title: "Art Exhibition",
-                  datetime: new Date(2023, 5, 22, 18, 0),
-                },
-                {
-                  title: "Summer Meetup",
-                  datetime: new Date(2023, 6, 18, 16, 30),
-                },
-                {
-                  title: "Creative Hackathon",
-                  datetime: new Date(2023, 8, 5, 9, 0),
-                },
-                {
-                  title: "Fall Showcase",
-                  datetime: new Date(2023, 9, 28, 17, 0),
-                },
-                {
-                  title: "Year-End Celebration",
-                  datetime: new Date(2023, 11, 15, 20, 0),
-                },
-                // 2024 events (chronological order)
-                { title: "Workshop", datetime: new Date(2024, 4, 15, 14, 0) },
-                {
-                  title: "Exhibition",
-                  datetime: new Date(2024, 4, 20, 18, 30),
-                },
-                { title: "Networking", datetime: new Date(2024, 5, 5, 19, 0) },
-                {
-                  title: "Networking #2",
-                  datetime: new Date(2024, 7, 12, 19, 0),
-                },
-                {
-                  title: "Exhibition #2",
-                  datetime: new Date(2024, 8, 12, 19, 0),
-                },
-                {
-                  title: "Boardgames #2",
-                  datetime: new Date(2024, 9, 12, 19, 0),
-                },
-                // 2025 events (chronological order)
-                { title: "Boardgames", datetime: new Date(2025, 6, 6, 22, 0) },
-                {
-                  title: "Workshop #2",
-                  datetime: new Date(2025, 6, 10, 14, 0),
-                },
-              ]}
+              events={combinedEvents}
               contentId="subtitle-content"
             />
             <div className="w-fit self-end">
@@ -146,7 +191,6 @@ export default async function Page(props: Props) {
             ]}
             menuText={t("menu")}
           />
-
         </div>
 
         {/* Content section - fills the remaining space */}
