@@ -1,7 +1,7 @@
-import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+import { MigrateDownArgs, MigrateUpArgs } from "@payloadcms/db-postgres";
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`
+  await db.execute(`
    CREATE TYPE "payload"."theme_options" AS ENUM('light', 'dark');
   CREATE TYPE "payload"."background_options" AS ENUM('solid', 'transparent', 'gradientUp', 'gradientDown');
   CREATE TYPE "payload"."enum_events_blocks_media_block_media_block_fields_position" AS ENUM('default', 'wide', 'fullWidth');
@@ -33,13 +33,17 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "events_blocks_media_block_order_idx" ON "payload"."events_blocks_media_block" USING btree ("_order");
   CREATE INDEX IF NOT EXISTS "events_blocks_media_block_parent_id_idx" ON "payload"."events_blocks_media_block" USING btree ("_parent_id");
   CREATE INDEX IF NOT EXISTS "events_blocks_media_block_path_idx" ON "payload"."events_blocks_media_block" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "events_blocks_media_block_media_block_fields_media_block_fields_media_idx" ON "payload"."events_blocks_media_block" USING btree ("media_block_fields_media_id");`)
+  CREATE INDEX IF NOT EXISTS "events_blocks_media_block_media_block_fields_media_block_fields_media_idx" ON "payload"."events_blocks_media_block" USING btree ("media_block_fields_media_id");`);
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.execute(sql`
-   DROP TABLE "payload"."events_blocks_media_block" CASCADE;
-  DROP TYPE "payload"."theme_options";
-  DROP TYPE "payload"."background_options";
-  DROP TYPE "payload"."enum_events_blocks_media_block_media_block_fields_position";`)
+export async function down({
+  db,
+  payload,
+  req,
+}: MigrateDownArgs): Promise<void> {
+  await db.execute(`
+    DROP TABLE "payload"."events_blocks_media_block" CASCADE;
+    DROP TYPE "payload"."theme_options";
+    DROP TYPE "payload"."background_options";
+    DROP TYPE "payload"."enum_events_blocks_media_block_media_block_fields_position";`);
 }
