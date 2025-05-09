@@ -39,7 +39,6 @@ export default function SignupPage() {
       password: '',
       confirmPassword: '',
       name: '',
-      staffSecret: '',
     },
     mode: 'onTouched',
     reValidateMode: 'onChange',
@@ -67,11 +66,6 @@ export default function SignupPage() {
         console.error('[SignupPage] Signup failed:', result.error)
         if (result.error.code === 'DUPLICATE_EMAIL') {
           form.setError('email', {
-            type: 'manual',
-            message: result.error.message
-          })
-        } else if (result.error.code === 'FAILED_TO_PREVALIDATE') {
-          form.setError('staffSecret', {
             type: 'manual',
             message: result.error.message
           })
@@ -137,24 +131,6 @@ export default function SignupPage() {
             <CardContent className="p-6 bg-slate-100">
               <FormField
                 control={form.control}
-                name="staffSecret"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Staff Secret</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Ask Creative Contact team (or you won't get to sign up)"
-                        disabled={isLoading}
-                        {...field}
-                      />
-                    </FormControl>
-                    {form.formState.touchedFields.staffSecret && <FormMessage />}
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -177,7 +153,7 @@ export default function SignupPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name (Optional)</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
