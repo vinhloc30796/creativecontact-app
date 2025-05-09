@@ -15,12 +15,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing userId or email' }, { status: 400 });
   }
 
+  // Set to the production channel
   const discordBotToken = process.env.DISCORD_BOT_TOKEN;
   const discordChannelId = process.env.DISCORD_CHANNEL_ID;
 
   if (!discordBotToken || !discordChannelId) {
     console.error('Discord bot token or channel ID is not configured.');
     return NextResponse.json({ error: 'Discord integration not configured' }, { status: 500 });
+  }
+
+  // Check if the secret is set -- prevent spam
+  if (!process.env.DISCORD_INTERNAL_API_SECRET) {
+    console.error('DISCORD_INTERNAL_API_SECRET is not set.')
+    // It's crucial not to leak that the secret is missing, so return a generic error
+    return NextResponse.json({ error: 'Internal Server Error: Configuration missing' }, { status: 500 })
+  }
+  // Then set the secret
+  const authHeader = request.headers.get('Authorization')
+  if (!authHeader || authHeader !== `Bearer ${process.env.DISCORD_INTERNAL_API_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const userDisplayName = name || email; // Use email if name is not available

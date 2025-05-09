@@ -155,6 +155,7 @@ export const Staffs: CollectionConfig = {
                 'Content-Type': 'application/json',
                 // Potentially add a secret header for security if this endpoint is exposed
                 // 'X-Internal-Secret': process.env.DISCORD_INTERNAL_API_SECRET,
+                'Authorization': `Bearer ${process.env.DISCORD_INTERNAL_API_SECRET}`,
               },
               body: JSON.stringify({
                 userId: doc.id,
