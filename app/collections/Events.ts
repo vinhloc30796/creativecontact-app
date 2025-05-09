@@ -5,6 +5,7 @@ import { slugField } from "../fields/slug";
 import { checkRole } from "./access/checkRole";
 import { db } from "@/lib/db";
 import { integrateEvent } from "@/lib/payload/eventAdapter";
+import { canManageContent } from "./access/canManageContent";
 
 // Import block configs
 import { EventDetails } from "../blocks/EventDetails";
@@ -23,12 +24,11 @@ export const Events: CollectionConfig = {
     defaultColumns: ["title", "eventDate", "location", "status"],
   },
   access: {
-    read: anyone,
-    create: ({ req: { user } }) =>
-      checkRole(["admin", "content-creator"], user || undefined),
-    update: ({ req: { user } }) =>
-      checkRole(["admin", "content-creator"], user || undefined),
-    delete: admins,
+    read: ({ req: { user } }) =>
+      checkRole(["admin", "content-creator", "check-in"], user || undefined),
+    create: canManageContent,
+    update: canManageContent,
+    delete: canManageContent,
   },
   fields: [
     {

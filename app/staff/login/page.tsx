@@ -76,7 +76,9 @@ export default function LoginPage() {
         setFormError(result.error.message)
         form.setFocus('email')
       } else {
-        router.push('/staff/checkin')
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+        const adminUrl = `${appUrl}/payload-admin`;
+        router.push(adminUrl);
       }
     } catch (error) {
       console.error('[LoginPage] Unexpected error:', error)

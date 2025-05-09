@@ -1,7 +1,5 @@
 import { CollectionConfig, IncomingAuthType } from "payload";
-import { anyone } from "./access/anyone";
 import { admins } from "./access/admins";
-import { adminsAndUser } from "./access/adminAndUser";
 import { checkRole } from "./access/checkRole";
 
 const SHOULD_VERIFY = process.env.NODE_ENV === "production";
@@ -28,14 +26,15 @@ export const Staffs: CollectionConfig = {
     useAsTitle: "email",
     group: "Admin",
   },
-  // Access control - admins have full access, users can only read their own data
-
+  // Access control
   access: {
-    read: adminsAndUser,
-    create: anyone,
-    update: adminsAndUser,
+    // Only admins can perform CRUD operations on other staff members
+    read: ({ req: { user } }) => checkRole(["admin", "check-in", "content-creator"], user || undefined),
+    create: admins,
+    update: admins,
     delete: admins,
-    admin: ({ req: { user } }) => checkRole(["admin"], user || undefined),
+    // All authenticated staff can access the admin panel
+    admin: ({ req: { user } }) => checkRole(["admin", "check-in", "content-creator"], user || undefined),
   },
   // Collection fields defining staff member data structure
   fields: [

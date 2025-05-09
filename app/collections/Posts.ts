@@ -8,8 +8,8 @@ import { MediaBlock } from '@/app/blocks/Media'
 import richText from '@/app/fields/richText'
 import { slugField } from '@/app/fields/slug'
 import { formatPreviewURL } from '@/lib/formatPreviewUrl'
-import { admins } from './access/admins'
 import { publishedOnly } from './access/publishedOnly'
+import { canManageContent } from "./access/canManageContent"
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import {
   HeadingFeature,
@@ -20,11 +20,11 @@ import {
 export const Posts: CollectionConfig = {
   slug: 'posts',
   access: {
-    create: admins,
-    delete: admins,
+    create: canManageContent,
+    delete: canManageContent,
     read: publishedOnly,
-    readVersions: admins,
-    update: admins,
+    readVersions: canManageContent,
+    update: canManageContent,
   },
   admin: {
     livePreview: {
