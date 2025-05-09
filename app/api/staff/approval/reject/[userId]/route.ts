@@ -3,23 +3,24 @@ import { getCustomPayload } from '@/lib/payload/getCustomPayload'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
-  const { userId } = params
+  const { userId } = await params
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
   }
 
-  const authHeader = request.headers.get('Authorization')
-  if (!authHeader || authHeader !== `Bearer ${process.env.DISCORD_INTERNAL_API_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+  // Check if the secret is set
   if (!process.env.DISCORD_INTERNAL_API_SECRET) {
     console.error('DISCORD_INTERNAL_API_SECRET is not set.')
     // It's crucial not to leak that the secret is missing, so return a generic error
     return NextResponse.json({ error: 'Internal Server Error: Configuration missing' }, { status: 500 })
+  }
+  // Then set the secret
+  const authHeader = request.headers.get('Authorization')
+  if (!authHeader || authHeader !== `Bearer ${process.env.DISCORD_INTERNAL_API_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
