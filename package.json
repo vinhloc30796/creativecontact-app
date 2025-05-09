@@ -19,6 +19,7 @@
     "payload:typegen": "payload generate:types",
     "payload:importMap": "payload generate:importMap",
     "payload:importMap:help": "payload generate:importMap --help",
+    "payload:migrate:create": "payload migrate:create",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:dir": "prettier --write",
     "list:scripts": "node -e \"console.log(Object.keys(require('./package.json').scripts).map(key => key + ': ' + require('./package.json').scripts[key]).join('\\n'))\""
@@ -65,6 +66,7 @@
     "cmdk": "1.0.4",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
+    "discord-api-types": "^0.38.4",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.36.1",
     "embla-carousel-react": "^8.5.1",
@@ -100,6 +102,7 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "tweetnacl": "^1.0.3",
     "uuid": "^11.0.3",
     "zod": "^3.23.8",
     "zustand": "5.0.2"

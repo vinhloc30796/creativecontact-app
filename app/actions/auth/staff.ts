@@ -4,8 +4,8 @@ import { cookiePolicy } from "@/app/collections/Staffs";
 import { StaffCleanSignupInput } from "@/app/staff/signup/types";
 import { getCustomPayload } from "@/lib/payload/getCustomPayload";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
-import { prevalidateStaff } from "./prevalidateStaff";
 import { AuthResult, StaffUser } from "./types";
 
 const payload = await getCustomPayload();
@@ -157,15 +157,6 @@ export async function signupStaff(
   data: StaffCleanSignupInput,
 ): Promise<AuthResult<StaffUser>> {
   try {
-    // Validate staff secret first
-    const validationResult = await prevalidateStaff(data.staffSecret);
-    if (validationResult.error) {
-      return {
-        data: null,
-        error: validationResult.error,
-      };
-    }
-
     console.debug("[signupStaff] Starting signup process...");
 
     // Create staff member
@@ -177,7 +168,8 @@ export async function signupStaff(
         name: data.name,
         // Default roles
         roles: ["check-in", "content-creator"],
-        active: true,
+        active: false,
+        status: "pending",
       },
     });
 
@@ -197,6 +189,11 @@ export async function signupStaff(
       newStaff.id,
     );
 
+    // Redirect to pending approval page
+    redirect("/staff/signup/pending-approval");
+
+    // Note: The code below this redirect will not be reached
+    // but is kept for structural consistency or future use if redirect is conditional.
     return {
       data: {
         id: newStaff.id,
@@ -208,13 +205,22 @@ export async function signupStaff(
       error: null,
     };
   } catch (error) {
-    const data = error instanceof Error && "data" in error ? error.data : null;
+    // Check if it's a Next.js redirect error
+    // Errors thrown by `redirect()` have a specific digest.
+    if (
+      error instanceof Error &&
+      (error as any).digest?.startsWith("NEXT_REDIRECT")
+    ) {
+      throw error; // Re-throw it to let Next.js handle the redirect
+    }
+
+    const errorData = error instanceof Error && "data" in error ? error.data : null;
     const cause = error instanceof Error ? error.cause : null;
     console.error(
       "[signupStaff] error:",
       error,
       "with data:",
-      data,
+      errorData,
       "and cause:",
       cause,
     );
@@ -231,7 +237,7 @@ export async function signupStaff(
       );
 
     const duplicateEmailExists =
-      isEmailAlreadyRegistered(cause) || isEmailAlreadyRegistered(data);
+      isEmailAlreadyRegistered(cause) || isEmailAlreadyRegistered(errorData);
     if (duplicateEmailExists) {
       return {
         data: null,

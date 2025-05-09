@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { admins } from './access/admins'
+import { canManageContent } from "./access/canManageContent";
 
 const s3AccessKey = process.env.S3_ACCESS_KEY || '625729a08b95bf1b7ff351a663f_ENDPOINT'
 const s3SecretKey = process.env.S3_SECRET_KEY || '850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907'
@@ -12,10 +12,10 @@ const s3ForcePathStyle = process.env.S3_FORCE_PATH_STYLE
 export const Media: CollectionConfig<'media'> = {
   slug: 'media',
   access: {
-    create: admins,
-    delete: admins,
-    read: () => true,
-    update: admins,
+    create: canManageContent,
+    delete: canManageContent,
+    read: canManageContent,
+    update: canManageContent,
   },
   defaultPopulate: {
     alt: true,

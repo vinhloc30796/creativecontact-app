@@ -138,6 +138,7 @@ export interface Staff {
   id: number;
   roles: ('admin' | 'check-in' | 'content-creator')[];
   name: string;
+  status: 'pending' | 'approved' | 'rejected' | 'inactive';
   /**
    * If unchecked, user cannot log in
    */
@@ -503,6 +504,7 @@ export interface PayloadMigration {
 export interface StaffsSelect<T extends boolean = true> {
   roles?: T;
   name?: T;
+  status?: T;
   active?: T;
   lastLogin?: T;
   updatedAt?: T;
