@@ -289,7 +289,7 @@ export async function POST(request: NextRequest) {
 
     // We start the async work but don't wait for it to finish before sending the deferred response.
     // Using `request.signal` for abort controller if needed for long-running tasks, but here we rely on Discord's async webhook nature.
-    handleInteractionLogic(interaction, request).catch(error => {
+    await handleInteractionLogic(interaction, request).catch(error => {
       // Log errors from the unawaited promise
       console.error("Error in detached handleInteractionLogic:", error);
       // Optionally, try to send a generic error followup if possible, though token might be expired
