@@ -9,7 +9,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
   await db.execute(`
-   ALTER TABLE "payload"."staffs" ADD COLUMN "_verified" boolean;
-  ALTER TABLE "payload"."staffs" ADD COLUMN "_verificationtoken" varchar;
-  ALTER TABLE "payload"."staffs" DROP COLUMN IF EXISTS "enable_a_p_i_key";`)
+   ALTER TABLE "payload"."staffs" DROP COLUMN IF EXISTS "enable_a_p_i_key";
+  ALTER TABLE "payload"."staffs" DROP COLUMN IF EXISTS "api_key";
+  ALTER TABLE "payload"."staffs" DROP COLUMN IF EXISTS "api_key_index";`)
 }
