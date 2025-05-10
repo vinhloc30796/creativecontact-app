@@ -17,6 +17,32 @@ import configPromise from '@payload-config'; // Ensure this path is correct
 import nacl from 'tweetnacl';
 import { getCustomPayload } from '@/lib/payload/getCustomPayload';
 
+// Helper function to make fetch calls with a timeout
+async function fetchWithTimeout(resource: RequestInfo, options: RequestInit & { timeout?: number } = {}) {
+  const { timeout = 8000 } = options; // Default timeout 8 seconds
+
+  const controller = new AbortController();
+  const id = setTimeout(() => {
+    console.warn(`[FETCH_TIMEOUT] Request to ${typeof resource === 'string' ? resource : 'URL object'} timed out after ${timeout}ms`);
+    controller.abort();
+  }, timeout);
+
+  try {
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      console.error(`[FETCH_ABORTED] Request to ${typeof resource === 'string' ? resource : 'URL object'} was aborted due to timeout.`);
+    }
+    throw error; // Re-throw error to be caught by calling function
+  }
+}
+
 // Helper function to get raw body for Next.js Edge/Serverless functions
 async function getRawBodyFromRequest(req: NextRequest): Promise<string> {
   const reader = req.body?.getReader();
@@ -36,12 +62,13 @@ async function getRawBodyFromRequest(req: NextRequest): Promise<string> {
 async function sendFollowUp(interaction: APIInteraction, content: string) {
   const followupUrl = `https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`;
   try {
-    const res = await fetch(followupUrl, {
+    const res = await fetchWithTimeout(followupUrl, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ content }),
+      timeout: 5000,
     });
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
@@ -135,7 +162,7 @@ async function handleInteractionLogic(interaction: APIInteraction) {
     }
     const userEmailForMessage = staffUser.email || `User ID ${userId}`;
 
-    const apiResponse = await fetch(apiUrl, {
+    const apiResponse = await fetchWithTimeout(apiUrl, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${internalApiSecret}`,
@@ -176,7 +203,7 @@ async function handleInteractionLogic(interaction: APIInteraction) {
       const discordBotToken = process.env.DISCORD_BOT_TOKEN;
       if (discordBotToken) {
         const editMessageUrl = `https://discord.com/api/v10/channels/${channelId}/messages/${originalMessage.id}`;
-        const editResponse = await fetch(editMessageUrl, {
+        const editResponse = await fetchWithTimeout(editMessageUrl, {
           method: 'PATCH',
           headers: {
             'Authorization': `Bot ${discordBotToken}`,
@@ -207,10 +234,11 @@ async function handleInteractionLogic(interaction: APIInteraction) {
 async function sendEphemeralFollowup(applicationId: string, interactionToken: string, content: string) {
   const followupUrl = `https://discord.com/api/v10/webhooks/${applicationId}/${interactionToken}/messages/@original`;
   try {
-    const response = await fetch(followupUrl, {
+    const response = await fetchWithTimeout(followupUrl, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content }),
+      timeout: 5000,
     });
     if (!response.ok) {
       const errorBody = await response.text();
