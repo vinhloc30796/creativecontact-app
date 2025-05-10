@@ -12,7 +12,7 @@ import {
   APIEmbed,
 } from 'discord-api-types/v10';
 import { verifyDiscordRequest } from '@/utils/discord_verify'; // Assuming @ is configured for src or utils
-import { getPayload } from 'payload';
+import { BasePayload, getPayload } from 'payload';
 import configPromise from '@payload-config'; // Ensure this path is correct
 import nacl from 'tweetnacl';
 import { getCustomPayload } from '@/lib/payload/getCustomPayload';
@@ -79,7 +79,7 @@ async function sendFollowUp(interaction: APIInteraction, content: string) {
   }
 }
 
-async function handleInteractionLogic(interaction: APIInteraction) {
+async function handleInteractionLogic(interaction: APIInteraction, req: NextRequest) {
   const {
     type,
     data,
@@ -151,7 +151,7 @@ async function handleInteractionLogic(interaction: APIInteraction) {
 
   try {
     console.log(`[INTERACTION_LOGIC] Attempting to get Payload instance for user ${userId}, action ${actionType}`);
-    let payload;
+    let payload: BasePayload;
     try {
       payload = await getCustomPayload();
       console.log(`[INTERACTION_LOGIC] Successfully got Payload instance for user ${userId}`);
@@ -167,6 +167,8 @@ async function handleInteractionLogic(interaction: APIInteraction) {
       staffUser = await payload.findByID({
         collection: 'staffs',
         id: userId,
+        depth: 0,
+        req
       });
       console.log(`[INTERACTION_LOGIC] Successfully queried for staff user ${userId}. Found: ${!!staffUser}`);
     } catch (e: any) {
@@ -327,7 +329,7 @@ export async function POST(request: NextRequest) {
 
     // We start the async work but don't wait for it to finish before sending the deferred response.
     // Using `request.signal` for abort controller if needed for long-running tasks, but here we rely on Discord's async webhook nature.
-    handleInteractionLogic(interaction).catch(error => {
+    handleInteractionLogic(interaction, request).catch(error => {
       // Log errors from the unawaited promise
       console.error("Error in detached handleInteractionLogic:", error);
       // Optionally, try to send a generic error followup if possible, though token might be expired
