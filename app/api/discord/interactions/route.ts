@@ -11,11 +11,10 @@ import {
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIEmbed,
 } from 'discord-api-types/v10';
+import { Staffs } from '@/app/collections/Staffs';
 import { verifyDiscordRequest } from '@/utils/discord_verify'; // Assuming @ is configured for src or utils
-import { BasePayload, getPayload } from 'payload';
 import configPromise from '@payload-config'; // Ensure this path is correct
 import nacl from 'tweetnacl';
-import { getCustomPayload } from '@/lib/payload/getCustomPayload';
 
 // Helper function to make fetch calls with a timeout
 async function fetchWithTimeout(resource: RequestInfo, options: RequestInit & { timeout?: number } = {}) {
@@ -133,13 +132,6 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
     return;
   }
 
-  const internalApiSecret = process.env.DISCORD_INTERNAL_API_SECRET;
-  if (!internalApiSecret) {
-    console.error('DISCORD_INTERNAL_API_SECRET is not set.');
-    await sendEphemeralFollowup(applicationId, interactionToken, 'Error: Server configuration issue (internal API secret missing).');
-    return;
-  }
-
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '');
   if (!appUrl) {
     console.error('NEXT_PUBLIC_APP_URL is not set.');
@@ -147,53 +139,72 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
     return;
   }
 
-  const apiUrl = `${appUrl}/api/staff/approval/${actionType}/${userId}`;
+  const approvalApiUrl = `${appUrl}/api/staff/approval/${actionType}/${userId}`;
 
   try {
-    console.log(`[INTERACTION_LOGIC] Attempting to get Payload instance for user ${userId}, action ${actionType}`);
-    let payload: BasePayload;
-    try {
-      payload = await getCustomPayload();
-      console.log(`[INTERACTION_LOGIC] Successfully got Payload instance for user ${userId}`);
-    } catch (e: any) {
-      console.error(`[INTERACTION_LOGIC] CRITICAL: Failed to get Payload instance for user ${userId}:`, e);
-      await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server critical issue (Payload init failed). Please contact support.`);
-      return;
-    }
-
-    console.log(`[INTERACTION_LOGIC] Attempting to find staff user ${userId}`);
+    // Fetch staff user information via the /payload-api endpoint
+    const staffApiUrl = `${appUrl}/payload-api/staffs/${userId}?depth=0`;
+    console.log(`[INTERACTION_LOGIC] Attempting to fetch staff user ${userId} via API: ${staffApiUrl}`);
     let staffUser;
+
     try {
-      staffUser = await payload.findByID({
-        collection: 'staffs',
-        id: userId,
-        depth: 0,
-        req
+      const staffResponse = await fetchWithTimeout(staffApiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // Authenticate with API Key
+          // The API key should belong to a staff user with read permission for the 'staffs' collection.
+          'Authorization': `${Staffs.slug} API-Key ${process.env.PAYLOAD_STAFF_API_KEY}`,
+        },
+        timeout: 5000, // Timeout for fetching staff user data
       });
-      console.log(`[INTERACTION_LOGIC] Successfully queried for staff user ${userId}. Found: ${!!staffUser}`);
+
+      if (!staffResponse.ok) {
+        const errorText = await staffResponse.text().catch(() => 'Failed to get error details');
+        console.error(`[INTERACTION_LOGIC] Failed to fetch staff user ${userId} from API. Status: ${staffResponse.status}. Body: ${errorText}`);
+        if (staffResponse.status === 404) {
+          await sendEphemeralFollowup(applicationId, interactionToken, `Error: Staff user with ID ${userId} not found (via API).`);
+        } else {
+          await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server issue (Failed to retrieve staff user data - API status ${staffResponse.status}).`);
+        }
+        return;
+      }
+
+      staffUser = await staffResponse.json();
+      console.log(`[INTERACTION_LOGIC] Successfully fetched staff user ${userId} from API. Found: ${!!staffUser}`);
+
+      if (!staffUser || typeof staffUser !== 'object' || !staffUser.id) {
+        console.error(`[INTERACTION_LOGIC] API returned OK for staff user ${userId}, but data is invalid, empty, or missing 'id'. Received:`, staffUser);
+        await sendEphemeralFollowup(applicationId, interactionToken, `Error: Staff user data for ID ${userId} is malformed or incomplete (from API).`);
+        return;
+      }
+
     } catch (e: any) {
-      console.error(`[INTERACTION_LOGIC] CRITICAL: Failed to query staff user ${userId}:`, e);
-      await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server critical issue (DB query failed). Please contact support.`);
+      console.error(`[INTERACTION_LOGIC] CRITICAL: Exception while fetching staff user ${userId} from API:`, e);
+      // Check if it's an AbortError (timeout)
+      if (e instanceof DOMException && e.name === 'AbortError') {
+        await sendEphemeralFollowup(applicationId, interactionToken, `Error: Timeout while trying to retrieve staff user data for ID ${userId}.`);
+      } else {
+        await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server critical issue (API query failed for staff user ${userId}). Please contact support.`);
+      }
       return;
     }
 
-    if (!staffUser) {
-      await sendEphemeralFollowup(applicationId, interactionToken, `Error: Staff user with ID ${userId} not found.`);
-      return;
-    }
+    // Proceed with the user information (staffUser should be populated here)
     const userEmailForMessage = staffUser.email || `User ID ${userId}`;
 
-    const apiResponse = await fetchWithTimeout(apiUrl, {
+    // Call the approval/rejection API endpoint
+    const apiResponse = await fetchWithTimeout(approvalApiUrl, {
       method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${internalApiSecret}`,
+        'Authorization': `Bearer ${process.env.DISCORD_INTERNAL_API_SECRET}`,
         'Content-Type': 'application/json',
       },
     });
 
     if (!apiResponse.ok) {
-      const errorData = await apiResponse.text();
-      console.error(`Failed to ${actionType} staff ${userId}: ${apiResponse.status} - ${errorData}`);
+      const errorData = await apiResponse.text().catch(() => 'Failed to get error details from approval API');
+      console.error(`Failed to ${actionType} staff ${userId} (${userEmailForMessage}): ${apiResponse.status} - ${errorData}`);
       await sendEphemeralFollowup(applicationId, interactionToken, `Error: Failed to ${actionType} ${userEmailForMessage}. API responded with ${apiResponse.status}.`);
       return;
     }
