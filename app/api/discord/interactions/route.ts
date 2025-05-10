@@ -1,3 +1,4 @@
+import { waitUntil } from '@vercel/functions';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   InteractionType,
@@ -79,6 +80,8 @@ async function sendFollowUp(interaction: APIInteraction, content: string) {
 }
 
 async function handleInteractionLogic(interaction: APIInteraction, req: NextRequest) {
+  // ----- 1. parse interaction -----
+  console.debug('[INTERACTION_HANDLER] Parsing interaction:', interaction);
   const {
     type,
     data,
@@ -103,10 +106,11 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
   const customId = data.custom_id;
   const adminRoles = member.roles;
   const adminUser = member.user;
+  console.debug('[INTERACTION_HANDLER] Admin user:', adminRoles);
 
   const requiredAdminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
   if (!requiredAdminRoleId) {
-    console.error('DISCORD_ADMIN_ROLE_ID is not set.');
+    console.error('[INTERACTION_HANDLER] DISCORD_ADMIN_ROLE_ID is not set.');
     await sendEphemeralFollowup(applicationId, interactionToken, 'Error: Server configuration issue (admin role ID missing).');
     return;
   }
@@ -118,7 +122,7 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
 
   const parts = customId.split('_');
   if (parts.length < 3) {
-    console.error(`Invalid custom_id format: ${customId}`);
+    console.error(`[INTERACTION_HANDLER] Invalid custom_id format: ${customId}`);
     await sendEphemeralFollowup(applicationId, interactionToken, 'Error: Invalid action command.');
     return;
   }
@@ -127,14 +131,14 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
   const userId = parts[2];
 
   if (entityType !== 'staff' || !userId || (actionType !== 'approve' && actionType !== 'reject')) {
-    console.error(`Invalid action parameters: ${actionType}, ${entityType}, ${userId}`);
+    console.error(`[INTERACTION_HANDLER] Invalid action parameters: ${actionType}, ${entityType}, ${userId}`);
     await sendEphemeralFollowup(applicationId, interactionToken, 'Error: Invalid action parameters.');
     return;
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '');
   if (!appUrl) {
-    console.error('NEXT_PUBLIC_APP_URL is not set.');
+    console.error('[INTERACTION_HANDLER] NEXT_PUBLIC_APP_URL is not set.');
     await sendEphemeralFollowup(applicationId, interactionToken, 'Error: Server configuration issue (app URL missing).');
     return;
   }
@@ -143,6 +147,7 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
 
   try {
     // Call the approval/rejection API endpoint
+    console.info('[INTERACTION_HANDLER] Calling approval/rejection API endpoint:', approvalApiUrl);
     const apiResponse = await fetchWithTimeout(approvalApiUrl, {
       method: 'PATCH',
       headers: {
@@ -183,6 +188,7 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
 
       const discordBotToken = process.env.DISCORD_BOT_TOKEN;
       if (discordBotToken) {
+        console.info('[INTERACTION_HANDLER] Editing original message:', originalMessage.id);
         const editMessageUrl = `https://discord.com/api/v10/channels/${channelId}/messages/${originalMessage.id}`;
         const editResponse = await fetchWithTimeout(editMessageUrl, {
           method: 'PATCH',
@@ -197,23 +203,24 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
         });
         if (!editResponse.ok) {
           const errorBody = await editResponse.text();
-          console.error(`Failed to edit original message ${originalMessage.id}: ${editResponse.status}`, errorBody);
+          console.error(`[INTERACTION_HANDLER] Failed to edit original message ${originalMessage.id}: ${editResponse.status}`, errorBody);
         } else {
-          console.log(`Successfully updated original message ${originalMessage.id} for user ${userId}`);
+          console.log(`[INTERACTION_HANDLER] Successfully updated original message ${originalMessage.id} for user ${userId}`);
         }
       } else {
-        console.error('Missing DISCORD_BOT_TOKEN for editing public message.');
+        console.error('[INTERACTION_HANDLER] Missing DISCORD_BOT_TOKEN for editing public message.');
       }
     }
 
   } catch (error) {
-    console.error(`Error processing ${actionType} staff ${userId}:`, error);
+    console.error(`[INTERACTION_HANDLER] Error processing ${actionType} staff ${userId}:`, error);
     await sendEphemeralFollowup(applicationId, interactionToken, `An unexpected error occurred while processing the ${actionType} request for user ID ${userId}.`);
   }
 }
 
 async function sendEphemeralFollowup(applicationId: string, interactionToken: string, content: string) {
   const followupUrl = `https://discord.com/api/v10/webhooks/${applicationId}/${interactionToken}/messages/@original`;
+  console.info('[INTERACTION_HANDLER] Sending ephemeral followup:', followupUrl);
   try {
     const response = await fetchWithTimeout(followupUrl, {
       method: 'PATCH',
@@ -224,6 +231,8 @@ async function sendEphemeralFollowup(applicationId: string, interactionToken: st
     if (!response.ok) {
       const errorBody = await response.text();
       console.error(`Error sending/editing ephemeral followup: ${response.status}`, errorBody);
+    } else {
+      console.info('[INTERACTION_HANDLER] Successfully sent ephemeral followup:', followupUrl);
     }
   } catch (fetchError) {
     console.error('Fetch error sending/editing ephemeral followup:', fetchError);
@@ -231,6 +240,7 @@ async function sendEphemeralFollowup(applicationId: string, interactionToken: st
 }
 
 export async function POST(request: NextRequest) {
+  // ----- 1. verify signature & parse interaction -----
   console.log('[INTERACTION_HANDLER] Received POST request');
   const rawBody = await getRawBodyFromRequest(request);
   console.log('[INTERACTION_HANDLER] Raw body extracted');
@@ -261,11 +271,13 @@ export async function POST(request: NextRequest) {
   const interaction = JSON.parse(rawBody) as APIInteraction;
   console.log(`[INTERACTION_HANDLER] Parsed interaction type: ${interaction.type}`);
 
+  // ---------- 2. PING handler ----------
   if (interaction.type === InteractionType.Ping) {
     console.log('Handling PING interaction');
     return NextResponse.json({ type: InteractionResponseType.Pong } as APIInteractionResponsePong);
   }
 
+  // ---------- 3. Message‑component handler ----------
   if (interaction.type === InteractionType.MessageComponent) {
     console.log('Handling MessageComponent interaction:', interaction.data.custom_id);
 
@@ -289,14 +301,8 @@ export async function POST(request: NextRequest) {
 
     // We start the async work but don't wait for it to finish before sending the deferred response.
     // Using `request.signal` for abort controller if needed for long-running tasks, but here we rely on Discord's async webhook nature.
-    await handleInteractionLogic(interaction, request).catch(error => {
-      // Log errors from the unawaited promise
-      console.error("Error in detached handleInteractionLogic:", error);
-      // Optionally, try to send a generic error followup if possible, though token might be expired
-      if (interaction.application_id && interaction.token) {
-        sendEphemeralFollowup(interaction.application_id, interaction.token, "A critical error occurred while processing your request.");
-      }
-    });
+    waitUntil(handleInteractionLogic(interaction, request));
+
 
     return NextResponse.json({
       type: InteractionResponseType.DeferredChannelMessageWithSource,

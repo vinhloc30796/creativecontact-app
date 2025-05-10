@@ -60,6 +60,7 @@
     "@tanstack/react-query": "^5.62.3",
     "@tanstack/react-table": "^8.20.5",
     "@types/ical": "^0.8.3",
+    "@vercel/functions": "^2.0.3",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
