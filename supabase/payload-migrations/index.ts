@@ -3,6 +3,7 @@ import * as migration_20250227_142445_init_posts_events from './20250227_142445_
 import * as migration_20250424_141059_init_event_blocks from './20250424_141059_init_event_blocks';
 import * as migration_20250424_150118_add_staff_verification_fields from './20250424_150118_add_staff_verification_fields';
 import * as migration_20250508_084716_add_staff_approval_status from './20250508_084716_add_staff_approval_status';
+import * as migration_20250510_140253_add_api_key_for_staff from './20250510_140253_add_api_key_for_staff';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20250508_084716_add_staff_approval_status.up,
     down: migration_20250508_084716_add_staff_approval_status.down,
-    name: '20250508_084716_add_staff_approval_status'
+    name: '20250508_084716_add_staff_approval_status',
+  },
+  {
+    up: migration_20250510_140253_add_api_key_for_staff.up,
+    down: migration_20250510_140253_add_api_key_for_staff.down,
+    name: '20250510_140253_add_api_key_for_staff'
   },
 ];

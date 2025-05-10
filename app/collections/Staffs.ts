@@ -20,7 +20,10 @@ export const authPolicy = {
 export const Staffs: CollectionConfig = {
   slug: "staffs",
   // Authentication settings with secure defaults
-  auth: authPolicy,
+  auth: {
+    ...authPolicy,
+    useAPIKey: true,
+  },
   // Admin panel display settings
   admin: {
     useAsTitle: "email",
