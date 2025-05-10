@@ -150,11 +150,30 @@ async function handleInteractionLogic(interaction: APIInteraction) {
   const apiUrl = `${appUrl}/api/staff/approval/${actionType}/${userId}`;
 
   try {
-    const payload = await getCustomPayload();
-    const staffUser = await payload.findByID({
-      collection: 'staffs',
-      id: userId,
-    });
+    console.log(`[INTERACTION_LOGIC] Attempting to get Payload instance for user ${userId}, action ${actionType}`);
+    let payload;
+    try {
+      payload = await getCustomPayload();
+      console.log(`[INTERACTION_LOGIC] Successfully got Payload instance for user ${userId}`);
+    } catch (e: any) {
+      console.error(`[INTERACTION_LOGIC] CRITICAL: Failed to get Payload instance for user ${userId}:`, e);
+      await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server critical issue (Payload init failed). Please contact support.`);
+      return;
+    }
+
+    console.log(`[INTERACTION_LOGIC] Attempting to find staff user ${userId}`);
+    let staffUser;
+    try {
+      staffUser = await payload.findByID({
+        collection: 'staffs',
+        id: userId,
+      });
+      console.log(`[INTERACTION_LOGIC] Successfully queried for staff user ${userId}. Found: ${!!staffUser}`);
+    } catch (e: any) {
+      console.error(`[INTERACTION_LOGIC] CRITICAL: Failed to query staff user ${userId}:`, e);
+      await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server critical issue (DB query failed). Please contact support.`);
+      return;
+    }
 
     if (!staffUser) {
       await sendEphemeralFollowup(applicationId, interactionToken, `Error: Staff user with ID ${userId} not found.`);
