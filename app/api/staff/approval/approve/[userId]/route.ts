@@ -38,6 +38,7 @@ export async function PATCH(req: NextRequest, { params }: ApprovalParams) {
       data: {
         status: 'approved',
         active: true,
+        _verified: true,
       },
     });
 
