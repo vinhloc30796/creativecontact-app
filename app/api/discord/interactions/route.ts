@@ -142,57 +142,6 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
   const approvalApiUrl = `${appUrl}/api/staff/approval/${actionType}/${userId}`;
 
   try {
-    // Fetch staff user information via the /payload-api endpoint
-    const staffApiUrl = `${appUrl}/payload-api/staffs/${userId}?depth=0`;
-    console.log(`[INTERACTION_LOGIC] Attempting to fetch staff user ${userId} via API: ${staffApiUrl}`);
-    let staffUser;
-
-    try {
-      const staffResponse = await fetchWithTimeout(staffApiUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          // Authenticate with API Key
-          // The API key should belong to a staff user with read permission for the 'staffs' collection.
-          'Authorization': `${Staffs.slug} API-Key ${process.env.PAYLOAD_STAFF_API_KEY}`,
-        },
-        timeout: 5000, // Timeout for fetching staff user data
-      });
-
-      if (!staffResponse.ok) {
-        const errorText = await staffResponse.text().catch(() => 'Failed to get error details');
-        console.error(`[INTERACTION_LOGIC] Failed to fetch staff user ${userId} from API. Status: ${staffResponse.status}. Body: ${errorText}`);
-        if (staffResponse.status === 404) {
-          await sendEphemeralFollowup(applicationId, interactionToken, `Error: Staff user with ID ${userId} not found (via API).`);
-        } else {
-          await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server issue (Failed to retrieve staff user data - API status ${staffResponse.status}).`);
-        }
-        return;
-      }
-
-      staffUser = await staffResponse.json();
-      console.log(`[INTERACTION_LOGIC] Successfully fetched staff user ${userId} from API. Found: ${!!staffUser}`);
-
-      if (!staffUser || typeof staffUser !== 'object' || !staffUser.id) {
-        console.error(`[INTERACTION_LOGIC] API returned OK for staff user ${userId}, but data is invalid, empty, or missing 'id'. Received:`, staffUser);
-        await sendEphemeralFollowup(applicationId, interactionToken, `Error: Staff user data for ID ${userId} is malformed or incomplete (from API).`);
-        return;
-      }
-
-    } catch (e: any) {
-      console.error(`[INTERACTION_LOGIC] CRITICAL: Exception while fetching staff user ${userId} from API:`, e);
-      // Check if it's an AbortError (timeout)
-      if (e instanceof DOMException && e.name === 'AbortError') {
-        await sendEphemeralFollowup(applicationId, interactionToken, `Error: Timeout while trying to retrieve staff user data for ID ${userId}.`);
-      } else {
-        await sendEphemeralFollowup(applicationId, interactionToken, `Error: Server critical issue (API query failed for staff user ${userId}). Please contact support.`);
-      }
-      return;
-    }
-
-    // Proceed with the user information (staffUser should be populated here)
-    const userEmailForMessage = staffUser.email || `User ID ${userId}`;
-
     // Call the approval/rejection API endpoint
     const apiResponse = await fetchWithTimeout(approvalApiUrl, {
       method: 'PATCH',
@@ -204,14 +153,14 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
 
     if (!apiResponse.ok) {
       const errorData = await apiResponse.text().catch(() => 'Failed to get error details from approval API');
-      console.error(`Failed to ${actionType} staff ${userId} (${userEmailForMessage}): ${apiResponse.status} - ${errorData}`);
-      await sendEphemeralFollowup(applicationId, interactionToken, `Error: Failed to ${actionType} ${userEmailForMessage}. API responded with ${apiResponse.status}.`);
+      console.error(`Failed to ${actionType} staff ${userId}: ${apiResponse.status} - ${errorData}`);
+      await sendEphemeralFollowup(applicationId, interactionToken, `Error: Failed to ${actionType} staff ${userId}. API responded with ${apiResponse.status}.`);
       return;
     }
 
     const successMessage = actionType === 'approve'
-      ? `✅ User ${userEmailForMessage} has been approved. They will be notified.`
-      : `❌ User ${userEmailForMessage} has been rejected. They will be notified.`;
+      ? `✅ Approval request for user ID ${userId} processed.`
+      : `❌ Rejection request for user ID ${userId} processed.`;
     await sendEphemeralFollowup(applicationId, interactionToken, successMessage);
 
     // If action was successful, update the original public message
@@ -219,13 +168,13 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
       const currentEmbed = originalMessage.embeds[0];
       const newEmbed: APIEmbed = {
         ...currentEmbed,
-        title: `${currentEmbed.title || 'Staff Signup Request'} - ${actionType === 'approve' ? 'Approved' : 'Rejected'}`,
+        title: `${currentEmbed.title || 'Staff Signup Request'} - Action Processed (${actionType})`,
         color: actionType === 'approve' ? 0x00FF00 : 0xFF0000, // Green for approve, Red for reject
         fields: [
           ...(currentEmbed.fields || []).filter(field => field.name !== 'Status'), // Remove old status if any
           {
             name: 'Status',
-            value: `${actionType === 'approve' ? 'Approved' : 'Rejected'} by ${adminUser?.username || 'Admin'}`,
+            value: `Action (${actionType}) processed by ${adminUser?.username || 'Admin'}`,
             inline: false,
           },
         ],
