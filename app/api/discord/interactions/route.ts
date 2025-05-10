@@ -144,7 +144,7 @@ async function handleInteractionLogic(interaction: APIInteraction, req: NextRequ
   try {
     // Fetch staff user information via the /payload-api endpoint
     const staffApiUrl = `${appUrl}/payload-api/staffs/${userId}?depth=0`;
-    console.log(`[INTERACTION_LOGIC] Attempting to fetch staff user ${userId} via API: ${staffApiUrl} with API key: ${process.env.PAYLOAD_STAFF_API_KEY}`);
+    console.log(`[INTERACTION_LOGIC] Attempting to fetch staff user ${userId} via API: ${staffApiUrl}`);
     let staffUser;
 
     try {
