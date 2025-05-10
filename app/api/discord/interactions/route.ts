@@ -19,7 +19,7 @@ import nacl from 'tweetnacl';
 
 // Helper function to make fetch calls with a timeout
 async function fetchWithTimeout(resource: RequestInfo, options: RequestInit & { timeout?: number } = {}) {
-  const { timeout = 8000 } = options; // Default timeout 8 seconds
+  const { timeout = 30000 } = options; // Default timeout 8 seconds
 
   const controller = new AbortController();
   const id = setTimeout(() => {
