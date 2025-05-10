@@ -3,6 +3,7 @@ import { Media } from "@/app/collections/Media";
 import { Posts } from "@/app/collections/Posts";
 import { Staffs } from "@/app/collections/Staffs";
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig, SanitizedConfig } from "payload";
@@ -16,6 +17,8 @@ console.log(
   "databaseUrl:",
   databaseUrl,
 );
+
+const dbAdapter = process.env.NODE_ENV === "production" ? vercelPostgresAdapter : postgresAdapter;
 
 const payloadConfig: Promise<SanitizedConfig> = buildConfig({
   // If you'd like to use Rich Text, pass your editor here
@@ -35,10 +38,14 @@ const payloadConfig: Promise<SanitizedConfig> = buildConfig({
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: payloadSecret,
   // Configure Postgres database connection
-  db: postgresAdapter({
+  db: dbAdapter({
     // db: vercelPostgresAdapter({
     pool: {
       connectionString: databaseUrl,
+      connectionTimeoutMillis: 10000, // 10 seconds to connect
+      idleTimeoutMillis: 15000,       // 15 seconds for an idle connection to be closed
+      // You might also consider a 'max' value, e.g., max: 5, if you want to limit connections per function instance
+      // but this needs careful consideration with serverless scaling & pgBouncer.
     },
     schemaName: 'payload',
     migrationDir: 'supabase/payload-migrations',
