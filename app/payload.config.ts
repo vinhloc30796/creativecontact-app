@@ -38,8 +38,7 @@ const payloadConfig: Promise<SanitizedConfig> = buildConfig({
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: payloadSecret,
   // Configure Postgres database connection
-  db: dbAdapter({
-    // db: vercelPostgresAdapter({
+  db: postgresAdapter({
     pool: {
       connectionString: databaseUrl,
       connectionTimeoutMillis: 10000, // 10 seconds to connect
