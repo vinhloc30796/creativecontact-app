@@ -23,6 +23,8 @@ export default function EventSwimLane({
   slug,
   rowIndex,
 }: EventSwimLaneProps) {
+  // Prefix with app URL if Production because https://github.com/payloadcms/payload/issues/6886
+  const prefixedThumbnailUrl = process.env.NODE_ENV === "production" ? `${process.env.NEXT_PUBLIC_APP_URL}${thumbnailUrl || ""}` : thumbnailUrl;
   // Format date
   const formattedDate = new Date(date).toLocaleDateString(undefined, {
     month: "long",
@@ -67,10 +69,10 @@ export default function EventSwimLane({
                 {title}
               </span>
             )}
-            {key === "image" && thumbnailUrl && (
+            {key === "image" && prefixedThumbnailUrl && (
               <div className="relative h-full w-4/5">
                 <Image
-                  src={thumbnailUrl}
+                  src={prefixedThumbnailUrl}
                   alt={title}
                   fill
                   className="rounded object-cover"
