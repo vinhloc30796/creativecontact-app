@@ -1,6 +1,6 @@
-import React from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import React, { useState } from "react";
 
 interface EventSwimLaneProps {
   eventId: string | number;
@@ -23,6 +23,8 @@ export default function EventSwimLane({
   slug,
   rowIndex,
 }: EventSwimLaneProps) {
+  const [ratio, setRatio] = useState(16 / 9)
+
   // Prefix with app URL if Production because https://github.com/payloadcms/payload/issues/6886
   const prefixedThumbnailUrl = process.env.NODE_ENV === "production" ? `${process.env.NEXT_PUBLIC_APP_URL}${thumbnailUrl || ""}` : thumbnailUrl;
   // Format date
@@ -76,6 +78,9 @@ export default function EventSwimLane({
                   alt={title}
                   fill
                   className="rounded object-cover"
+                  onLoadingComplete={({ naturalWidth, naturalHeight }) =>
+                    setRatio(naturalWidth / naturalHeight)
+                  }
                 />
               </div>
             )}
