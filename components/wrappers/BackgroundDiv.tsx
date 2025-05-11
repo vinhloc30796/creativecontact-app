@@ -8,23 +8,29 @@ interface BackgroundDivProps {
   shouldCenter?: boolean;
 }
 
-export function BackgroundDiv({ children, className, eventSlug = 'hoantat-2024', shouldCenter = true }: BackgroundDivProps) {
-  const backgroundImage = `/${eventSlug}-background-blur.png`;
-  const fallbackImage = '/bg.jpg';
+export function BackgroundDiv({ children, className, eventSlug, shouldCenter = true }: BackgroundDivProps) {
   const centerClass = shouldCenter ? 'flex items-center justify-center' : '';
+
+  // Style based on whether eventSlug is provided
+  const backgroundStyle = eventSlug
+    ? {
+      backgroundImage: `url(/${eventSlug}-background-blur.png), url(/bg.jpg)`,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    }
+    : {
+      backgroundColor: '#FCFAF5'
+    };
+
   return (
     <div
       className={cn(
         "min-h-screen w-full",
         "min-h-[100vh]",
-        "bg-cover bg-center bg-no-repeat",
+        eventSlug ? "bg-cover bg-center bg-no-repeat" : "",
         centerClass,
         className
       )}
-      style={{
-        backgroundImage: `url(${backgroundImage}), url(${fallbackImage})`,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
-      }}
+      style={backgroundStyle}
     >
       {children}
     </div>

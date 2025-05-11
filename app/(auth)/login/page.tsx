@@ -25,7 +25,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <BackgroundDiv eventSlug="early-access-2024">
+    <BackgroundDiv>
       <Suspense fallback={<Loading />}>
         <LoginContent />
       </Suspense>

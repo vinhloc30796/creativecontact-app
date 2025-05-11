@@ -121,7 +121,7 @@ function LoadingSkeleton() {
 
 export default function BlogPage() {
   return (
-    <BackgroundDiv eventSlug="hoantat-2024" shouldCenter={false}>
+    <BackgroundDiv shouldCenter={false}>
       <div className="container py-12">
         <div className="mb-12 text-center">
           <H1>Blog</H1>

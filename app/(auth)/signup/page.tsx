@@ -147,7 +147,7 @@ export default function SignupPage(
   }
 
   return (
-    <BackgroundDiv eventSlug="early-access-2024">
+    <BackgroundDiv>
       <Card className="w-[400px] mx-auto mt-10">
         <CardHeader
           className="border-b aspect-video bg-accent-foreground text-accent-foreground"
