@@ -4,6 +4,22 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 First, run the development server:
 
+### Supabase Setup
+
+Before starting the project locally, follow these steps to ensure Supabase is configured correctly:
+
+1. Make sure you don't have any existing Supabase projects running. Clean up Docker containers:
+   ```bash
+   docker ps -a | grep supabase | awk '{print $1}' | xargs docker rm -f
+   ```
+
+2. Move `supabase/20240610094940_create_schemas.sql` to `supabase/migrations/20240610094940_create_schemas.sql` 
+
+3. Start Supabase:
+   ```bash
+   supabase start
+   ```
+
 ```bash
 npm run dev
 # or

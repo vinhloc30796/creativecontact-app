@@ -17,13 +17,35 @@ import { Facebook, Instagram, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { fetchEvents } from "@/lib/payload/fetchEvents";
 import { ClientNavMenu } from "../components/ClientNavMenu";
+import { formatEventDate } from "@/lib/dateUtils";
 
 // show the in-construction page
 const inConstructPage = false;
 
-async function getCurrentEvent(): Promise<string> {
-  // @TODO: get the current event from the database
-  return "[IN CONSTRUCTION]";
+async function getCurrentEvent(): Promise<{ title: string; date: string } | null> {
+  try {
+    const events = await fetchEvents({
+      sort: "eventDate",
+      where: {
+        status: { equals: "upcoming" },
+        eventDate: { greater_than: new Date().toISOString() }
+      },
+      limit: 1
+    });
+
+    if (events.length === 0) {
+      return null;
+    }
+
+    const nextEvent = events[0];
+    return {
+      title: nextEvent.title,
+      date: formatEventDate(nextEvent.eventDate)
+    };
+  } catch (error) {
+    console.error("Error fetching current event:", error);
+    return null;
+  }
 }
 
 async function getEventSlots(event: string): Promise<EventSlot[]> {
@@ -241,8 +263,12 @@ export default async function Page(props: Props) {
 
         {/* Event ticker */}
         <EventTicker
-          eventName={currentEvent}
-          tickerText={t("ticker")}
+          eventName={currentEvent ? currentEvent.title : "Creative Contact"}
+          tickerText={
+            currentEvent
+              ? `${t("ticker")} ${currentEvent.date}!`
+              : t("Stay tuned for more exciting events!")
+          }
           repetitions={6}
           pauseOnHover={true}
           direction="left"
