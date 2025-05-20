@@ -91,7 +91,7 @@ function RegistrationContent() {
             You can also self-check-in here on the day of the event: &nbsp;
             <Link className='underline'
               href={`${hostUrl}/checkin?utm_source=webapp&utm_medium=button&utm_campaign=registration-confirmed&utm_content=${registrationInfo.userId || user?.id || 'unknown'}`}>
-                /checkin
+              /checkin
             </Link>
           </p>
         </div>
