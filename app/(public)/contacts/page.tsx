@@ -10,6 +10,7 @@ import { getServerTranslation } from "@/lib/i18n/init-server";
 import { ArrowUpRight } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
+import { getServerContacts, UserContactView } from "@/app/api/users/helper";
 
 export const metadata: Metadata = {
   title: "Contact Book | Creative Contact",
@@ -17,32 +18,12 @@ export const metadata: Metadata = {
     "Connect with Creative Contact's network of artists and creators.",
 };
 
-// Dummy contact data for demonstration
-const dummyContacts = Array(6)
-  .fill(0)
-  .map((_, i) => ({
-    contactId: `contact-${i + 1}`,
-    name: `Creative ${i + 1}`,
-    role:
-      [
-        "Artist",
-        "Designer",
-        "Photographer",
-        "Writer",
-        "Musician",
-        "Filmmaker",
-      ][i % 6],
-    location: "Ho Chi Minh City",
-    slug: `creative-${i + 1}`,
-    profilePictureUrl: undefined, // Using placeholder for now
-    tags: ["Design", "Digital", "Art", "Music", "Film", "Writing"].slice(
-      0,
-      (i % 3) + 1,
-    ),
-  }));
+// Contact interface and dummyContacts are no longer needed here or from helper
+// getContacts function from helper is no longer needed here
 
 export default async function ContactsPage() {
   const { t } = await getServerTranslation("en", "HomePage");
+  const contacts: UserContactView[] = await getServerContacts();
 
   return (
     <BackgroundDiv shouldCenter={false} className="flex min-h-screen flex-col">
@@ -129,19 +110,15 @@ export default async function ContactsPage() {
 
             {/* Replaced Grid with a simple div for swimlanes */}
             <div className="mt-6 flex flex-col">
-              {dummyContacts.map((contact, i) => (
-                <ContactSwimLane
-                  key={contact.contactId}
-                  contactId={contact.contactId}
-                  name={contact.name}
-                  role={contact.role}
-                  location={contact.location}
-                  slug={contact.slug}
-                  profilePictureUrl={contact.profilePictureUrl}
-                  tags={contact.tags}
-                  rowIndex={i}
-                />
-              ))}
+              {contacts.map((contact, i) => {
+                return (
+                  <ContactSwimLane
+                    key={contact.contactId}
+                    {...contact}
+                    rowIndex={i}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
