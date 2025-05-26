@@ -263,11 +263,11 @@ export default async function Page(props: Props) {
 
         {/* Event ticker */}
         <EventTicker
-          eventName={currentEvent ? currentEvent.title : "Creative Contact"}
+          eventName={currentEvent ? currentEvent.title : ""}
           tickerText={
             currentEvent
               ? `${t("ticker")} ${currentEvent.date}!`
-              : t("Stay tuned for more exciting events!")
+              : t("tickerNoUpcomingEvents")
           }
           repetitions={6}
           pauseOnHover={true}

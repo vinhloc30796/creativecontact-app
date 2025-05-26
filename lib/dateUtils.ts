@@ -4,12 +4,12 @@ import { toZonedTime } from "date-fns-tz";
 
 /**
  * Formats a date string into a user-friendly format for event display
- * Example: "January 15, 2024"
+ * Example: "15.01.2024"
  */
 export function formatEventDate(dateString: string): string {
   const date = new Date(dateString);
   const zonedDate = toZonedTime(date, TIMEZONE);
-  return format(zonedDate, "MMMM d, yyyy");
+  return format(zonedDate, "dd.MM.yyyy");
 }
 
 /**
