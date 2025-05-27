@@ -10,8 +10,9 @@
   "contactBook": "CONTACT BOOK",
   "event": "EVENTS",
   "menu": "MENU",
-  "ticker": "IS HAPPENING RIGHT NOW",
+  "ticker": "IS COMING SOON ON",
   "followUs": "Follow us",
   "languageTooltip": "Change language",
-  "menuTooltip": "Open menu"
+  "menuTooltip": "Open menu",
+  "tickerNoUpcomingEvents": "Join our creative community and be the first to know about our next gathering!"
 }
