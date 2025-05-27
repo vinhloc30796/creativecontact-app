@@ -1,5 +1,4 @@
 import { ClientNavMenu } from "@/components/ClientNavMenu";
-import ContactSwimLane from "@/components/contacts/ContactSwimLane";
 import { ConstructionIcon } from "@/components/icons/ConstructionIcon";
 import { TextIconBox } from "@/components/text-icon-box";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { getServerTranslation } from "@/lib/i18n/init-server";
 import { ArrowUpRight } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { getServerContacts, UserContactView } from "@/app/api/users/helper";
+import ContactsInfinite from "./client";
 
 export const metadata: Metadata = {
   title: "Contact Book | Creative Contact",
@@ -23,7 +22,6 @@ export const metadata: Metadata = {
 
 export default async function ContactsPage() {
   const { t } = await getServerTranslation("en", "HomePage");
-  const contacts: UserContactView[] = await getServerContacts();
 
   return (
     <BackgroundDiv shouldCenter={false} className="flex min-h-screen flex-col">
@@ -110,15 +108,7 @@ export default async function ContactsPage() {
 
             {/* Replaced Grid with a simple div for swimlanes */}
             <div className="mt-6 flex flex-col">
-              {contacts.map((contact, i) => {
-                return (
-                  <ContactSwimLane
-                    key={contact.contactId}
-                    {...contact}
-                    rowIndex={i}
-                  />
-                );
-              })}
+              <ContactsInfinite />
             </div>
           </div>
         </div>

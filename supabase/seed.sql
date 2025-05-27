@@ -226,6 +226,35 @@ INSERT INTO user_infos (
     'vl307'
 );
 
+-- Additional seed data for 10 test users
+INSERT INTO auth.users (
+    instance_id, id, aud, role, email, last_sign_in_at, created_at, updated_at, is_anonymous
+) VALUES
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174001','authenticated','authenticated','user1@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174002','authenticated','authenticated','user2@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174003','authenticated','authenticated','user3@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174004','authenticated','authenticated','user4@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174005','authenticated','authenticated','user5@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174006','authenticated','authenticated','user6@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174007','authenticated','authenticated','user7@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174008','authenticated','authenticated','user8@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174009','authenticated','authenticated','user9@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false),
+('00000000-0000-0000-0000-000000000000','123e4567-e89b-12d3-a456-426614174010','authenticated','authenticated','user10@example.com',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,false);
+
+INSERT INTO user_infos (
+    id, user_name, first_name, last_name, display_name, phone_country_code, phone_number, phone_country_alpha3, location, occupation, about, profile_picture, instagram_handle, facebook_handle
+) VALUES
+('123e4567-e89b-12d3-a456-426614174001','user1','Alice','Anderson','Alice Anderson','1','1000000001','USA','New York','Photographer','Enthusiastic photographer specializing in portrait and landscape photography.',NULL,'alice_insta','alice_fb'),
+('123e4567-e89b-12d3-a456-426614174002','user2','Bob','Brown','Bob Brown','1','1000000002','USA','San Francisco','Software Developer','Full-stack software developer with a passion for web technologies.',NULL,'bob_insta','bob_fb'),
+('123e4567-e89b-12d3-a456-426614174003','user3','Carol','Clark','Carol Clark','1','1000000003','USA','Austin','Artisan','Artisan skilled in handmade crafts and decorative art.',NULL,'carol_insta','carol_fb'),
+('123e4567-e89b-12d3-a456-426614174004','user4','David','Davis','David Davis','1','1000000004','USA','Chicago','Designer','UI/UX designer with a focus on user-centered design.',NULL,'david_insta','david_fb'),
+('123e4567-e89b-12d3-a456-426614174005','user5','Eva','Evans','Eva Evans','1','1000000005','USA','Los Angeles','Model','Professional model and fashion consultant.',NULL,'eva_insta','eva_fb'),
+('123e4567-e89b-12d3-a456-426614174006','user6','Frank','Foster','Frank Foster','1','1000000006','USA','Miami','Marketer','Marketing expert with experience in digital advertising campaigns.',NULL,'frank_insta','frank_fb'),
+('123e4567-e89b-12d3-a456-426614174007','user7','Grace','Green','Grace Green','1','1000000007','USA','Nashville','Musician','Award-winning musician and composer.',NULL,'grace_insta','grace_fb'),
+('123e4567-e89b-12d3-a456-426614174008','user8','Helen','Harris','Helen Harris','1','1000000008','USA','Seattle','Dancer','Professional dancer in contemporary and classical styles.',NULL,'helen_insta','helen_fb'),
+('123e4567-e89b-12d3-a456-426614174009','user9','Ian','Irving','Ian Irving','1','1000000009','USA','Boston','Publisher','Experienced publisher and editor in the book industry.',NULL,'ian_insta','ian_fb'),
+('123e4567-e89b-12d3-a456-426614174010','user10','Jack','Johnson','Jack Johnson','1','1000000010','USA','Denver','Architect','Licensed architect designing sustainable structures.',NULL,'jack_insta','jack_fb');
+
 -- Seed data for user_industry_experience table
 INSERT INTO user_industry_experience (user_id, industry, experience_level) VALUES
 ('7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', 'Software and Interactive', 'Senior'),
@@ -234,6 +263,20 @@ INSERT INTO user_industry_experience (user_id, industry, experience_level) VALUE
 ('13f60da9-8dd4-42f9-8a57-c0569a158857', 'Film, Video, and Photography', 'Junior'),
 ('314f834c-3ff2-4382-bc92-d37cbe2286a8', 'Software and Interactive', 'Senior'),
 ('314f834c-3ff2-4382-bc92-d37cbe2286a8', 'Advertising', 'Mid-level');
+
+-- Additional seed data for 10 test users
+INSERT INTO user_industry_experience (user_id, industry, experience_level) VALUES
+('123e4567-e89b-12d3-a456-426614174001','Film, Video, and Photography','Senior'),
+('123e4567-e89b-12d3-a456-426614174002','Software and Interactive','Entry'),
+('123e4567-e89b-12d3-a456-426614174003','Arts and Crafts','Mid-level'),
+('123e4567-e89b-12d3-a456-426614174004','Design','Junior'),
+('123e4567-e89b-12d3-a456-426614174005','Fashion','Manager'),
+('123e4567-e89b-12d3-a456-426614174006','Advertising','Entry'),
+('123e4567-e89b-12d3-a456-426614174007','Music','C-level'),
+('123e4567-e89b-12d3-a456-426614174008','Performing Arts','Senior'),
+('123e4567-e89b-12d3-a456-426614174009','Publishing','Junior'),
+('123e4567-e89b-12d3-a456-426614174010','Architecture','Mid-level');
+
 
 -- Seed data for events table
 INSERT INTO events (id, created_at, name, slug, created_by)

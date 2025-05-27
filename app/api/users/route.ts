@@ -8,7 +8,6 @@ export async function GET() {
   try {
     // Authentication/Authorization for the API endpoint can remain here
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
     // Example: if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const processedUsers: UserContactView[] = await getServerContacts();
