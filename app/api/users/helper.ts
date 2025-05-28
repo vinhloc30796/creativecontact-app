@@ -4,6 +4,7 @@
 
 import { db } from "@/lib/db";
 import { userInfos, userIndustryExperience, type UserInfo, type UserIndustryExperience as RawUserIndustryExperience } from "@/drizzle/schema/user";
+import { eq } from "drizzle-orm";
 // createClient from supabase/server might not be needed here if helper is purely for DB logic
 // If getServerContacts needs auth context *passed to it*, then it's fine.
 
@@ -27,50 +28,49 @@ export type UserContactView = {
 
 // Function for server-side data fetching logic
 export async function getServerContacts(): Promise<UserContactView[]> {
-  // 1. Fetch all user infos, using original field names from the schema
-  const usersFromDb = await db.select({
+  const rows = await db.select({
     id: userInfos.id,
-    dbDisplayName: userInfos.displayName, // Use a distinct name if 'name' is a computed field
+    dbDisplayName: userInfos.displayName,
     firstName: userInfos.firstName,
     lastName: userInfos.lastName,
     occupation: userInfos.occupation,
     location: userInfos.location,
     userName: userInfos.userName,
     profilePicture: userInfos.profilePicture,
-  }).from(userInfos);
+    industry: userIndustryExperience.industry,
+    experienceLevel: userIndustryExperience.experienceLevel,
+  })
+    .from(userInfos)
+    .leftJoin(userIndustryExperience, eq(userInfos.id, userIndustryExperience.userId));
 
-  // 2. Fetch all industry experiences
-  const allIndustryExperiences = await db
-    .select({
-      userId: userIndustryExperience.userId,
-      industry: userIndustryExperience.industry,
-      experienceLevel: userIndustryExperience.experienceLevel,
-    })
-    .from(userIndustryExperience);
+  const usersMap = new Map<string, UserContactView>();
 
-  // 3. Map to UserContactView
-  const usersWithExperiences = usersFromDb.map(uDb => {
-    const experiences: ProcessedIndustryExperience[] = allIndustryExperiences
-      .filter(exp => exp.userId === uDb.id)
-      .map(exp => ({ industry: exp.industry, experienceLevel: exp.experienceLevel }));
-
-    const constructedName = uDb.dbDisplayName || `${uDb.firstName || ''} ${uDb.lastName || ''}`.trim();
-
-    const contactView: UserContactView = {
-      contactId: uDb.id, // From userInfos.id
-      name: constructedName,
-      firstName: uDb.firstName,
-      lastName: uDb.lastName,
-      role: uDb.occupation,
-      location: uDb.location,
-      slug: uDb.userName,
-      profilePictureUrl: uDb.profilePicture === null ? undefined : uDb.profilePicture,
-      tags: [],
-      collaborationStatus: ["Open to Collaborations"],
-      industryExperiences: experiences,
-    };
-    return contactView;
+  rows.forEach(row => {
+    let user = usersMap.get(row.id);
+    if (!user) {
+      const constructedName = row.dbDisplayName || `${row.firstName || ''} ${row.lastName || ''}`.trim();
+      user = {
+        contactId: row.id,
+        name: constructedName,
+        firstName: row.firstName,
+        lastName: row.lastName,
+        role: row.occupation,
+        location: row.location,
+        slug: row.userName,
+        profilePictureUrl: row.profilePicture === null ? undefined : row.profilePicture,
+        tags: [],
+        collaborationStatus: ["Open to Collaborations"],
+        industryExperiences: [],
+      };
+      usersMap.set(row.id, user);
+    }
+    if (row.industry && row.experienceLevel) {
+      user.industryExperiences.push({
+        industry: row.industry,
+        experienceLevel: row.experienceLevel,
+      });
+    }
   });
 
-  return usersWithExperiences;
+  return Array.from(usersMap.values());
 }
