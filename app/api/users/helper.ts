@@ -4,7 +4,7 @@
 
 import { db } from "@/lib/db";
 import { userInfos, userIndustryExperience, type UserInfo, type UserIndustryExperience as RawUserIndustryExperience } from "@/drizzle/schema/user";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 // createClient from supabase/server might not be needed here if helper is purely for DB logic
 // If getServerContacts needs auth context *passed to it*, then it's fine.
 
@@ -27,28 +27,61 @@ export type UserContactView = {
 };
 
 // Function for server-side data fetching logic
-export async function getServerContacts(): Promise<UserContactView[]> {
-  const rows = await db.select({
-    id: userInfos.id,
-    dbDisplayName: userInfos.displayName,
-    firstName: userInfos.firstName,
-    lastName: userInfos.lastName,
-    occupation: userInfos.occupation,
-    location: userInfos.location,
-    userName: userInfos.userName,
-    profilePicture: userInfos.profilePicture,
-    industry: userIndustryExperience.industry,
-    experienceLevel: userIndustryExperience.experienceLevel,
-  })
+export async function getServerContacts(
+  limit: number = 5,
+  lastCursor?: string,
+  seed: string = ""
+): Promise<{ contacts: UserContactView[]; nextCursor?: string }> {
+  const pageSize = limit;
+  const fetchSize = pageSize + 1;
+  const hashExpr = sql`md5(${seed}::text || ${userInfos.id}::text)`;
+
+  // Build paged sub-query of IDs with optional hash filter
+  const baseQuery = db
+    .select({ id: userInfos.id })
+    .from(userInfos);
+  const filtered = lastCursor
+    ? baseQuery.where(sql`${hashExpr} > ${lastCursor}`)
+    : baseQuery;
+  // Alias the builder for joining (cast to any to satisfy TS)
+  const sq = (filtered
+    .orderBy(hashExpr)
+    .limit(fetchSize)
+    .as("sq") as any);
+
+  // Fetch user details and industry experiences for paged IDs
+  const rows = await db
+    .select({
+      id: userInfos.id,
+      dbDisplayName: userInfos.displayName,
+      firstName: userInfos.firstName,
+      lastName: userInfos.lastName,
+      occupation: userInfos.occupation,
+      location: userInfos.location,
+      userName: userInfos.userName,
+      profilePicture: userInfos.profilePicture,
+      industry: userIndustryExperience.industry,
+      experienceLevel: userIndustryExperience.experienceLevel,
+      hash: hashExpr,
+    })
     .from(userInfos)
-    .leftJoin(userIndustryExperience, eq(userInfos.id, userIndustryExperience.userId));
+    .innerJoin(sq, eq(userInfos.id, sq.id))
+    .leftJoin(
+      userIndustryExperience,
+      eq(userInfos.id, userIndustryExperience.userId)
+    )
+    .orderBy(hashExpr);
 
+  // Assemble view models and track hashes for cursor
   const usersMap = new Map<string, UserContactView>();
-
-  rows.forEach(row => {
+  const hashMap = new Map<string, string>();
+  rows.forEach((row) => {
+    // record hash for this user
+    hashMap.set(row.id, (row as any).hash);
     let user = usersMap.get(row.id);
     if (!user) {
-      const constructedName = row.dbDisplayName || `${row.firstName || ''} ${row.lastName || ''}`.trim();
+      const constructedName =
+        row.dbDisplayName || `${row.firstName || ""} ${row.lastName || ""}`.trim();
       user = {
         contactId: row.id,
         name: constructedName,
@@ -57,7 +90,8 @@ export async function getServerContacts(): Promise<UserContactView[]> {
         role: row.occupation,
         location: row.location,
         slug: row.userName,
-        profilePictureUrl: row.profilePicture === null ? undefined : row.profilePicture,
+        profilePictureUrl:
+          row.profilePicture === null ? undefined : row.profilePicture,
         tags: [],
         collaborationStatus: ["Open to Collaborations"],
         industryExperiences: [],
@@ -72,5 +106,14 @@ export async function getServerContacts(): Promise<UserContactView[]> {
     }
   });
 
-  return Array.from(usersMap.values());
+  const contactsArray = Array.from(usersMap.values());
+  let nextCursor: string | undefined;
+  if (contactsArray.length === fetchSize) {
+    // Remove the extra record used only to detect more pages
+    contactsArray.pop();
+    // Use the last displayed item's hash as the cursor for the next page
+    const lastDisplayed = contactsArray[contactsArray.length - 1];
+    nextCursor = hashMap.get(lastDisplayed.contactId);
+  }
+  return { contacts: contactsArray, nextCursor };
 }

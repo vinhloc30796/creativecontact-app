@@ -6,27 +6,34 @@ import type { UserContactView } from '@/app/api/users/helper';
 import ContactSwimLane from '@/components/contacts/ContactSwimLane';
 
 export default function ContactsInfinite() {
+  // Stable seed for this pageload
+  const seedRef = useRef<string>(Math.random().toString());
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isFetching,
-  } = useInfiniteQuery<{ data: UserContactView[]; nextCursor?: number }, Error>({
-    queryKey: ['contacts'],
-    queryFn: async ({ pageParam = 0 }): Promise<{ data: UserContactView[]; nextCursor?: number }> => {
-      const res = await fetch('/api/users');
+  } = useInfiniteQuery<{ data: UserContactView[]; nextCursor?: string }, Error>({
+    queryKey: ['contacts', seedRef.current],
+    queryFn: async ({ pageParam }): Promise<{ data: UserContactView[]; nextCursor?: string }> => {
+      const limit = 5;
+      const cursor = pageParam as string | undefined;
+      const params = new URLSearchParams();
+      params.set('limit', limit.toString());
+      params.set('seed', seedRef.current);
+      if (cursor) params.set('cursor', cursor);
+      const res = await fetch(`/api/users?${params.toString()}`);
       if (!res.ok) {
         throw new Error('Error fetching contacts');
       }
-      const allContacts: UserContactView[] = await res.json();
-      const limit = 5;
-      const start = pageParam as number;
-      const page = allContacts.slice(start, start + limit);
-      const nextCursor = start + limit < allContacts.length ? start + limit : undefined;
-      return { data: page, nextCursor };
+      const result = await res.json();
+      return {
+        data: result.data as UserContactView[],
+        nextCursor: result.nextCursor as string | undefined,
+      };
     },
-    initialPageParam: 0,
+    initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 
