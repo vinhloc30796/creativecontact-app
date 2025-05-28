@@ -36,6 +36,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/payload-api/media/**',
       },
+      // Added for picsum.photos
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   // Configure webpack to handle SVG files and add debugging
