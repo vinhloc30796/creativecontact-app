@@ -3,7 +3,6 @@ import { Media } from "@/app/collections/Media";
 import { Posts } from "@/app/collections/Posts";
 import { Staffs } from "@/app/collections/Staffs";
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { buildConfig, SanitizedConfig } from "payload";
@@ -17,8 +16,6 @@ console.log(
   "databaseUrl:",
   databaseUrl,
 );
-
-const dbAdapter = process.env.NODE_ENV === "production" ? vercelPostgresAdapter : postgresAdapter;
 
 const payloadConfig: Promise<SanitizedConfig> = buildConfig({
   // If you'd like to use Rich Text, pass your editor here
@@ -42,12 +39,12 @@ const payloadConfig: Promise<SanitizedConfig> = buildConfig({
     pool: {
       connectionString: databaseUrl,
       connectionTimeoutMillis: 10000, // 10 seconds to connect
-      idleTimeoutMillis: 15000,       // 15 seconds for an idle connection to be closed
+      idleTimeoutMillis: 15000, // 15 seconds for an idle connection to be closed
       // You might also consider a 'max' value, e.g., max: 5, if you want to limit connections per function instance
       // but this needs careful consideration with serverless scaling & pgBouncer.
     },
-    schemaName: 'payload',
-    migrationDir: 'supabase/payload-migrations',
+    schemaName: "payload",
+    migrationDir: "supabase/payload-migrations",
   }),
   // If you want to resize images, crop, set focal point, etc.
   // make sure to install it and pass it to the config.
