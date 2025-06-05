@@ -154,11 +154,23 @@ export const Events: CollectionConfig = {
         // Automatically set status based on date
         const currentDate = new Date();
         const eventDate = new Date(data.eventDate);
+        const endDate = data.endDate ? new Date(data.endDate) : null;
 
         if (data.status !== "draft") {
           if (eventDate > currentDate) {
+            // Event hasn't started yet
             data.status = "upcoming";
+          } else if (endDate && currentDate <= endDate) {
+            // Event has started and hasn't ended (active)
+            data.status = "active";
+          } else if (
+            !endDate &&
+            eventDate.toDateString() === currentDate.toDateString()
+          ) {
+            // Single-day event happening today
+            data.status = "active";
           } else {
+            // Event has ended
             data.status = "past";
           }
         }

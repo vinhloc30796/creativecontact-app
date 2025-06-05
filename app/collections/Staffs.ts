@@ -5,8 +5,12 @@ import { checkRole } from "./access/checkRole";
 const SHOULD_VERIFY = process.env.NODE_ENV === "production";
 export const cookiePolicy = {
   secure: SHOULD_VERIFY,
-  sameSite: "Lax",
-  domain: process.env.COOKIE_DOMAIN,
+  sameSite: "Lax" as "Lax",
+  domain:
+    process.env.NODE_ENV === "production"
+      ? process.env.COOKIE_DOMAIN
+      : undefined,
+  httpOnly: true,
 };
 export const authPolicy = {
   tokenExpiration: 7 * 24 * 60 * 60, // 1 week
@@ -29,12 +33,14 @@ export const Staffs: CollectionConfig = {
   // Access control
   access: {
     // Only admins can perform CRUD operations on other staff members
-    read: ({ req: { user } }) => checkRole(["admin", "check-in", "content-creator"], user || undefined),
+    read: ({ req: { user } }) =>
+      checkRole(["admin", "check-in", "content-creator"], user || undefined),
     create: admins,
     update: admins,
     delete: admins,
     // All authenticated staff can access the admin panel
-    admin: ({ req: { user } }) => checkRole(["admin", "check-in", "content-creator"], user || undefined),
+    admin: ({ req: { user } }) =>
+      checkRole(["admin", "check-in", "content-creator"], user || undefined),
   },
   // Collection fields defining staff member data structure
   fields: [
@@ -113,14 +119,20 @@ export const Staffs: CollectionConfig = {
         if (!user.active) {
           throw new Error("Account is deactivated");
         }
-        if (user.status === 'pending') {
-          throw new Error("Account is pending approval. Please wait for an admin to approve your account.");
+        if (user.status === "pending") {
+          throw new Error(
+            "Account is pending approval. Please wait for an admin to approve your account.",
+          );
         }
-        if (user.status === 'rejected') {
-          throw new Error("Your account registration was rejected. Please contact an administrator for more information.");
+        if (user.status === "rejected") {
+          throw new Error(
+            "Your account registration was rejected. Please contact an administrator for more information.",
+          );
         }
-        if (user.status === 'inactive') {
-          throw new Error("Your account is currently inactive. Please contact an administrator.");
+        if (user.status === "inactive") {
+          throw new Error(
+            "Your account is currently inactive. Please contact an administrator.",
+          );
         }
       },
     ],
@@ -143,18 +155,21 @@ export const Staffs: CollectionConfig = {
     afterChange: [
       async ({ doc, operation, req }) => {
         // Only trigger on create operations for pending users
-        if (operation === 'create' && doc.status === 'pending') {
+        if (operation === "create" && doc.status === "pending") {
           try {
             // Construct the full URL for the internal API endpoint
-            const notifyUrl = new URL('/api/discord/notify-signup', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
+            const notifyUrl = new URL(
+              "/api/discord/notify-signup",
+              process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+            );
 
             const response = await fetch(notifyUrl.toString(), {
-              method: 'POST',
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
                 // Potentially add a secret header for security if this endpoint is exposed
                 // 'X-Internal-Secret': process.env.DISCORD_INTERNAL_API_SECRET,
-                'Authorization': `Bearer ${process.env.DISCORD_INTERNAL_API_SECRET}`,
+                Authorization: `Bearer ${process.env.DISCORD_INTERNAL_API_SECRET}`,
               },
               body: JSON.stringify({
                 userId: doc.id,
@@ -165,14 +180,21 @@ export const Staffs: CollectionConfig = {
 
             if (!response.ok) {
               const errorBody = await response.text();
-              console.error(`Failed to notify Discord for user ${doc.id}. Status: ${response.status}, Body: ${errorBody}`);
+              console.error(
+                `Failed to notify Discord for user ${doc.id}. Status: ${response.status}, Body: ${errorBody}`,
+              );
               // Depending on requirements, you might want to throw an error here
               // or handle it in a way that doesn't block the user creation process.
             } else {
-              console.log(`Successfully sent Discord notification for new staff: ${doc.email} (ID: ${doc.id})`);
+              console.log(
+                `Successfully sent Discord notification for new staff: ${doc.email} (ID: ${doc.id})`,
+              );
             }
           } catch (error) {
-            console.error(`Error sending Discord notification for user ${doc.id}:`, error);
+            console.error(
+              `Error sending Discord notification for user ${doc.id}:`,
+              error,
+            );
             // Handle error appropriately
           }
         }
