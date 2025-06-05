@@ -89,7 +89,7 @@ interface UseTranslationOptions {
 export function useTranslation(lng: string, ns: string | string[], options: UseTranslationOptions = {}) {
   const ret = useTranslationOrg(ns, options);
   const { i18n } = ret;
-  
+
   // Use a ref to prevent unnecessary effect triggers
   const initialRender = useRef(true);
 
