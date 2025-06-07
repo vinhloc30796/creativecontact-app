@@ -32,10 +32,13 @@ export function ProfileEditForm({
         ...formData.contact,
         ...formData.professional,
       });
+
+      await UserService.addNewSkills(formData.professional.userNewSkills);
       await UserService.updateUserSkills(
         userData.id,
         formData.professional.userSkills,
       );
+
       router.push("/profile");
     } catch (error) {
       console.error("Error saving profile:", error);

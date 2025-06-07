@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
+import { set } from "date-fns";
 
 interface IndustryComboboxProps {
   value: Industry | null;
@@ -226,6 +227,8 @@ export function ProfessionalSection({
     null,
   );
   const [newSkill, setNewSkill] = useState<Skill | null>(null);
+  const [userInputSkill, setUserInputSkill] = useState<string>("");
+  const [userNewSkills, setUserNewSkills] = useState<Skill[] | null>(null);
   const { setFieldDirty, setFormData } = useFormState();
 
   const [selectedSkills, setSelectedSkills] = useState<
@@ -253,7 +256,10 @@ export function ProfessionalSection({
           throw new Error("Failed to fetch skills");
         }
         const data = await response.json();
-        setSkills(data);
+        const sortedSkills = data.sort((a: Skill, b: Skill) =>
+          a.numberOfPeople > b.numberOfPeople ? -1 : 1,
+        );
+        setSkills(sortedSkills);
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -277,10 +283,11 @@ export function ProfessionalSection({
       "professional",
       selectedSkillsIds.join(",") !== userSkillsIds.join(","),
     );
-
+    const userNewSkillsIds = (userNewSkills || []).map((s) => s.skillId);
     setFormData("professional", {
       industryExperiences: selectedIndustryExperiences,
       userSkills: { skills: selectedSkillsIds },
+      userNewSkills: userNewSkills,
     });
   }, [
     selectedIndustryExperiences,
@@ -326,6 +333,14 @@ export function ProfessionalSection({
 
   const addSkill = () => {
     if (newSkill) {
+      // Check if the skill already exists
+      const existingSkill = selectedSkills.find(
+        (s) => s.skillId === newSkill.id,
+      );
+      if (existingSkill) {
+        console.log("Skill already exists:", newSkill);
+        return;
+      }
       console.log("Adding new skill:", newSkill);
       setSelectedSkills((current) => {
         const updatedSkills = [
@@ -340,6 +355,36 @@ export function ProfessionalSection({
         return updatedSkills;
       });
       setNewSkill(null);
+    }
+  };
+
+  const addUserInputSkill = () => {
+    if (userInputSkill) {
+      // Check if the skill already exists in the selectedSkills array
+      if (selectedSkills.some((skill) => skill.skillName === userInputSkill)) {
+        console.error("Skill already selected:", userInputSkill);
+        return;
+      }
+
+      const newSkillId = crypto.randomUUID();
+      const newSkill = {
+        id: newSkillId,
+        skillId: newSkillId,
+        skillName: userInputSkill,
+        numberOfPeople: 0,
+      };
+      console.log("Adding user input skill:", newSkill);
+      setUserNewSkills((current) => {
+        const updatedSkills = [...(current || []), newSkill];
+        console.log("New skills with user input:", updatedSkills);
+        return updatedSkills;
+      });
+      setSelectedSkills((current) => {
+        const updatedSkills = [...current, newSkill];
+        console.log("Updated skills with user input:", updatedSkills);
+        return updatedSkills;
+      });
+      setUserInputSkill(""); // Clear the input field
     }
   };
 
@@ -442,6 +487,18 @@ export function ProfessionalSection({
               />
               <Button onClick={addSkill} disabled={!newSkill}>
                 Add Skill
+              </Button>
+            </div>
+            <div className="mt-2 flex gap-2">
+              <input
+                type="text"
+                value={userInputSkill}
+                onChange={(e) => setUserInputSkill(e.target.value)}
+                placeholder="Enter new skill"
+                className="flex-1 rounded border p-2"
+              />
+              <Button onClick={addUserInputSkill} disabled={!userInputSkill}>
+                Add User Input Skill
               </Button>
             </div>
           </div>

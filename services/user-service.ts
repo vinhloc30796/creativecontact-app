@@ -1,3 +1,4 @@
+import { addNewSkills } from "@/app/actions/skills/addNewSkills";
 import { updateUserSkills } from "@/app/actions/skills/updateUserSkills";
 import { writeUserInfo } from "@/app/actions/user/writeUserInfo";
 import { type AboutInfoData } from "@/app/form-schemas/about-info";
@@ -9,6 +10,7 @@ import {
   professionalInfoSchema,
   type ProfessionalInfoData,
 } from "@/app/form-schemas/professional-info";
+import { Skill } from "@/drizzle/schema/skills";
 import { type UserIndustryExperience } from "@/drizzle/schema/user";
 
 export class UserService {
@@ -57,5 +59,9 @@ export class UserService {
 
   static async updateUserSkills(userId: string, skills: { skills: string[] }) {
     return await updateUserSkills(userId, skills);
+  }
+
+  static async addNewSkills(newSkills: Skill[]) {
+    return await addNewSkills(newSkills);
   }
 }
