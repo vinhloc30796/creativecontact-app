@@ -461,6 +461,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+@utility no-scrollbar {
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
+
 /* Primary colors */
 .bg-primary-50 {
   background-color: hsla(var(--primary-50));

@@ -123,9 +123,9 @@ export default async function ProfilePage(props: ProfilePageProps) {
 
               <div
                 className={cn(
-                  "mt-6 w-full",
+                  "mt-6 w-full lg:w-[437px] lg:flex-shrink-0",
                   "max-h-[calc(100vh-225px)] overflow-y-scroll",
-                  "lg:mt-0 lg:w-1/3 lg:pl-6",
+                  "lg:mt-0 lg:-ml-px lg:pl-6",
                 )}
               >
                 <Suspense fallback={<ProfileCardSkeleton />}>

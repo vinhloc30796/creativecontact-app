@@ -1,7 +1,7 @@
 # Print diff, two choices: either staged, or main..HEAD; if diff, log to diff-staged.log; if main, log to diff-main.log
 # List all commands
 default:
-    just --list
+    just --choose
 
 # Generate git diff logs - either for staged changes or against main branch
 [group('git')]

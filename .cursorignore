@@ -23,3 +23,6 @@
 !vercel.json
 !/public/translations/en/*.json
 !/public/translations/vi/*.json
+!.env.example
+!.env.local
+!.env.local.example
