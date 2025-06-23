@@ -140,22 +140,11 @@ export function ProfileCard({
           <h3 className="text-base font-extrabold uppercase tracking-[0.02em] text-[#1A1A1A] mb-2">Industry</h3>
           <div className="flex flex-wrap gap-2">
             {userData.industryExperiences.map((exp) => (
-              <span key={`${exp.industry}-${exp.experienceLevel}`} className="text-base font-medium text-[#1A1A1A]">
-                {exp.industry}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Level Section */}
-      {userData.industryExperiences && userData.industryExperiences.length > 0 && (
-        <div className="px-6 py-8 border-b border-[#1A1A1A]">
-          <h3 className="text-base font-extrabold uppercase tracking-[0.02em] text-[#1A1A1A] mb-2">level</h3>
-          <div className="flex flex-wrap gap-2">
-            {userData.industryExperiences.map((exp) => (
-              <span key={`level-${exp.experienceLevel}`} className="text-base font-medium text-[#1A1A1A] tracking-[0.0625em]">
-                {exp.experienceLevel}
+              <span
+                key={`${exp.industry}-${exp.experienceLevel}`}
+                className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-base font-medium text-[#1A1A1A]"
+              >
+                {`${exp.industry} (${exp.experienceLevel})`}
               </span>
             ))}
           </div>
