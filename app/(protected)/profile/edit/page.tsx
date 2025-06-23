@@ -4,9 +4,10 @@ import { fetchUserData } from "@/app/api/user/helper";
 import { UserData } from "@/app/types/UserInfo";
 // Components
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { Header } from "@/components/Header";
 // React
 import { getServerAuth } from "@/hooks/useServerAuth";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { redirect } from "next/navigation";
 import { ProfileEditForm } from "./ProfileEditForm";
 import { BackButton } from "../BackButton";
@@ -21,6 +22,7 @@ interface ProfileEditPageProps {
 export default async function ProfileEditPage(props: ProfileEditPageProps) {
   const searchParams = await props.searchParams;
   const lang = searchParams.lang || "en";
+  const { t } = await getServerTranslation(lang, "HomePage");
   const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   if (!isLoggedIn || isAnonymous) {
@@ -44,9 +46,8 @@ export default async function ProfileEditPage(props: ProfileEditPageProps) {
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
-        <UserHeader
-          lang={lang}
-          isLoggedIn={isLoggedIn}
+        <Header
+          t={t}
           className="bg-background/80 backdrop-blur-xs"
         />
 

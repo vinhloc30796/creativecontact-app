@@ -4,7 +4,7 @@ import { ErrorMessage } from "@/components/ErrorMessage";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { LoadingUserHeader } from "@/components/wrappers/LoadingUserHeader";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { Header } from "@/components/Header";
 import { getServerTranslation } from "@/lib/i18n/init-server";
 import { UserCircle } from "lucide-react";
 import Image from "next/image";
@@ -21,7 +21,7 @@ export default async function AnonymousProfilePage({
   isLoggedIn,
   errorMessage,
 }: AnonymousProfilePageProps) {
-  const { t } = await getServerTranslation(lang, "ProfilePage");
+  const { t } = await getServerTranslation(lang, ["HomePage", "ProfilePage"]);
 
   return (
     <BackgroundDiv>
@@ -30,9 +30,8 @@ export default async function AnonymousProfilePage({
       </Suspense>
       <div className="flex min-h-screen w-full flex-col">
         <Suspense fallback={<LoadingUserHeader />}>
-          <UserHeader
-            lang={lang}
-            isLoggedIn={isLoggedIn}
+          <Header
+            t={t}
             className="bg-background/80 backdrop-blur-xs"
           />
         </Suspense>

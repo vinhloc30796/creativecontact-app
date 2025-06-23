@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { Header } from "@/components/Header";
 
 // Hook imports
 import { getServerAuth } from "@/hooks/useServerAuth";
@@ -44,6 +44,7 @@ export default async function UserPage({
   const username = (await params).username;
   const lang = (await searchParams).lang || "en";
   const { t } = await getServerTranslation(lang, [
+    "HomePage",
     "ProfilePage",
     "ContactList",
   ]);
@@ -61,9 +62,8 @@ export default async function UserPage({
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
-        <UserHeader
-          lang={lang}
-          isLoggedIn={isLoggedIn}
+        <Header
+          t={t}
           className="bg-background/80 backdrop-blur-xs"
         />
         <main className="mt-10 w-full grow justify-between lg:mt-20">
