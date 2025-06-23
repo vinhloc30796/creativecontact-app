@@ -6,9 +6,10 @@ import Link from "next/link";
 
 interface HeaderProps {
   t: (key: string) => string;
+  variant?: "full" | "compact";
 }
 
-export function Header({ t }: HeaderProps) {
+export function Header({ t, variant = "full" }: HeaderProps) {
   return (
     <header className="flex w-full items-center justify-between py-4 pl-12 pr-4">
       <div className="flex items-center gap-2">

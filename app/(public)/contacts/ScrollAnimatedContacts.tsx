@@ -3,13 +3,9 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useLayoutEffect } from 'react';
 import { ClientNavMenu } from '@/components/ClientNavMenu';
-import { ConstructionIcon } from '@/components/icons/ConstructionIcon';
-import { TextIconBox } from '@/components/text-icon-box';
-import { Button } from '@/components/ui/button';
+import { Header } from '@/components/Header';
 import { Separator } from '@/components/ui/separator';
 import { H2, Lead, P } from '@/components/ui/typography';
-import { ArrowUpRight } from 'lucide-react';
-import Link from 'next/link';
 import ContactsInfinite from './client';
 import { useTranslation } from '@/lib/i18n/init-client';
 
@@ -65,41 +61,10 @@ export function ScrollAnimatedContacts() {
 
   return (
     <div ref={containerRef} className="flex flex-1 flex-col">
-      {/* Fixed Header with logo, join button, and animated title */}
-      <header className="fixed left-0 right-0 top-0 z-50 bg-background/80 backdrop-blur-sm">
-        <div className="flex w-full items-center justify-between p-4">
-          <div className="flex items-center gap-6">
-            <Link
-              href="/"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
-            >
-              <span className="text-xl font-bold text-black">CC</span>
-            </Link>
-          </div>
-
-          <div className="flex items-center">
-            <Button
-              variant="link"
-              asChild
-              className="text-sm text-foreground hover:text-sunglow"
-            >
-              <Link href="/signup">
-                <TextIconBox
-                  title={tHome("joinUsLine1")}
-                  subtitle={tHome("joinUsLine2")}
-                  icon={
-                    <ArrowUpRight
-                      className="text-sunglow"
-                      style={{ height: "125%", width: "125%" }}
-                    />
-                  }
-                  className="text-sm"
-                />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Fixed Header with logo and join button */}
+      <div className="fixed left-0 right-0 top-0 z-50 bg-background/80 backdrop-blur-sm">
+        <Header t={tHome} />
+      </div>
 
       {/* Main animated content */}
       <div className="relative pt-20">
