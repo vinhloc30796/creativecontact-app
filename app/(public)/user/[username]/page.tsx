@@ -66,10 +66,15 @@ export default async function UserPage({
           t={t}
           className="bg-background/80 backdrop-blur-xs"
         />
-        <main className="mt-10 w-full grow justify-between lg:mt-20">
+        <main className="mt-10 w-full grow justify-between lg:mt-20 pb-16 lg:pb-0">
           <div className="w-full px-4 sm:px-8 md:px-16">
             <div className="flex flex-col lg:flex-row">
-              <div className="w-full overflow-y-auto lg:w-2/3 2xl:w-3/4 order-2 lg:order-1">
+              <div
+                className={cn(
+                  "w-full order-2 lg:order-1 lg:w-2/3 2xl:w-3/4 -mt-px lg:mt-0",
+                  "lg:h-[calc(100vh-225px)] lg:flex lg:flex-col",
+                )}
+              >
                 <ErrorBoundary
                   fallback={<ErrorPortfolioProjectCard lang={lang} />}
                 >
@@ -85,7 +90,7 @@ export default async function UserPage({
               <div
                 className={cn(
                   "w-full order-1 lg:order-2 lg:w-1/3 2xl:w-1/4 lg:-ml-px",
-                  "max-h-[calc(100vh-225px)] overflow-y-scroll no-scrollbar",
+                  "lg:max-h-[calc(100vh-225px)] lg:overflow-y-scroll no-scrollbar",
                   "-mt-px lg:mt-0",
                 )}
               >

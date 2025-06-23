@@ -161,7 +161,7 @@ function ExistingPortfolioProjectCard({
     }
 
     return (
-      <div className="h-screen">
+      <div>
         <h4 className="mb-2 font-medium">{t("portfolio.media")}</h4>
         <div className="grid grid-cols-1 gap-4">
           {artworkWithAssets?.map(
@@ -199,7 +199,7 @@ function ExistingPortfolioProjectCard({
   };
 
   return (
-    <Card className="w-full max-h-[calc(100vh-425px)] overflow-y-auto no-scrollbar border-0 rounded-none bg-transparent shadow-none">
+    <Card className="w-full border-0 rounded-none bg-transparent shadow-none">
       <FormProvider {...form}>
         <CardHeader className="items-left flex flex-col space-y-4">
           <div className="flex items-center gap-4">
@@ -345,8 +345,13 @@ export function PortfolioTabs({
           lang={lang}
         />
       ) : (
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex items-center justify-between rounded-none">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex flex-col h-full w-full"
+        >
+          {/* Sticky header containing the tab buttons and add button */}
+          <div className="sticky top-0 z-10 bg-[#FCFAF5] flex items-center justify-between rounded-none flex-none border-b border-[#1A1A1A]">
             <TabsList className="h-auto p-0 bg-[#FCFAF5] flex flex-row">
               {projects.map((project, index) => (
                 <TabsTrigger
@@ -367,23 +372,27 @@ export function PortfolioTabs({
               </Button>
             )}
           </div>
-          {projects.map((project) => (
-            <TabsContent
-              className="mt-0 p-0 rounded-none border-t border-[#1A1A1A]"
-              key={project.portfolioArtworks.id}
-              value={project.portfolioArtworks.id}
-            >
-              <Suspense fallback={<div>{t("portfolio.loadingProject")}</div>}>
-                <ExistingPortfolioProjectCard
-                  showButtons={showButtons}
-                  form={form}
-                  handlePendingFilesUpdate={handlePendingFilesUpdate}
-                  project={project}
-                  lang={lang}
-                />
-              </Suspense>
-            </TabsContent>
-          ))}
+
+          {/* Scrollable body for tab content */}
+          <div className="flex-1 overflow-y-auto no-scrollbar">
+            {projects.map((project) => (
+              <TabsContent
+                className="mt-0 p-0 rounded-none"
+                key={project.portfolioArtworks.id}
+                value={project.portfolioArtworks.id}
+              >
+                <Suspense fallback={<div>{t("portfolio.loadingProject")}</div>}>
+                  <ExistingPortfolioProjectCard
+                    showButtons={showButtons}
+                    form={form}
+                    handlePendingFilesUpdate={handlePendingFilesUpdate}
+                    project={project}
+                    lang={lang}
+                  />
+                </Suspense>
+              </TabsContent>
+            ))}
+          </div>
         </Tabs>
       )}
     </>
