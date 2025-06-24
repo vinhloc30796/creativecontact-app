@@ -41,51 +41,57 @@ export default function ContactSwimLane(props: ContactSwimLaneProps) {
   return (
     <Link
       href={`/user/${linkSlug}`}
-      className="group block w-full cursor-pointer border-t border-black py-4 first:border-t last:border-b hover:bg-white/10 hover:backdrop-blur-sm"
+      /*
+       * Consistent row height
+       *  - `h-20` (~80px) on small screens
+       *  - `md:h-24` (~96px) on medium+ screens
+       */
+      className="group block w-full cursor-pointer border-t border-black first:border-t last:border-b hover:bg-white/10 hover:backdrop-blur-sm px-0 py-3 my-2"
+      style={{ height: "calc(5lh + 1.5rem)" }}
       aria-label={`View profile of ${name}`}
     >
-      <div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_1.5fr] items-center gap-4 px-4 md:gap-8">
+      {/*
+        * Internal grid – top-aligned items instead of vertically centred
+        */}
+      <div className="grid grid-cols-[2fr_1fr_1.5fr_1fr_1.5fr] items-start gap-4 px-4 md:gap-8">
         <div className="flex flex-col">
-          <span className="font-bricolage-grotesque group-hover:text-stroke-sunglow text-lg font-semibold md:text-xl">
+          <span className="font-plus-jakarta-sans text-lg font-semibold md:text-xl transition-colors group-hover:text-black group-hover:font-bricolage-grotesque">
             {name}
           </span>
         </div>
 
-        <div className="flex flex-col text-sm text-foreground/80 md:text-base">
-          <span>{displayRole}</span>
+        <div className="flex flex-col pt-0.5 text-sm text-foreground/80">
+          <span className="font-medium">{displayRole}</span>
         </div>
 
-        {/* Replaced Tags with Industry Experiences */}
-        <div className="hidden flex-wrap items-center justify-start gap-1 md:flex">
-          {industryExperiences && industryExperiences.length > 0 && industryExperiences.slice(0, 2).map((exp, index) => { // Show max 2 experiences
-            return (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-foreground"
-              >
-                {`${exp.industry} (${exp.experienceLevel})`}
-              </span>
-            );
-          })}
+        {/* Industry / experience pairs – stacked, with overflow clipping */}
+        <div className="hidden h-full overflow-hidden md:flex md:flex-col md:gap-1">
+          {industryExperiences?.map((exp, index) => (
+            <span
+              key={index}
+              className="block w-fit rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-sm font-medium text-foreground"
+            >
+              {`${exp.industry} (${exp.experienceLevel})`}
+            </span>
+          ))}
         </div>
 
         {location && (
-          <div className="hidden text-right text-sm text-foreground/80 md:block">
+          <div className="hidden pt-0.5 text-right text-sm font-medium text-foreground/80 md:block">
             {location}
           </div>
         )}
 
-        <div className="hidden flex-wrap items-center justify-start gap-1 md:flex">
-          {collaborationStatus && collaborationStatus.length > 0 && collaborationStatus.slice(0, 3).map((status, index) => {
-            return (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-foreground"
-              >
-                {status}
-              </span>
-            );
-          })}
+        {/* Collaboration status – stacked like industry tags */}
+        <div className="hidden h-full overflow-hidden md:flex md:flex-col md:gap-1">
+          {collaborationStatus?.map((status, index) => (
+            <span
+              key={index}
+              className="block w-fit rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-sm font-medium text-foreground"
+            >
+              {status}
+            </span>
+          ))}
         </div>
       </div>
     </Link>
