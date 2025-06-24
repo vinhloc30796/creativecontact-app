@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { Header } from "@/components/Header";
 
 // Hook imports
 import { getServerAuth } from "@/hooks/useServerAuth";
@@ -44,6 +44,7 @@ export default async function UserPage({
   const username = (await params).username;
   const lang = (await searchParams).lang || "en";
   const { t } = await getServerTranslation(lang, [
+    "HomePage",
     "ProfilePage",
     "ContactList",
   ]);
@@ -58,55 +59,39 @@ export default async function UserPage({
     userId!,
   );
 
-  async function checkCurrentUser() {
-    if (user?.id === userId) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
-        <UserHeader
-          lang={lang}
-          isLoggedIn={isLoggedIn}
+        <Header
+          t={t}
           className="bg-background/80 backdrop-blur-xs"
         />
-        <main className="mt-10 w-full grow justify-between lg:mt-20">
+        <main className="mt-10 w-full grow justify-between lg:mt-20 pb-16 lg:pb-0">
           <div className="w-full px-4 sm:px-8 md:px-16">
             <div className="flex flex-col lg:flex-row">
-              <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
-                <div className="mb-6">
-                  <Tabs defaultValue="portfolio">
-                    <TabsList>
-                      <TabsTrigger value="portfolio">
-                        {t("portfolioHeader")}
-                      </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="portfolio">
-                      <ErrorBoundary
-                        fallback={<ErrorPortfolioProjectCard lang={lang} />}
-                      >
-                        <PortfolioSection
-                          showButtons={false}
-                          userData={userData}
-                          portfolioArtworksPromise={portfolioArtworksPromise}
-                          lang={lang}
-                        />
-                      </ErrorBoundary>
-                    </TabsContent>
-                  </Tabs>
-                </div>
+              <div
+                className={cn(
+                  "w-full order-2 lg:order-1 lg:w-2/3 2xl:w-3/4 -mt-px lg:mt-0",
+                  "lg:h-[calc(100vh-225px)] lg:flex lg:flex-col",
+                )}
+              >
+                <ErrorBoundary
+                  fallback={<ErrorPortfolioProjectCard lang={lang} />}
+                >
+                  <PortfolioSection
+                    showButtons={false}
+                    userData={userData}
+                    portfolioArtworksPromise={portfolioArtworksPromise}
+                    lang={lang}
+                  />
+                </ErrorBoundary>
               </div>
 
               <div
                 className={cn(
-                  "mt-6 w-full",
-                  "max-h-[calc(100vh-225px)] overflow-y-scroll",
-                  "lg:mt-0 lg:w-1/3 lg:pl-6",
+                  "w-full order-1 lg:order-2 lg:w-1/3 2xl:w-1/4 lg:-ml-px",
+                  "lg:max-h-[calc(100vh-225px)] lg:overflow-y-scroll no-scrollbar",
+                  "-mt-px lg:mt-0",
                 )}
               >
                 <Suspense fallback={<ProfileCardSkeleton />}>

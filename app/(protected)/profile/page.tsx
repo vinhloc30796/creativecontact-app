@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { Header } from "@/components/Header";
 
 // Hook imports
 import { getServerAuth } from "@/hooks/useServerAuth";
@@ -42,7 +42,7 @@ interface ProfilePageProps {
 export default async function ProfilePage(props: ProfilePageProps) {
   const searchParams = await props.searchParams;
   const lang = searchParams.lang || "en";
-  const { t } = await getServerTranslation(lang, ["ProfilePage", "ContactList"]);
+  const { t } = await getServerTranslation(lang, ["HomePage", "ProfilePage", "ContactList"]);
   const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   // Early return for anonymous users
@@ -67,9 +67,8 @@ export default async function ProfilePage(props: ProfilePageProps) {
   return (
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
-        <UserHeader
-          lang={lang}
-          isLoggedIn={isLoggedIn}
+        <Header
+          t={t}
           className="bg-background/80 backdrop-blur-xs"
         />
         <main className="mt-10 w-full grow justify-between lg:mt-20">
@@ -123,9 +122,9 @@ export default async function ProfilePage(props: ProfilePageProps) {
 
               <div
                 className={cn(
-                  "mt-6 w-full",
+                  "mt-6 w-full lg:w-[437px] lg:flex-shrink-0",
                   "max-h-[calc(100vh-225px)] overflow-y-scroll",
-                  "lg:mt-0 lg:w-1/3 lg:pl-6",
+                  "lg:mt-0 lg:-ml-px lg:pl-6",
                 )}
               >
                 <Suspense fallback={<ProfileCardSkeleton />}>

@@ -17,7 +17,7 @@ import { UserData } from "@/app/types/UserInfo";
 // Component imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { LoadingUserHeader } from "@/components/wrappers/LoadingUserHeader";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { Header } from "@/components/Header";
 import { BackButton } from "@/app/(protected)/profile/BackButton";
 import PortfolioEditForm from "./PortfolioEditForm";
 
@@ -43,7 +43,7 @@ export default async function PortfolioEditPage(props: PortfolioEditPageProps) {
   const searchParams = await props.searchParams;
   const params = await props.params;
   const lang = searchParams.lang || "en";
-  const { t } = await getServerTranslation(lang, "EventPage");
+  const { t } = await getServerTranslation(lang, ["HomePage", "EventPage"]);
   const { user, isLoggedIn, isAnonymous } = await getServerAuth();
 
   if (!isLoggedIn || isAnonymous) {
@@ -82,9 +82,8 @@ export default async function PortfolioEditPage(props: PortfolioEditPageProps) {
     <BackgroundDiv>
       <div className="flex min-h-screen w-full flex-col">
         <Suspense fallback={<LoadingUserHeader />}>
-          <UserHeader
-            lang={lang}
-            isLoggedIn={isLoggedIn}
+          <Header
+            t={t}
             className="bg-background/80 backdrop-blur-xs"
           />
         </Suspense>

@@ -15,6 +15,7 @@ import Link from "next/link";
 
 // UI Components
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -160,32 +161,7 @@ function ExistingPortfolioProjectCard({
     }
 
     return (
-      <div className="h-screen space-y-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-          <div className="flex flex-col md:col-span-3">
-            <h4 className="mb-2 font-medium">{t("portfolio.description")}</h4>
-            <p className="text-gray-600">
-              {project.artworks?.description || t("portfolio.noDescription")}
-            </p>
-          </div>
-          <div className="flex flex-col">
-            <h4 className="mb-2 font-medium">{t("portfolio.artists")}</h4>
-            {isLoadingCredits ? (
-              <Skeleton className="h-4" />
-            ) : (
-              <p className="text-gray-600">
-                {artworkCredits && artworkCredits?.length > 0
-                  ? artworkCredits
-                      .map(
-                        (credit: ArtworkWithCredits) =>
-                          `${credit.displayName || "Anonymous"} (${credit.title})`,
-                      )
-                      .join(", ")
-                  : t("portfolio.noArtists")}
-              </p>
-            )}
-          </div>
-        </div>
+      <div>
         <h4 className="mb-2 font-medium">{t("portfolio.media")}</h4>
         <div className="grid grid-cols-1 gap-4">
           {artworkWithAssets?.map(
@@ -223,9 +199,9 @@ function ExistingPortfolioProjectCard({
   };
 
   return (
-    <Card className="h-[calc(100vh-425px)] w-full overflow-y-auto">
+    <Card className="w-full border-0 rounded-none bg-transparent shadow-none">
       <FormProvider {...form}>
-        <CardHeader className="items-left flex flex-col">
+        <CardHeader className="items-left flex flex-col space-y-4">
           <div className="flex items-center gap-4">
             {showButtons && (
               <Button variant="ghost" size="sm" asChild>
@@ -246,13 +222,41 @@ function ExistingPortfolioProjectCard({
               </Button>
             )}
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between w-full">
             <h3 className="text-lg font-medium">
               {project.artworks?.title || t("portfolio.untitled")}
             </h3>
           </div>
+          <div className="flex flex-col md:flex-row w-full">
+            <div className="flex flex-col md:w-3/4">
+              <h4 className="mb-2 font-medium">
+                {t("portfolio.description")}
+              </h4>
+              <p className="text-gray-600">
+                {project.artworks?.description || t("portfolio.noDescription")}
+              </p>
+            </div>
+            <Separator orientation="vertical" className="mx-4 hidden md:block" />
+            <div className="flex flex-col md:w-1/4 mt-4 md:mt-0">
+              <h4 className="mb-2 font-medium">{t("portfolio.artists")}</h4>
+              {isLoadingCredits ? (
+                <Skeleton className="h-4" />
+              ) : (
+                <p className="text-gray-600">
+                  {artworkCredits && artworkCredits.length > 0
+                    ? artworkCredits
+                      .map(
+                        (credit: ArtworkWithCredits) =>
+                          `${credit.displayName || "Anonymous"} (${credit.title})`,
+                      )
+                      .join(", ")
+                    : t("portfolio.noArtists")}
+                </p>
+              )}
+            </div>
+          </div>
         </CardHeader>
-
+        <Separator className="my-2 border-b border-[#1A1A1A]" />
         <CardContent className="space-y-6 p-6">{renderContent()}</CardContent>
       </FormProvider>
     </Card>
@@ -333,40 +337,47 @@ export function PortfolioTabs({
   const { t } = useTranslation(lang, "ProfilePage");
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("portfolio.title")}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {projects.length === 0 ? (
-          <EmptyPortfolioProjectCard
-            showButtons={showButtons}
-            handleAddProject={handleAddProject}
-            lang={lang}
-          />
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="mb-4 flex items-center justify-between">
-              <TabsList>
-                {projects.map((project) => (
-                  <TabsTrigger
-                    key={project.portfolioArtworks.id}
-                    value={project.portfolioArtworks.id}
-                  >
-                    {project.artworks?.title || t("portfolio.untitled")}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+    <>
+      {projects.length === 0 ? (
+        <EmptyPortfolioProjectCard
+          showButtons={showButtons}
+          handleAddProject={handleAddProject}
+          lang={lang}
+        />
+      ) : (
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex flex-col h-full w-full"
+        >
+          {/* Sticky header containing the tab buttons and add button */}
+          <div className="sticky top-0 z-10 bg-[#FCFAF5] flex items-center justify-between rounded-none flex-none border-b border-[#1A1A1A]">
+            <TabsList className="h-auto p-0 bg-[#FCFAF5] flex flex-row">
+              {projects.map((project, index) => (
+                <TabsTrigger
+                  className="bg-[#FCFAF5] border-r border-[#1A1A1A] rounded-none px-5 py-4 text-[#1A1A1A] font-sans font-extrabold text-base leading-[1.26] tracking-[0.02em] uppercase transition-colors hover:bg-[#1A1A1A] hover:text-[#FCFAF5] data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-[#FCFAF5] flex-shrink-0 relative"
+                  style={{ marginLeft: index === 0 ? '0' : '-1px' }}
+                  key={project.portfolioArtworks.id}
+                  value={project.portfolioArtworks.id}
+                >
+                  {project.artworks?.title || t("portfolio.untitled")}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
-              {showButtons === true && (
-                <Button onClick={handleAddProject} variant="outline" size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t("portfolio.addProject")}
-                </Button>
-              )}
-            </div>
+            {showButtons === true && (
+              <Button onClick={handleAddProject} variant="outline" size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                {t("portfolio.addProject")}
+              </Button>
+            )}
+          </div>
+
+          {/* Scrollable body for tab content */}
+          <div className="flex-1 overflow-y-auto no-scrollbar">
             {projects.map((project) => (
               <TabsContent
+                className="mt-0 p-0 rounded-none"
                 key={project.portfolioArtworks.id}
                 value={project.portfolioArtworks.id}
               >
@@ -381,9 +392,9 @@ export function PortfolioTabs({
                 </Suspense>
               </TabsContent>
             ))}
-          </Tabs>
-        )}
-      </CardContent>
-    </Card>
+          </div>
+        </Tabs>
+      )}
+    </>
   );
 }

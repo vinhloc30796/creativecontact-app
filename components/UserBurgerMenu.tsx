@@ -22,7 +22,7 @@ export const UserBurgerMenu: React.FC<UserBurgerMenuProps> = ({
 
   return (
     <div>
-      <button onClick={toggleMenu} className="p-2 text-primary">
+      <button onClick={toggleMenu} className="inline-flex items-center justify-center h-[50px] p-2 text-primary">
         <Menu className="h-6 w-6" />
       </button>
       {isOpen && (

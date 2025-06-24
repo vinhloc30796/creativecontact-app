@@ -1,7 +1,8 @@
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { LoadingUserHeader } from "@/components/wrappers/LoadingUserHeader";
-import { UserHeader } from "@/components/wrappers/UserHeader";
+import { Header } from "@/components/Header";
 import { getServerAuth } from "@/hooks/useServerAuth";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { Suspense } from "react";
 import { BackButton } from "../../profile/BackButton";
 import Wrapper from "./wrapper.component";
@@ -18,6 +19,7 @@ export default async function PortfolioCreatePage(
 ) {
   const { isLoggedIn } = await getServerAuth();
   const lang = (await props.searchParams).lang || "en";
+  const { t } = await getServerTranslation(lang, "HomePage");
   const project = {
     portfolioArtworks: {
       id: "new",
@@ -27,9 +29,8 @@ export default async function PortfolioCreatePage(
   return (
     <BackgroundDiv className="min-h-screen w-full">
       <Suspense fallback={<LoadingUserHeader />}>
-        <UserHeader
-          lang={lang}
-          isLoggedIn={isLoggedIn}
+        <Header
+          t={t}
           className="fixed left-0 right-0 top-0 z-30 bg-background/80 backdrop-blur-xs"
         />
       </Suspense>

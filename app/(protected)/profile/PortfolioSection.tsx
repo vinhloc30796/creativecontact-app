@@ -23,7 +23,7 @@ export default function PortfolioSection({
   if (!userData) return null;
 
   return (
-    <div className="space-y-8">
+    <div className="w-full flex-1 flex flex-col overflow-hidden border border-[#1A1A1A] rounded-none bg-[#FCFAF5]">
       <Suspense fallback={<PortfolioSkeleton />}>
         <PortfolioContent
           showButtons={showButtons}
