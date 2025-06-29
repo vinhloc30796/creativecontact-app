@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
 import { RotatingWord } from "@/components/RotatingWord";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { getServerTranslation } from "@/i18n/server";
+import { getServerTranslation } from "@/lib/i18n/init-server";
 import { EventTicker } from "@/components/events/EventTicker";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
