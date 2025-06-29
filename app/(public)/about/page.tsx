@@ -194,7 +194,7 @@ export default async function AboutPage(props: Props) {
       </div>
 
       {/* Footer ticker using shared EventTicker for style consistency */}
-      <footer className="w-full bg-sunglow py-3 text-black">
+      <footer className="w-full text-black">
         <EventTicker
           eventName={t("AboutPage:footerEventName")}
           tickerText={t("AboutPage:footerTickerText")}
