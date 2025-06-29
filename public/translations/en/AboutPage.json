@@ -23,10 +23,10 @@
   "meetTeamSubtitle": "Hey, connect with us first for fun!",
   "constructionBanner": "Under construction",
   "memberRole": "Creative Contactor",
-  "adTitle": "30s Advertisement 📣",
-  "adText": "If you also want to do something with Creative Contact — anything — just say so!",
-  "inputPlaceholder": "Hello, I think that…",
-  "connectNow": "Connect now",
+  "adTitle": "15s Advertisement 📣",
+  "adText": "Want to join Creative Contact? Contact!",
+  "connectNow": "Contact!",
+  "emailSubject": "Hi Creative Contact, I am...",
   "footerEventName": "Create with us",
   "footerTickerText": "• Creative Contact"
 }

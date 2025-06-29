@@ -183,22 +183,11 @@ export default async function AboutPage(props: Props) {
               {t("AboutPage:adText")}
             </P>
 
-            <div className="relative w-full max-w-md">
-              <input
-                disabled
-                className="w-full rounded-full border-2 border-black bg-white px-5 py-4 pr-16 text-left text-sm text-black placeholder:text-black/60 focus:outline-none"
-                placeholder={t("AboutPage:inputPlaceholder")}
-              />
-              <span className="absolute right-5 top-1/2 -translate-y-1/2 select-none text-2xl">
-                👋
-              </span>
-            </div>
-
             <Button
               asChild
               className="rounded-full border-2 border-black bg-black px-8 py-4 font-semibold text-sunglow transition-colors hover:bg-white hover:text-black"
             >
-              <Link href="/signup">{t("AboutPage:connectNow")}</Link>
+              <Link href={`mailto:creative.contact.vn@gmail.com?subject=${t("AboutPage:emailSubject")}`}>{t("AboutPage:connectNow")}</Link>
             </Button>
           </div>
         </div>
