@@ -1,15 +1,17 @@
-import { ArrowUpRight } from "lucide-react";
 import { Metadata } from "next";
-import Link from "next/link";
 import { JSX, SVGProps } from "react";
+import Link from "next/link";
 
 import { ClientNavMenu } from "@/components/ClientNavMenu";
-import { TextIconBox } from "@/components/text-icon-box";
+import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
+import { RotatingWord } from "@/components/RotatingWord";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
-import { getServerTranslation } from "@/lib/i18n/init-server";
+import { getServerTranslation } from "@/i18n/server";
+import { EventTicker } from "@/components/events/EventTicker";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "About | Creative Contact",
@@ -17,167 +19,130 @@ export const metadata: Metadata = {
     "Learn about Creative Contact's mission, vision, and the team behind our creative community.",
 };
 
-export default async function AboutPage() {
-  const { t } = await getServerTranslation("en", "HomePage");
+interface Props {
+  searchParams: Promise<{
+    lang?: string;
+  }>;
+}
+
+export default async function AboutPage(props: Props) {
+  // The lang query param overrides default 'en'
+  const { lang = "en" } = await props.searchParams;
+
+  // Load both the shared navigation namespace and the page-specific namespace
+  const { t } = await getServerTranslation(lang, ["HomePage", "AboutPage"]);
 
   return (
     <BackgroundDiv shouldCenter={false} className="flex min-h-screen flex-col">
-      {/* Header with logo and join button */}
-      <header className="flex w-full items-center justify-between p-4">
-        <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-sunglow p-1"
-          >
-            <span className="text-xl font-bold text-black">CC</span>
-          </Link>
-        </div>
+      {/* Shared site header */}
+      <Header t={t} stickyOverlay={false} />
 
-        <div className="flex items-center">
-          <Button
-            variant="link"
-            asChild
-            className="text-sm text-foreground hover:text-sunglow"
-          >
-            <Link href="/signup">
-              <TextIconBox
-                title={t("joinUsLine1")}
-                subtitle={t("joinUsLine2")}
-                icon={
-                  <ArrowUpRight
-                    className="text-sunglow"
-                    style={{ height: "125%", width: "125%" }}
-                  />
-                }
-                className="text-sm"
-              />
-            </Link>
-          </Button>
-        </div>
-      </header>
+      {/* Sticky control bar (language switcher + nav), row layout full width, centered vertically */}
+      <div className="fixed inset-x-0 top-1/2 z-40 -translate-y-1/2 flex w-full items-center justify-between px-4 md:px-8">
+        <LanguageSwitcher currentLang={lang} />
+
+        <ClientNavMenu
+          items={[
+            { text: t("aboutCC"), href: "/about" },
+            { text: t("contactBook"), href: "/contacts" },
+            { text: t("event"), href: "/events" },
+          ]}
+          menuText={t("menu")}
+        />
+      </div>
 
       {/* Main content */}
       <div className="relative z-0 flex flex-1 flex-col">
         {/* Header section */}
         <div className="flex h-[30vh] max-h-[30vh] flex-col justify-center px-12">
           <HeroTitle className="whitespace-pre-line font-bold" size="medium">
-            About Us
+            {t("AboutPage:heroTitle")}
           </HeroTitle>
-
-          {/* Navigation row */}
-          <div className="flex w-full items-center justify-end py-6">
-            <ClientNavMenu
-              items={[
-                { text: t("aboutCC"), href: "/about" },
-                { text: t("contactBook"), href: "/contacts" },
-                { text: t("event"), href: "/events" },
-              ]}
-              menuText={t("menu")}
-            />
-          </div>
         </div>
 
         {/* Content section */}
         <div className="flex-1 space-y-10 overflow-y-auto px-12 pb-12">
+          {/* Hook section */}
           <Lead className="whitespace-pre-line text-xl text-foreground/90 md:text-2xl">
-            Creative Contact is a community platform connecting artists,
-            designers, and creative professionals in Vietnam.
+            {t("AboutPage:hookBefore")}
+            <RotatingWord
+              words={t("AboutPage:hookWords", { returnObjects: true }) as string[]}
+              className="text-sunglow"
+            />
+            {t("AboutPage:hookAfter")}
           </Lead>
 
           <Separator className="bg-white/10" />
 
-          {/* Mission Section */}
+          {/* Project Purpose Section */}
           <div className="mt-12">
-            <H2 className="text-foreground/90">Our Mission</H2>
+            <H2 className="text-foreground/90">{t("AboutPage:whatIsCCTitle")}</H2>
             <div className="mt-6 grid gap-8 md:grid-cols-2">
-              <div>
+              <div className="space-y-4">
                 <P className="text-foreground/80">
-                  Creative Contact was founded with a simple yet powerful
-                  mission: to foster collaboration, innovation, and growth
-                  within Vietnam&apos;s creative community. We believe that by
-                  connecting talented individuals across different disciplines,
-                  we can create a thriving ecosystem where creativity
-                  flourishes.
+                  {t("AboutPage:whatIsCCParagraphOne")}
                 </P>
-                <P className="mt-4 text-foreground/80">
-                  Our platform serves as a bridge between artists, designers,
-                  writers, musicians, filmmakers, and other creative
-                  professionals, providing them with opportunities to showcase
-                  their work, find collaborators, and access resources that help
-                  them advance their careers.
+                <ul className="list-disc space-y-2 pl-5 text-foreground/80">
+                  <li>{t("AboutPage:whatIsCCListDo")}</li>
+                  <li>{t("AboutPage:whatIsCCListLearn")}</li>
+                  <li>{t("AboutPage:whatIsCCListFindJob")}</li>
+                </ul>
+
+                <P className="text-foreground/80">
+                  {t("AboutPage:whatIsCCParagraphTwo.part1")}
+                  <Link href="/contacts" className="underline decoration-sunglow hover:text-sunglow">
+                    {t("AboutPage:connectLinkText")}
+                  </Link>
+                  {t("AboutPage:whatIsCCParagraphTwo.part2")}
                 </P>
               </div>
               <div className="relative h-64 w-full overflow-hidden rounded-lg md:h-auto">
                 <div className="absolute inset-0 bg-linear-to-r from-sunglow/20 to-purple-500/20" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-white">
-                    Creative Vision
+                  <span className="text-2xl font-bold text-black">
+                    {t("AboutPage:formulaQuote")}
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Values Section */}
-          <div className="mt-16">
-            <H2 className="text-foreground/90">Our Values</H2>
-            <div className="mt-6 grid gap-6 md:grid-cols-3">
-              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sunglow/20">
-                  <span className="text-xl font-bold text-sunglow">01</span>
-                </div>
-                <h3 className="mb-2 text-xl font-semibold text-foreground">
-                  Collaboration
-                </h3>
-                <P className="text-foreground/80">
-                  We believe that the most innovative ideas emerge when diverse
-                  perspectives come together.
-                </P>
-              </div>
-
-              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sunglow/20">
-                  <span className="text-xl font-bold text-sunglow">02</span>
-                </div>
-                <h3 className="mb-2 text-xl font-semibold text-foreground">
-                  Inclusivity
-                </h3>
-                <P className="text-foreground/80">
-                  Our community welcomes creators from all backgrounds,
-                  disciplines, and experience levels.
-                </P>
-              </div>
-
-              <div className="rounded-lg bg-white/5 p-6 backdrop-blur-xs">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sunglow/20">
-                  <span className="text-xl font-bold text-sunglow">03</span>
-                </div>
-                <h3 className="mb-2 text-xl font-semibold text-foreground">
-                  Innovation
-                </h3>
-                <P className="text-foreground/80">
-                  We encourage experimentation and pushing boundaries in
-                  creative expression.
-                </P>
-              </div>
+          {/* Inspirational Quote Section */}
+          <div className="mt-16 -mx-12 overflow-hidden">
+            <div className="flex w-screen animate-marquee whitespace-nowrap py-2 text-lg font-semibold text-sunglow">
+              {Array(6)
+                .fill(0)
+                .map((_, i) => (
+                  <span key={i} className="mx-6">
+                    {t("AboutPage:marqueeQuote")}
+                  </span>
+                ))}
             </div>
           </div>
 
           {/* Team Section */}
           <div className="mt-16">
-            <H2 className="text-foreground/90">Our Team</H2>
+            <H2 className="text-foreground/90">{t("AboutPage:meetTeamTitle")}</H2>
             <P className="mt-2 text-foreground/70">
-              Meet the passionate individuals behind Creative Contact.
+              {t("AboutPage:meetTeamSubtitle")}
             </P>
 
             <div className="mt-6 grid gap-6 md:grid-cols-4">
               {/* Team members */}
               {[
-                { name: "Team Member 1", role: "Founder & Creative Director" },
-                { name: "Team Member 2", role: "Community Manager" },
-                { name: "Team Member 3", role: "Event Coordinator" },
-                { name: "Team Member 4", role: "Technical Lead" },
-              ].map((member, i) => (
+                "Khải Hoàn",
+                "Vĩnh Lộc",
+                "Chi Nguyễn",
+                "Minh Tâm",
+                "Ngọc Huế",
+                "Song Như",
+                "Annie This",
+                "Annie That",
+                "Khánh Ly",
+                "Tuyết Như",
+                "Đức Mạnh",
+                "Minh Hạnh",
+              ].map((memberName, i) => (
                 <div
                   key={i}
                   className="relative rounded-lg border border-white/10 bg-white/5 p-6 text-center backdrop-blur-xs"
@@ -186,7 +151,7 @@ export default async function AboutPage() {
                   <div className="absolute left-0 right-0 top-0 flex items-center justify-center gap-2 rounded-t-lg bg-sunglow px-2 py-1">
                     <ConstructionIcon className="h-5 w-5 text-black" />
                     <span className="text-xs font-medium text-black">
-                      Under Construction
+                      {t("AboutPage:constructionBanner")}
                     </span>
                   </div>
 
@@ -194,49 +159,59 @@ export default async function AboutPage() {
                   <div className="mt-6">
                     <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-md bg-white/10">
                       <span className="text-4xl font-bold text-white/50">
-                        {String.fromCharCode(65 + i)}
+                        {memberName.charAt(0)}
                       </span>
                     </div>
                     <h3 className="text-lg font-medium text-foreground">
-                      {member.name}
+                      {memberName}
                     </h3>
-                    <p className="text-sm text-foreground/70">{member.role}</p>
+                    <p className="text-sm text-foreground/70">{t("AboutPage:memberRole")}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Join Us CTA */}
-          <div className="mt-16 rounded-lg bg-linear-to-r from-sunglow/20 to-purple-500/20 p-8 text-center backdrop-blur-xs">
-            <H2 className="text-foreground">Join Our Creative Community</H2>
-            <P className="mx-auto mt-4 max-w-2xl text-foreground/80">
-              Whether you&apos;re an established professional or just starting your
-              creative journey, there&apos;s a place for you in our community.
-              Connect, collaborate, and grow with us.
+          {/* Open Invitation Section */}
+          <div
+            className="relative mt-20 flex w-full flex-col items-center justify-center gap-6 rounded-3xl border-4 border-black bg-sunglow p-10 text-center shadow-[4px_4px_0_0_#000] transition-transform md:-rotate-1 md:hover:rotate-0"
+          >
+            <H2 className="text-3xl font-bold text-black md:text-4xl">
+              {t("AboutPage:adTitle")}
+            </H2>
+            <P className="max-w-2xl text-lg font-medium text-black md:text-xl">
+              {t("AboutPage:adText")}
             </P>
+
+            <div className="relative w-full max-w-md">
+              <input
+                disabled
+                className="w-full rounded-full border-2 border-black bg-white px-5 py-4 pr-16 text-left text-sm text-black placeholder:text-black/60 focus:outline-none"
+                placeholder={t("AboutPage:inputPlaceholder")}
+              />
+              <span className="absolute right-5 top-1/2 -translate-y-1/2 select-none text-2xl">
+                👋
+              </span>
+            </div>
+
             <Button
               asChild
-              className="mt-6 bg-sunglow text-black hover:bg-yellow-500"
+              className="rounded-full border-2 border-black bg-black px-8 py-4 font-semibold text-sunglow transition-colors hover:bg-white hover:text-black"
             >
-              <Link href="/signup">Become a Member</Link>
+              <Link href="/signup">{t("AboutPage:connectNow")}</Link>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Footer ticker */}
-      <footer className="w-full overflow-hidden bg-sunglow py-3 text-black">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <span
-                key={i}
-                className="mx-4 text-base font-medium"
-              >{`Join our creative community • Creative Contact`}</span>
-            ))}
-        </div>
+      {/* Footer ticker using shared EventTicker for style consistency */}
+      <footer className="w-full bg-sunglow py-3 text-black">
+        <EventTicker
+          eventName={t("AboutPage:footerEventName")}
+          tickerText={t("AboutPage:footerTickerText")}
+          repetitions={4}
+          speed={30}
+        />
       </footer>
     </BackgroundDiv>
   );
