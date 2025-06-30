@@ -26,15 +26,16 @@ import { ErrorProfileCard } from "../ErrorProfileCard";
 export const dynamic = "force-dynamic";
 
 interface ContactsPageProps {
-    searchParams: {
+    searchParams: Promise<{
         lang?: string;
-    };
+    }>;
 }
 
 export default async function ProfileContactsPage({
     searchParams,
 }: ContactsPageProps) {
-    const lang = searchParams?.lang || "en";
+    const params = await searchParams;
+    const lang = params?.lang || "en";
     const { t } = await getServerTranslation(lang, [
         "HomePage",
         "ProfilePage",
