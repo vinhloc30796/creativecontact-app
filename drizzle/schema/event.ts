@@ -72,7 +72,7 @@ export const eventRegistrations = pgTable("event_registrations", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone_country_code: text("phone_country_code").notNull().default("84"),
-  phone_number: text("phone_number").notNull(),
+  phone_number: text("phone_number"),
   phone_country_alpha3: text("phone_country_alpha3").notNull().default("VNM"),
 }, (table) => ({
   uniqueUserSlotRegistration: unique("unique_user_slot_registration").on(

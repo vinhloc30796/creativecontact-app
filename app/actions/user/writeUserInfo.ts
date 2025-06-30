@@ -14,7 +14,7 @@ export async function writeUserInfo(
   userId: string,
   userInfo: {
     phoneCountryCode: string;
-    phoneNumber: string;
+    phoneNumber?: string;
     phoneCountryAlpha3: string;
     firstName: string;
     lastName: string;
@@ -50,7 +50,7 @@ export async function writeUserInfo(
 
   // Validate user info
   if (validateUserInfo) {
-    if (!userInfo.phoneNumber || !userInfo.firstName || !userInfo.lastName) {
+    if (!userInfo.firstName || !userInfo.lastName) {
       console.error("Invalid user info:", userInfo);
       return { success: false, error: "Invalid user info" };
     }

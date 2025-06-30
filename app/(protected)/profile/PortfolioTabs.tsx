@@ -9,9 +9,8 @@ import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,6 @@ import { ArtworkWithAssets } from "@/app/api/artworks/[id]/assets/helper";
 import { UserData } from "@/app/types/UserInfo";
 import { PortfolioArtworkWithDetails } from "@/drizzle/schema/portfolio";
 import { ArtworkWithCredits } from "@/app/api/artworks/[id]/credits/helper";
-import { deletePortfolio } from "@/app/actions/portfolio/server.action";
 import { deletePortfolioClient } from "@/app/actions/portfolio/client.actions";
 
 interface ProjectFormValues {
@@ -76,7 +74,6 @@ function ExistingPortfolioProjectCard({
   project,
   lang = "en",
 }: ExistingPortfolioProjectCardProps) {
-  const router = useRouter();
   const { t } = useTranslation(lang, "ProfilePage");
   const { data: artworkWithAssets, isLoading: isLoadingAssets } = useQuery<
     ArtworkWithAssets[]
@@ -111,45 +108,10 @@ function ExistingPortfolioProjectCard({
     },
     enabled: !!project?.artworks?.id,
   });
-  const [deleteLoading, setDeleteLoading] = useState(false);
 
   if (!project?.artworks) {
     return <div>Project not found</div>;
   }
-
-  const handleEdit = () => {
-    if (project.artworks) {
-      router.push(`/portfolio/${project.artworks.id}`);
-    } else {
-      toast.error("Failed to edit the portfolio artwork", {
-        description: "The artwork could not be found",
-        duration: 5000,
-      });
-    }
-  };
-  const handleDelete = async () => {
-    setDeleteLoading(true);
-    if (!project?.artworks?.id) {
-      toast.error("Failed to delete the portfolio artwork", {
-        description: "The artwork could not be found",
-        duration: 5000,
-      });
-      return;
-    }
-    const rs = await deletePortfolioClient(project.portfolioArtworks.id);
-    setDeleteLoading(false);
-    if (rs.data?.success) {
-      toast.success("Portfolio deleted successfully", {
-        duration: 5000,
-      });
-    } else {
-      toast.error("Failed to delete the portfolio artwork", {
-        description: "The artwork could not be found",
-        duration: 5000,
-      });
-    }
-    window.location.reload();
-  };
 
   const renderContent = () => {
     if (isLoadingAssets) {
@@ -202,26 +164,6 @@ function ExistingPortfolioProjectCard({
     <Card className="w-full border-0 rounded-none bg-transparent shadow-none">
       <FormProvider {...form}>
         <CardHeader className="items-left flex flex-col space-y-4">
-          <div className="flex items-center gap-4">
-            {showButtons && (
-              <Button variant="ghost" size="sm" asChild>
-                {project.artworks?.id ? (
-                  <Link href={`/portfolio/${project.artworks.id}`}>
-                    {t("portfolio.edit")}
-                  </Link>
-                ) : (
-                  <span className="text-muted-foreground">
-                    {t("portfolio.edit")}
-                  </span>
-                )}
-              </Button>
-            )}
-            {showButtons && (
-              <Button variant="ghost" size="sm" onClick={handleDelete}>
-                {t("portfolio.delete")}
-              </Button>
-            )}
-          </div>
           <div className="flex items-center justify-between w-full">
             <h3 className="text-lg font-medium">
               {project.artworks?.title || t("portfolio.untitled")}
@@ -315,6 +257,71 @@ export function PortfolioTabs({
     router.push("/portfolio/new");
   };
 
+  // Edit current project
+  const handleEditProject = () => {
+    if (!activeTab) return;
+    const currentProject = projects.find(
+      (p) => p.portfolioArtworks.id === activeTab,
+    );
+    const artworkId = currentProject?.artworks?.id;
+
+    if (!artworkId) {
+      toast.error("Failed to edit the portfolio artwork", {
+        description: "The artwork could not be found",
+        duration: 5000,
+      });
+      return;
+    }
+
+    router.push(`/portfolio/${artworkId}`);
+  };
+
+  // Delete current project
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const handleDeleteProject = async () => {
+    if (!activeTab) return;
+    const currentProject = projects.find(
+      (p) => p.portfolioArtworks.id === activeTab,
+    );
+    if (!currentProject) {
+      toast.error("Failed to delete the portfolio artwork", {
+        description: "The artwork could not be found",
+        duration: 5000,
+      });
+      return;
+    }
+
+    setDeleteLoading(true);
+    const rs = await deletePortfolioClient(currentProject.portfolioArtworks.id);
+    setDeleteLoading(false);
+
+    if (rs.data?.success) {
+      toast.success("Portfolio deleted successfully", {
+        duration: 5000,
+      });
+
+      // Remove the deleted project from local state
+      setProjects((prev) =>
+        prev.filter((p) => p.portfolioArtworks.id !== activeTab),
+      );
+
+      // Determine the next active tab
+      const remaining = projects.filter(
+        (p) => p.portfolioArtworks.id !== activeTab,
+      );
+      if (remaining.length > 0) {
+        setActiveTab(remaining[0].portfolioArtworks.id);
+      } else {
+        setActiveTab("new");
+      }
+    } else {
+      toast.error("Failed to delete the portfolio artwork", {
+        description: "The artwork could not be deleted",
+        duration: 5000,
+      });
+    }
+  };
+
   // Handle pending files
   const handlePendingFilesUpdate = (projectId: string, files: File[]) => {
     console.log("[PortfolioTabs] Updating pending files", {
@@ -365,11 +372,37 @@ export function PortfolioTabs({
               ))}
             </TabsList>
 
-            {showButtons === true && (
-              <Button onClick={handleAddProject} variant="outline" size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                {t("portfolio.addProject")}
-              </Button>
+            {showButtons && (
+              <div className="flex items-stretch h-full">
+                <Button
+                  onClick={handleEditProject}
+                  aria-label={t("portfolio.edit")}
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-none h-full w-12 border-l border-[#1A1A1A] text-[#1A1A1A] font-sans font-extrabold text-base leading-[1.26] tracking-[0.02em] uppercase bg-[#FCFAF5] hover:bg-sunglow hover:text-[#1A1A1A]"
+                >
+                  <Pencil className="h-5 w-5" />
+                </Button>
+                <Button
+                  onClick={handleDeleteProject}
+                  aria-label={t("portfolio.delete")}
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-none h-full w-12 border-l border-[#1A1A1A] text-[#1A1A1A] font-sans font-extrabold text-base leading-[1.26] tracking-[0.02em] uppercase bg-[#FCFAF5] hover:bg-sunglow hover:text-[#1A1A1A]"
+                  disabled={deleteLoading}
+                >
+                  <Trash className="h-5 w-5" />
+                </Button>
+                <Button
+                  onClick={handleAddProject}
+                  aria-label={t("portfolio.addProject")}
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-none h-full w-12 border-l border-[#1A1A1A] text-[#1A1A1A] font-sans font-extrabold text-base leading-[1.26] tracking-[0.02em] uppercase bg-[#FCFAF5] hover:bg-sunglow hover:text-[#1A1A1A]"
+                >
+                  <Plus className="h-5 w-5" />
+                </Button>
+              </div>
             )}
           </div>
 

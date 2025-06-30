@@ -7,9 +7,15 @@ export const contactInfoSchema = z.object({
   userName: z.string().optional(),
   displayName: z.string().optional(),
   phoneCountryCode: z.string().default("84"),
-  phoneNumber: z.string().refine((value) => /^\d{10}$/.test(value), {
-    message: "Phone number must be 10 digits",
-  }),
+  phoneNumber: z
+    .string()
+    .refine(
+      (value) => value === undefined || value === "" || /^\d{10}$/.test(value),
+      {
+        message: "Phone number must be 10 digits",
+      },
+    )
+    .optional(),
   phoneCountryAlpha3: z.string().default("VNM"),
   location: z.string().optional(),
   instagramHandle: z.string().optional(),

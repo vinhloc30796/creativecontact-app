@@ -224,7 +224,7 @@ export async function createRegistration(
             email: formData.email,
             name: `${formData.lastName} ${formData.firstName}`,
             phone_country_code: formData.phoneCountryCode,
-            phone_number: formData.phoneNumber,
+            phone_number: formData.phoneNumber ?? null,
             phone_country_alpha3: formData.phoneCountryAlpha3,
             status: status,
           })
@@ -250,7 +250,7 @@ export async function createRegistration(
             email: formData.email,
             name: name,
             phone_country_code: formData.phoneCountryCode,
-            phone_number: formData.phoneNumber, 
+            phone_number: formData.phoneNumber ?? null,
             phone_country_alpha3: formData.phoneCountryAlpha3,
             created_by: formData.created_by,
             status: status,

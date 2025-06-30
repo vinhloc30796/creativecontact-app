@@ -183,14 +183,17 @@ export function ProfileCard({
 
       {/* Edit Button */}
       {showButtons && (
-        <div className="px-6 py-4 border-t border-[#1A1A1A]">
-          <Button variant="outline" size="sm" asChild className="w-full">
-            <a href="/profile/edit">
-              <Pencil className="mr-1 h-4 w-4" />
-              {t("edit")}
-            </a>
-          </Button>
-        </div>
+        <Button
+          asChild
+          variant="ghost"
+          aria-label={t("edit")}
+          className="w-full rounded-none border-t border-[#1A1A1A] bg-[#FCFAF5] hover:bg-sunglow text-[#1A1A1A] hover:text-[#1A1A1A] font-sans font-extrabold text-base leading-[1.26] tracking-[0.02em] uppercase flex items-center justify-center py-4 px-6"
+        >
+          <a href="/profile/edit" className="flex items-center gap-2 w-full h-full justify-center">
+            <Pencil className="h-5 w-5" />
+            {t("edit")}
+          </a>
+        </Button>
       )}
     </div>
   );

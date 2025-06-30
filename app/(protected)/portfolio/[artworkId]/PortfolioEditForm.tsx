@@ -185,7 +185,7 @@ export default function PortfolioEditForm({
   return (
     <FormProvider {...form}>
       <div className="flex flex-row space-x-8">
-        <Card className="w-full" style={{ flex: 7 }}>
+        <Card className="w-full rounded-none" style={{ flex: 7 }}>
           <CardHeader>
             <CardTitle>{isNew ? t("newProject") : t("editProject")}</CardTitle>
           </CardHeader>
@@ -269,7 +269,7 @@ export default function PortfolioEditForm({
 
         <div className="flex w-full flex-col" style={{ flex: 3 }}>
           <div className="sticky top-[100px]">
-            <Card className="w-full">
+            <Card className="w-full rounded-none">
               <CardHeader>
                 <CardTitle>{t("creditInfo")}</CardTitle>
               </CardHeader>
@@ -284,7 +284,7 @@ export default function PortfolioEditForm({
           <div className="grow"></div>{" "}
           {/* This div will take up the remaining space */}
           <div className="sticky bottom-0">
-            <Card className="w-full">
+            <Card className="w-full rounded-none">
               <CardHeader>
                 <CardTitle>{t("dataUsage")}</CardTitle>
               </CardHeader>
@@ -298,7 +298,7 @@ export default function PortfolioEditForm({
             <div className="mt-4 flex flex-col gap-4">
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full rounded-none border"
                 onClick={form.handleSubmit(handleSubmit)}
               >
                 {isNew ? t("create") : t("save")}
@@ -306,7 +306,7 @@ export default function PortfolioEditForm({
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full rounded-none"
                 onClick={() => router.push("/profile")}
               >
                 {t("cancel")}

@@ -13,7 +13,7 @@
       "placeholder": "Nguyễn"
     },
     "phone": {
-      "label": "Số điện thoại",
+      "label": "Số điện thoại (tùy chọn)",
       "placeholder": "1234567890"
     },
     "instagramHandle": {

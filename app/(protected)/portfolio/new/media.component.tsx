@@ -13,7 +13,7 @@ interface MediaShowProps {
 const MediaShow = (props: MediaShowProps) => {
   return (
     <div className='w-full relative'>
-      <Button variant='secondary' className='absolute top-2 right-2 rounded-full' onClick={props.removeFile}>
+      <Button variant='secondary' className='absolute top-2 right-2 rounded-none' onClick={props.removeFile}>
         <Trash2Icon className='w-4 h-4' />
       </Button>
       {
@@ -24,7 +24,7 @@ const MediaShow = (props: MediaShowProps) => {
       }
       {
         !props.isThumbnail ?
-          <Button variant='secondary' className='absolute bottom-2 right-2 rounded-full' onClick={props.setThumbnail}>
+          <Button variant='secondary' className='absolute bottom-2 right-2 rounded-none' onClick={props.setThumbnail}>
             Set as thumbnail
           </Button> : null
       }

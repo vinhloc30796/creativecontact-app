@@ -51,7 +51,9 @@ export const POST = async (request: Request) => {
       id: result.data.id,
       name: result.data.name,
       email: result.data.email,
-      phone: `${result.data.phone_country_code}${result.data.phone_number}`,
+      phone: result.data.phone_number
+        ? `${result.data.phone_country_code}${result.data.phone_number}`
+        : undefined,
     });
   } catch (error) {
     console.error("Unexpected error during check-in:", error);
