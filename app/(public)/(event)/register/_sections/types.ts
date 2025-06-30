@@ -13,7 +13,7 @@ export type FormData = {
   firstName: string;
   lastName: string;
   phoneCountryCode: string;
-  phoneNumber: string;
+  phoneNumber?: string | null;
   phoneCountryAlpha3: string;
 
   // Professional Info

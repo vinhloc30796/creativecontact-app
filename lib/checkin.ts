@@ -21,7 +21,7 @@ export type CheckinResult = {
     name: string;
     email: string;
     phone_country_code: string;
-    phone_number: string;
+    phone_number: string | null;
     phone_country_alpha3: string;
   };
   error?: string;
