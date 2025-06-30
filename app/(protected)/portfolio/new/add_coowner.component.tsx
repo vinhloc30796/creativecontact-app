@@ -46,7 +46,7 @@ export default function AddCoOwner({ artworkCreditForm }: AddCoOwnerProps) {
   };
   return (
     <div className="min-h-[200px] w-full">
-      <h3 className="text-sm font-semibold uppercase">Add Co-onwer</h3>
+      <h3 className="text-sm font-semibold uppercase">Add Co-owner</h3>
       <div className="mb-4 flex w-full flex-col gap-2">
         {(artworkCreditForm.getValues().coartists || []).map(
           (coartist, index) => (
@@ -124,7 +124,7 @@ export function AddCoOwnerDialog(props: AddCoOwnerDialogProps) {
   return (
     <Dialog open={props.isOpen} onOpenChange={props.setIsOpenDialog}>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="w-full rounded-full">
+        <Button variant="secondary" className="w-full rounded-none border">
           <Plus className="mr-2 h-4 w-4" />
           {t("add")}
         </Button>
@@ -194,7 +194,7 @@ export function AddCoOwnerDialog(props: AddCoOwnerDialogProps) {
           <div className="justify-space-between flex">
             <Button
               type="button"
-              className="w-full rounded-full"
+              className="w-full rounded-none border"
               onClick={() =>
                 props.addCoartist(
                   newCoartist.userId,
@@ -209,7 +209,7 @@ export function AddCoOwnerDialog(props: AddCoOwnerDialogProps) {
             </Button>
             <Button
               variant={"outline"}
-              className="w-full rounded-full"
+              className="w-full rounded-none"
               onClick={props.setIsOpenDialog}
             >
               {t("dialog.cancel")}

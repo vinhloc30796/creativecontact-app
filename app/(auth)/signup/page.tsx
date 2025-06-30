@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect, use, Suspense } from 'react';
 import { useForm, FormProvider, UseFormReturn } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -17,6 +17,9 @@ import { contactInfoSchema, ContactInfoData } from '@/app/form-schemas/contact-i
 import { professionalInfoSchema, ProfessionalInfoData } from '@/app/form-schemas/professional-info'
 import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
 import { IndustryType, ExperienceType } from '@/drizzle/schema/user'
+import { Loading } from '@/components/Loading';
+import { HeroTitle } from '@/components/ui/typography';
+import { cn } from '@/lib/utils';
 
 const signupSchema = z.object({
   ...contactInfoSchema.shape,
@@ -147,44 +150,90 @@ export default function SignupPage(
   }
 
   return (
-    <BackgroundDiv>
-      <Card className="w-[400px] mx-auto mt-10">
-        <CardHeader
-          className="border-b aspect-video bg-accent-foreground text-accent-foreground"
-          style={{
-            backgroundImage: 'url(/signup-background.png), url(/banner.jpg)',
-            backgroundSize: 'cover',
-          }}
-        />
-        <CardContent className="p-6 flex flex-col gap-2">
-          <div
-            className="flex flex-col space-y-2 p-4 bg-primary bg-opacity-10 rounded-md"
-          >
-            <h2 className="text-2xl font-semibold text-primary">{currentStep.title}</h2>
-            <p>{currentStep.description}</p>
-            <Progress value={progress} className="w-full" />
-          </div>
-          <FormProvider {...currentStep.form as unknown as FormContextType}>
-            <form onSubmit={currentStep.form.handleSubmit(step === steps.length - 1 ? handleSubmit : handleNextStep)}>
-              {currentStep.component}
-              <div className="flex justify-between mt-4">
-                {step > 0 && (
-                  <Button type="button" onClick={() => setStep((prev) => prev - 1)} disabled={isSubmitting}>
-                    {t('Button.back')}
-                  </Button>
-                )}
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting
-                    ? t('Button.submitting')
-                    : step === steps.length - 1
-                      ? t('Button.submit')
-                      : t('Button.next')}
-                </Button>
+    <BackgroundDiv
+      shouldCenter={false}
+      className={cn(
+        'flex flex-col md:flex-row h-screen w-full overflow-hidden'
+      )}
+    >
+      {/* Hero / Illustration section */}
+      <div
+        className={cn(
+          'order-2 md:order-1 flex-1 hidden md:block',
+          "bg-[url('/banner.jpg')] bg-cover bg-center"
+        )}
+      />
+
+      {/* Signup form section */}
+      <div
+        className={cn(
+          'order-1 md:order-2 flex-1',
+          'flex items-center justify-center'
+        )}
+      >
+        <Suspense fallback={<Loading />}>
+          <Card className="w-[90%] max-w-[420px] overflow-hidden border-4 border-black shadow-[4px_4px_0_0_#000]">
+            {/* Mobile banner */}
+            <CardHeader
+              className="aspect-video md:hidden bg-[url('/banner.jpg')] bg-cover bg-center relative"
+            />
+            <CardContent className="p-6 flex flex-col gap-6">
+              {/* Brand heading */}
+              <HeroTitle
+                size="small"
+                bordered="black"
+                variant="accent"
+                className="text-black text-center"
+              >
+                SIGN&nbsp;UP
+              </HeroTitle>
+
+              {/* Step information */}
+              <div className="flex flex-col gap-2 bg-sunglow/10 p-4 mb-2 rounded-md border border-sunglow/40">
+                <h2 className="text-2xl font-semibold text-black">{currentStep.title}</h2>
+                <p>{currentStep.description}</p>
+                <Progress
+                  value={progress}
+                  className="w-full bg-sunglow/20"
+                  indicatorClassName="bg-sunglow"
+                />
               </div>
-            </form>
-          </FormProvider>
-        </CardContent>
-      </Card>
+
+              {/* Form */}
+              <FormProvider {...(currentStep.form as unknown as FormContextType)}>
+                <form onSubmit={currentStep.form.handleSubmit(step === steps.length - 1 ? handleSubmit : handleNextStep)}>
+                  {currentStep.component}
+                  <div className="flex justify-between mt-4">
+                    {step > 0 && (
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        onClick={() => setStep((prev) => prev - 1)}
+                        disabled={isSubmitting}
+                        className="bg-sunglow text-black hover:bg-yellow-400 focus-visible:ring-yellow-500"
+                      >
+                        {t('Button.back')}
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="bg-sunglow text-black hover:bg-yellow-400 focus-visible:ring-yellow-500"
+                    >
+                      {isSubmitting
+                        ? t('Button.submitting')
+                        : step === steps.length - 1
+                          ? t('Button.submit')
+                          : t('Button.next')}
+                    </Button>
+                  </div>
+                </form>
+              </FormProvider>
+            </CardContent>
+          </Card>
+        </Suspense>
+      </div>
     </BackgroundDiv>
   )
 }

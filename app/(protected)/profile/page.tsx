@@ -6,7 +6,6 @@ import { fetchUserData } from "@/app/api/user/helper";
 
 // UI imports
 import { ProfileCard } from "@/components/profile/ProfileCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Wrapper imports
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
@@ -21,16 +20,12 @@ import { cookies } from "next/headers";
 // Next.js imports
 import { Suspense } from "react";
 // Local component import
-import { ContactList } from "@/components/contacts/ContactList";
-import { ErrorContactCard } from "@/components/contacts/ErrorContactCard";
 import { ProfileCardSkeleton } from "@/components/profile/ProfileCardSkeleton";
 import ErrorBoundary from "@/components/wrappers/ErrorBoundary";
 import AnonymousProfilePage from "./AnonymousProfilePage";
 import { ErrorPortfolioProjectCard } from "./ErrorPortfolioProjectCard";
 import { ErrorProfileCard } from "./ErrorProfileCard";
 import PortfolioSection from "./PortfolioSection";
-import { ContactListSkeleton } from "@/components/contacts/ContactListSkeleton";
-import { use } from "react";
 
 interface ProfilePageProps {
   params: Promise<{}>;
@@ -74,57 +69,29 @@ export default async function ProfilePage(props: ProfilePageProps) {
         <main className="mt-10 w-full grow justify-between lg:mt-20">
           <div className="w-full px-4 sm:px-8 md:px-16">
             <div className="flex flex-col lg:flex-row">
-              <div className="w-full overflow-y-auto pr-0 lg:w-2/3 lg:pr-6">
-                <div className="mb-6">
-                  <Tabs defaultValue="contacts">
-                    <TabsList>
-                      <TabsTrigger value="contacts">
-                        {t("contactsHeader")}
-                      </TabsTrigger>
-                      <TabsTrigger value="portfolio">
-                        {t("portfolioHeader")}
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="contacts">
-                      {!user || !user.id ? (
-                        <ErrorContactCard
-                          lang={lang}
-                          message={t("noUserError", { ns: "ContactList" })}
-                        />
-                      ) : (
-                        <ErrorBoundary
-                          fallback={<ErrorContactCard lang={lang} />}
-                        >
-                          <Suspense fallback={<ContactListSkeleton />}>
-                            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-                              <ContactList userId={user.id} lang={lang} />
-                            </div>
-                          </Suspense>
-                        </ErrorBoundary>
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="portfolio">
-                      <ErrorBoundary
-                        fallback={<ErrorPortfolioProjectCard lang={lang} />}
-                      >
-                        <PortfolioSection
-                          showButtons={true}
-                          userData={userData}
-                          portfolioArtworksPromise={portfolioArtworksPromise}
-                          lang={lang}
-                        />
-                      </ErrorBoundary>
-                    </TabsContent>
-                  </Tabs>
-                </div>
+              <div
+                className={cn(
+                  "w-full order-2 lg:order-1 lg:w-2/3 2xl:w-3/4 -mt-px lg:mt-0",
+                  "lg:h-[calc(100vh-225px)] lg:flex lg:flex-col",
+                )}
+              >
+                <ErrorBoundary
+                  fallback={<ErrorPortfolioProjectCard lang={lang} />}
+                >
+                  <PortfolioSection
+                    showButtons={true}
+                    userData={userData}
+                    portfolioArtworksPromise={portfolioArtworksPromise}
+                    lang={lang}
+                  />
+                </ErrorBoundary>
               </div>
 
               <div
                 className={cn(
-                  "mt-6 w-full lg:w-[437px] lg:flex-shrink-0",
-                  "max-h-[calc(100vh-225px)] overflow-y-scroll",
-                  "lg:mt-0 lg:-ml-px lg:pl-6",
+                  "w-full order-1 lg:order-2 lg:w-1/3 2xl:w-1/4 lg:-ml-px",
+                  "lg:max-h-[calc(100vh-225px)] lg:overflow-y-scroll no-scrollbar",
+                  "-mt-px lg:mt-0",
                 )}
               >
                 <Suspense fallback={<ProfileCardSkeleton />}>

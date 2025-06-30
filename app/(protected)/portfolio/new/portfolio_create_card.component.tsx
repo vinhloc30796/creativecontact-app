@@ -99,7 +99,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   }
 
   return (
-    <Card className="container mb-4 max-h-full w-full grow justify-between gap-4 px-4 md:mx-auto lg:flex">
+    <Card className="container mb-4 max-h-full w-full grow justify-between gap-4 px-4 md:mx-auto lg:flex rounded-none">
       <div className="position-absolute grow">
         <CardHeader>
           <FormProvider {...artworkForm}>
@@ -156,7 +156,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
         <UploadInfo />
         <div className="flex w-full flex-col gap-2 pt-10">
           <Button
-            className="w-full rounded-full"
+            className="w-full rounded-none border"
             onClick={onSubmit}
             disabled={submitLoading}
           >
@@ -165,7 +165,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
               : t("form.submit.create")}
           </Button>
           <Button
-            className="w-full rounded-full underline"
+            className="w-full rounded-none underline"
             variant={"secondary"}
             onClick={() => {
               artworkForm.reset();
@@ -178,7 +178,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       </CardFooter>
 
       {submitLoading && uploadProgress > 0 && (
-        <Dialog open={true} onOpenChange={() => {}}>
+        <Dialog open={true} onOpenChange={() => { }}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="mb-2 text-2xl font-bold">

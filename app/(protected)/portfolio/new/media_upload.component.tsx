@@ -32,7 +32,7 @@ export function MediaUploadComponent(props: MediaUploadComponentProps) {
     <div className='w-full mx-auto'>
       <div
         {...getRootProps()}
-        className={cn(`cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors flex items-center justify-center flex-col max-w-3xl mx-auto`,
+        className={cn(`cursor-pointer rounded-none border border-dashed p-8 text-center transition-colors flex items-center justify-center flex-col max-w-3xl mx-auto`,
           isDragActive ? "border-primary bg-primary/10" : "border-border")}
       >
         <input {...getInputProps()} />

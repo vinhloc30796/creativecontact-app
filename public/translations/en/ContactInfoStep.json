@@ -13,7 +13,7 @@
       "placeholder": "Doe"
     },
     "phone": {
-      "label": "Phone",
+      "label": "Phone (optional)",
       "placeholder": "1234567890"
     },
     "instagramHandle": {

@@ -96,9 +96,9 @@ export function PortfolioProjectCard({ project }: PortfolioProjectCardProps) {
           </div>
 
           <div className="container flex flex-col lg:gap-1">
-            <Button className="rounded-full">Save</Button>
-            <Button className="rounded-full">Save</Button>
-            <Button className="rounded-full">Save</Button>
+            <Button className="rounded-none border">Save</Button>
+            <Button className="rounded-none border">Save</Button>
+            <Button className="rounded-none border">Save</Button>
           </div>
         </CardFooter>
       </ThumbnailProvider>
