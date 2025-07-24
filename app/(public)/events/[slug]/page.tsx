@@ -50,8 +50,8 @@ export async function generateMetadata({
     description: event.summary || "Creative Contact Event",
     openGraph: mediaUrl
       ? {
-          images: [{ url: mediaUrl }],
-        }
+        images: [{ url: mediaUrl }],
+      }
       : undefined,
   };
 }
@@ -100,15 +100,33 @@ export default async function EventPage({
   const featuredImageUrl = getMediaUrl(event.featuredImage);
 
   // --- Flatten Content Blocks --- START ---
+  // 0. Insert the featured image as the **first** block so it always shows up
+  //    before the rest of the content. We reuse the same MediaBlock structure
+  //    used elsewhere so RenderBlocks can handle it seamlessly.
+  const flatContentBlocks: Array<BlockTypes> = [];
+
+  if (event.featuredImage) {
+    flatContentBlocks.push({
+      id: "featured-image",
+      blockType: "mediaBlock",
+      blockName: "Featured Image",
+      mediaBlockFields: {
+        media: event.featuredImage as Media,
+        caption: undefined,
+        position: "default",
+      },
+    } as BlockTypes);
+  }
+
+  // Identify the standalone EventCredits block (rendered separately in the sidebar)
   const creditsBlock = event.content?.find(
     (
       block,
-    ): block is Extract<BlockTypes, { blockType: "EventCredits" }> => // Type guard
+    ): block is Extract<BlockTypes, { blockType: "EventCredits" }> =>
       block.blockType === "EventCredits",
   );
 
-  // Use a more flexible type for the flattened array
-  const flatContentBlocks: Array<BlockTypes> = []; // Simplified type
+  // 1. Process the remaining blocks from the CMS content field
   event.content?.forEach((block, blockIndex) => {
     // Add blockIndex for key generation
     if (block.blockType === "EventCredits") {
@@ -144,22 +162,22 @@ export default async function EventPage({
 
         // Create a pseudo-block matching the structure expected by RenderSingleBlock for 'mediaBlock'
         const mediaBlockData: Extract<BlockTypes, { blockType: "mediaBlock" }> =
-          {
-            id: imgItem.id || `gallery-img-${blockIndex}-${imgIndex}`, // Unique ID using indices
-            blockType: "mediaBlock",
-            blockName: `Gallery Image ${imgIndex + 1}`, // Optional: Add a block name
-            // These fields form the 'data' prop for MediaBlock component via RenderSingleBlock
-            mediaBlockFields: {
-              media: imgItem.image as Media, // Assert Media type
-              // Ensure caption is RichText or undefined
-              caption:
-                typeof imgItem.caption === "object" && imgItem.caption !== null
-                  ? imgItem.caption
-                  : undefined,
-              position: "default", // Default position for individual items
-              // settings: block.settings, // Pass gallery-level settings if applicable/needed
-            },
-          };
+        {
+          id: imgItem.id || `gallery-img-${blockIndex}-${imgIndex}`, // Unique ID using indices
+          blockType: "mediaBlock",
+          blockName: `Gallery Image ${imgIndex + 1}`, // Optional: Add a block name
+          // These fields form the 'data' prop for MediaBlock component via RenderSingleBlock
+          mediaBlockFields: {
+            media: imgItem.image as Media, // Assert Media type
+            // Ensure caption is RichText or undefined
+            caption:
+              typeof imgItem.caption === "object" && imgItem.caption !== null
+                ? imgItem.caption
+                : undefined,
+            position: "default", // Default position for individual items
+            // settings: block.settings, // Pass gallery-level settings if applicable/needed
+          },
+        };
         flatContentBlocks.push(mediaBlockData as BlockTypes); // Add to flattened list
       });
     } else {
