@@ -1,5 +1,10 @@
 import { Block } from "payload";
 
+// Add note to help future devs understand enum constraint
+// NOTE: The `columns` field stores a Postgres enum with allowed values "2", "3", and "4" only.
+// Seeds or migrations that provide any other value (e.g., "1") will fail at runtime with
+// `invalid input value for enum payload.enum_events_blocks_event_gallery_columns`.
+// Keep the options list in sync with the database enum!
 export const EventGallery: Block = {
   slug: "EventGallery",
   labels: {
@@ -62,6 +67,9 @@ export const EventGallery: Block = {
         { label: "4 Columns", value: "4" },
       ],
       admin: {
+        // Provide inline guidance in the admin UI
+        description:
+          "Select 2–4 columns. Any other value will cause a database validation error.",
         condition: (data: any) =>
           data.layout === "grid" || data.layout === "masonry",
       },

@@ -1,29 +1,24 @@
-import { H1, H2 } from "@/components/ui/typography";
+import { type EventSpeakerBlockProps } from "@/components/payload-cms/blocks/EventSpeakerBlock";
+import { H1 } from "@/components/ui/typography";
 import { fetchEventBySlug } from "@/lib/payload/fetchEvents";
 import {
   BlockTypes,
   getMediaUrl,
   Media,
 } from "@/lib/payload/payloadTypeAdapter";
-import { type EventSpeakerBlockProps } from "@/components/payload-cms/blocks/EventSpeakerBlock";
 import {
-  Event,
-  EventSpeakerBlock as PayloadEventSpeakerBlockType,
+  Event
 } from "@/payload-types";
 import { format } from "date-fns";
 import { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 // --- Component Imports from Homepage --- (Assuming paths are correct)
-import { ClientNavMenu } from "@/components/ClientNavMenu";
+import { ClientFloatingActions } from "@/components/ClientFloatingActions";
 import { Header } from "@/components/Header";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { RenderSingleBlock } from "@/components/payload-cms/RenderSingleBlock";
+import { SquareWrapper } from "@/components/payload-cms/SquareWrapper";
 import { EventCreditsBlock } from "@/components/payload-cms/blocks/EventCreditsBlock";
 import { getServerTranslation } from "@/lib/i18n/init-server";
-import { cn } from "@/lib/utils";
-import { RenderBlocks } from "@/components/payload-cms/RenderBlocks";
-import { ClientFloatingActions } from "@/components/ClientFloatingActions";
 
 // server component
 
@@ -196,7 +191,7 @@ export default async function EventPage({
       {/* The outer div here controls the height and relative positioning */}
       <div
         id="event-scroll"
-        className="relative z-10 my-4 flex h-full snap-x snap-mandatory overflow-x-auto"
+        className="relative z-10 my-4 flex flex-col md:flex-row w-full md:h-full overflow-y-auto md:overflow-x-auto snap-y md:snap-x snap-mandatory gap-4 p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {/* 1. Metadata Card (Fixed Width) */}
         <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 px-4">
@@ -226,10 +221,14 @@ export default async function EventPage({
         {/* RenderBlocks now includes the horizontal scroll container styles */}
         {/* Pass flatContentBlocks to the component */}
         {/* Removed the gap-4 from the outer div as RenderBlocks handles it */}
-        <RenderBlocks
-          blocks={flatContentBlocks}
-          className="flex-shrink-0 overflow-visible"
-        />{" "}
+        {flatContentBlocks.map((block, index) => (
+          <SquareWrapper
+            key={block.id || `flat-block-${index}`}
+            block={block}
+          >
+            <RenderSingleBlock block={block} />
+          </SquareWrapper>
+        ))}{" "}
         {/* Pass blocks and allow it to grow */}
       </div>
       <div className="pointer-events-none absolute top-1/2 right-0 left-0 z-20 -translate-y-1/2 transform px-12">
@@ -240,7 +239,7 @@ export default async function EventPage({
             items={[
               { text: t("aboutCC"), href: "/about" },
               { text: t("contactBook"), href: "/contacts" },
-              { text: t("events"), href: "/events" },
+              { text: t("event"), href: "/events" },
             ]}
             menuText={t("menu")}
           />
