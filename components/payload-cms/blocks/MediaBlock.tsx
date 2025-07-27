@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
@@ -33,6 +35,10 @@ export const MediaBlock: React.FC<MediaBlockProps> = ({ data }) => {
   const imageUrl = getMediaUrl(mediaData);
   const imageAlt = getMediaAlt(mediaData) || "Media item";
 
+  // Extract intrinsic dimensions for Next Image. Provide sensible defaults as fallback.
+  const intrinsicWidth = mediaData?.width ?? 1280;
+  const intrinsicHeight = mediaData?.height ?? 720;
+
   useEffect(() => {
     if (captionRef.current && containerRef.current && caption) {
       // Show chevron if there's a caption (since it will be hideable)
@@ -60,13 +66,16 @@ export const MediaBlock: React.FC<MediaBlockProps> = ({ data }) => {
     // Use React.Fragment to avoid adding an extra div layer
     <React.Fragment>
       {/* Image container fills the space given by the parent */}
-      <div ref={containerRef} className="relative h-full w-full overflow-hidden rounded-lg">
+      <div
+        ref={containerRef}
+        className="flex h-full w-auto items-center justify-center overflow-hidden rounded-lg"
+      >
         <Image
           src={imageUrl}
           alt={imageAlt}
-          fill
-          className="object-cover" // Use cover to fill the container
-          sizes="100vw" // Simplified sizes, adjust if needed based on parent layout
+          width={intrinsicWidth}
+          height={intrinsicHeight}
+          className="object-contain img-orientation max-h-full max-w-full"
         />
         {caption && (
           // Grey transparent overlay similar in style to EventDetailsBlock

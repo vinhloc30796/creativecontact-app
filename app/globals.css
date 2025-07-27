@@ -654,3 +654,47 @@
 .bg-bermuda {
   background-color: var(--color-bermuda);
 }
+
+@layer utilities {
+  /* Responsive image sizing based on device orientation */
+  .img-orientation {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (orientation: landscape) {
+    .img-orientation {
+      width: auto;
+      height: 100%;
+    }
+  }
+
+  /* Orientation-aware flex container that switches scroll direction */
+  .orientation-flow {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+  }
+
+  @media (orientation: portrait) {
+    .orientation-flow {
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+    }
+
+    /* Flex-only orientation utility (no scroll behaviors) */
+    .orientation-flex {
+      flex-direction: column;
+    }
+  }
+
+  /* Default orientation-flex (landscape) */
+  .orientation-flex {
+    display: flex;
+    flex-direction: row;
+  }
+}
