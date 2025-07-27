@@ -39,7 +39,7 @@ export const MediaBlock: React.FC<MediaBlockProps> = ({ data }) => {
   // --- TODO: Implement video rendering if media type can be video --- //
 
   return (
-    <div className="relative flex h-full w-auto items-center justify-center overflow-hidden rounded-lg">
+    <div className="media-wrapper relative flex items-center justify-center overflow-hidden rounded-lg">
       <Image
         src={imageUrl}
         alt={imageAlt}

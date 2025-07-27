@@ -656,6 +656,47 @@
 }
 
 @layer utilities {
+  /* Responsive Metadata Card sizing */
+  .metadata-card {
+    flex: 0 0 50vw; /* approx 50% of viewport width */
+    width: 50vw;
+    min-width: 250px; /* ensure usability on very small screens */
+    height: 100%;
+    overflow-y: auto;
+  }
+  @media (orientation: portrait) {
+    .metadata-card {
+      flex: 0 0 auto;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  /* Responsive wrapper for media blocks */
+  .media-wrapper {
+    width: auto;
+    height: 100%;
+  }
+  @media (orientation: portrait) {
+    .media-wrapper {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  /* Wrapper for non-media blocks that is square by default but tall in landscape */
+  .square-wrapper {
+    aspect-ratio: 1 / 1;
+  }
+  @media (orientation: landscape) {
+    .square-wrapper {
+      aspect-ratio: auto;
+      height: 100%;
+      max-width: 100vw; /* don’t exceed viewport width */
+      overflow-y: auto;
+    }
+  }
+
   /* Responsive image sizing based on device orientation */
   .img-orientation {
     width: 100%;

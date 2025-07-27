@@ -191,10 +191,10 @@ export default async function EventPage({
       {/* The outer div here controls the height and relative positioning */}
       <div
         id="event-scroll"
-        className="relative z-10 my-4 flex flex-col md:flex-row w-full md:h-full overflow-y-auto md:overflow-x-auto snap-y md:snap-x snap-mandatory gap-4 p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="relative z-10 my-4 orientation-flow w-full h-full gap-4 p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {/* 1. Metadata Card (Fixed Width) */}
-        <div className="h-full w-[400px] max-w-screen flex-shrink-0 snap-start bg-black/1 px-4">
+        <div className="metadata-card flex-shrink-0 snap-start bg-black/1 px-4">
           {" "}
           {/* Added pl-4 here */}
           <div className="bg-gray/40 flex h-full flex-col justify-between rounded-lg p-6 backdrop-blur-md">
