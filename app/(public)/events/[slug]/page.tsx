@@ -1,28 +1,24 @@
-import { H1, H2 } from "@/components/ui/typography";
+import { type EventSpeakerBlockProps } from "@/components/payload-cms/blocks/EventSpeakerBlock";
+import { H1 } from "@/components/ui/typography";
 import { fetchEventBySlug } from "@/lib/payload/fetchEvents";
 import {
   BlockTypes,
   getMediaUrl,
   Media,
 } from "@/lib/payload/payloadTypeAdapter";
-import { type EventSpeakerBlockProps } from "@/components/payload-cms/blocks/EventSpeakerBlock";
 import {
-  Event,
-  EventSpeakerBlock as PayloadEventSpeakerBlockType,
+  Event
 } from "@/payload-types";
 import { format } from "date-fns";
 import { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 // --- Component Imports from Homepage --- (Assuming paths are correct)
-import { ClientNavMenu } from "@/components/ClientNavMenu";
+import { ClientFloatingActions } from "@/components/ClientFloatingActions";
 import { Header } from "@/components/Header";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { RenderSingleBlock } from "@/components/payload-cms/RenderSingleBlock";
+import { SquareWrapper } from "@/components/payload-cms/SquareWrapper";
 import { EventCreditsBlock } from "@/components/payload-cms/blocks/EventCreditsBlock";
 import { getServerTranslation } from "@/lib/i18n/init-server";
-import { cn } from "@/lib/utils";
-import { ClientFloatingActions } from "@/components/ClientFloatingActions";
 
 // server component
 
@@ -226,17 +222,12 @@ export default async function EventPage({
         {/* Pass flatContentBlocks to the component */}
         {/* Removed the gap-4 from the outer div as RenderBlocks handles it */}
         {flatContentBlocks.map((block, index) => (
-          <div
+          <SquareWrapper
             key={block.id || `flat-block-${index}`}
-            className={cn(
-              "flex-shrink-0 snap-start rounded-xl last:mr-4",
-              block.blockType === "mediaBlock"
-                ? "bg-transparent p-0 w-auto flex items-center justify-center"
-                : "w-full md:h-full bg-gray/40 p-6 backdrop-blur-md"
-            )}
+            block={block}
           >
             <RenderSingleBlock block={block} />
-          </div>
+          </SquareWrapper>
         ))}{" "}
         {/* Pass blocks and allow it to grow */}
       </div>
