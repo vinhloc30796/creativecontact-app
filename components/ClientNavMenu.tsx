@@ -34,13 +34,13 @@ export function ClientNavMenu({
     activeIndex !== undefined
       ? activeIndex
       : items.findIndex(
-          (item) =>
-            currentPath === item.href ||
-            currentPath.startsWith(`${item.href}/`),
-        );
+        (item) =>
+          currentPath === item.href ||
+          currentPath.startsWith(`${item.href}/`),
+      );
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col items-end gap-3 md:flex-row md:items-center">
       {isExpanded && (
         <>
           {items.map((item, index) => {
@@ -52,11 +52,10 @@ export function ClientNavMenu({
                 key={`nav-item-${index}`}
                 variant={variant === "primary" ? "default" : "ghost"}
                 asChild
-                className={`flex h-auto items-center gap-2 rounded-full border border-black px-4 py-1.5 text-base transition-colors ${
-                  variant === "primary"
-                    ? "bg-sunglow font-medium text-black hover:bg-yellow-500"
-                    : "text-foreground bg-white/10 hover:bg-white/20"
-                }`}
+                className={`flex h-auto items-center gap-2 rounded-full border border-black px-4 py-1.5 text-base transition-colors ${variant === "primary"
+                  ? "bg-sunglow font-medium text-black hover:bg-yellow-500"
+                  : "text-foreground bg-white/50 hover:bg-white/50"
+                  }`}
               >
                 <Link href={item.href} className="flex items-center gap-2">
                   {item.text}
@@ -70,11 +69,10 @@ export function ClientNavMenu({
       <Button
         variant="ghost"
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`flex h-auto items-center gap-2 rounded-full border border-black px-4 py-1.5 text-base transition-colors ${
-          activeItemIndex === -1 && isExpanded
-            ? "bg-sunglow font-medium text-black hover:bg-yellow-500"
-            : "text-foreground bg-white/10 hover:bg-white/20"
-        }`}
+        className={`flex h-auto items-center gap-2 rounded-full border border-black px-4 py-1.5 text-base transition-colors ${activeItemIndex === -1 && isExpanded
+          ? "bg-sunglow font-medium text-black hover:bg-yellow-500"
+          : "text-foreground bg-white/50 hover:bg-white/50"
+          }`}
       >
         {menuText}
         {isExpanded ? (

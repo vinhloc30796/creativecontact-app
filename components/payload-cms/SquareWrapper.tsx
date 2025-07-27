@@ -27,8 +27,8 @@ export const SquareWrapper: React.FC<SquareWrapperProps> = ({ block, children })
 
     // All other blocks get a square ratio with an inner card.
     return (
-        <div className={cn(base, "aspect-square bg-black/10 p-5")}>
-            <div className="bg-gray/40 h-full rounded-lg p-6 backdrop-blur-md">
+        <div className={cn(base, "square-wrapper bg-black/10 p-5")}>
+            <div className="bg-gray/40 h-full rounded-lg p-6 backdrop-blur-md overflow-y-auto">
                 {children}
             </div>
         </div>
