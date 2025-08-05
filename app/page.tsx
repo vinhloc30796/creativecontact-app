@@ -162,17 +162,11 @@ export default async function Page(props: Props) {
     where: { status: { not_equals: "draft" } },
   });
 
-  const combinedEvents = [
-    ...mockEvents.map((e: any) => ({
-      ...e,
-      isPlaceholder: true,
-    })),
-    ...realEvents.map((e: any) => ({
-      ...e,
-      datetime: new Date(e.eventDate),
-      isPlaceholder: false,
-    })),
-  ];
+  const combinedEvents = realEvents.map((e: any) => ({
+    ...e,
+    datetime: new Date(e.eventDate),
+    isPlaceholder: false,
+  }));
 
   return (
     <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
