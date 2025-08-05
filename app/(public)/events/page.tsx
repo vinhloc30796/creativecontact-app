@@ -41,7 +41,7 @@ export default async function EventsPage() {
   const { t } = await getServerTranslation("en", "HomePage");
 
   const events = await fetchEvents({
-    sort: "eventDate",
+    sort: "-eventDate",
     where: {
       status: {
         not_equals: "draft",
