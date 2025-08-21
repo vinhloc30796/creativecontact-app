@@ -31,6 +31,9 @@ import { Header } from "@/components/Header";
 import { FooterCTA } from "@/components/FooterCTA";
 import EventSwimLane from "@/components/events/EventSwimLane";
 
+// Revalidate the Events listing page every 60 seconds (ISR)
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Events | Creative Contact",
   description:
