@@ -42,6 +42,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -233,22 +234,58 @@ function UploadPageContent({
   };
 
   async function validateForms() {
-    const validationResult = await Promise.all([
+    // Validate each step's form in sequence and return granular results for debugging
+    const validationResults = await Promise.all([
       contactInfoForm.trigger(),
       professionalInfoForm.trigger(),
       artworkForm.trigger(),
       artworkCreditForm.trigger(),
     ]);
-
-    return validationResult.every((result) => result === true);
+    const isValid = validationResults.every((result) => result === true);
+    return { isValid, validationResults };
   }
 
   const handleSubmit = async () => {
+    console.log("Submit clicked", {
+      currentFormStep: formStep,
+      isSubmitting,
+      pendingFilesCount: pendingFiles.length,
+      hasArtworkUUID: Boolean(artworkUUID),
+      hasThumbnail: Boolean(thumbnailFileName),
+    });
     setIsSubmitting(true);
     resetUploadProgress();
     try {
-      const isValid = await validateForms();
-      if (!isValid) return false;
+      const { isValid, validationResults } = await validateForms();
+      if (!isValid) {
+        const stepLabels = [
+          "Contact Info",
+          "Professional Info",
+          "Artwork Info",
+          "Artwork Credits",
+        ];
+        const firstInvalidIndex = validationResults.findIndex((r) => r !== true);
+        const invalidStepLabel = stepLabels[firstInvalidIndex] ?? "Unknown";
+        console.warn("Form validation failed", {
+          validationResults,
+          errors: {
+            contactInfo: contactInfoForm.formState.errors,
+            professionalInfo: professionalInfoForm.formState.errors,
+            artwork: artworkForm.formState.errors,
+            artworkCredit: artworkCreditForm.formState.errors,
+          },
+          firstInvalidIndex,
+          invalidStepLabel,
+        });
+        toast.error(
+          `Please complete required fields in: ${invalidStepLabel}`,
+        );
+        // Navigate user to first invalid step for visibility
+        if (firstInvalidIndex >= 0) {
+          setFormStep(firstInvalidIndex);
+        }
+        return false;
+      }
 
       const contactInfoData = contactInfoForm.getValues();
       const professionalInfoData = professionalInfoForm.getValues();
@@ -263,12 +300,15 @@ function UploadPageContent({
       console.log("Write user info successful:", writeUserInfoResult);
 
       if (pendingFiles.length === 0) {
+        console.warn("Submit blocked: No files to upload");
         toast.error("No files to upload");
         return false;
       } else if (!artworkUUID) {
+        console.warn("Submit blocked: Artwork UUID not set");
         toast.error("Artwork UUID not set");
         return false;
       } else if (!thumbnailFileName) {
+        console.warn("Submit blocked: Thumbnail file not set");
         toast.error("Thumbnail file not set");
         return false;
       }
@@ -477,16 +517,16 @@ function UploadPageContent({
 
   return (
     <BackgroundDiv eventSlug={eventSlug}>
-      <Card className="mx-auto mt-10 w-[400px]">
+      <Card className="mx-auto mt-10 w-[50vw] min-w-[450px]">
         <CardHeader
-          className="aspect-video border-b bg-accent-foreground text-accent-foreground"
+          className="aspect-video border-b text-accent-foreground"
           style={{
             backgroundImage: `url(/${eventSlug}-background.png), url(/banner.jpg)`,
             backgroundSize: "cover",
           }}
         ></CardHeader>
         <CardContent className="flex flex-col gap-2 p-6">
-          <div className="flex flex-col space-y-2 rounded-md bg-primary bg-opacity-10 p-4">
+          <div className="flex flex-col space-y-2 rounded-md bg-opacity-10 p-4">
             <h2 className="text-2xl font-semibold text-primary">
               {currentStep.title}
             </h2>
@@ -525,11 +565,15 @@ function UploadPageContent({
               </Button>
             ) : (
               <Button
-                type="submit"
+                type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
+                aria-busy={isSubmitting}
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 sm:w-auto"
               >
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isSubmitting ? t("Button.submitting") : t("Button.submit")}
               </Button>
             )}
@@ -537,8 +581,8 @@ function UploadPageContent({
         </CardContent>
       </Card>
       {/* Upload Progress Dialog */}
-      {isSubmitting && uploadProgress > 0 && (
-        <Dialog open={true} onOpenChange={() => {}}>
+      {isSubmitting && (
+        <Dialog open={true} onOpenChange={() => { }}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="mb-2 text-2xl font-bold">

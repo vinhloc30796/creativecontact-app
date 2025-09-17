@@ -26,7 +26,7 @@ export function BackgroundDiv({ children, className, eventSlug, shouldCenter = t
       className={cn(
         "min-h-screen w-full",
         "min-h-[100vh]",
-        eventSlug ? "bg-cover bg-center bg-no-repeat" : "",
+        eventSlug ? "bg-cover bg-center bg-no-repeat bg-parallax" : "",
         centerClass,
         className
       )}

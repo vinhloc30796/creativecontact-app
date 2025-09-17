@@ -205,6 +205,22 @@
       transform: translateX(-100%);
     }
   }
+  @keyframes bgPanX {
+    from {
+      background-position-x: 0%;
+    }
+    to {
+      background-position-x: 100%;
+    }
+  }
+  @keyframes bgPanY {
+    from {
+      background-position-y: 0%;
+    }
+    to {
+      background-position-y: 100%;
+    }
+  }
 }
 
 @utility container {
@@ -417,6 +433,57 @@
     --ring: 87, 86%, 40%;
 
     --radius: 0.1rem;
+  }
+
+  [data-theme="trungthu-archive-2025"] {
+    --background: 325.5882, 97.1429%, 86.2745%;
+    --foreground: 334.5455, 76.7442%, 4.314%;
+    --card: 332.1429, 93.3333%, 94.1176%;
+    --card-foreground: 334.5455, 76.7442%, 8.4314%;
+    --popover: 332.1429, 93.3333%, 94.1176%;
+    --popover-foreground: 334.5455, 76.7442%, 8.4314%;
+    --primary: 336.055, 100%, 57.2549%;
+    --primary-foreground: 334.5455, 76.7442%, 4.314%;
+    --secondary: 61.4458, 85.567%, 80.9804%;
+    --secondary-foreground: 334.5455, 76.7442%, 8.4314%;
+    --muted: 332.1429, 93.3333%, 94.1176%;
+    --muted-foreground: 330, 26.7327%, 25%;
+    --accent: 336.055, 100%, 57.2549%;
+    --accent-foreground: 0, 0%, 100%;
+    --destructive: 0, 84.2365%, 60.1961%;
+    --destructive-foreground: 0, 0%, 100%;
+    --border: 61.4458, 85.567%, 80.9804%;
+    --input: 332.1429, 93.3333%, 94.1176%;
+    --ring: 336.055, 100%, 57.2549%;
+    --chart-1: 336.055, 100%, 57.2549%;
+    --chart-2: 61.4458, 85.567%, 80.9804%;
+    --chart-3: 270.7407, 91.0112%, 65.098%;
+    --chart-4: 217.2193, 91.2195%, 59.8039%;
+    --chart-5: 173.4146, 80.3922%, 40%;
+    --sidebar: 332.1429, 93.3333%, 94.1176%;
+    --sidebar-foreground: 334.5455, 76.7442%, 8.4314%;
+    --sidebar-primary: 336.055, 100%, 57.2549%;
+    --sidebar-primary-foreground: 0, 0%, 100%;
+    --sidebar-accent: 61.4458, 85.567%, 80.9804%;
+    --sidebar-accent-foreground: 334.5455, 76.7442%, 8.4314%;
+    --sidebar-border: 61.4458, 85.567%, 80.9804%;
+    --sidebar-ring: 336.055, 100%, 57.2549%;
+    --radius: 0.5rem;
+    --shadow-2xs: 0px 2px 8px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0px 2px 8px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm:
+      0px 2px 8px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow:
+      0px 2px 8px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md:
+      0px 2px 8px 0px hsl(0 0% 0% / 0.1), 0px 2px 4px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg:
+      0px 2px 8px 0px hsl(0 0% 0% / 0.1), 0px 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-xl:
+      0px 2px 8px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-2xl: 0px 2px 8px 0px hsl(0 0% 0% / 0.25);
+    --tracking-normal: normal;
+    --spacing: 0.25rem;
   }
 
   /* https://coolors.co/f3f1f2-010101-dea3a5-f86134-283bdd */
@@ -748,5 +815,31 @@
   .orientation-flex {
     display: flex;
     flex-direction: row;
+  }
+
+  /* Scroll-driven parallax for event pages */
+  #event-scroll {
+    scroll-timeline-name: eventScroll;
+    scroll-timeline-axis: inline;
+  }
+  @media (orientation: portrait) {
+    #event-scroll {
+      scroll-timeline-axis: block;
+    }
+  }
+  .bg-parallax {
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* Baseline: start at left/top even without scroll */
+    background-position-x: 0%;
+    background-position-y: top;
+    animation: bgPanX linear both;
+    animation-timeline: eventScroll;
+    animation-range: 0% 100%;
+  }
+  @media (orientation: portrait) {
+    .bg-parallax {
+      animation-name: bgPanY;
+    }
   }
 }

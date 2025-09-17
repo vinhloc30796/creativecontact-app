@@ -123,6 +123,8 @@ export default async function EventPage(props: EventPageProps) {
 
           {/* Main content area */}
           <main className="relative z-20 mt-10 w-full grow justify-between lg:mt-20">
+            {/* Spacer to push artworks below the fold */}
+            <div className="h-screen" aria-hidden="true" />
             <div className="w-full px-4 sm:px-8 md:px-16">
               {/* Render artwork cards */}
               {shuffledArtworks.map((artwork, index) => (

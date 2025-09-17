@@ -307,6 +307,15 @@ VALUES (
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
 );
 
+INSERT INTO events (id, created_at, name, slug, created_by)
+VALUES (
+    'd8d2b8e9-7a2d-4c1a-9c2f-4f9b8a6c1b2e', -- Random UUID
+    CURRENT_TIMESTAMP, -- Current timestamp
+    'Chung Thu 2025',
+    'trungthu-archive-2025',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
+);
+
 -- Static special slot
 INSERT INTO event_slots (id, created_at, event, time_start, time_end, capacity, special_notes)
 VALUES (

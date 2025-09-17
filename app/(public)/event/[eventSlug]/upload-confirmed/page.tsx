@@ -36,7 +36,7 @@ async function UploadConfirmedContent(props: UploadConfirmedContentProps) {
 
   return (
     <BackgroundDiv eventSlug={eventSlug}>
-      <Card className="w-[400px] overflow-hidden relative z-10">
+      <Card className="w-[50vw] min-w-[400px] overflow-hidden relative z-10">
         <CardHeader className="border-b aspect-video bg-accent-foreground text-accent-foreground"
           style={{
             backgroundImage: `url(/${eventSlug}-background.png)`,
