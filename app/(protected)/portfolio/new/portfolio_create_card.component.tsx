@@ -3,6 +3,8 @@ import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
 import { BorderlessCard, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
+import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
+import DataUsage from "@/components/uploads/DataUsage";
 import { PortfolioEditorShell } from "../PortfolioEditorShell";
 import {
   Dialog,
@@ -17,14 +19,23 @@ import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { useUploadStore } from "@/stores/uploadStore";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
 import { handleSubmit } from "./action.client";
-import AddCoOwner from "./add_coowner.component";
-import { useFileUpload } from "./files_uplooad_provider.component";
 import { MediaUpload } from "@/components/uploads/media-upload";
-import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
-import UploadInfo from "./upload_info.component";
+import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
+
+interface ThumbnailRefBridgeProps {
+  onChange: (name: string | null) => void;
+}
+
+function ThumbnailRefBridge({ onChange }: ThumbnailRefBridgeProps) {
+  const { thumbnailFileName } = useThumbnail();
+  useEffect(() => {
+    onChange(thumbnailFileName);
+  }, [thumbnailFileName, onChange]);
+  return null;
+}
 
 interface PortfolioCreateCardProps {
   project?: {
@@ -35,7 +46,8 @@ interface PortfolioCreateCardProps {
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const router = useRouter();
-  const { fileUploads, thumbnailFileName, addFiles, removeFile } = useFileUpload();
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const thumbnailRef = useRef<string | null>(null);
   const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -71,8 +83,8 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     const rs = await handleSubmit(
       artworkForm.getValues(),
       { id: projectId },
-      fileUploads,
-      thumbnailFileName,
+      pendingFiles,
+      thumbnailRef.current || "thumbnail.jpg",
       (progress, uploadedCount, totalCount) => {
         setUploadProgress(progress, uploadedCount, totalCount);
       },
@@ -97,7 +109,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       primaryLabel={submitLoading ? t("form.submit.submitting") : t("form.submit.create")}
       secondaryLabel={t("cancel")}
       onPrimary={onSubmit}
-      onSecondary={() => { artworkForm.reset(); artworkCreditForm.reset(); }}
+      onSecondary={() => { artworkForm.reset(); artworkCreditForm.reset(); setPendingFiles([]); }}
       rightRail={(
         <div className="flex flex-col gap-4">
           <BorderlessCard className="w-full">
@@ -105,7 +117,9 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
               <CardTitle>{t("creditInfo", { ns: "Portfolio" })}</CardTitle>
             </CardHeader>
             <CardContent>
-              <AddCoOwner artworkCreditForm={artworkCreditForm} />
+              <FormProvider {...artworkCreditForm}>
+                <ArtworkCreditInfoStep form={artworkCreditForm as any} />
+              </FormProvider>
             </CardContent>
           </BorderlessCard>
           <BorderlessCard className="w-full">
@@ -113,7 +127,7 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
               <CardTitle>{t("dataUsage", { ns: "Portfolio" })}</CardTitle>
             </CardHeader>
             <CardContent>
-              <UploadInfo />
+              <DataUsage dataUsage={0} fileCount={pendingFiles.length} maxSizeMB={25} />
             </CardContent>
           </BorderlessCard>
         </div>
@@ -129,20 +143,13 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
           />
         </FormProvider>
         <ThumbnailProvider>
+          <ThumbnailRefBridge onChange={(name) => { thumbnailRef.current = name; }} />
           <MediaUpload
             dataUsage={0}
             isNewArtwork={true}
             emailLink="/contact"
             onPendingFilesUpdate={(files) => {
-              const currentNames = new Set(fileUploads.map((f) => f.name));
-              const nextNames = new Set(files.map((f) => f.name));
-              // remove files not in next
-              fileUploads.forEach((f) => {
-                if (!nextNames.has(f.name)) removeFile(f.name);
-              });
-              // add new files
-              const newOnes = files.filter((f) => !currentNames.has(f.name));
-              if (newOnes.length > 0) addFiles(newOnes);
+              setPendingFiles(files);
             }}
           />
         </ThumbnailProvider>

@@ -209,7 +209,7 @@ export default function PortfolioEditForm({
               </CardHeader>
               <CardContent>
                 <div className="mt-1">
-                  <DataUsage dataUsage={dataUsage} />
+                  <DataUsage dataUsage={dataUsage} fileCount={pendingFiles.length} maxSizeMB={25} />
                 </div>
               </CardContent>
             </BorderlessCard>
