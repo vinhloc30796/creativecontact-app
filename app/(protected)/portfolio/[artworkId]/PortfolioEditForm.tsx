@@ -5,7 +5,8 @@ import { UserData } from "@/app/types/UserInfo";
 import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
 import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BorderlessCard, CardContent, CardHeader, CardHeaderSticky, CardTitle } from "@/components/ui/card";
+import { PortfolioEditorShell } from "../PortfolioEditorShell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
@@ -184,139 +185,100 @@ export default function PortfolioEditForm({
 
   return (
     <FormProvider {...form}>
-      <div className="flex flex-row space-x-8">
-        <Card className="w-full rounded-none" style={{ flex: 7 }}>
-          <CardHeader>
-            <CardTitle>{isNew ? t("newProject") : t("editProject")}</CardTitle>
-          </CardHeader>
-
-          <CardContent>
-            <div
-              className="flex flex-col space-y-8"
-            >
-              <div className="flex flex-col space-y-4">
-                <ArtworkInfoStep
-                  form={form as any}
-                  artworksCount={artworkWithAssets?.length || 0}
-                  artworks={
-                    artwork?.artworks
-                      ? [
-                        {
-                          ...artwork.artworks,
-                          description: artwork.artworks.description || "",
-                        },
-                      ]
-                      : []
-                  }
-                />
-
-                {pendingFiles.length > 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    {pendingFiles.reduce((acc, file) => acc + file.size, 0) /
-                      1024 /
-                      1024}{" "}
-                    MB
-                  </p>
-                )}
-                {!isNew && !isLoading && artworkWithAssets && (
-                  <div className="h-full">
-                    {artworkWithAssets.map(
-                      (item, index) =>
-                        item.assets && (
-                          <div
-                            key={item.assets.id}
-                            className="relative mb-4 w-full"
-                            style={index < 2 ? { zIndex: 10 } : {}}
-                          >
-                            {item.assets.assetType === "video" ? (
-                              <video
-                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
-                                controls
-                                className="w-full"
-                              >
-                                Your browser does not support the video tag.
-                              </video>
-                            ) : (
-                              <div className="relative h-auto w-full">
-                                <Image
-                                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
-                                  alt={`${artwork?.artworks?.title || "Untitled"} - Asset ${index + 1}`}
-                                  layout="responsive"
-                                  width={100}
-                                  height={100}
-                                  className="object-contain"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        ),
-                    )}
-                  </div>
-                )}
-
-                <ThumbnailProvider>
-                  <MediaUpload
-                    dataUsage={dataUsage}
-                    isNewArtwork={isNew}
-                    emailLink="/contact"
-                    onPendingFilesUpdate={setPendingFiles}
-                  />
-                </ThumbnailProvider>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex w-full flex-col" style={{ flex: 3 }}>
-          <div className="sticky top-[100px]">
-            <Card className="w-full rounded-none">
+      <PortfolioEditorShell
+        title={isNew ? t("newProject") : t("editProject")}
+        primaryLabel={isNew ? t("create") : t("save")}
+        secondaryLabel={t("cancel")}
+        onPrimary={form.handleSubmit(handleSubmit)}
+        onSecondary={() => router.push("/profile")}
+        rightRail={(
+          <div className="flex flex-col gap-4">
+            <BorderlessCard className="w-full">
               <CardHeader>
                 <CardTitle>{t("creditInfo")}</CardTitle>
               </CardHeader>
-
               <CardContent>
                 <div className="flex flex-col space-y-4">
                   <ArtworkCreditInfoStep form={form as any} />
                 </div>
               </CardContent>
-            </Card>
-          </div>
-          <div className="grow"></div>{" "}
-          {/* This div will take up the remaining space */}
-          <div className="sticky bottom-0">
-            <Card className="w-full rounded-none">
+            </BorderlessCard>
+            <BorderlessCard className="w-full">
               <CardHeader>
                 <CardTitle>{t("dataUsage")}</CardTitle>
               </CardHeader>
-
               <CardContent>
                 <div className="mt-1">
                   <DataUsage dataUsage={dataUsage} />
                 </div>
               </CardContent>
-            </Card>
-            <div className="mt-4 flex flex-col gap-4">
-              <Button
-                type="submit"
-                className="w-full rounded-none border"
-                onClick={form.handleSubmit(handleSubmit)}
-              >
-                {isNew ? t("create") : t("save")}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full rounded-none"
-                onClick={() => router.push("/profile")}
-              >
-                {t("cancel")}
-              </Button>
-            </div>
+            </BorderlessCard>
+          </div>
+        )}
+      >
+        <div className="flex flex-col space-y-8">
+          <div className="flex flex-col space-y-4">
+            <ArtworkInfoStep
+              form={form as any}
+              artworksCount={artworkWithAssets?.length || 0}
+              artworks={
+                artwork?.artworks
+                  ? [
+                    {
+                      ...artwork.artworks,
+                      description: artwork.artworks.description || "",
+                    },
+                  ]
+                  : []
+              }
+            />
+            {pendingFiles.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                {pendingFiles.reduce((acc, file) => acc + file.size, 0) / 1024 / 1024} MB
+              </p>
+            )}
+            {!isNew && !isLoading && artworkWithAssets && (
+              <div className="grid grid-cols-1 gap-4">
+                {artworkWithAssets.map(
+                  (item, index) =>
+                    item.assets && (
+                      <div key={item.assets.id} className="relative w-full" style={index < 2 ? { zIndex: 10 } : {}}>
+                        {item.assets.assetType === "video" ? (
+                          <video
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}#t=0.05`}
+                            controls
+                            className="w-full h-auto"
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : (
+                          <div className="relative h-auto w-full">
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artwork_assets/${item.assets.filePath}`}
+                              alt={`${artwork?.artworks?.title || "Untitled"} - Asset ${index + 1}`}
+                              layout="responsive"
+                              width={100}
+                              height={100}
+                              className="object-contain"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ),
+                )}
+              </div>
+            )}
+            <ThumbnailProvider>
+              <MediaUpload
+                dataUsage={dataUsage}
+                isNewArtwork={isNew}
+                emailLink="/contact"
+                onPendingFilesUpdate={setPendingFiles}
+              />
+            </ThumbnailProvider>
           </div>
         </div>
-      </div>
-
-      <div className="mt-8 flex justify-end gap-4"></div>
+      </PortfolioEditorShell>
     </FormProvider>
   );
 }

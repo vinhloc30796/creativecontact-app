@@ -89,10 +89,10 @@ export default async function PortfolioEditPage(props: PortfolioEditPageProps) {
         </Suspense>
 
         <main className="relative z-20 mt-10 w-full grow lg:mt-20">
-          <div className="container mx-auto mb-4 px-4">
+          <div className="w-full px-4 sm:px-8 md:px-16 mb-4">
             <BackButton />
           </div>
-          <div className="container mx-auto px-4">
+          <div className="w-full px-4 sm:px-8 md:px-16">
             <PortfolioEditForm
               dataUsage={dataUsage}
               userData={userData}

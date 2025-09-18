@@ -29,16 +29,17 @@ export function MediaUploadComponent(props: MediaUploadComponentProps) {
 
   const { t } = useTranslation(["media-upload"])
   return (
-    <div className='w-full mx-auto'>
+    <div className='mx-auto w-full max-w-md'>
       <div
         {...getRootProps()}
-        className={cn(`cursor-pointer rounded-none border border-dashed p-8 text-center transition-colors flex items-center justify-center flex-col max-w-3xl mx-auto`,
-          isDragActive ? "border-primary bg-primary/10" : "border-border")}
+        className={cn(
+          `cursor-pointer rounded-md border-2 border-dashed p-8 text-center transition-colors`,
+          isDragActive ? "border-primary bg-primary/10" : "border-border",
+        )}
       >
         <input {...getInputProps()} />
-        <Upload className='w-8 h-8' />
-        <p className='text-sm text-muted-foreground mt-2'>{t("form.dropzone")}</p>
-
+        <Upload className='mx-auto h-12 w-12 text-muted-foreground' />
+        <p className='mt-2 text-sm text-muted-foreground'>{t("form.dropzone")}</p>
       </div>
       <div className='mt-4 flex flex-col gap-4 mb-4'>
         {

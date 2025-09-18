@@ -1,8 +1,9 @@
 "use client";
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
-import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader } from "@/components/ui/card";
+import { BorderlessCard, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
+import { PortfolioEditorShell } from "../PortfolioEditorShell";
 import {
   Dialog,
   DialogContent,
@@ -10,27 +11,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormProvider, useForm } from "react-hook-form";
 import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { useUploadStore } from "@/stores/uploadStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { v4 } from "uuid";
 import { handleSubmit } from "./action.client";
 import AddCoOwner from "./add_coowner.component";
 import { useFileUpload } from "./files_uplooad_provider.component";
-import { MediaUploadComponent } from "./media_upload.component";
+import { MediaUpload } from "@/components/uploads/media-upload";
+import { ThumbnailProvider } from "@/contexts/ThumbnailContext";
 import UploadInfo from "./upload_info.component";
 
 interface PortfolioCreateCardProps {
@@ -42,7 +35,7 @@ interface PortfolioCreateCardProps {
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const router = useRouter();
-  const { fileUploads, thumbnailFileName } = useFileUpload();
+  const { fileUploads, thumbnailFileName, addFiles, removeFile } = useFileUpload();
   const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -99,83 +92,61 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   }
 
   return (
-    <Card className="container mb-4 max-h-full w-full grow justify-between gap-4 px-4 md:mx-auto lg:flex rounded-none">
-      <div className="position-absolute grow">
-        <CardHeader>
-          <FormProvider {...artworkForm}>
-            <FormField
-              control={artworkForm.control}
-              name="title"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>
-                      {t("title.label", { ns: "ArtworkInfoStep" })}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("title.placeholder", {
-                          ns: "ArtworkInfoStep",
-                        })}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
-            />
-            <FormField
-              control={artworkForm.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {t("description.label", { ns: "ArtworkInfoStep" })}
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("description.placeholder", {
-                        ns: "ArtworkInfoStep",
-                      })}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </FormProvider>
-        </CardHeader>
-        <div className="container px-6">
-          <MediaUploadComponent />
+    <PortfolioEditorShell
+      title={t("newProject", { ns: "Portfolio" })}
+      primaryLabel={submitLoading ? t("form.submit.submitting") : t("form.submit.create")}
+      secondaryLabel={t("cancel")}
+      onPrimary={onSubmit}
+      onSecondary={() => { artworkForm.reset(); artworkCreditForm.reset(); }}
+      rightRail={(
+        <div className="flex flex-col gap-4">
+          <BorderlessCard className="w-full">
+            <CardHeader>
+              <CardTitle>{t("creditInfo", { ns: "Portfolio" })}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AddCoOwner artworkCreditForm={artworkCreditForm} />
+            </CardContent>
+          </BorderlessCard>
+          <BorderlessCard className="w-full">
+            <CardHeader>
+              <CardTitle>{t("dataUsage", { ns: "Portfolio" })}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UploadInfo />
+            </CardContent>
+          </BorderlessCard>
         </div>
-      </div>
-      <CardFooter className="flex flex-col items-start gap-2 p-4 md:min-w-[400px] lg:gap-4">
-        <AddCoOwner artworkCreditForm={artworkCreditForm} />
-        <UploadInfo />
-        <div className="flex w-full flex-col gap-2 pt-10">
-          <Button
-            className="w-full rounded-none border"
-            onClick={onSubmit}
-            disabled={submitLoading}
-          >
-            {submitLoading
-              ? t("form.submit.submitting")
-              : t("form.submit.create")}
-          </Button>
-          <Button
-            className="w-full rounded-none underline"
-            variant={"secondary"}
-            onClick={() => {
-              artworkForm.reset();
-              artworkCreditForm.reset();
+      )}
+    >
+      <div className="flex flex-col space-y-8">
+        <FormProvider {...artworkForm}>
+          <ArtworkInfoStep
+            form={artworkForm as any}
+            artworksCount={0}
+            artworks={[]}
+            showExistingArtworksHelper={false}
+          />
+        </FormProvider>
+        <ThumbnailProvider>
+          <MediaUpload
+            dataUsage={0}
+            isNewArtwork={true}
+            emailLink="/contact"
+            onPendingFilesUpdate={(files) => {
+              const currentNames = new Set(fileUploads.map((f) => f.name));
+              const nextNames = new Set(files.map((f) => f.name));
+              // remove files not in next
+              fileUploads.forEach((f) => {
+                if (!nextNames.has(f.name)) removeFile(f.name);
+              });
+              // add new files
+              const newOnes = files.filter((f) => !currentNames.has(f.name));
+              if (newOnes.length > 0) addFiles(newOnes);
             }}
-          >
-            {t("cancel")}
-          </Button>
-        </div>
-      </CardFooter>
+          />
+        </ThumbnailProvider>
+      </div>
 
       {submitLoading && uploadProgress > 0 && (
         <Dialog open={true} onOpenChange={() => { }}>
@@ -190,16 +161,13 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
             </DialogHeader>
             <div className="space-y-3 py-4">
               <p className="text-sm text-gray-700">
-                {t("UploadProgress.fileCount", {
-                  current: uploadedFileCount,
-                  total: totalFileCount,
-                })}
+                {t("UploadProgress.fileCount", { current: uploadedFileCount, total: totalFileCount })}
               </p>
               <Progress value={uploadProgress} className="mt-2 w-full" />
             </div>
           </DialogContent>
         </Dialog>
       )}
-    </Card>
+    </PortfolioEditorShell>
   );
 }
