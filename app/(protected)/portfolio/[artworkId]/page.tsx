@@ -79,8 +79,8 @@ export default async function PortfolioEditPage(props: PortfolioEditPageProps) {
   }
 
   return (
-    <BackgroundDiv>
-      <div className="flex min-h-screen w-full flex-col">
+    <BackgroundDiv shouldCenter={false}>
+      <div className="flex w-full flex-col">
         <Suspense fallback={<LoadingUserHeader />}>
           <Header
             t={t}
@@ -88,8 +88,8 @@ export default async function PortfolioEditPage(props: PortfolioEditPageProps) {
           />
         </Suspense>
 
-        <main className="relative z-20 mt-10 w-full grow lg:mt-20">
-          <div className="w-full px-4 sm:px-8 md:px-16 mb-4">
+        <main className="relative z-20 w-full grow pt-0 lg:max-h-[calc(100vh-var(--cc-header-h,80px))] lg:overflow-hidden">
+          <div className="w-full px-4 sm:px-8 md:px-16 mb-4 pt-4">
             <BackButton />
           </div>
           <div className="w-full px-4 sm:px-8 md:px-16">

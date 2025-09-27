@@ -232,11 +232,20 @@ export default function PortfolioEditForm({
                   : []
               }
             />
+            <ThumbnailProvider>
+              <MediaUpload
+                dataUsage={dataUsage}
+                isNewArtwork={isNew}
+                emailLink="/contact"
+                onPendingFilesUpdate={setPendingFiles}
+              />
+            </ThumbnailProvider>
             {pendingFiles.length > 0 && (
               <p className="text-sm text-muted-foreground">
                 {pendingFiles.reduce((acc, file) => acc + file.size, 0) / 1024 / 1024} MB
               </p>
             )}
+
             {!isNew && !isLoading && artworkWithAssets && (
               <div className="grid grid-cols-1 gap-4">
                 {artworkWithAssets.map(
@@ -268,14 +277,7 @@ export default function PortfolioEditForm({
                 )}
               </div>
             )}
-            <ThumbnailProvider>
-              <MediaUpload
-                dataUsage={dataUsage}
-                isNewArtwork={isNew}
-                emailLink="/contact"
-                onPendingFilesUpdate={setPendingFiles}
-              />
-            </ThumbnailProvider>
+
           </div>
         </div>
       </PortfolioEditorShell>

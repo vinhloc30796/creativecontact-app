@@ -25,84 +25,92 @@ export async function EventHeader({
 }: EventHeaderProps) {
   const { t } = await getServerTranslation(lang, "EventPage");
   const headerLayoutClassName = stickyOverlay
-    ? "sticky top-0 left-0 right-0 z-30"
+    ? "fixed top-0 left-0 right-0 z-30"
     : "";
 
   return (
-    <header className={cn("w-full", headerLayoutClassName, className)}>
-      <div className="mx-auto flex w-full items-center justify-between px-4 py-4 md:px-16">
-        <div className="flex-1">
-          <Link href={`/event/${eventSlug}`}>
-            <CreativeContactLogo className="h-8 w-auto fill-muted sm:h-12 md:h-16" />
-          </Link>
-        </div>
-        <div className="hidden flex-1 justify-center lg:flex">
-          {/* Desktop menu */}
-          <div className="space-x-4">
-            <Link
-              href={`/event/${eventSlug}`}
-              className="px-4 py-2 font-bold text-primary hover:bg-transparent hover:text-primary-500"
-            >
-              <span
-                style={{
-                  textShadow: `hsl(var(--primary)) 0px 0px 10px`,
-                }}
-              >
-                {t("gallery", { ns: "EventPage" })}
-              </span>
-            </Link>
-            <Link
-              href={`https://creativecontact.vn`}
-              className="px-4 py-2 font-bold text-muted hover:bg-transparent hover:text-muted-foreground"
-            >
-              {t("about", { ns: "EventPage" })}
+    <>
+      <header
+        className={cn("w-full", headerLayoutClassName, className)}
+        style={{ ["--cc-header-h" as any]: "80px" }}
+      >
+        <div className="mx-auto flex w-full items-center justify-between px-4 py-4 md:px-16">
+          <div className="flex-1">
+            <Link href={`/event/${eventSlug}`}>
+              <CreativeContactLogo className="h-8 w-auto fill-muted sm:h-12 md:h-16" />
             </Link>
           </div>
-        </div>
-        <div className="hidden flex-1 justify-end lg:flex">
-          {/* Desktop buttons */}
-          <div className="flex flex-row space-x-4">
-            <Button
-              variant="outline"
-              className={cn(
-                "relative inset-0 overflow-hidden rounded-full border-accent bg-accent/5 font-bold text-accent shadow-inner shadow-accent-500/50",
-                eventEnded
-                  ? "cursor-not-allowed opacity-50 hover:shadow-none"
-                  : "hover:shadow-md hover:shadow-accent-500/50"
-              )}
-              asChild
-            >
-              {eventEnded ? (
-                <span>{t("upload", { ns: "EventPage" })}</span>
-              ) : (
-                <Link href={`/event/${eventSlug}/upload`}>
-                  {t("upload", { ns: "EventPage" })}
-                </Link>
-              )}
-            </Button>
-            <p>
+          <div className="hidden flex-1 justify-center lg:flex">
+            {/* Desktop menu */}
+            <div className="space-x-4">
+              <Link
+                href={`/event/${eventSlug}`}
+                className="px-4 py-2 font-bold text-primary hover:bg-transparent hover:text-primary-500"
+              >
+                <span
+                  style={{
+                    textShadow: `hsl(var(--primary)) 0px 0px 10px`,
+                  }}
+                >
+                  {t("gallery", { ns: "EventPage" })}
+                </span>
+              </Link>
+              <Link
+                href={`https://creativecontact.vn`}
+                className="px-4 py-2 font-bold text-muted hover:bg-transparent hover:text-muted-foreground"
+              >
+                {t("about", { ns: "EventPage" })}
+              </Link>
+            </div>
+          </div>
+          <div className="hidden flex-1 justify-end lg:flex">
+            {/* Desktop buttons */}
+            <div className="flex flex-row space-x-4">
               <Button
-                variant="ghost"
-                className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
+                variant="outline"
+                className={cn(
+                  "relative inset-0 overflow-hidden rounded-full border-accent bg-accent/5 font-bold text-accent shadow-inner shadow-accent-500/50",
+                  eventEnded
+                    ? "cursor-not-allowed opacity-50 hover:shadow-none"
+                    : "hover:shadow-md hover:shadow-accent-500/50"
+                )}
                 asChild
               >
-                <Link href="/signup">{t("signup", { ns: "EventPage" })}</Link>
+                {eventEnded ? (
+                  <span>{t("upload", { ns: "EventPage" })}</span>
+                ) : (
+                  <Link href={`/event/${eventSlug}/upload`}>
+                    {t("upload", { ns: "EventPage" })}
+                  </Link>
+                )}
               </Button>
-              <span className="text-primary">|</span>
-              <Button
-                variant="ghost"
-                className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
-                asChild
-              >
-                <Link href="/login">{t("login", { ns: "EventPage" })}</Link>
-              </Button>
-            </p>
+              <p>
+                <Button
+                  variant="ghost"
+                  className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
+                  asChild
+                >
+                  <Link href="/signup">{t("signup", { ns: "EventPage" })}</Link>
+                </Button>
+                <span className="text-primary">|</span>
+                <Button
+                  variant="ghost"
+                  className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
+                  asChild
+                >
+                  <Link href="/login">{t("login", { ns: "EventPage" })}</Link>
+                </Button>
+              </p>
+            </div>
+          </div>
+          <div className="lg:hidden">
+            <BurgerMenu lang={lang} eventSlug={eventSlug} />
           </div>
         </div>
-        <div className="lg:hidden">
-          <BurgerMenu lang={lang} eventSlug={eventSlug} />
-        </div>
-      </div>
-    </header>
+      </header>
+      {stickyOverlay && (
+        <div aria-hidden className="w-full" style={{ height: "var(--cc-header-h, 80px)" }} />
+      )}
+    </>
   );
 };
