@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import AboutEventDialog from "@/components/event/AboutEventDialog";
 
 interface EventBurgerMenuProps {
   lang: string;
@@ -31,12 +32,22 @@ const EventBurgerMenu: React.FC<EventBurgerMenuProps> = ({ lang, eventSlug }) =>
             >
               {t("gallery", { ns: "EventPage" })}
             </Link>
-            <Link
-              href={`https://creativecontact.vn`}
-              className="block w-full text-center py-4 text-2xl text-muted hover:text-muted-foreground hover:bg-muted/10"
-            >
-              {t("about", { ns: "EventPage" })}
-            </Link>
+            <AboutEventDialog
+              trigger={
+                <button className="block w-full text-center py-4 text-2xl text-muted hover:text-muted-foreground hover:bg-muted/10">
+                  {t("about", { ns: "EventPage" })}
+                </button>
+              }
+              eventSlug={eventSlug}
+              title="Trung Thu Creative Archive"
+              body={
+                "Trung Thu Creative Archive (TTCA) là nơi lưu giữ và lan tỏa các tác phẩm, ý tưởng và câu chuyện về Trung thu do cộng đồng tất cả các ngành sáng tạo cùng đóng góp."
+              }
+              igUrl="https://instagram.com/creativecontact.vn"
+              fbUrl="https://facebook.com/creativecontact.vn"
+              ctaText="Về TTCA"
+              ctaHref={`/event/${eventSlug}`}
+            />
             <Button
               variant="outline"
               className="w-full mt-6 py-4 text-xl text-accent rounded-full border-accent bg-accent/5 shadow-inner shadow-accent-500/50 hover:shadow-md hover:shadow-accent-500/50 transition-shadow duration-500 relative overflow-hidden"

@@ -7,6 +7,7 @@ import Link from "next/link";
 import React, { use } from "react";
 import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
 import BurgerMenu from "@/components/EventBurgerMenu";
+import AboutEventDialog from "@/components/event/AboutEventDialog";
 
 interface EventHeaderProps {
   eventSlug: string;
@@ -55,12 +56,22 @@ export async function EventHeader({
                   {t("gallery", { ns: "EventPage" })}
                 </span>
               </Link>
-              <Link
-                href={`https://creativecontact.vn`}
-                className="px-4 py-2 font-bold text-muted hover:bg-transparent hover:text-muted-foreground"
-              >
-                {t("about", { ns: "EventPage" })}
-              </Link>
+              <AboutEventDialog
+                trigger={
+                  <button className="px-4 py-2 font-bold text-muted hover:bg-transparent hover:text-muted-foreground">
+                    {t("about", { ns: "EventPage" })}
+                  </button>
+                }
+                eventSlug={eventSlug}
+                title="Trung Thu Creative Archive"
+                body={
+                  "Trung Thu Creative Archive (TTCA) là nơi lưu giữ và lan tỏa các tác phẩm, ý tưởng và câu chuyện về Trung thu do cộng đồng tất cả các ngành sáng tạo cùng đóng góp."
+                }
+                igUrl="https://instagram.com/creativecontact.vn"
+                fbUrl="https://facebook.com/creativecontact.vn"
+                ctaText="Về TTCA"
+                ctaHref={`/event/${eventSlug}`}
+              />
             </div>
           </div>
           <div className="hidden flex-1 justify-end lg:flex">
