@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React, { use } from "react";
 import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
-import BurgerMenu from "@/components/EventBurgerMenu";
 import AboutEventDialog from "@/components/event/AboutEventDialog";
 import { getEventAbout } from "@/lib/events/getEventAbout";
 import { getServerAuth } from "@/hooks/useServerAuth";
@@ -49,7 +48,7 @@ export async function EventHeader({
               <CreativeContactLogo className="h-8 w-auto fill-muted sm:h-12 md:h-16" />
             </Link>
           </div>
-          <div className="hidden flex-1 justify-center lg:flex">
+          <div className="flex-1 justify-center flex">
             {/* Desktop menu */}
             <div className="space-x-4">
               <Link
@@ -66,7 +65,7 @@ export async function EventHeader({
               </Link>
               <AboutEventDialog
                 trigger={
-                  <button className="px-4 py-2 font-bold text-muted hover:bg-transparent hover:text-muted-foreground">
+                  <button className="px-4 py-2 font-bold text-foreground hover:bg-transparent hover:text-muted-foreground">
                     {t("about", { ns: "EventPage" })}
                   </button>
                 }
@@ -77,7 +76,7 @@ export async function EventHeader({
               />
             </div>
           </div>
-          <div className="hidden flex-1 justify-end lg:flex">
+          <div className="flex-1 justify-end flex">
             {/* Desktop single smart CTA matching Header visual */}
             <div className="flex flex-row space-x-4">
               {isAuthed ? (
@@ -105,9 +104,7 @@ export async function EventHeader({
               )}
             </div>
           </div>
-          <div className="lg:hidden">
-            <BurgerMenu lang={lang} eventSlug={eventSlug} />
-          </div>
+          {/* Mobile menu removed; header is simplified */}
         </div>
       </header>
       {stickyOverlay && (
