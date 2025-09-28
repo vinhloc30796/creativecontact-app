@@ -376,7 +376,7 @@
   /* https://coolors.co/e4aac2-551b33-75cf54-db0058-c98e36 */
   /* https://www.realtimecolors.com/?colors=e4aac2-551b33-75cf54-db0058-c98e36&fonts=Plus%20Jakarta%20Sans-Plus%20Jakarta%20Sans */
   [data-theme="trungthu-archive-2024"] {
-    --background: 335, 52%, 88%;
+    --background: 335, 52%, 9%;
     --foreground: 325, 52%, 88%;
 
     --card: 335, 52%, 88%;
@@ -409,7 +409,7 @@
   }
 
   [data-theme="trungthu-archive-2025"] {
-    --background: 325.5882, 97.1429%, 86.2745%;
+    --background: 325.5882, 97.1429%, 88.2745%;
     --foreground: 334.5455, 76.7442%, 4.314%;
     --card: 332.1429, 93.3333%, 94.1176%;
     --card-foreground: 334.5455, 76.7442%, 8.4314%;
@@ -422,8 +422,8 @@
     --secondary-foreground: 334.5455, 76.7442%, 8.4314%;
     --muted: 332.1429, 93.3333%, 94.1176%;
     --muted-foreground: 330, 26.7327%, 25%;
-    --accent: 336.055, 100%, 57.2549%;
-    --accent-foreground: 0, 0%, 100%;
+    --accent: 61.055, 86%, 38.2549%;
+    --accent-foreground: 61.055, 86%, 81%;
     --destructive: 0, 84.2365%, 60.1961%;
     --destructive-foreground: 0, 0%, 100%;
     --border: 61.4458, 85.567%, 80.9804%;

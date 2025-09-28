@@ -15,13 +15,13 @@ interface UploadStatisticsProps {
 
 export const UploadStatistics = ({ eventSlug, eventTitle, artworkCount, countdown }: UploadStatisticsProps) => {
   console.log("[UploadStatistics] Starting render");
-  
+
   // Router
   const router = useRouter();
   // State
   const [timeLeft, setTimeLeft] = useState(countdown);
   const [isClient, setIsClient] = useState(false);
-  
+
   // I18n - wrap in try-catch to handle potential initialization errors
   const { t } = useTranslation("en", "UploadStatistics", {
     useSuspense: true,
