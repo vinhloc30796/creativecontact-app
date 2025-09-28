@@ -8,6 +8,7 @@ import React, { use } from "react";
 import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
 import BurgerMenu from "@/components/EventBurgerMenu";
 import AboutEventDialog from "@/components/event/AboutEventDialog";
+import { getEventAbout } from "@/lib/events/getEventAbout";
 
 interface EventHeaderProps {
   eventSlug: string;
@@ -28,6 +29,8 @@ export async function EventHeader({
   const headerLayoutClassName = stickyOverlay
     ? "fixed top-0 left-0 right-0 z-30"
     : "";
+
+  const about = await getEventAbout(eventSlug, lang);
 
   return (
     <>
@@ -63,14 +66,9 @@ export async function EventHeader({
                   </button>
                 }
                 eventSlug={eventSlug}
-                title="Trung Thu Creative Archive"
-                body={
-                  "Trung Thu Creative Archive (TTCA) là nơi lưu giữ và lan tỏa các tác phẩm, ý tưởng và câu chuyện về Trung thu do cộng đồng tất cả các ngành sáng tạo cùng đóng góp."
-                }
-                igUrl="https://instagram.com/creativecontact.vn"
-                fbUrl="https://facebook.com/creativecontact.vn"
-                ctaText="Về TTCA"
-                ctaHref={`/event/${eventSlug}`}
+                title={about.title}
+                body={about.body}
+                ctaText={about.ctaText}
               />
             </div>
           </div>

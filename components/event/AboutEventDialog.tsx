@@ -17,10 +17,7 @@ interface AboutEventDialogProps {
   title: string;
   body: string;
   eventSlug: string;
-  igUrl?: string;
-  fbUrl?: string;
   ctaText?: string;
-  ctaHref?: string;
 }
 
 export function AboutEventDialog({
@@ -28,16 +25,29 @@ export function AboutEventDialog({
   title,
   body,
   eventSlug,
-  igUrl,
-  fbUrl,
   ctaText,
-  ctaHref,
 }: AboutEventDialogProps) {
+  const IG_URL = "https://instagram.com/creativecontact.vn";
+  const FB_URL = "https://facebook.com/creativecontact.vn";
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open) {
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      const originalBodyOverflow = document.body.style.overflow;
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.documentElement.style.overflow = originalHtmlOverflow;
+        document.body.style.overflow = originalBodyOverflow;
+      };
+    }
+  }, [open]);
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="inset-0 left-0 top-0 z-50 h-[100dvh] w-screen translate-x-0 translate-y-0 max-w-none rounded-none bg-background p-6 sm:p-8 md:p-10 overflow-y-auto">
-        <div className="flex min-h-[100dvh] w-full flex-col items-center justify-center text-center">
+      <DialogContent className="fixed inset-0 left-0 top-0 z-50 h-[100svh] w-screen translate-x-0 translate-y-0 max-w-none rounded-none bg-background p-6 sm:p-8 md:p-10 overflow-hidden">
+        <div className="flex min-h-[100svh] w-full flex-col items-center justify-center text-center">
           <div className="mx-auto max-w-[50vw]">
             <EventLogo
               eventSlug={eventSlug}
@@ -52,30 +62,26 @@ export function AboutEventDialog({
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-6">
-              {igUrl && (
-                <Link
-                  href={igUrl}
-                  className="inline-flex items-center gap-3 text-primary hover:underline"
-                  aria-label="Instagram"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Instagram className="h-7 w-7" />
-                  <span className="text-[clamp(1rem,2.5vw,1.5rem)]">Instagram</span>
-                </Link>
-              )}
-              {fbUrl && (
-                <Link
-                  href={fbUrl}
-                  className="inline-flex items-center gap-3 text-primary hover:underline"
-                  aria-label="Facebook"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Facebook className="h-7 w-7" />
-                  <span className="text-[clamp(1rem,2.5vw,1.5rem)]">Facebook</span>
-                </Link>
-              )}
+              <Link
+                href={IG_URL}
+                className="inline-flex items-center gap-3 text-primary hover:underline"
+                aria-label="Instagram"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Instagram className="h-7 w-7" />
+                <span className="text-[clamp(1rem,2.5vw,1.5rem)]">Instagram</span>
+              </Link>
+              <Link
+                href={FB_URL}
+                className="inline-flex items-center gap-3 text-primary hover:underline"
+                aria-label="Facebook"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Facebook className="h-7 w-7" />
+                <span className="text-[clamp(1rem,2.5vw,1.5rem)]">Facebook</span>
+              </Link>
             </div>
 
             {ctaText && (

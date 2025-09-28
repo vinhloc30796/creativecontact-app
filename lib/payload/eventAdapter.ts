@@ -19,6 +19,9 @@ export function payloadToDrizzleEvent(payloadEvent: Event) {
     slug: payloadEvent.slug || "",
     created_by: null, // Default admin user ID - replace with actual logic
     time_end: payloadEvent.endDate ? new Date(payloadEvent.endDate) : null,
+    summary_i18n: payloadEvent.summary
+      ? { en: payloadEvent.summary, vi: payloadEvent.summary }
+      : null,
   };
 }
 
@@ -35,7 +38,18 @@ export async function getOrCreateDrizzleEvent(
   });
 
   if (existingEvent) {
-    return existingEvent;
+    // Update projection on existing event (name, time_end, summary_i18n)
+    const projection = payloadToDrizzleEvent(payloadEvent);
+    const updated = await db
+      .update(events)
+      .set({
+        name: projection.name,
+        time_end: projection.time_end,
+        summary_i18n: projection.summary_i18n,
+      })
+      .where(eq(events.slug, payloadEvent.slug || ""))
+      .returning();
+    return updated[0] || existingEvent;
   }
 
   // If not found, create a new event in Drizzle

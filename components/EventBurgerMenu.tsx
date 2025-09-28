@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import AboutEventDialog from "@/components/event/AboutEventDialog";
+import { getEventAbout } from "@/lib/events/getEventAbout";
 
 interface EventBurgerMenuProps {
   lang: string;
@@ -15,6 +16,16 @@ interface EventBurgerMenuProps {
 const EventBurgerMenu: React.FC<EventBurgerMenuProps> = ({ lang, eventSlug }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation(lang, "EventPage");
+  // Note: Data is fetched on the server in EventHeader and passed via props ideally.
+  // For now, we compute it client-side by reading i18n fallback only to avoid client CMS calls.
+  const aboutFallback = {
+    title: t(`EventAbout.${eventSlug}.title`, { defaultValue: "Creative Contact Event" }),
+    body: t(`EventAbout.${eventSlug}.body`, { defaultValue: "" }),
+    igUrl: t(`EventAbout.${eventSlug}.igUrl`, { defaultValue: "" }) || undefined,
+    fbUrl: t(`EventAbout.${eventSlug}.fbUrl`, { defaultValue: "" }) || undefined,
+    ctaText: t(`EventAbout.${eventSlug}.ctaText`, { defaultValue: "" }) || undefined,
+    ctaHref: `/event/${eventSlug}`,
+  };
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -39,14 +50,9 @@ const EventBurgerMenu: React.FC<EventBurgerMenuProps> = ({ lang, eventSlug }) =>
                 </button>
               }
               eventSlug={eventSlug}
-              title="Trung Thu Creative Archive"
-              body={
-                "Trung Thu Creative Archive (TTCA) là nơi lưu giữ và lan tỏa các tác phẩm, ý tưởng và câu chuyện về Trung thu do cộng đồng tất cả các ngành sáng tạo cùng đóng góp."
-              }
-              igUrl="https://instagram.com/creativecontact.vn"
-              fbUrl="https://facebook.com/creativecontact.vn"
-              ctaText="Về TTCA"
-              ctaHref={`/event/${eventSlug}`}
+              title={aboutFallback.title}
+              body={aboutFallback.body}
+              ctaText={aboutFallback.ctaText}
             />
             <Button
               variant="outline"
