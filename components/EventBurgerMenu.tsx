@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import AboutEventDialog from "@/components/event/AboutEventDialog";
 import { getEventAbout } from "@/lib/events/getEventAbout";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 interface EventBurgerMenuProps {
   lang: string;
@@ -16,6 +18,8 @@ interface EventBurgerMenuProps {
 const EventBurgerMenu: React.FC<EventBurgerMenuProps> = ({ lang, eventSlug }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation(lang, "EventPage");
+  const { isLoggedIn, isAnonymous, isLoading } = useAuth();
+  const router = useRouter();
   // Note: Data is fetched on the server in EventHeader and passed via props ideally.
   // For now, we compute it client-side by reading i18n fallback only to avoid client CMS calls.
   const aboutFallback = {
@@ -57,15 +61,22 @@ const EventBurgerMenu: React.FC<EventBurgerMenuProps> = ({ lang, eventSlug }) =>
             <Button
               variant="outline"
               className="w-full mt-6 py-4 text-xl text-accent rounded-full border-accent bg-accent/5 shadow-inner shadow-accent-500/50 hover:shadow-md hover:shadow-accent-500/50 transition-shadow duration-500 relative overflow-hidden"
-              asChild
+              onClick={() => {
+                const isAuthed = isLoggedIn && !isAnonymous;
+                setIsOpen(false);
+                if (isAuthed) {
+                  router.push(`/event/${eventSlug}/upload`);
+                } else {
+                  router.push(`/login`);
+                }
+              }}
+              aria-label={isLoading ? "..." : (isLoggedIn && !isAnonymous ? t("upload", { ns: "EventPage" }) : t("login", { ns: "EventPage" }))}
             >
-              <Link href={`/event/${eventSlug}/upload`}>{t("upload", { ns: "EventPage" })}</Link>
-            </Button>
-            <Button variant="ghost" className="w-full mt-4 py-4 text-xl text-primary hover:text-primary-foreground hover:bg-primary/10" asChild>
-              <Link href="/signup">{t("signup", { ns: "EventPage" })}</Link>
-            </Button>
-            <Button variant="ghost" className="w-full mt-4 py-4 text-xl text-primary hover:text-primary-foreground hover:bg-primary/10" asChild>
-              <Link href="/login">{t("login", { ns: "EventPage" })}</Link>
+              {isLoading
+                ? "..."
+                : (isLoggedIn && !isAnonymous
+                  ? t("upload", { ns: "EventPage" })
+                  : t("login", { ns: "EventPage" }))}
             </Button>
           </div>
         </div>

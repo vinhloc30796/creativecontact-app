@@ -10,9 +10,10 @@ import { handleMagicLinkRequest } from '@/app/(public)/(event)/checkin/_utils/ap
 
 interface MagicSignInProps {
   purpose: 'login' | 'checkin';
+  redirectTo?: string;
 }
 
-export function MagicSignIn({ purpose }: MagicSignInProps) {
+export function MagicSignIn({ purpose, redirectTo }: MagicSignInProps) {
   // State
   const [email, setEmail] = useState<string>('');
   const [magicLinkSent, setMagicLinkSent] = useState<boolean>(false);
@@ -20,7 +21,7 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   // I18n
   const { t } = useTranslation('MagicSignIn');
-  const redirectTo = purpose === 'checkin' ? '/checkin' : '/';
+  const fallbackRedirect = purpose === 'checkin' ? '/checkin' : '/';
 
   // Effects
   useEffect(() => {
@@ -45,7 +46,7 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await handleMagicLinkRequest(e, email, setMagicLinkSent, redirectTo);
+      await handleMagicLinkRequest(e, email, setMagicLinkSent, redirectTo ?? fallbackRedirect);
       setCountdown(60);
       localStorage.setItem('magicLinkCountdown', '60');
       localStorage.setItem('magicLinkTimestamp', Date.now().toString());

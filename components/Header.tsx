@@ -1,6 +1,7 @@
 import CreativeContactLogo, { LogoVariant } from "@/components/branding/CreativeContactLogo";
 import { TextIconBox } from "@/components/text-icon-box";
 import { Button } from "@/components/ui/button";
+import { CtaLinkButton } from "@/components/cta/CtaLinkButton";
 import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
@@ -28,27 +29,11 @@ export function Header({ t, className, stickyOverlay = true }: HeaderProps) {
               <CreativeContactLogo variant={LogoVariant.FULL} width={80} height={50} />
             </Link>
           </div>
-          <div className="flex items-center">
-            <Button
-              variant="link"
-              asChild
-              className="text-sm text-foreground hover:text-sunglow"
-            >
-              <Link href="/signup">
-                <TextIconBox
-                  title={t("joinUsLine1")}
-                  subtitle={t("joinUsLine2")}
-                  icon={
-                    <ArrowUpRight
-                      className="text-sunglow"
-                      style={{ height: "125%", width: "125%" }}
-                    />
-                  }
-                  className="text-sm"
-                />
-              </Link>
-            </Button>
-          </div>
+          <CtaLinkButton
+            href="/signup"
+            title={t("joinUsLine1")}
+            subtitle={t("joinUsLine2")}
+          />
         </div>
       </header>
       {stickyOverlay && (

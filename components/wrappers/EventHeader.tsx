@@ -9,6 +9,9 @@ import CreativeContactLogo from "@/components/branding/CreativeContactLogo";
 import BurgerMenu from "@/components/EventBurgerMenu";
 import AboutEventDialog from "@/components/event/AboutEventDialog";
 import { getEventAbout } from "@/lib/events/getEventAbout";
+import { getServerAuth } from "@/hooks/useServerAuth";
+import { CtaLinkButton } from "@/components/cta/CtaLinkButton";
+import { TextIconBox } from "@/components/text-icon-box";
 
 interface EventHeaderProps {
   eventSlug: string;
@@ -31,6 +34,8 @@ export async function EventHeader({
     : "";
 
   const about = await getEventAbout(eventSlug, lang);
+  const { isLoggedIn, isAnonymous } = await getServerAuth();
+  const isAuthed = isLoggedIn && !isAnonymous;
 
   return (
     <>
@@ -73,43 +78,31 @@ export async function EventHeader({
             </div>
           </div>
           <div className="hidden flex-1 justify-end lg:flex">
-            {/* Desktop buttons */}
+            {/* Desktop single smart CTA matching Header visual */}
             <div className="flex flex-row space-x-4">
-              <Button
-                variant="outline"
-                className={cn(
-                  "relative inset-0 overflow-hidden rounded-full border-accent bg-accent/5 font-bold text-accent shadow-inner shadow-accent-500/50",
-                  eventEnded
-                    ? "cursor-not-allowed opacity-50 hover:shadow-none"
-                    : "hover:shadow-md hover:shadow-accent-500/50"
-                )}
-                asChild
-              >
-                {eventEnded ? (
-                  <span>{t("upload", { ns: "EventPage" })}</span>
+              {isAuthed ? (
+                eventEnded ? (
+                  <Button
+                    variant="link"
+                    className="text-sm text-foreground opacity-50 cursor-not-allowed"
+                    disabled
+                  >
+                    <TextIconBox title={t("upload", { ns: "EventPage" })} className="text-sm" />
+                  </Button>
                 ) : (
-                  <Link href={`/event/${eventSlug}/upload`}>
-                    {t("upload", { ns: "EventPage" })}
-                  </Link>
-                )}
-              </Button>
-              <p>
-                <Button
-                  variant="ghost"
-                  className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
-                  asChild
-                >
-                  <Link href="/signup">{t("signup", { ns: "EventPage" })}</Link>
-                </Button>
-                <span className="text-primary">|</span>
-                <Button
-                  variant="ghost"
-                  className="font-bold text-primary hover:bg-primary/10 hover:text-primary-foreground"
-                  asChild
-                >
-                  <Link href="/login">{t("login", { ns: "EventPage" })}</Link>
-                </Button>
-              </p>
+                  <CtaLinkButton
+                    href={`/event/${eventSlug}/upload`}
+                    title={t("upload", { ns: "EventPage" })}
+                    colorScheme="primary"
+                  />
+                )
+              ) : (
+                <CtaLinkButton
+                  href={`/login`}
+                  title={t("upload", { ns: "EventPage" })}
+                  colorScheme="primary"
+                />
+              )}
             </div>
           </div>
           <div className="lg:hidden">

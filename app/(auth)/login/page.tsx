@@ -53,7 +53,8 @@ export default function LoginPage() {
               >
                 LOG&nbsp;IN
               </HeroTitle>
-              <MagicSignIn purpose="login" />
+              {/* Support optional ?next redirect back after login */}
+              <MagicSignIn purpose="login" redirectTo={typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('next') ?? undefined : undefined} />
             </CardContent>
           </Card>
         </Suspense>
