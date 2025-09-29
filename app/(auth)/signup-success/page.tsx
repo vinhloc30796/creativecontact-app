@@ -39,9 +39,7 @@ export default async function SignupSuccessPage({
             </ul>
           </div>
           <div className="flex justify-between mt-4">
-            <Link href="/">
-              <Button>{t('backToHome')}</Button>
-            </Link>
+            <Button><Link href="/">{t('backToHome')}</Link></Button>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
