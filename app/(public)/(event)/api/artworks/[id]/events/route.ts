@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { artworkEvents } from "@/drizzle/schema/artwork";
+import { artworkEvents, artworkCredits } from "@/drizzle/schema/artwork";
 import { events } from "@/drizzle/schema/event";
 import { eq, and } from "drizzle-orm";
+import { createClient as createSupabaseServerClient } from "@/utils/supabase/server";
 
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -24,8 +25,36 @@ export async function POST(request: NextRequest, props: { params: Promise<{ id: 
   const params = await props.params;
   const { id } = params;
   try {
-    const body = await request.json();
-    const eventIds: string[] = Array.isArray(body?.eventIds) ? body.eventIds : [];
+    // Authentication: require a valid Supabase session
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Basic input validation
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const eventIds: string[] = Array.isArray((body as any)?.eventIds)
+      ? (body as any).eventIds
+      : [];
+
+    // Authorization: require the user to be credited on the artwork (owner/creator/collaborator)
+    // Adjust this rule as needed (e.g., restrict to specific credit titles or roles)
+    const credit = await db
+      .select({ id: artworkCredits.id })
+      .from(artworkCredits)
+      .where(and(eq(artworkCredits.artworkId, id), eq(artworkCredits.userId, user.id)))
+      .limit(1);
+    if (credit.length === 0) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     // Reuse server action implementation through direct DB ops to avoid circular imports
     await db.transaction(async (tx) => {
       const current = await tx
