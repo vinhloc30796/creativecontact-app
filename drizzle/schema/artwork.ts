@@ -118,6 +118,9 @@ export const artworkEvents = pgTable(
     eventId: uuid("event_id")
       .notNull()
       .references(() => events.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => ({
     uniqueArtworkEvent: unique("unique_artwork_event").on(

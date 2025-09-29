@@ -44,10 +44,12 @@ export async function EventHeader({
     "early-access-2024": "early-access-2024",
   };
   const themeName = eventThemes[eventSlug] ?? undefined;
-  const nextAfterLogin = `/event/${eventSlug}/upload`;
+  // Build destination after login and after clicking CTA for event-specific flow
+  const eventGalleryUrl = `/event/${encodeURIComponent(eventSlug)}?lang=${encodeURIComponent(lang)}`;
+  const nextAfterLogin = `/portfolio/new?eventSlug=${encodeURIComponent(eventSlug)}&lang=${encodeURIComponent(lang)}&next=${encodeURIComponent(eventGalleryUrl)}`;
   const loginHref = themeName
-    ? `/login?theme=${encodeURIComponent(themeName)}&event=${encodeURIComponent(eventSlug)}&next=${encodeURIComponent(nextAfterLogin)}`
-    : `/login?event=${encodeURIComponent(eventSlug)}&next=${encodeURIComponent(nextAfterLogin)}`;
+    ? `/login?theme=${encodeURIComponent(themeName)}&eventSlug=${encodeURIComponent(eventSlug)}&next=${encodeURIComponent(nextAfterLogin)}`
+    : `/login?eventSlug=${encodeURIComponent(eventSlug)}&next=${encodeURIComponent(nextAfterLogin)}`;
 
   return (
     <>
@@ -103,7 +105,7 @@ export async function EventHeader({
                   </Button>
                 ) : (
                   <CtaLinkButton
-                    href={`/event/${eventSlug}/upload`}
+                    href={`/portfolio/new?eventSlug=${encodeURIComponent(eventSlug)}&lang=${encodeURIComponent(lang)}&next=${encodeURIComponent(eventGalleryUrl)}`}
                     title={t("upload", { ns: "EventPage" })}
                     colorScheme="primary"
                   />

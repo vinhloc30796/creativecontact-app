@@ -14,7 +14,7 @@ export default async function LoginPage({
 }) {
   const awaitedSearchParams = await searchParams;
   const themeQuery = (awaitedSearchParams?.theme as string | undefined) ?? undefined;
-  const eventSlug = (awaitedSearchParams?.event as string | undefined) ?? undefined;
+  const eventSlug = (awaitedSearchParams?.eventSlug as string | undefined) ?? undefined;
   const next = (awaitedSearchParams?.next as string | undefined) ?? undefined;
 
   const allowedThemes = new Set<string>([

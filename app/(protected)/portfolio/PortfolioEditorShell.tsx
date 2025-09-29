@@ -58,7 +58,7 @@ export function PortfolioEditorShell({
   }, []);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] w-full rounded-none bg-[#FCFAF5] shadow-none pb-12 lg:pb-0">
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] w-full rounded-none bg-none shadow-none pb-12 lg:pb-0">
       <div className={cn(
         "min-w-0 flex flex-col bg-[#FCFAF5] border border-[#1A1A1A]"
       )}>

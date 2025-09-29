@@ -11,6 +11,8 @@ interface PortfolioCreatePageProps {
   params: Promise<{}>;
   searchParams: Promise<{
     lang: string;
+    eventSlug?: string;
+    next?: string;
   }>;
 }
 
@@ -18,7 +20,9 @@ export default async function PortfolioCreatePage(
   props: PortfolioCreatePageProps,
 ) {
   const { isLoggedIn } = await getServerAuth();
-  const lang = (await props.searchParams).lang || "en";
+  const searchParams = await props.searchParams;
+  const lang = searchParams.lang || "en";
+  const eventSlug = searchParams.eventSlug;
   const { t } = await getServerTranslation(lang, "HomePage");
   const project = {
     portfolioArtworks: {
@@ -27,7 +31,7 @@ export default async function PortfolioCreatePage(
     artworks: null,
   };
   return (
-    <BackgroundDiv shouldCenter={false} className="w-full">
+    <BackgroundDiv shouldCenter={false} shouldImage={false} eventSlug={eventSlug} className="w-full">
       <div className="flex w-full flex-col">
         <Suspense fallback={<LoadingUserHeader />}>
           <Header

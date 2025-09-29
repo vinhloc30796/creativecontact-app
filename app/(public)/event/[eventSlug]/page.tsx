@@ -99,7 +99,7 @@ export default async function EventPage(props: EventPageProps) {
 
     console.log("[EventPage] About to render component");
     return (
-      <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
+      <BackgroundDiv eventSlug={eventSlug} shouldCenter={true} shouldImage={true}>
         <div className="flex min-h-screen w-full flex-col">
           {/* Header section */}
           <EventHeader

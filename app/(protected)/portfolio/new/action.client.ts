@@ -1,6 +1,7 @@
 import {
   createPortfolioTransaction,
   insertArtworkAssetsTransaction,
+  linkArtworkToEventBySlug,
 } from "./transaction.actions";
 import { createClient } from "@/utils/supabase/client";
 import { performUpload } from "@/app/(public)/event/[eventSlug]/upload/client";
@@ -66,7 +67,7 @@ export const addArtworkAssets = async (
     artworkId,
     files,
     thumbnailFileName,
-    onProgress ?? (() => {}),
+    onProgress ?? (() => { }),
   );
   if (errors && errors.length > 0) {
     console.error("[addArtworkAssets] errors:", errors);
@@ -118,6 +119,16 @@ export const handleSubmit = async (
       "and artworkId",
       result.artwork.id,
     );
+  }
+  // If eventSlug is present in URL, link the new artwork to that event
+  try {
+    const url = new URL(window.location.href);
+    const eventSlug = url.searchParams.get("eventSlug");
+    if (eventSlug) {
+      await linkArtworkToEventBySlug(result.artwork.id, eventSlug);
+    }
+  } catch (e) {
+    console.warn("[handleSubmit] could not link artwork to eventSlug:", e);
   }
   const rs = await addArtworkAssets(
     artWorkData.id,

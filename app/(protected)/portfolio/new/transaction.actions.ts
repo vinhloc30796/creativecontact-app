@@ -1,7 +1,8 @@
 "use server"
 
 import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile"
-import { artworkAssets, artworkCredits, artworks } from "@/drizzle/schema/artwork"
+import { artworkAssets, artworkCredits, artworks, artworkEvents } from "@/drizzle/schema/artwork"
+import { events } from "@/drizzle/schema/event"
 import { portfolioArtworks } from "@/drizzle/schema/portfolio"
 import { db } from "@/lib/db"
 import { eq, max } from "drizzle-orm"
@@ -79,6 +80,27 @@ export async function insertArtworkAssetsTransaction(
   return { data: result, errors: null }
 }
 
+
+export async function linkArtworkToEventBySlug(
+  artworkId: string,
+  eventSlug: string,
+) {
+  const result = await db.transaction(async (tx) => {
+    const foundEvent = await tx.select().from(events).where(eq(events.slug, eventSlug));
+    if (!foundEvent || foundEvent.length === 0) {
+      return { linked: false, reason: "event_not_found" as const };
+    }
+    const eventId = foundEvent[0].id;
+    try {
+      await tx.insert(artworkEvents).values({ artworkId, eventId });
+      return { linked: true as const };
+    } catch (e) {
+      // Likely unique violation if already linked; treat as linked
+      return { linked: true as const };
+    }
+  });
+  return result;
+}
 
 function getAssetType(path: string): "image" | "video" | "audio" | "font" | null {
   // Return "image", "video", "audio", "font"

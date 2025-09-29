@@ -627,17 +627,40 @@
   }
   .bg-parallax {
     background-repeat: no-repeat;
-    background-size: cover;
-    /* Baseline: start at left/top even without scroll */
-    background-position-x: 0%;
-    background-position-y: top;
+    /* Ensure full width of the background image is visible */
+    background-size: 100% auto;
+    /* Center horizontally, align to top vertically */
+    background-position: center top;
+    /* Align to top by default; horizontal alignment can be set via utilities (e.g., bg-center) */
     animation: bgPanX linear both;
-    animation-timeline: eventScroll;
+    /* Tie to viewport scroll (horizontal in landscape) */
+    animation-timeline: scroll(root inline);
     animation-range: 0% 100%;
   }
   @media (orientation: portrait) {
     .bg-parallax {
       animation-name: bgPanY;
+      /* Tie to viewport vertical scroll in portrait */
+      animation-timeline: scroll(root block);
     }
+  }
+
+  /* Explicit parallax variants (orientation-independent) */
+  .bg-parallax-horizontal {
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
+    animation: bgPanX linear both;
+    animation-timeline: scroll(root inline);
+    animation-range: 0% 100%;
+  }
+
+  .bg-parallax-vertical {
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: center top;
+    animation: bgPanY linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0% 100%;
   }
 }

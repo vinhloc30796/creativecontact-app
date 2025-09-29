@@ -18,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { useUploadStore } from "@/stores/uploadStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
 import { handleSubmit } from "./action.client";
@@ -46,6 +46,7 @@ interface PortfolioCreateCardProps {
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const thumbnailRef = useRef<string | null>(null);
   const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
@@ -95,7 +96,12 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
       toast.success(t("form.toast.success.title"), {
         duration: 5000,
       });
-      router.push("/profile#portfolio?projectId=" + projectId);
+      const nextUrl = searchParams.get("next");
+      if (nextUrl && nextUrl.startsWith("/")) {
+        router.push(nextUrl);
+      } else {
+        router.push("/profile#portfolio?projectId=" + projectId);
+      }
     } else {
       toast.error(t("form.toast.error.title"), {
         duration: 5000,
