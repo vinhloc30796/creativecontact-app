@@ -57,7 +57,7 @@ export function MagicSignIn({ purpose, redirectTo }: MagicSignInProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-2 bg-sunglow/10 p-4 mb-2 rounded-md border border-sunglow/40">
+      <div className="flex flex-col gap-2 bg-primary/10 p-4 mb-2 rounded-md border border-primary/40">
         <h1 className="text-2xl font-semibold">{t(`title`)}</h1>
         <p>{t(`${purpose}.description`)}</p>
       </div>
@@ -76,13 +76,13 @@ export function MagicSignIn({ purpose, redirectTo }: MagicSignInProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="focus-visible:ring-sunglow focus-visible:ring-offset-2"
+              className="focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             />
           </div>
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-sunglow text-black hover:bg-yellow-400 focus-visible:ring-yellow-500"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary-600 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {isLoading ? t(`sending`) : t(`send`)}
           </Button>

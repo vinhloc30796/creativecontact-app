@@ -1,11 +1,12 @@
 'use client'
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { ReactNode } from 'react'
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const params = useParams()
+  const searchParams = useSearchParams()
   const eventSlug = params.eventSlug as string
 
   // Define a mapping of event slugs to theme names
@@ -17,7 +18,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // Add more event slugs and their corresponding theme names here
   }
 
-  const forcedTheme = eventSlug ? eventThemes[eventSlug] : undefined
+  const allowedThemes = new Set<string>([
+    'light',
+    'trungthu-archive-2024',
+    'trungthu-archive-2025',
+    'early-access-2024',
+  ])
+
+  const queryTheme = searchParams.get('theme') || undefined
+  const safeQueryTheme = queryTheme && allowedThemes.has(queryTheme) ? queryTheme : undefined
+
+  const forcedTheme = safeQueryTheme ?? (eventSlug ? eventThemes[eventSlug] : undefined)
 
   return (
     <NextThemesProvider

@@ -36,6 +36,19 @@ export async function EventHeader({
   const { isLoggedIn, isAnonymous } = await getServerAuth();
   const isAuthed = isLoggedIn && !isAnonymous;
 
+  // Map event slug to theme name for login theming
+  const eventThemes: { [key: string]: string } = {
+    "hoantat-2024": "light",
+    "trungthu-archive-2024": "trungthu-archive-2024",
+    "trungthu-archive-2025": "trungthu-archive-2025",
+    "early-access-2024": "early-access-2024",
+  };
+  const themeName = eventThemes[eventSlug] ?? undefined;
+  const nextAfterLogin = `/event/${eventSlug}/upload`;
+  const loginHref = themeName
+    ? `/login?theme=${encodeURIComponent(themeName)}&event=${encodeURIComponent(eventSlug)}&next=${encodeURIComponent(nextAfterLogin)}`
+    : `/login?event=${encodeURIComponent(eventSlug)}&next=${encodeURIComponent(nextAfterLogin)}`;
+
   return (
     <>
       <header
@@ -97,7 +110,7 @@ export async function EventHeader({
                 )
               ) : (
                 <CtaLinkButton
-                  href={`/login`}
+                  href={loginHref}
                   title={t("upload", { ns: "EventPage" })}
                   colorScheme="primary"
                 />

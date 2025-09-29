@@ -371,6 +371,9 @@
     --ring: 11.93, 86.1%, 63.33%;
 
     --radius: 0.1rem;
+
+    /* Hero defaults */
+    --hero-overlay-alpha: 0;
   }
 
   /* https://coolors.co/e4aac2-551b33-75cf54-db0058-c98e36 */
@@ -402,10 +405,13 @@
     --destructive-foreground: 325, 52%, 9%;
 
     --border: 325.85, 52%, 75.49%;
-    --input: 325.85, 52%, 75.49%;
+    --input: 325.85, 52%, 9.49%;
     --ring: 87, 86%, 40%;
 
     --radius: 0.1rem;
+
+    /* Slightly stronger overlay for readability behind cards/forms */
+    --hero-overlay-alpha: 0.1;
   }
 
   [data-theme="trungthu-archive-2025"] {

@@ -6,27 +6,48 @@ interface BackgroundDivProps {
   className?: string;
   eventSlug?: string;
   shouldCenter?: boolean;
+  shouldImage?: boolean;
 }
 
-export function BackgroundDiv({ children, className, eventSlug, shouldCenter = true }: BackgroundDivProps) {
+export function BackgroundDiv({ children, className, eventSlug, shouldCenter = true, shouldImage = true }: BackgroundDivProps) {
   const centerClass = shouldCenter ? 'flex items-center justify-center' : '';
 
-  // Style based on whether eventSlug is provided
-  const backgroundStyle = eventSlug
-    ? {
+  // Determine background style based on eventSlug and shouldImage combinations
+  let backgroundStyle: React.CSSProperties = {};
+  let backgroundClasses = '';
+
+  if (eventSlug && shouldImage) {
+    // Event-specific background image
+    backgroundStyle = {
       backgroundImage: `url(/${eventSlug}-background-blur.png), url(/bg.jpg)`,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    }
-    : {
-      backgroundColor: '#FCFAF5'
+      backgroundColor: 'hsla(var(--background), 0.6)'
     };
+    backgroundClasses = 'bg-cover bg-center bg-no-repeat bg-parallax';
+  } else if (eventSlug && !shouldImage) {
+    // Event-specific color (using CSS custom properties for theming)
+    backgroundStyle = {
+      backgroundColor: 'hsl(var(--background))'
+    };
+  } else if (!eventSlug && shouldImage) {
+    // Generic background image
+    backgroundStyle = {
+      backgroundImage: 'url(/bg.jpg)',
+      backgroundColor: 'hsla(var(--background), 0.6)'
+    };
+    backgroundClasses = 'bg-cover bg-center bg-no-repeat';
+  } else {
+    // Generic color (!eventSlug && !shouldImage)
+    backgroundStyle = {
+      backgroundColor: 'hsl(var(--background))'
+    };
+  }
 
   return (
     <div
       className={cn(
         "min-h-screen w-full",
         "min-h-[100vh]",
-        eventSlug ? "bg-cover bg-center bg-no-repeat bg-parallax" : "",
+        backgroundClasses,
         centerClass,
         className
       )}
