@@ -1,9 +1,6 @@
 import CreativeContactLogo, { LogoVariant } from "@/components/branding/CreativeContactLogo";
-import { TextIconBox } from "@/components/text-icon-box";
-import { Button } from "@/components/ui/button";
 import { CtaLinkButton } from "@/components/cta/CtaLinkButton";
 import { cn } from "@/lib/utils";
-import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 interface HeaderProps {
