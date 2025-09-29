@@ -81,26 +81,7 @@ export async function insertArtworkAssetsTransaction(
 }
 
 
-export async function linkArtworkToEventBySlug(
-  artworkId: string,
-  eventSlug: string,
-) {
-  const result = await db.transaction(async (tx) => {
-    const foundEvent = await tx.select().from(events).where(eq(events.slug, eventSlug));
-    if (!foundEvent || foundEvent.length === 0) {
-      return { linked: false, reason: "event_not_found" as const };
-    }
-    const eventId = foundEvent[0].id;
-    try {
-      await tx.insert(artworkEvents).values({ artworkId, eventId });
-      return { linked: true as const };
-    } catch (e) {
-      // Likely unique violation if already linked; treat as linked
-      return { linked: true as const };
-    }
-  });
-  return result;
-}
+// merged linking behavior into setArtworkEventsTransaction via add mode
 
 /**
  * Set artwork events to exactly match the provided eventIds.
@@ -109,7 +90,9 @@ export async function linkArtworkToEventBySlug(
 export async function setArtworkEventsTransaction(
   artworkId: string,
   eventIds: string[],
+  options?: { mode?: "set" | "add" },
 ) {
+  const mode = options?.mode ?? "set";
   return await db.transaction(async (tx) => {
     const current = await tx
       .select({ eventId: artworkEvents.eventId })
@@ -120,7 +103,7 @@ export async function setArtworkEventsTransaction(
     const desiredIds = new Set(eventIds);
 
     const toInsert = [...desiredIds].filter((id) => !currentIds.has(id));
-    const toDelete = [...currentIds].filter((id) => !desiredIds.has(id));
+    const toDelete = mode === "set" ? [...currentIds].filter((id) => !desiredIds.has(id)) : [];
 
     if (toInsert.length > 0) {
       await tx.insert(artworkEvents).values(

@@ -1,8 +1,3 @@
-import {
-  createPortfolioTransaction,
-  insertArtworkAssetsTransaction,
-  linkArtworkToEventBySlug,
-} from "./transaction.actions";
 import { createClient } from "@/utils/supabase/client";
 import { performUpload } from "@/app/(public)/event/[eventSlug]/upload/client";
 const supabase = createClient();
@@ -25,11 +20,21 @@ async function createPortfolio(
   if (!user) {
     throw new Error("could not find user");
   }
-  const result = await createPortfolioTransaction(
-    { id: user.id },
-    { ...artWorkData },
-    { ...portfolioData },
-  );
+  const url = new URL(window.location.href);
+  const eventSlug = url.searchParams.get("eventSlug");
+  const resp = await fetch("/api/portfolio/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      artworkData: { ...artWorkData },
+      portfolioData: { ...portfolioData },
+      eventSlug,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error("failed_to_create_portfolio");
+  }
+  const result = await resp.json();
   return result;
 }
 
@@ -76,14 +81,19 @@ export const addArtworkAssets = async (
       errors,
     };
   }
-  const rs = await insertArtworkAssetsTransaction(artworkId, results!);
-  if (rs.errors || rs.data.length === 0) {
+  const resp = await fetch("/api/portfolio/assets", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ artworkId, assets: results! }),
+  });
+  if (!resp.ok) {
     await deleteAllFileInArtwork(artworkId);
     return {
       data: null,
-      errors: rs.errors || [new Error("could not insert artwork assets")],
+      errors: [new Error("could not insert artwork assets")],
     };
   }
+  const rs = await resp.json();
   return {
     data: true,
     errors: null,
@@ -119,16 +129,6 @@ export const handleSubmit = async (
       "and artworkId",
       result.artwork.id,
     );
-  }
-  // If eventSlug is present in URL, link the new artwork to that event
-  try {
-    const url = new URL(window.location.href);
-    const eventSlug = url.searchParams.get("eventSlug");
-    if (eventSlug) {
-      await linkArtworkToEventBySlug(result.artwork.id, eventSlug);
-    }
-  } catch (e) {
-    console.warn("[handleSubmit] could not link artwork to eventSlug:", e);
   }
   const rs = await addArtworkAssets(
     artWorkData.id,
