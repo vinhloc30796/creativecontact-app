@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const awaitedSearchParams = await searchParams;
   const themeQuery = (awaitedSearchParams?.theme as string | undefined) ?? undefined;
