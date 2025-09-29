@@ -26,6 +26,8 @@ import {
 import { insertArtworkAssets } from "@/app/(public)/event/[eventSlug]/upload/actions";
 import { useUploadStore } from "@/stores/uploadStore";
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
+import EventMultiSelect, { EventOption } from "@/components/events/EventMultiSelect";
+import { useSearchParams } from "next/navigation";
 
 interface ArtworkFormValues {
   title: string;
@@ -66,6 +68,7 @@ export default function PortfolioEditForm({
 }: PortfolioEditFormProps) {
   const { t } = useTranslation(lang, "Portfolio");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const {
     uploadProgress,
@@ -86,6 +89,10 @@ export default function PortfolioEditForm({
     },
   });
 
+  // Events state
+  const [selectedEvents, setSelectedEvents] = useState<EventOption[]>([]);
+  const [eventsLocked, setEventsLocked] = useState(false);
+
   // Fetch artwork assets if editing existing artwork
   const { data: artworkWithAssets, isLoading } = useQuery<ArtworkWithAssets[]>({
     queryKey: ["artwork", artwork?.artworks?.id],
@@ -101,6 +108,45 @@ export default function PortfolioEditForm({
     },
     enabled: !!artwork?.artworks?.id,
   });
+  // Load existing events for artwork and handle ?eventSlug lock/prefill
+  useEffect(() => {
+    let ignore = false;
+    async function loadExisting() {
+      const id = artwork?.artworks?.id;
+      if (!id) return;
+      try {
+        const rs = await fetch(`/api/artworks/${encodeURIComponent(id)}/events`);
+        if (!rs.ok) return;
+        const data: { id: string; name: string; slug: string }[] = await rs.json();
+        if (!ignore) setSelectedEvents(data);
+      } catch { }
+    }
+    loadExisting();
+    return () => { ignore = true; };
+  }, [artwork?.artworks?.id]);
+
+  useEffect(() => {
+    let ignore = false;
+    async function prefillFromSlug() {
+      const eventSlug = searchParams.get("eventSlug");
+      if (!eventSlug) return;
+      try {
+        const rs = await fetch(`/api/events/${encodeURIComponent(eventSlug)}`);
+        if (!rs.ok) return;
+        const data = await rs.json();
+        if (data?.id) {
+          // ensure included in selection and lock
+          setSelectedEvents((prev) => {
+            const exists = prev.some((e) => e.id === data.id);
+            return exists ? prev : [...prev, { id: data.id, name: data.name, slug: data.slug }];
+          });
+          setEventsLocked(true);
+        }
+      } catch { }
+    }
+    prefillFromSlug();
+    return () => { ignore = true; };
+  }, [searchParams]);
 
   const { data: artworkCredits, isLoading: isLoadingCredits } = useQuery<
     ArtworkCredit[]
@@ -175,6 +221,16 @@ export default function PortfolioEditForm({
         );
         console.log("Insert assets successful:", insertAssetsResult);
       }
+
+      // Update artwork events to match selection (respect lock by including slug ensured above)
+      try {
+        const eventIds = selectedEvents.map((e) => e.id);
+        await fetch(`/api/artworks/${encodeURIComponent(formData.uuid)}/events`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ eventIds }),
+        });
+      } catch { }
 
       router.push("/profile");
       router.refresh();
@@ -281,6 +337,16 @@ export default function PortfolioEditForm({
           </div>
         </div>
       </PortfolioEditorShell>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Related Events</label>
+        <EventMultiSelect
+          value={selectedEvents}
+          onChange={setSelectedEvents}
+          disabled={eventsLocked}
+          prefilledNote={eventsLocked ? "Prefilled from event context" : null}
+          lockReason={eventsLocked ? "This association is locked by ?eventSlug" : null}
+        />
+      </div>
     </FormProvider>
   );
 }

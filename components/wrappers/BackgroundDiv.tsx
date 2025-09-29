@@ -19,7 +19,7 @@ export function BackgroundDiv({ children, className, eventSlug, shouldCenter = t
   if (eventSlug && shouldImage) {
     // Event-specific background image
     backgroundStyle = {
-      backgroundImage: `url(/${eventSlug}-background-blur.png), url(/bg.jpg)`,
+      backgroundImage: `url(/${eventSlug}-background.png)`,
       backgroundColor: 'hsla(var(--background), 0.6)'
     };
     // Vertical parallax by default (page scroll)

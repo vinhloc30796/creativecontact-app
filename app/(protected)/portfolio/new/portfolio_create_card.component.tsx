@@ -24,6 +24,7 @@ import { v4 } from "uuid";
 import { handleSubmit } from "./action.client";
 import { MediaUpload } from "@/components/uploads/media-upload";
 import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
+import EventMultiSelect, { EventOption } from "@/components/events/EventMultiSelect";
 
 interface ThumbnailRefBridgeProps {
   onChange: (name: string | null) => void;
@@ -51,6 +52,8 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const thumbnailRef = useRef<string | null>(null);
   const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [selectedEvents, setSelectedEvents] = useState<EventOption[]>([]);
+  const [eventsLocked, setEventsLocked] = useState(false);
 
   const {
     uploadProgress,
@@ -77,6 +80,29 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     },
   });
 
+  // Prefill from ?eventSlug and lock if present
+  useEffect(() => {
+    const eventSlug = searchParams.get("eventSlug");
+    let ignore = false;
+    async function run() {
+      if (eventSlug) {
+        try {
+          const rs = await fetch(`/api/events/${encodeURIComponent(eventSlug)}`);
+          if (!rs.ok) return;
+          const data = await rs.json();
+          if (!ignore && data?.id) {
+            setSelectedEvents([{ id: data.id, name: data.name, slug: data.slug }] as EventOption[]);
+            setEventsLocked(true);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+    run();
+    return () => { ignore = true; };
+  }, [searchParams]);
+
   async function onSubmit() {
     setSubmitLoading(true);
     resetUploadProgress();
@@ -93,6 +119,19 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
 
     setSubmitLoading(false);
     if (rs) {
+      try {
+        // After creation, set artwork events to selectedEvents
+        const eventIds = selectedEvents.map((e) => e.id);
+        if (eventIds.length > 0) {
+          await fetch(`/api/artworks/${encodeURIComponent(artworkForm.getValues().id)}/events`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ eventIds }),
+          });
+        }
+      } catch {
+        // non-blocking
+      }
       toast.success(t("form.toast.success.title"), {
         duration: 5000,
       });
@@ -148,6 +187,16 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
             showExistingArtworksHelper={false}
           />
         </FormProvider>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">{t("Related Events", { ns: "Portfolio" })}</label>
+          <EventMultiSelect
+            value={selectedEvents}
+            onChange={setSelectedEvents}
+            disabled={eventsLocked}
+            prefilledNote={eventsLocked ? t("Prefilled from event context", { ns: "Portfolio" }) : null}
+            lockReason={eventsLocked ? t("This association is locked by ?eventSlug", { ns: "Portfolio" }) : null}
+          />
+        </div>
         <ThumbnailProvider>
           <ThumbnailRefBridge onChange={(name) => { thumbnailRef.current = name; }} />
           <MediaUpload

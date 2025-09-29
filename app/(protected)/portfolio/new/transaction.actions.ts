@@ -5,7 +5,7 @@ import { artworkAssets, artworkCredits, artworks, artworkEvents } from "@/drizzl
 import { events } from "@/drizzle/schema/event"
 import { portfolioArtworks } from "@/drizzle/schema/portfolio"
 import { db } from "@/lib/db"
-import { eq, max } from "drizzle-orm"
+import { and, eq, inArray, max } from "drizzle-orm"
 
 
 // todo: add co-owner
@@ -100,6 +100,41 @@ export async function linkArtworkToEventBySlug(
     }
   });
   return result;
+}
+
+/**
+ * Set artwork events to exactly match the provided eventIds.
+ * Inserts any missing and deletes extras in a single transaction.
+ */
+export async function setArtworkEventsTransaction(
+  artworkId: string,
+  eventIds: string[],
+) {
+  return await db.transaction(async (tx) => {
+    const current = await tx
+      .select({ eventId: artworkEvents.eventId })
+      .from(artworkEvents)
+      .where(eq(artworkEvents.artworkId, artworkId));
+
+    const currentIds = new Set(current.map((r) => r.eventId));
+    const desiredIds = new Set(eventIds);
+
+    const toInsert = [...desiredIds].filter((id) => !currentIds.has(id));
+    const toDelete = [...currentIds].filter((id) => !desiredIds.has(id));
+
+    if (toInsert.length > 0) {
+      await tx.insert(artworkEvents).values(
+        toInsert.map((eventId) => ({ artworkId, eventId })),
+      );
+    }
+    if (toDelete.length > 0) {
+      await tx
+        .delete(artworkEvents)
+        .where(and(eq(artworkEvents.artworkId, artworkId), inArray(artworkEvents.eventId, toDelete)));
+    }
+
+    return { ok: true as const };
+  });
 }
 
 function getAssetType(path: string): "image" | "video" | "audio" | "font" | null {
