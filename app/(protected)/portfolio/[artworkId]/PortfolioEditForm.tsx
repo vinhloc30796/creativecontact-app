@@ -69,6 +69,7 @@ export default function PortfolioEditForm({
   const { t } = useTranslation(lang, "Portfolio");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const eventSlug = searchParams.get("eventSlug");
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const {
     uploadProgress,
@@ -126,13 +127,12 @@ export default function PortfolioEditForm({
   }, [artwork?.artworks?.id]);
 
   useEffect(() => {
+    if (!eventSlug) return;
     let ignore = false;
-    async function prefillFromSlug() {
-      const eventSlug = searchParams.get("eventSlug");
-      if (!eventSlug) return;
+    async function prefillFromSlug(slugParam: string) {
       try {
-        const rs = await fetch(`/api/events/${encodeURIComponent(eventSlug)}`);
-        if (!rs.ok) return;
+        const rs = await fetch(`/api/events/${encodeURIComponent(slugParam)}`);
+        if (!rs.ok || ignore) return;
         const data = await rs.json();
         if (data?.id) {
           // ensure included in selection and lock
@@ -144,9 +144,9 @@ export default function PortfolioEditForm({
         }
       } catch { }
     }
-    prefillFromSlug();
+    prefillFromSlug(eventSlug);
     return () => { ignore = true; };
-  }, [searchParams]);
+  }, [eventSlug]);
 
   const { data: artworkCredits, isLoading: isLoadingCredits } = useQuery<
     ArtworkCredit[]
