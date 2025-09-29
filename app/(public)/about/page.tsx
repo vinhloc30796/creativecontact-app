@@ -1,17 +1,17 @@
 import { Metadata } from "next";
-import { JSX, SVGProps } from "react";
 import Link from "next/link";
+import { JSX, SVGProps } from "react";
 
 import { ClientNavMenu } from "@/components/ClientNavMenu";
+import { EventTicker } from "@/components/events/EventTicker";
 import { Header } from "@/components/Header";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { RotatingWord } from "@/components/RotatingWord";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { H2, HeroTitle, Lead, P } from "@/components/ui/typography";
-import { RotatingWord } from "@/components/RotatingWord";
 import { BackgroundDiv } from "@/components/wrappers/BackgroundDiv";
 import { getServerTranslation } from "@/lib/i18n/init-server";
-import { EventTicker } from "@/components/events/EventTicker";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "About | Creative Contact",
@@ -19,15 +19,13 @@ export const metadata: Metadata = {
     "Learn about Creative Contact's mission, vision, and the team behind our creative community.",
 };
 
-interface Props {
-  searchParams: Promise<{
-    lang?: string;
-  }>;
-}
-
-export default async function AboutPage(props: Props) {
+export default async function AboutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>
+}) {
   // The lang query param overrides default 'en'
-  const { lang = "en" } = await props.searchParams;
+  const { lang = "en" } = await searchParams
 
   // Load both the shared navigation namespace and the page-specific namespace
   const { t } = await getServerTranslation(lang, ["HomePage", "AboutPage"]);

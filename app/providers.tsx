@@ -88,17 +88,17 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient()
 
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<Loading />}>
+    <Suspense fallback={<Loading />}>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
           <SearchParamsProvider>
             <PosthogProvider>
               {children}
             </PosthogProvider>
             <Toaster visibleToasts={9} closeButton={true} />
           </SearchParamsProvider>
-        </Suspense>
-      </QueryClientProvider>
-    </ThemeProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </Suspense>
   )
 }

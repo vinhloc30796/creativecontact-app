@@ -1,17 +1,17 @@
-'use client'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import { getServerTranslation } from "@/lib/i18n/init-server";
+import Link from 'next/link';
 
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
-import { useRouter } from 'next/navigation'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import Link from 'next/link'
-
-export default function SignupSuccessPage() {
-  const { t } = useTranslation(['signupSuccess'])
-  const router = useRouter()
+export default async function SignupSuccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>
+}) {
+  const { lang = "en" } = await searchParams;
+  const { t } = await getServerTranslation(lang, ['signupSuccess'])
 
   return (
     <BackgroundDiv>
@@ -39,7 +39,9 @@ export default function SignupSuccessPage() {
             </ul>
           </div>
           <div className="flex justify-between mt-4">
-            <Button onClick={() => router.push('/')}>{t('backToHome')}</Button>
+            <Link href="/">
+              <Button>{t('backToHome')}</Button>
+            </Link>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
