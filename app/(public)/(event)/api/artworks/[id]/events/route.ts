@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { artworkEvents, artworkCredits } from "@/drizzle/schema/artwork";
+import { artworkCredits, artworkEvents } from "@/drizzle/schema/artwork";
 import { events } from "@/drizzle/schema/event";
-import { eq, and } from "drizzle-orm";
+import { db } from "@/lib/db";
 import { createClient as createSupabaseServerClient } from "@/utils/supabase/server";
+import { and, eq, inArray } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -69,12 +69,14 @@ export async function POST(request: NextRequest, props: { params: Promise<{ id: 
         await tx.insert(artworkEvents).values(toInsert.map((eid) => ({ artworkId: id, eventId: eid })));
       }
       if (toDelete.length > 0) {
-        // drizzle-orm doesn't support composite where with in() in one call cleanly; do simple deletes
-        for (const eid of toDelete) {
-          await tx
-            .delete(artworkEvents)
-            .where(and(eq(artworkEvents.artworkId, id), eq(artworkEvents.eventId, eid)));
-        }
+        await tx
+          .delete(artworkEvents)
+          .where(
+            and(
+              eq(artworkEvents.artworkId, id),
+              inArray(artworkEvents.eventId, toDelete),
+            ),
+          );
       }
     });
     return NextResponse.json({ ok: true }, { status: 200 });
