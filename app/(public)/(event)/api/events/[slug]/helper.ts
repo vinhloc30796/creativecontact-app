@@ -9,9 +9,10 @@ export async function fetchEvent(slug: string) {
       where: eq(events.slug, slug),
       columns: {
         id: true,
-        name: true, 
+        name: true,
         slug: true,
-        time_end: true
+        time_end: true,
+        summary_i18n: true,
       }
     });
 

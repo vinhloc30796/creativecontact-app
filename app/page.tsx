@@ -169,7 +169,7 @@ export default async function Page(props: Props) {
   }));
 
   return (
-    <BackgroundDiv shouldCenter={false} className="flex h-screen flex-col">
+    <BackgroundDiv shouldCenter={false} shouldImage={false} className="flex h-screen flex-col">
       {/* Header with logo and join button */}
       <Header t={t} />
 

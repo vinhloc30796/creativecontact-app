@@ -26,6 +26,8 @@ const CreativeContactLogo: React.FC<CreativeContactLogoProps> = ({
   className,
   width,
   height,
+  // cls1Fill = 'var(--color-primary)',
+  // cls2Fill = 'var(--color-foreground)',
   cls1Fill = '#ffe12d',
   cls2Fill = '#1a1a1a',
   cls1Opacity = 1,

@@ -1,10 +1,11 @@
 "use server"
 
 import { ThumbnailSupabaseFile } from "@/app/types/SupabaseFile"
-import { artworkAssets, artworkCredits, artworks } from "@/drizzle/schema/artwork"
+import { artworkAssets, artworkCredits, artworks, artworkEvents } from "@/drizzle/schema/artwork"
+import { events } from "@/drizzle/schema/event"
 import { portfolioArtworks } from "@/drizzle/schema/portfolio"
 import { db } from "@/lib/db"
-import { eq, max } from "drizzle-orm"
+import { and, eq, inArray, max } from "drizzle-orm"
 
 
 // todo: add co-owner
@@ -79,6 +80,58 @@ export async function insertArtworkAssetsTransaction(
   return { data: result, errors: null }
 }
 
+
+// merged linking behavior into setArtworkEventsTransaction via add mode
+
+/**
+ * Set artwork events to exactly match the provided eventIds.
+ * Inserts any missing and deletes extras in a single transaction.
+ */
+export async function setArtworkEventsTransaction(
+  artworkId: string,
+  eventIds: string[],
+  options?: { mode?: "set" | "add" },
+) {
+  const mode = options?.mode ?? "set";
+  return await db.transaction(async (tx) => {
+    const current = await tx
+      .select({ eventId: artworkEvents.eventId })
+      .from(artworkEvents)
+      .where(eq(artworkEvents.artworkId, artworkId));
+
+    const currentIds = new Set(current.map((r) => r.eventId));
+    const desiredIds = new Set(eventIds);
+
+    const toInsert = [...desiredIds].filter((id) => !currentIds.has(id));
+    const toDelete = mode === "set" ? [...currentIds].filter((id) => !desiredIds.has(id)) : [];
+
+    if (toInsert.length > 0) {
+      try {
+        await tx.insert(artworkEvents).values(
+          toInsert.map((eventId) => ({ artworkId, eventId })),
+        );
+      } catch (error) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "code" in error &&
+          (error as { code: string }).code === "23505"
+        ) {
+          // already linked by a concurrent transaction; safe to proceed
+        } else {
+          throw error;
+        }
+      }
+    }
+    if (toDelete.length > 0) {
+      await tx
+        .delete(artworkEvents)
+        .where(and(eq(artworkEvents.artworkId, artworkId), inArray(artworkEvents.eventId, toDelete)));
+    }
+
+    return { ok: true as const };
+  });
+}
 
 function getAssetType(path: string): "image" | "video" | "audio" | "font" | null {
   // Return "image", "video", "audio", "font"

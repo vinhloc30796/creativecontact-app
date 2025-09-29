@@ -12,20 +12,23 @@ const formatSize = (bytes: number) => {
 
 interface DataUsageProps {
   dataUsage: number;
+  fileCount?: number;
+  maxSizeMB?: number;
 }
 
-export default function DataUsage({ dataUsage }: DataUsageProps) {
+export default function DataUsage({ dataUsage, fileCount = 0, maxSizeMB = 25 }: DataUsageProps) {
   const { pendingSize } = usePendingSizeStore();
-  const maxSize = 25 * 1024 * 1024; // 25MB in bytes
+  const maxSize = maxSizeMB * 1024 * 1024; // in bytes
   const isOverLimit = pendingSize > maxSize;
-  const pendingPercentage = (pendingSize / maxSize) * 100;
-  const remainingPercentage = 100 - pendingPercentage;
+  const pendingPercentage = Math.min(100, (pendingSize / maxSize) * 100);
+  const remainingPercentage = Math.max(0, 100 - pendingPercentage);
 
   return (
     <div className="flex flex-col">
-      <div className="items-left mt-4 flex flex-col">
-        <p className="grow text-sm text-muted-foreground">
-          {formatSize(pendingSize)} of 25MB used
+      <div className="mt-1 flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">{fileCount} files</p>
+        <p className="text-sm text-muted-foreground">
+          {formatSize(pendingSize)} of {maxSizeMB}MB used
         </p>
       </div>
       {isOverLimit && (

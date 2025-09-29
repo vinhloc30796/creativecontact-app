@@ -36,6 +36,7 @@ interface ArtworkInfoStepProps {
     title: string;
     description: string;
   }>;
+  showExistingArtworksHelper?: boolean;
 }
 
 function ExistingArtworkSidepane({
@@ -99,7 +100,7 @@ function ExistingArtworkSidepane({
   );
 }
 
-export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
+export function ArtworkInfoStep({ form, artworksCount, showExistingArtworksHelper = true }: ArtworkInfoStepProps) {
   // State
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -170,7 +171,7 @@ export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
       )}
       {error && <p>{t("ExistingArtworkSelector.error")}</p>}
 
-      {fetchedArtworks && !artworksCount && (
+      {showExistingArtworksHelper && fetchedArtworks && artworksCount === undefined && (
         <>
           <div className="mb-2 mt-4">
             {fetchedArtworks.length > 0 ? (
@@ -202,21 +203,23 @@ export function ArtworkInfoStep({ form, artworksCount }: ArtworkInfoStepProps) {
         </>
       )}
 
-      {artworksCount && artworksCount > 0 ? (
-        <div className="mb-2 mt-4">
-          <div className="flex items-center">
-            <p className="text-sm">
-              {t("ExistingArtworkSelector.existingArtworksCount")}
-            </p>
-            <Badge variant="secondary" className="mx-2">
-              &nbsp;{artworksCount}&nbsp;
-            </Badge>
+      {showExistingArtworksHelper && artworksCount !== undefined && (
+        artworksCount > 0 ? (
+          <div className="mb-2 mt-4">
+            <div className="flex items-center">
+              <p className="text-sm">
+                {t("ExistingArtworkSelector.existingArtworksCount")}
+              </p>
+              <Badge variant="secondary" className="mx-2">
+                &nbsp;{artworksCount}&nbsp;
+              </Badge>
+            </div>
           </div>
-        </div>
-      ) : (
-        <p className="text-sm">
-          {t("ExistingArtworkSelector.noExistingArtworks")}
-        </p>
+        ) : (
+          <p className="text-sm">
+            {t("ExistingArtworkSelector.noExistingArtworks")}
+          </p>
+        )
       )}
     </>
   );

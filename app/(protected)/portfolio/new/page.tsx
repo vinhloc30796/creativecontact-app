@@ -11,6 +11,8 @@ interface PortfolioCreatePageProps {
   params: Promise<{}>;
   searchParams: Promise<{
     lang: string;
+    eventSlug?: string;
+    next?: string;
   }>;
 }
 
@@ -18,7 +20,9 @@ export default async function PortfolioCreatePage(
   props: PortfolioCreatePageProps,
 ) {
   const { isLoggedIn } = await getServerAuth();
-  const lang = (await props.searchParams).lang || "en";
+  const searchParams = await props.searchParams;
+  const lang = searchParams.lang || "en";
+  const eventSlug = searchParams.eventSlug;
   const { t } = await getServerTranslation(lang, "HomePage");
   const project = {
     portfolioArtworks: {
@@ -27,19 +31,23 @@ export default async function PortfolioCreatePage(
     artworks: null,
   };
   return (
-    <BackgroundDiv className="min-h-screen w-full">
-      <Suspense fallback={<LoadingUserHeader />}>
-        <Header
-          t={t}
-          className="fixed left-0 right-0 top-0 z-30 bg-background/80 backdrop-blur-xs"
-        />
-      </Suspense>
-      <main className="flex min-h-screen w-screen grow flex-col px-2 pt-10 lg:pt-32">
-        <div className="container mx-auto mb-4">
-          <BackButton />
-        </div>
-        <Wrapper />
-      </main>
+    <BackgroundDiv shouldCenter={false} shouldImage={false} eventSlug={eventSlug} className="w-full">
+      <div className="flex w-full flex-col">
+        <Suspense fallback={<LoadingUserHeader />}>
+          <Header
+            t={t}
+            className="bg-background/80 backdrop-blur-xs"
+          />
+        </Suspense>
+        <main className="flex w-full grow flex-col pt-0">
+          <div className="w-full px-4 sm:px-8 md:px-16 mb-4 pt-4">
+            <BackButton />
+          </div>
+          <div className="w-full px-4 sm:px-8 md:px-16">
+            <Wrapper />
+          </div>
+        </main>
+      </div>
     </BackgroundDiv>
   );
 }
@@ -47,3 +55,4 @@ export default async function PortfolioCreatePage(
 // Source: https://github.com/vercel/next.js/issues/74128
 // TODO: Attempt to remove now that we have Next 15.2
 export const dynamic = "force-dynamic";
+

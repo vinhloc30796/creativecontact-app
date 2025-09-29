@@ -10,9 +10,10 @@ import { handleMagicLinkRequest } from '@/app/(public)/(event)/checkin/_utils/ap
 
 interface MagicSignInProps {
   purpose: 'login' | 'checkin';
+  redirectTo?: string;
 }
 
-export function MagicSignIn({ purpose }: MagicSignInProps) {
+export function MagicSignIn({ purpose, redirectTo }: MagicSignInProps) {
   // State
   const [email, setEmail] = useState<string>('');
   const [magicLinkSent, setMagicLinkSent] = useState<boolean>(false);
@@ -20,7 +21,7 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   // I18n
   const { t } = useTranslation('MagicSignIn');
-  const redirectTo = purpose === 'checkin' ? '/checkin' : '/';
+  const fallbackRedirect = purpose === 'checkin' ? '/checkin' : '/';
 
   // Effects
   useEffect(() => {
@@ -45,7 +46,7 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await handleMagicLinkRequest(e, email, setMagicLinkSent, redirectTo);
+      await handleMagicLinkRequest(e, email, setMagicLinkSent, redirectTo ?? fallbackRedirect);
       setCountdown(60);
       localStorage.setItem('magicLinkCountdown', '60');
       localStorage.setItem('magicLinkTimestamp', Date.now().toString());
@@ -56,7 +57,7 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-2 bg-sunglow/10 p-4 mb-2 rounded-md border border-sunglow/40">
+      <div className="flex flex-col gap-2 bg-primary/10 p-4 mb-2 rounded-md border border-primary/40">
         <h1 className="text-2xl font-semibold">{t(`title`)}</h1>
         <p>{t(`${purpose}.description`)}</p>
       </div>
@@ -75,13 +76,13 @@ export function MagicSignIn({ purpose }: MagicSignInProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="focus-visible:ring-sunglow focus-visible:ring-offset-2"
+              className="focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             />
           </div>
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-sunglow text-black hover:bg-yellow-400 focus-visible:ring-yellow-500"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary-600 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {isLoading ? t(`sending`) : t(`send`)}
           </Button>

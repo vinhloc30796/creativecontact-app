@@ -99,7 +99,7 @@ export default async function EventPage(props: EventPageProps) {
 
     console.log("[EventPage] About to render component");
     return (
-      <BackgroundDiv eventSlug={eventSlug} shouldCenter={false}>
+      <BackgroundDiv eventSlug={eventSlug} shouldCenter={true} shouldImage={true}>
         <div className="flex min-h-screen w-full flex-col">
           {/* Header section */}
           <EventHeader
@@ -123,6 +123,8 @@ export default async function EventPage(props: EventPageProps) {
 
           {/* Main content area */}
           <main className="relative z-20 mt-10 w-full grow justify-between lg:mt-20">
+            {/* Spacer to push artworks below the fold */}
+            <div className="h-screen" aria-hidden="true" />
             <div className="w-full px-4 sm:px-8 md:px-16">
               {/* Render artwork cards */}
               {shuffledArtworks.map((artwork, index) => (

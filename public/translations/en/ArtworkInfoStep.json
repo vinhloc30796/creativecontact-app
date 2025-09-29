@@ -19,7 +19,7 @@
     "description": "Select an existing artwork if you want to update an existing artwork",
     "noArtworksFound": "No artworks found",
     "error": "Error loading artworks. Please try again.",
-    "existingArtworksCount": "Existing artworks",
+    "existingArtworksCount": "Existing Artworks",
     "noExistingArtworks": "No existing artworks found",
     "selectArtworkTitle": "Your Existing Artworks",
     "selectArtworkDescription": "Here are the artworks you have uploaded to this event"

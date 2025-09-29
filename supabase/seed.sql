@@ -279,32 +279,45 @@ INSERT INTO user_industry_experience (user_id, industry, experience_level) VALUE
 
 
 -- Seed data for events table
-INSERT INTO events (id, created_at, name, slug, created_by)
+INSERT INTO events (id, created_at, name, slug, created_by, summary_i18n)
 VALUES (
     '10177076-f591-49c8-a87d-042ba7aa6345', -- Random UUID
     CURRENT_TIMESTAMP, -- Current timestamp
     'Hoàn Tất 2024',
     'hoantat-2024',
-    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', -- Assuming this is a valid user UUID
+    '{"en": "Community showcase concluding 2024.", "vi": "Sự kiện cộng đồng khép lại năm 2024."}'::jsonb
 );
 
-INSERT INTO events (id, created_at, name, slug, created_by, time_end)
+INSERT INTO events (id, created_at, name, slug, created_by, time_end, summary_i18n)
 VALUES (
     '9419ee07-81ed-4114-8143-1fff084d019a', -- Random UUID
     CURRENT_TIMESTAMP, -- Current timestamp
     'Trung Thu Creative Archive 2024',
     'trungthu-archive-2024',
     '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', -- Assuming this is a valid user UUID
-    '2024-10-01 00:00:00+00' -- Oct 1st, 2024
+    '2024-10-01 00:00:00+00', -- Oct 1st, 2024
+    '{"en": "Trung Thu Creative Archive (TTCA) is a community-driven archive of works, ideas, and stories about Mid-Autumn, contributed by creators across disciplines.", "vi": "Trung Thu Creative Archive (TTCA) là nơi lưu giữ và lan tỏa các tác phẩm, ý tưởng và câu chuyện về Trung thu do cộng đồng tất cả các ngành sáng tạo cùng đóng góp."}'::jsonb
 );
 
-INSERT INTO events (id, created_at, name, slug, created_by)
+INSERT INTO events (id, created_at, name, slug, created_by, summary_i18n)
 VALUES (
     '849fb451-1129-4f6a-8daf-9ad32a26c172', -- Random UUID
     CURRENT_TIMESTAMP, -- Current timestamp
     'Early Access 2024',
     'early-access-2024',
-    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d' -- Assuming this is a valid user UUID
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', -- Assuming this is a valid user UUID
+    '{"en": "Early Access 2024 program for Creative Contact features and events.", "vi": "Chương trình Early Access 2024 cho các tính năng và sự kiện Creative Contact."}'::jsonb
+);
+
+INSERT INTO events (id, created_at, name, slug, created_by, summary_i18n)
+VALUES (
+    'd8d2b8e9-7a2d-4c1a-9c2f-4f9b8a6c1b2e', -- Random UUID
+    CURRENT_TIMESTAMP, -- Current timestamp
+    'Chung Thu 2025',
+    'trungthu-archive-2025',
+    '7c37e6b3-5e62-4f76-b67c-0d5a42b92a2d', -- Assuming this is a valid user UUID
+    '{"en": "Trung Thu Creative Archive (TTCA) is a community-driven archive of works, ideas, and stories about Mid-Autumn, contributed by creators across disciplines.", "vi": "Trung Thu Creative Archive (TTCA) là nơi lưu giữ và lan tỏa các tác phẩm, ý tưởng và câu chuyện về Trung thu do cộng đồng tất cả các ngành sáng tạo cùng đóng góp."}'::jsonb
 );
 
 -- Static special slot

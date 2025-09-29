@@ -138,7 +138,7 @@ export default async function ArtworkPage(props: ArtworkPageProps) {
   );
 
   return (
-    <BackgroundDiv eventSlug={eventSlug || undefined} shouldCenter={false}>
+    <BackgroundDiv eventSlug={eventSlug || undefined} shouldCenter={false} shouldImage={true}>
       <div className="mx-auto flex h-screen flex-col">
         {/* Header section */}
         <EventHeader

@@ -13,7 +13,8 @@ export async function fetchRecentEvents(limit: number = 5) {
         name: true,
         slug: true,
         time_end: true,
-        created_at: true
+        created_at: true,
+        summary_i18n: true
       }
     });
 

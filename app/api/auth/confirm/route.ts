@@ -2,6 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { getAdminSupabaseClient } from "@/utils/supabase/server-admin";
 import { NextRequest, NextResponse } from "next/server";
+import { type EmailOtpType } from "@supabase/supabase-js";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -9,7 +10,29 @@ export async function GET(request: NextRequest) {
   const token = requestUrl.searchParams.get("token");
   const type = requestUrl.searchParams.get("type");
   const ignoreOtpExpired = requestUrl.searchParams.get("ignoreOtpExpired") === "true";
-  const redirectTo = requestUrl.searchParams.get("redirect_to") || "/";
+  // Prefer "redirect_to" (our email builder param), fallback to legacy "next"
+  const redirectToRaw = requestUrl.searchParams.get("redirect_to") || requestUrl.searchParams.get("next") || "/";
+
+  // Validate and normalize redirect target to prevent open redirects
+  const getSafeRedirect = (raw: string): string => {
+    try {
+      // Allow relative URLs
+      if (raw.startsWith("/")) return raw;
+      // Allow absolute URL if it matches our app origin
+      const appOrigin = process.env.NEXT_PUBLIC_APP_URL;
+      if (appOrigin) {
+        const appUrl = new URL(appOrigin);
+        const target = new URL(raw);
+        if (target.origin === appUrl.origin) {
+          return target.pathname + (target.search || "");
+        }
+      }
+    } catch {
+      // fall through to default
+    }
+    return "/";
+  };
+  const redirectTo = getSafeRedirect(redirectToRaw);
 
   if (!token || !type) {
     return NextResponse.redirect("/error");
@@ -24,11 +47,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid session data" }, { status: 400 });
     }
 
-    // Now verify the OTP
-    console.log("Verifying OTP for email:", email, "with token:", token);
+    // Now verify the OTP using the provided type (e.g. "magiclink")
+    console.log("Verifying OTP for email:", email, "with token:", token, "type:", type);
+    const emailOtpType = (type as EmailOtpType) || "magiclink";
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: token,
-      type: 'email'
+      type: emailOtpType,
     });
 
     if (error) {

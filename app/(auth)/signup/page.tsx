@@ -1,25 +1,25 @@
 'use client'
 
-import React, { useState, useEffect, use, Suspense } from 'react';
-import { useForm, FormProvider, UseFormReturn } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button } from '@/components/ui/button'
-import { ContactInfoStep } from '@/components/user/ContactInfoStep'
-import { ProfessionalInfoStep } from '@/components/user/ProfessionalInfoStep'
-import { useTranslation } from '@/lib/i18n/init-client'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { useFormUserId } from '@/hooks/useFormUserId'
-import { writeUserInfo } from '@/app/actions/user/writeUserInfo'
-import { useRouter } from 'next/navigation'
-import { contactInfoSchema, ContactInfoData } from '@/app/form-schemas/contact-info'
-import { professionalInfoSchema, ProfessionalInfoData } from '@/app/form-schemas/professional-info'
-import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv'
-import { IndustryType, ExperienceType } from '@/drizzle/schema/user'
+import { writeUserInfo } from '@/app/actions/user/writeUserInfo';
+import { ContactInfoData, contactInfoSchema } from '@/app/form-schemas/contact-info';
+import { ProfessionalInfoData, professionalInfoSchema } from '@/app/form-schemas/professional-info';
 import { Loading } from '@/components/Loading';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { HeroTitle } from '@/components/ui/typography';
+import { ContactInfoStep } from '@/components/user/ContactInfoStep';
+import { ProfessionalInfoStep } from '@/components/user/ProfessionalInfoStep';
+import { BackgroundDiv } from '@/components/wrappers/BackgroundDiv';
+import { ExperienceType, IndustryType } from '@/drizzle/schema/user';
+import { useFormUserId } from '@/hooks/useFormUserId';
+import { useTranslation } from '@/lib/i18n/init-client';
 import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { FormProvider, useForm, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
 
 const signupSchema = z.object({
   ...contactInfoSchema.shape,
@@ -36,8 +36,8 @@ export default function SignupPage(
     }>;
   }
 ) {
-  const searchParams = use(props.searchParams);
-  const lang = searchParams.lang || "en";
+  const searchParams = useSearchParams();
+  const lang = searchParams.get("lang") || "en";
   const [step, setStep] = useState(0)
   const { t } = useTranslation(lang, ['formSteps'])
   const router = useRouter()

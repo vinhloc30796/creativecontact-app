@@ -19,7 +19,7 @@ export function makeEventSeed(data: EventSeedData) {
     try {
       const payload = await getPayload({ config: configPromise })
       const created = await payload.create({ collection: 'events', data })
-      console.log(`✓ seeded event '${data.slug}'`) 
+      console.log(`✓ seeded event '${data.slug}'`)
     } catch (error) {
       console.error('Error seeding event', data.slug, error)
       throw error

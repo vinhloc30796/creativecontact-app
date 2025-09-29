@@ -9,6 +9,7 @@ import {
   timestamp,
   unique,
   uuid,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { authUsers } from "./user";
 
@@ -20,6 +21,7 @@ export const events = pgTable("events", {
   slug: text("slug").notNull().unique(),
   created_by: uuid("created_by"),
   time_end: timestamp("time_end", { withTimezone: true }),
+  summary_i18n: jsonb("summary_i18n"),
 });
 
 export const eventSlots = pgTable("event_slots", {

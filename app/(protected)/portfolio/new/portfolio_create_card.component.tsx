@@ -1,8 +1,11 @@
 "use client";
 import { ArtworkCreditInfoData } from "@/app/form-schemas/artwork-credit-info";
 import { ArtworkInfoData } from "@/app/form-schemas/artwork-info";
-import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader } from "@/components/ui/card";
+import { BorderlessCard, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArtworkInfoStep } from "@/components/artwork/ArtworkInfoStep";
+import { ArtworkCreditInfoStep } from "@/components/artwork/ArtworkCreditInfoStep";
+import DataUsage from "@/components/uploads/DataUsage";
+import { PortfolioEditorShell } from "../PortfolioEditorShell";
 import {
   Dialog,
   DialogContent,
@@ -10,28 +13,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { FormProvider, useForm } from "react-hook-form";
 import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslation } from "@/lib/i18n/init-client";
 import { useUploadStore } from "@/stores/uploadStore";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { v4 } from "uuid";
 import { handleSubmit } from "./action.client";
-import AddCoOwner from "./add_coowner.component";
-import { useFileUpload } from "./files_uplooad_provider.component";
-import { MediaUploadComponent } from "./media_upload.component";
-import UploadInfo from "./upload_info.component";
+import { MediaUpload } from "@/components/uploads/media-upload";
+import { ThumbnailProvider, useThumbnail } from "@/contexts/ThumbnailContext";
+import EventMultiSelect, { EventOption } from "@/components/events/EventMultiSelect";
+
+interface ThumbnailRefBridgeProps {
+  onChange: (name: string | null) => void;
+}
+
+function ThumbnailRefBridge({ onChange }: ThumbnailRefBridgeProps) {
+  const { thumbnailFileName } = useThumbnail();
+  useEffect(() => {
+    onChange(thumbnailFileName);
+  }, [thumbnailFileName, onChange]);
+  return null;
+}
 
 interface PortfolioCreateCardProps {
   project?: {
@@ -42,9 +47,13 @@ interface PortfolioCreateCardProps {
 }
 export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   const router = useRouter();
-  const { fileUploads, thumbnailFileName } = useFileUpload();
+  const searchParams = useSearchParams();
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const thumbnailRef = useRef<string | null>(null);
   const { t } = useTranslation("en", ["Portfolio", "ArtworkInfoStep"]);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [selectedEvents, setSelectedEvents] = useState<EventOption[]>([]);
+  const [eventsLocked, setEventsLocked] = useState(false);
 
   const {
     uploadProgress,
@@ -71,6 +80,29 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     },
   });
 
+  // Prefill from ?eventSlug and lock if present
+  useEffect(() => {
+    const eventSlug = searchParams.get("eventSlug");
+    let ignore = false;
+    async function run() {
+      if (eventSlug) {
+        try {
+          const rs = await fetch(`/api/events/${encodeURIComponent(eventSlug)}`);
+          if (!rs.ok) return;
+          const data = await rs.json();
+          if (!ignore && data?.id) {
+            setSelectedEvents([{ id: data.id, name: data.name, slug: data.slug }] as EventOption[]);
+            setEventsLocked(true);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+    run();
+    return () => { ignore = true; };
+  }, [searchParams]);
+
   async function onSubmit() {
     setSubmitLoading(true);
     resetUploadProgress();
@@ -78,8 +110,8 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
     const rs = await handleSubmit(
       artworkForm.getValues(),
       { id: projectId },
-      fileUploads,
-      thumbnailFileName,
+      pendingFiles,
+      thumbnailRef.current || "thumbnail.jpg",
       (progress, uploadedCount, totalCount) => {
         setUploadProgress(progress, uploadedCount, totalCount);
       },
@@ -87,10 +119,28 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
 
     setSubmitLoading(false);
     if (rs) {
+      try {
+        // After creation, set artwork events to selectedEvents
+        const eventIds = selectedEvents.map((e) => e.id);
+        if (eventIds.length > 0) {
+          await fetch(`/api/artworks/${encodeURIComponent(artworkForm.getValues().id)}/events`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ eventIds }),
+          });
+        }
+      } catch {
+        // non-blocking
+      }
       toast.success(t("form.toast.success.title"), {
         duration: 5000,
       });
-      router.push("/profile#portfolio?projectId=" + projectId);
+      const nextUrl = searchParams.get("next");
+      if (nextUrl && nextUrl.startsWith("/")) {
+        router.push(nextUrl);
+      } else {
+        router.push("/profile#portfolio?projectId=" + projectId);
+      }
     } else {
       toast.error(t("form.toast.error.title"), {
         duration: 5000,
@@ -99,83 +149,66 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
   }
 
   return (
-    <Card className="container mb-4 max-h-full w-full grow justify-between gap-4 px-4 md:mx-auto lg:flex rounded-none">
-      <div className="position-absolute grow">
-        <CardHeader>
-          <FormProvider {...artworkForm}>
-            <FormField
-              control={artworkForm.control}
-              name="title"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>
-                      {t("title.label", { ns: "ArtworkInfoStep" })}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("title.placeholder", {
-                          ns: "ArtworkInfoStep",
-                        })}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
-            />
-            <FormField
-              control={artworkForm.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {t("description.label", { ns: "ArtworkInfoStep" })}
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("description.placeholder", {
-                        ns: "ArtworkInfoStep",
-                      })}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </FormProvider>
-        </CardHeader>
-        <div className="container px-6">
-          <MediaUploadComponent />
+    <PortfolioEditorShell
+      title={t("newProject", { ns: "Portfolio" })}
+      primaryLabel={submitLoading ? t("form.submit.submitting") : t("form.submit.create")}
+      secondaryLabel={t("cancel")}
+      onPrimary={onSubmit}
+      onSecondary={() => { artworkForm.reset(); artworkCreditForm.reset(); setPendingFiles([]); }}
+      rightRail={(
+        <div className="flex flex-col gap-4">
+          <BorderlessCard className="w-full">
+            <CardHeader>
+              <CardTitle>{t("creditInfo", { ns: "Portfolio" })}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormProvider {...artworkCreditForm}>
+                <ArtworkCreditInfoStep form={artworkCreditForm as any} />
+              </FormProvider>
+            </CardContent>
+          </BorderlessCard>
+          <BorderlessCard className="w-full">
+            <CardHeader>
+              <CardTitle>{t("dataUsage", { ns: "Portfolio" })}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <DataUsage dataUsage={0} fileCount={pendingFiles.length} maxSizeMB={25} />
+            </CardContent>
+          </BorderlessCard>
         </div>
-      </div>
-      <CardFooter className="flex flex-col items-start gap-2 p-4 md:min-w-[400px] lg:gap-4">
-        <AddCoOwner artworkCreditForm={artworkCreditForm} />
-        <UploadInfo />
-        <div className="flex w-full flex-col gap-2 pt-10">
-          <Button
-            className="w-full rounded-none border"
-            onClick={onSubmit}
-            disabled={submitLoading}
-          >
-            {submitLoading
-              ? t("form.submit.submitting")
-              : t("form.submit.create")}
-          </Button>
-          <Button
-            className="w-full rounded-none underline"
-            variant={"secondary"}
-            onClick={() => {
-              artworkForm.reset();
-              artworkCreditForm.reset();
+      )}
+    >
+      <div className="flex flex-col space-y-8">
+        <FormProvider {...artworkForm}>
+          <ArtworkInfoStep
+            form={artworkForm as any}
+            artworksCount={0}
+            artworks={[]}
+            showExistingArtworksHelper={false}
+          />
+        </FormProvider>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">{t("Related Events", { ns: "Portfolio" })}</label>
+          <EventMultiSelect
+            value={selectedEvents}
+            onChange={setSelectedEvents}
+            disabled={eventsLocked}
+            prefilledNote={eventsLocked ? t("Prefilled from event context", { ns: "Portfolio" }) : null}
+            lockReason={eventsLocked ? t("This association is locked by ?eventSlug", { ns: "Portfolio" }) : null}
+          />
+        </div>
+        <ThumbnailProvider>
+          <ThumbnailRefBridge onChange={(name) => { thumbnailRef.current = name; }} />
+          <MediaUpload
+            dataUsage={0}
+            isNewArtwork={true}
+            emailLink="/contact"
+            onPendingFilesUpdate={(files) => {
+              setPendingFiles(files);
             }}
-          >
-            {t("cancel")}
-          </Button>
-        </div>
-      </CardFooter>
+          />
+        </ThumbnailProvider>
+      </div>
 
       {submitLoading && uploadProgress > 0 && (
         <Dialog open={true} onOpenChange={() => { }}>
@@ -190,16 +223,13 @@ export default function PortfolioCreateCard(props: PortfolioCreateCardProps) {
             </DialogHeader>
             <div className="space-y-3 py-4">
               <p className="text-sm text-gray-700">
-                {t("UploadProgress.fileCount", {
-                  current: uploadedFileCount,
-                  total: totalFileCount,
-                })}
+                {t("UploadProgress.fileCount", { current: uploadedFileCount, total: totalFileCount })}
               </p>
               <Progress value={uploadProgress} className="mt-2 w-full" />
             </div>
           </DialogContent>
         </Dialog>
       )}
-    </Card>
+    </PortfolioEditorShell>
   );
 }
