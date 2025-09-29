@@ -106,9 +106,22 @@ export async function setArtworkEventsTransaction(
     const toDelete = mode === "set" ? [...currentIds].filter((id) => !desiredIds.has(id)) : [];
 
     if (toInsert.length > 0) {
-      await tx.insert(artworkEvents).values(
-        toInsert.map((eventId) => ({ artworkId, eventId })),
-      );
+      try {
+        await tx.insert(artworkEvents).values(
+          toInsert.map((eventId) => ({ artworkId, eventId })),
+        );
+      } catch (error) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "code" in error &&
+          (error as { code: string }).code === "23505"
+        ) {
+          // already linked by a concurrent transaction; safe to proceed
+        } else {
+          throw error;
+        }
+      }
     }
     if (toDelete.length > 0) {
       await tx
