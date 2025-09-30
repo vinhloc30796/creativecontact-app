@@ -173,10 +173,6 @@ export default function SignupPage(
       >
         <Suspense fallback={<Loading />}>
           <Card className="w-[90%] max-w-[420px] overflow-hidden border-4 border-black shadow-[4px_4px_0_0_#000]">
-            {/* Mobile banner */}
-            <CardHeader
-              className="aspect-video md:hidden bg-[url('/banner.jpg')] bg-cover bg-center relative"
-            />
             <CardContent className="p-6 flex flex-col gap-6">
               {/* Brand heading */}
               <HeroTitle
