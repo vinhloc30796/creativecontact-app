@@ -41,7 +41,6 @@ export default async function LoginPage({
         >
           <Suspense fallback={<Loading />}>
             <Card className="w-[90%] max-w-[420px] overflow-hidden border-4 border-black shadow-[4px_4px_0_0_#000]">
-              <CardHeader className="aspect-video bg-cover bg-center relative" />
               <CardContent className="p-6 flex flex-col gap-6">
                 <HeroTitle
                   size="small"
