@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
   const redirectTo = getSafeRedirect(redirectToRaw);
 
   if (!token || !type) {
-    return NextResponse.redirect("/error");
+    return NextResponse.redirect(new URL("/error", request.url));
   }
 
   try {
@@ -77,13 +77,13 @@ export async function GET(request: NextRequest) {
       console.log("Auth update error:", authUpdateError);
       // Successfully verified and logged in
       // Set the session in a cookie
-      const response = NextResponse.redirect(redirectTo);
+      const response = NextResponse.redirect(new URL(redirectTo, request.url));
       await supabase.auth.setSession(data.session);
 
       return response;
     } else {
       // Verification successful but no session created (unlikely scenario)
-      return NextResponse.redirect(redirectTo);
+      return NextResponse.redirect(new URL(redirectTo, request.url));
     }
   } catch (error) {
     console.error("Unexpected error during OTP verification:", error);
